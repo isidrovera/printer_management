@@ -16,6 +16,13 @@ class Agent(AgentBase):
     id: int
     token: str
     status: str
-    
+
     class Config:
         from_attributes = True
+
+class AgentUpdate(BaseModel):
+    hostname: Optional[str] = None
+    username: Optional[str] = None
+    ip_address: Optional[str] = None
+    device_type: Optional[str] = None
+    system_info: Optional[Dict] = None
