@@ -5,7 +5,7 @@ from datetime import datetime
 class AgentService:
     def __init__(self, db_session):
         self.db = db_session
-    
+
     async def register_agent(
         self, 
         client_token: str,
@@ -48,3 +48,10 @@ class AgentService:
             self.db.commit()
             return agent
         return None
+
+    async def get_agents(self, skip: int = 0, limit: int = 100):
+        """
+        Devuelve una lista de agentes, con paginación.
+        """
+        agents = self.db.query(Agent).offset(skip).limit(limit).all()
+        return agents
