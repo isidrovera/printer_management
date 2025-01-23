@@ -6,7 +6,7 @@ from app.core.config import settings
 from app.api.v1.api import api_router
 from app.api.v1.endpoints import web
 from app.db.session import engine
-from app.db.models.base import Base  # Agrega esta línea
+from app.db.base import Base  # Agrega esta línea
 
 app = FastAPI(title=settings.PROJECT_NAME)
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
