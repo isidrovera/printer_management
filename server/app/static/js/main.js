@@ -51,7 +51,7 @@ function installPrinter() {
 
 // WebSocket
 function connectWebSocket() {
-   ws = new WebSocket(`ws://${window.location.host}/api/v1/ws/status`);
+   ws = new WebSocket(`ws://${window.location.host}/api/v1/status`);
    
    ws.onopen = () => {
        console.log('WebSocket conectado');
