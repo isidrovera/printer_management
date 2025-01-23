@@ -10,6 +10,10 @@ from app.services.driver_service import DriverService
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
 
+@router.get("/")
+async def index(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
+
 @router.get("/clients")
 async def list_clients(request: Request, db: Session = Depends(get_db)):
     client_service = ClientService(db)
