@@ -63,12 +63,11 @@ async def create_client(request: Request, db: Session = Depends(get_db)):
 
 @router.get("/agents")
 async def list_agents(request: Request, db: Session = Depends(get_db)):
-    """
-    Renderiza la lista de agentes con los datos necesarios.
-    """
     agent_service = AgentService(db)
-    agents = await agent_service.get_agents(skip=0, limit=100)  # Obtiene los agentes
-    drivers = await agent_service.get_drivers()  # Obtiene la lista de drivers
+    agents = await agent_service.get_agents(skip=0, limit=100)
+    print(f"Agentes obtenidos: {agents}")  # Debug
+    drivers = await agent_service.get_drivers()
+    print(f"Drivers obtenidos: {drivers}")  # Debug
     return templates.TemplateResponse(
         "agents/agents.html",
         {"request": request, "agents": agents, "drivers": drivers}
