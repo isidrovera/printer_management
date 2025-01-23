@@ -46,21 +46,23 @@ function confirmDelete(type, id) {
  }
  
  // Actualización de estado en tiempo real vía WebSocket
- let ws;
- function connectWebSocket() {
+ // En static/js/main.js
+let ws;
+
+function connectWebSocket() {
     ws = new WebSocket(`ws://${window.location.host}/api/v1/ws/status`);
-    
     ws.onmessage = function(event) {
-        const data = JSON.parse(event.data);
-        if (data.type === 'status_update') {
-            updateAgentStatus(data.agent_id, data.status);
-        }
+        console.log("WebSocket message received:", event.data);
     };
- 
-    ws.onclose = function() {
-        setTimeout(connectWebSocket, 1000);
+    ws.onerror = function(error) {
+        console.error("WebSocket error:", error);
     };
- }
+}
+
+// Solo conectar si estamos en una página que necesita WebSocket
+if (document.querySelector('.status-updates')) {
+    connectWebSocket();
+}
  
  function updateAgentStatus(agentId, status) {
     const statusCell = document.querySelector(`[data-agent-id="${agentId}"] .status`);

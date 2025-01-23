@@ -5,6 +5,8 @@ from app.db.session import get_db
 from app.services.websocket_manager import ws_manager
 from app.services.agent_service import AgentService
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi import WebSocket, WebSocketDisconnect
+from typing import Dict
 
 router = APIRouter()
 
@@ -33,11 +35,29 @@ async def websocket_endpoint(
         ws_manager.disconnect(agent_token)
 
 
+class ConnectionManager:
+    def __init__(self):
+        self.active_connections: Dict[str, WebSocket] = {}
+
+    async def connect(self, websocket: WebSocket):
+        await websocket.accept()
+        self.active_connections[id(websocket)] = websocket
+
+    def disconnect(self, websocket: WebSocket):
+        del self.active_connections[id(websocket)]
+
+    async def broadcast(self, message: str):
+        for connection in self.active_connections.values():
+            await connection.send_text(message)
+
+manager = ConnectionManager()
+
 @router.websocket("/status")
 async def status_websocket(websocket: WebSocket):
     await manager.connect(websocket)
     try:
         while True:
-            await websocket.receive_text()
+            data = await websocket.receive_text()
+            await manager.broadcast(data)
     except WebSocketDisconnect:
         manager.disconnect(websocket)
