@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Inicio{% endblock %}
+{% block content %}
+<h1>Sistema de Gestión de Impresoras</h1>
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Clientes</h5>
+                <a href="/clients" class="btn btn-primary">Gestionar</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Agentes</h5>
+                <a href="/agents" class="btn btn-primary">Gestionar</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Drivers</h5>
+                <a href="/drivers" class="btn btn-primary">Gestionar</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
