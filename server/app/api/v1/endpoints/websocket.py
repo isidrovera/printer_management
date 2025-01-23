@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.services.websocket_manager import ws_manager
 from app.services.agent_service import AgentService
+from fastapi.middleware.cors import CORSMiddleware
 
 router = APIRouter()
 
@@ -30,3 +31,13 @@ async def websocket_endpoint(
         print(f"WebSocket error: {e}")
     finally:
         ws_manager.disconnect(agent_token)
+
+
+@router.websocket("/status")
+async def status_websocket(websocket: WebSocket):
+    await manager.connect(websocket)
+    try:
+        while True:
+            await websocket.receive_text()
+    except WebSocketDisconnect:
+        manager.disconnect(websocket)
