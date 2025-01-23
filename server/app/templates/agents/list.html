@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Agentes{% endblock %}
+{% block content %}
+<h2>Agentes</h2>
+<table class="table">
+   <thead>
+       <tr>
+           <th>Cliente</th>
+           <th>Hostname</th>
+           <th>Usuario</th>
+           <th>IP</th>
+           <th>Tipo</th>
+           <th>Estado</th>
+           <th>Acciones</th>
+       </tr>
+   </thead>
+   <tbody>
+       {% for agent in agents %}
+       <tr>
+           <td>{{ agent.client.name }}</td>
+           <td>{{ agent.hostname }}</td>
+           <td>{{ agent.username }}</td>
+           <td>{{ agent.ip_address }}</td>
+           <td>{{ agent.device_type }}</td>
+           <td class="status-{{ agent.status }}">{{ agent.status }}</td>
+           <td>
+               <button onclick="showInstallPrinter({{ agent.id }})" class="btn btn-sm btn-primary">Instalar Impresora</button>
+               <button onclick="confirmDelete('agent', {{ agent.id }})" class="btn btn-sm btn-danger">Eliminar</button>
+           </td>
+       </tr>
+       {% endfor %}
+   </tbody>
+</table>
+
+<!-- Modal Instalar Impresora -->
+<div class="modal fade" id="installPrinterModal">
+   <div class="modal-dialog">
+       <div class="modal-content">
+           <div class="modal-header">
+               <h5 class="modal-title">Instalar Impresora</h5>
+               <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+           </div>
+           <div class="modal-body">
+               <form id="installPrinterForm">
+                   <input type="hidden" id="agentId">
+                   <div class="mb-3">
+                       <label class="form-label">Driver</label>
+                       <select class="form-select" id="driverId" required>
+                           <option value="">Seleccione un driver</option>
+                           {% for driver in drivers %}
+                           <option value="{{ driver.id }}">{{ driver.manufacturer }} {{ driver.model }}</option>
+                           {% endfor %}
+                       </select>
+                   </div>
+                   <div class="mb-3">
+                       <label class="form-label">IP Impresora</label>
+                       <input type="text" class="form-control" id="printerIp" required>
+                   </div>
+               </form>
+           </div>
+           <div class="modal-footer">
+               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+               <button type="button" class="btn btn-primary" onclick="installPrinter()">Instalar</button>
+           </div>
+       </div>
+   </div>
+</div>
+{% endblock %}

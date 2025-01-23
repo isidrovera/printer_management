@@ -1,48 +1,33 @@
-
 {% extends "base.html" %}
 {% block title %}Clientes{% endblock %}
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Clientes</h2>
-    <a href="/clients/create" class="btn btn-primary">Nuevo Cliente</a>
+<div class="d-flex justify-content-between mb-4">
+   <h2>Clientes</h2>
+   <a href="/clients/create" class="btn btn-primary">Nuevo Cliente</a>
 </div>
 <table class="table">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Nombre</th>
-            <th>Token</th>
-            <th>Estado</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for client in clients %}
-        <tr>
-            <td>{{ client.id }}</td>
-            <td>{{ client.name }}</td>
-            <td>{{ client.token }}</td>
-            <td>{{ "Activo" if client.is_active else "Inactivo" }}</td>
-            <td>
-                <a href="/clients/{{ client.id }}/edit" class="btn btn-sm btn-warning">Editar</a>
-                <button onclick="deleteClient({{ client.id }})" class="btn btn-sm btn-danger">Eliminar</button>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
+   <thead>
+       <tr>
+           <th>ID</th>
+           <th>Nombre</th>
+           <th>Token</th>
+           <th>Estado</th>
+           <th>Acciones</th>
+       </tr>
+   </thead>
+   <tbody>
+       {% for client in clients %}
+       <tr>
+           <td>{{ client.id }}</td>
+           <td>{{ client.name }}</td>
+           <td>{{ client.token }}</td>
+           <td>{{ "Activo" if client.is_active else "Inactivo" }}</td>
+           <td>
+               <a href="/clients/{{ client.id }}/edit" class="btn btn-sm btn-warning">Editar</a>
+               <button onclick="confirmDelete('client', {{ client.id }})" class="btn btn-sm btn-danger">Eliminar</button>
+           </td>
+       </tr>
+       {% endfor %}
+   </tbody>
 </table>
-
-<script>
-function deleteClient(id) {
-    if (confirm('¿Está seguro de eliminar este cliente?')) {
-        fetch(`/api/v1/clients/${id}`, {
-            method: 'DELETE'
-        }).then(response => {
-            if (response.ok) {
-                window.location.reload();
-            }
-        });
-    }
-}
-</script>
 {% endblock %}

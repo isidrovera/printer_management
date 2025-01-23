@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}{{ "Editar" if driver else "Nuevo" }} Driver{% endblock %}
+{% block content %}
+<div class="card">
+   <div class="card-header">
+       <h3>{{ "Editar" if driver else "Nuevo" }} Driver</h3>
+   </div>
+   <div class="card-body">
+       <form method="POST" enctype="multipart/form-data">
+           <div class="mb-3">
+               <label class="form-label">Fabricante</label>
+               <input type="text" name="manufacturer" class="form-control" value="{{ driver.manufacturer if driver else '' }}" required>
+           </div>
+           <div class="mb-3">
+               <label class="form-label">Modelo</label>
+               <input type="text" name="model" class="form-control" value="{{ driver.model if driver else '' }}" required>
+           </div>
+           {% if not driver %}
+           <div class="mb-3">
+               <label class="form-label">Archivo Driver (ZIP)</label>
+               <input type="file" name="driver_file" class="form-control" accept=".zip" required>
+           </div>
+           {% endif %}
+           <div class="mb-3">
+               <label class="form-label">Descripción</label>
+               <textarea name="description" class="form-control" rows="3">{{ driver.description if driver else '' }}</textarea>
+           </div>
+           <button type="submit" class="btn btn-primary">Guardar</button>
+           <a href="/drivers" class="btn btn-secondary">Cancelar</a>
+       </form>
+   </div>
+</div>
+{% endblock %}

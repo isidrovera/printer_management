@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Drivers{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between mb-4">
+   <h2>Drivers</h2>
+   <a href="/drivers/create" class="btn btn-primary">Nuevo Driver</a>
+</div>
+<table class="table">
+   <thead>
+       <tr>
+           <th>Fabricante</th>
+           <th>Modelo</th>
+           <th>Archivo INF</th>
+           <th>Descripción</th>
+           <th>Acciones</th>
+       </tr>
+   </thead>
+   <tbody>
+       {% for driver in drivers %}
+       <tr>
+           <td>{{ driver.manufacturer }}</td>
+           <td>{{ driver.model }}</td>
+           <td>{{ driver.inf_path }}</td>
+           <td>{{ driver.description }}</td>
+           <td>
+               <a href="/drivers/{{ driver.id }}/edit" class="btn btn-sm btn-warning">Editar</a>
+               <button onclick="confirmDelete('driver', {{ driver.id }})" class="btn btn-sm btn-danger">Eliminar</button>
+           </td>
+       </tr>
+       {% endfor %}
+   </tbody>
+</table>
+{% endblock %}
+
