@@ -60,3 +60,16 @@ async def create_client(request: Request, db: Session = Depends(get_db)):
             "clients/form.html",
             {"request": request, "client": None, "error": str(e)}
         )
+
+@router.get("/agents")
+async def list_agents(request: Request, db: Session = Depends(get_db)):
+    """
+    Renderiza la lista de agentes con los datos necesarios.
+    """
+    agent_service = AgentService(db)
+    agents = await agent_service.get_agents(skip=0, limit=100)  # Obtiene los agentes
+    drivers = await agent_service.get_drivers()  # Obtiene la lista de drivers
+    return templates.TemplateResponse(
+        "agents/agents.html",
+        {"request": request, "agents": agents, "drivers": drivers}
+    )
