@@ -4,20 +4,6 @@ let ws;
 let reconnectAttempts = 0;
 const MAX_RECONNECT_ATTEMPTS = 5;
 
-// Funciones de confirmación y eliminación
-function confirmDelete(type, id) {
-   if (confirm(`¿Está seguro de eliminar este ${type}?`)) {
-       fetch(`/api/v1/${type}s/${id}`, {
-           method: 'DELETE'
-       }).then(response => {
-           if (response.ok) {
-               window.location.reload();
-           } else {
-               alert('Error al eliminar');
-           }
-       });
-   }
-}
 
 // Gestión de modal de instalación de impresora
 function showInstallPrinter(agentId) {

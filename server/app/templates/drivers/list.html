@@ -33,7 +33,7 @@
 <script>
     function confirmDelete(type, id) {
         if (confirm('¿Estás seguro de eliminar este elemento?')) {
-            fetch(`/drivers/${id}`, {
+            fetch(`/drivers/${id}`, {  // Removido /api/v1/
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json'
