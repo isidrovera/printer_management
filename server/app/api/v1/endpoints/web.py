@@ -62,6 +62,21 @@ async def create_client(request: Request, db: Session = Depends(get_db)):
             {"request": request, "client": None, "error": str(e)}
         )
 
+@router.delete("/api/v1/clients/{client_id}")
+async def delete_client(client_id: int, db: Session = Depends(get_db)):
+    try:
+        client_service = ClientService(db)
+        client = await client_service.get_by_id(client_id)
+        if not client:
+            return {"success": False, "error": "Cliente no encontrado"}, 404
+
+        deleted = await client_service.delete(client_id)
+        return {"success": True} if deleted else {"success": False, "error": "Error al eliminar cliente"}
+    except Exception as e:
+        logger.error(f"Error eliminando cliente: {str(e)}")
+        return {"success": False, "error": str(e)}
+
+
 @router.get("/agents")
 async def list_agents(request: Request, db: Session = Depends(get_db)):
     agent_service = AgentService(db)
