@@ -15,13 +15,13 @@ Base = declarative_base(metadata=metadata)
 
 @event.listens_for(Base.metadata, 'after_create')
 def create_ddl(target, connection, **kw):
-    tables = connection.execute("SELECT tablename FROM pg_tables WHERE schemaname = 'public'").fetchall()
+    from sqlalchemy import text
+    tables = connection.execute(text("SELECT tablename FROM pg_tables WHERE schemaname = 'public'"))
     for table in tables:
         for model in Base._decl_class_registry.values():
             if hasattr(model, '__tablename__') and model.__tablename__ == table[0]:
                 for column in model.__table__.columns:
-                    connection.execute(f"ALTER TABLE {table[0]} ADD COLUMN IF NOT EXISTS {column.name} {column.type}")
-
+                    connection.execute(text(f"ALTER TABLE {table[0]} ADD COLUMN IF NOT EXISTS {column.name} {column.type}"))
 class BaseModel(Base):
     __abstract__ = True
     id = Column(Integer, primary_key=True)
