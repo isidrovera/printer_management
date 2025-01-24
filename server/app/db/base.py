@@ -1,14 +1,14 @@
 # server/app/db/base.py
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, DateTime, event, MetaData, text, func
-import inspect
+from sqlalchemy import inspect as sa_inspect
 
 metadata = MetaData()
 Base = declarative_base(metadata=metadata)
 
 @event.listens_for(Base.metadata, 'after_create')
 def create_ddl(target, connection, **kw):
-    inspector = inspect(connection)
+    inspector = sa_inspect(connection)
     tables = inspector.get_table_names()
     for table in tables:
         sql = text(f"ALTER TABLE {table} ADD COLUMN IF NOT EXISTS driver_inf VARCHAR")
