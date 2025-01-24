@@ -34,14 +34,32 @@ async def create_client_form(request: Request):
         {"request": request, "client": None}
     )
 
-@router.get("/clients/{client_id}/edit")
-async def edit_client_form(request: Request, client_id: int, db: Session = Depends(get_db)):
-    client_service = ClientService(db)
-    client = await client_service.get_by_id(client_id)
-    return templates.TemplateResponse(
-        "clients/form.html",
-        {"request": request, "client": client}
-    )
+
+@router.post("/clients/{client_id}/edit")
+async def edit_client(request: Request, client_id: int, db: Session = Depends(get_db)):
+    try:
+        form = await request.form()
+        name = form.get("name")
+        logger.info(f"Editing client with ID {client_id}, new name: {name}")
+
+        client_service = ClientService(db)
+        client = await client_service.get_by_id(client_id)
+
+        if not client:
+            return templates.TemplateResponse(
+                "clients/form.html",
+                {"request": request, "client": None, "error": "Cliente no encontrado"}
+            )
+
+        await client_service.update(client_id, name=name)
+        logger.info(f"Client with ID {client_id} updated successfully")
+        return RedirectResponse("/clients", status_code=303)
+    except Exception as e:
+        logger.error(f"Error editing client: {str(e)}")
+        return templates.TemplateResponse(
+            "clients/form.html",
+            {"request": request, "client": {"id": client_id, "name": form.get("name")}, "error": str(e)}
+        )
 
 @router.post("/clients/create")
 async def create_client(request: Request, db: Session = Depends(get_db)):
