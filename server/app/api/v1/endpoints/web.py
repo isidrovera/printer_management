@@ -9,6 +9,7 @@ from app.services.agent_service import AgentService
 from app.services.driver_service import DriverService
 from fastapi import File, UploadFile
 from pathlib import Path
+from fastapi.responses import FileResponse
 import logging
 
 logger = logging.getLogger(__name__)
