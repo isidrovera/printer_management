@@ -8,6 +8,7 @@ from app.services.client_service import ClientService
 from app.services.agent_service import AgentService
 from app.services.driver_service import DriverService
 from fastapi import File, UploadFile
+from pathlib import Path
 import logging
 
 logger = logging.getLogger(__name__)
@@ -212,7 +213,7 @@ async def delete_driver(driver_id: int, db: Session = Depends(get_db)):
         logger.error(f"Error eliminando driver: {str(e)}")
         return {"success": False, "error": str(e)}
 
-        
+
 @router.get("/drivers/{driver_id}/download")
 async def download_driver(driver_id: int, db: Session = Depends(get_db)):
     driver_service = DriverService(db)
