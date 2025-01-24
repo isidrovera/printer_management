@@ -1,5 +1,5 @@
 # server/app/db/models/printer_driver.py
-from app.db.base import BaseModel
+from app.db.base import Base
 from sqlalchemy import Column, String, LargeBinary
 
 class PrinterDriver(Base):
