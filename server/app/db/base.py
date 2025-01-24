@@ -16,9 +16,10 @@ def sync_columns(target, connection, **kw):
         existing_columns = {col['name'] for col in inspector.get_columns(table_name)}
         
         # Obtener columnas definidas en el modelo
-        table = target.tables.get(table_name)
-        if not table:
+        table = target.tables.get(table_name)  # Esto devuelve un objeto Table o None
+        if table is None:  # Verificación explícita
             continue
+        
         model_columns = {col.name for col in table.columns}
         
         # Agregar columnas que faltan
@@ -39,6 +40,7 @@ def sync_columns(target, connection, **kw):
                     print(f"Columna '{col}' eliminada de la tabla '{table_name}'")
                 except Exception as e:
                     print(f"Error eliminando columna '{col}' de '{table_name}': {e}")
+
 
 class BaseModel(Base):
     __abstract__ = True
