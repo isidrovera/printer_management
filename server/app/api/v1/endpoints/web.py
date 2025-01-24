@@ -157,11 +157,12 @@ async def edit_driver(request: Request, driver_id: int, db: Session = Depends(ge
 async def delete_driver(driver_id: int, db: Session = Depends(get_db)):
     try:
         driver_service = DriverService(db)
+        driver = await driver_service.get_by_id(driver_id)
+        if not driver:
+            return {"success": False, "error": "Driver no encontrado"}, 404
+            
         deleted = await driver_service.delete(driver_id)
-        if deleted:
-            logger.info(f"Driver {driver_id} eliminado")
-            return {"success": True}
-        return {"success": False, "error": "Driver no encontrado"}
+        return {"success": True} if deleted else {"success": False, "error": "Error al eliminar"}
     except Exception as e:
         logger.error(f"Error eliminando driver: {str(e)}")
         return {"success": False, "error": str(e)}
