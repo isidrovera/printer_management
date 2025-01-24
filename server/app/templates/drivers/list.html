@@ -10,7 +10,7 @@
        <tr>
            <th>Fabricante</th>
            <th>Modelo</th>
-           <th>Archivo INF</th>
+           <th>Archivo</th> <!-- Cambiado para reflejar que es el nombre del archivo -->
            <th>Descripción</th>
            <th>Acciones</th>
        </tr>
@@ -20,11 +20,11 @@
        <tr>
            <td>{{ driver.manufacturer }}</td>
            <td>{{ driver.model }}</td>
-           <td>{{ driver.driver_file }}</td>
+           <td>{{ driver.driver_filename }}</td> <!-- Mostrar el nombre del archivo -->
            <td>{{ driver.description }}</td>
            <td>
-            <a href="/drivers/{{ driver.id }}/edit" class="btn btn-sm btn-warning">Editar</a>
-            <button onclick="confirmDelete('driver', {{ driver.id }})" class="btn btn-sm btn-danger">Eliminar</button>
+               <a href="/drivers/{{ driver.id }}/edit" class="btn btn-sm btn-warning">Editar</a>
+               <button onclick="confirmDelete('driver', {{ driver.id }})" class="btn btn-sm btn-danger">Eliminar</button>
            </td>
        </tr>
        {% endfor %}
@@ -49,6 +49,6 @@
             });
         }
     }
-    </script>
+</script>
 {% endblock %}
 
