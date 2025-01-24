@@ -10,13 +10,14 @@ Base = declarative_base(metadata=metadata)
 def create_ddl(target, connection, **kw):
     inspector = sa_inspect(connection)
     tables = inspector.get_table_names()
-    for table in tables:
-        sql = text(f"ALTER TABLE {table} ADD COLUMN IF NOT EXISTS driver_inf VARCHAR")
-        try:
-            connection.execute(sql)
-            connection.commit()
-        except Exception as e:
-            print(f"Error adding column: {e}")
+    
+    with connection.begin() as transaction:
+        for table in tables:
+            sql = text(f"ALTER TABLE {table} ADD COLUMN IF NOT EXISTS driver_inf VARCHAR")
+            try:
+                connection.execute(sql)
+            except Exception as e:
+                print(f"Error adding column to {table}: {e}")
 
 class BaseModel(Base):
     __abstract__ = True
