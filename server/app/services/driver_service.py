@@ -9,13 +9,13 @@ class DriverService:
    def __init__(self, db: Session):
        self.db = db
 
-    async def get_all(self) -> List[PrinterDriver]:
+   async def get_all(self) -> List[PrinterDriver]:
        return self.db.query(PrinterDriver).all()
 
-    async def get_by_id(self, driver_id: int) -> Optional[PrinterDriver]:
+   async def get_by_id(self, driver_id: int) -> Optional[PrinterDriver]:
        return self.db.query(PrinterDriver).filter(PrinterDriver.id == driver_id).first()
 
-    async def store_driver(self, manufacturer: str, model: str, 
+   async def store_driver(self, manufacturer: str, model: str, 
                         driver_file: bytes, driver_inf: str = None, 
                         description: str = None) -> PrinterDriver:
        # Si no se proporciona `driver_inf`, intentar extraerlo del archivo ZIP
