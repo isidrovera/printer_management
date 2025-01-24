@@ -23,12 +23,32 @@
            <td>{{ driver.inf_path }}</td>
            <td>{{ driver.description }}</td>
            <td>
-               <a href="/drivers/{{ driver.id }}/edit" class="btn btn-sm btn-warning">Editar</a>
-               <button onclick="confirmDelete('driver', {{ driver.id }})" class="btn btn-sm btn-danger">Eliminar</button>
+            <a href="/drivers/{{ driver.id }}/edit" class="btn btn-sm btn-warning">Editar</a>
+            <button onclick="confirmDelete('driver', {{ driver.id }})" class="btn btn-sm btn-danger">Eliminar</button>
            </td>
        </tr>
        {% endfor %}
    </tbody>
 </table>
+<script>
+    function confirmDelete(type, id) {
+        if (confirm('¿Estás seguro de eliminar este elemento?')) {
+            fetch(`/drivers/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert(data.error || 'Error al eliminar');
+                }
+            });
+        }
+    }
+    </script>
 {% endblock %}
 
