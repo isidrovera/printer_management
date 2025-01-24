@@ -30,9 +30,6 @@ class DriverService:
        self.db.refresh(driver)
        return driver
 
-       except Exception as e:
-           self.db.rollback()
-           raise
 
    async def update(self, driver_id: int, manufacturer: str, model: str, 
                    description: str = None) -> PrinterDriver:
