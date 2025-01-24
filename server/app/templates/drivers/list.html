@@ -24,6 +24,7 @@
            <td>{{ driver.description }}</td>
            <td>
                <a href="/drivers/{{ driver.id }}/edit" class="btn btn-sm btn-warning">Editar</a>
+               <a href="/drivers/{{ driver.id }}/download" class="btn btn-sm btn-info">Descargar</a>
                <button onclick="confirmDelete('driver', {{ driver.id }})" class="btn btn-sm btn-danger">Eliminar</button>
            </td>
        </tr>

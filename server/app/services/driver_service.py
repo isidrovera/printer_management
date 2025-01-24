@@ -4,8 +4,11 @@ from sqlalchemy.orm import Session
 from app.db.models.printer_driver import PrinterDriver
 import tempfile
 import zipfile
+import os
+from pathlib import Path
 
 class DriverService:
+   STORAGE_PATH = "/var/www/printer_drivers"
    def __init__(self, db: Session):
        self.db = db
 
@@ -15,23 +18,28 @@ class DriverService:
    async def get_by_id(self, driver_id: int) -> Optional[PrinterDriver]:
        return self.db.query(PrinterDriver).filter(PrinterDriver.id == driver_id).first()
 
-   async def store_driver(self, manufacturer: str, model: str, 
-                           driver_file: bytes, filename: str, 
-                           description: str = None) -> PrinterDriver:
-        # Guarda el archivo ZIP directamente y elimina la lógica de extracción del .inf
+   async def store_driver(self, manufacturer: str, model: str, driver_file: bytes, filename: str, description: str = None):
+        # Crear el directorio de almacenamiento si no existe
+        os.makedirs(self.STORAGE_PATH, exist_ok=True)
+
+        # Ruta completa donde se guardará el archivo
+        file_path = Path(self.STORAGE_PATH) / filename
+
+        # Guardar el archivo en el sistema de archivos
+        with open(file_path, "wb") as f:
+            f.write(driver_file)
+
+        # Crear el registro en la base de datos
         driver = PrinterDriver(
             manufacturer=manufacturer,
             model=model,
-            driver_file=driver_file,  # Almacenar el archivo ZIP
-            driver_filename=filename,  # Preservar el nombre del archivo original
+            driver_filename=filename,  # Guardamos solo el nombre del archivo
             description=description
         )
-        # Guardar en la base de datos
         self.db.add(driver)
         self.db.commit()
         self.db.refresh(driver)
         return driver
-
 
 
    async def update(self, driver_id: int, manufacturer: str, model: str, 

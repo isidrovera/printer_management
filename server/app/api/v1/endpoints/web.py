@@ -141,17 +141,17 @@ async def create_driver(request: Request, db: Session = Depends(get_db)):
         if not driver_file:
             raise ValueError("Se requiere archivo de driver")
 
-        # Lee el archivo como binario
+        # Leer el archivo como binario
         file_content = await driver_file.read()
-        filename = driver_file.filename
+        filename = driver_file.filename  # Obtener el nombre original del archivo
 
-        # Llamar al servicio para guardar el driver
+        # Guardar el archivo y registrar el driver en la base de datos
         driver_service = DriverService(db)
         driver = await driver_service.store_driver(
             manufacturer=form.get("manufacturer"),
             model=form.get("model"),
             driver_file=file_content,
-            filename=filename,  # Pasa el nombre del archivo original
+            filename=filename,
             description=form.get("description")
         )
 
@@ -211,3 +211,21 @@ async def delete_driver(driver_id: int, db: Session = Depends(get_db)):
     except Exception as e:
         logger.error(f"Error eliminando driver: {str(e)}")
         return {"success": False, "error": str(e)}
+
+        
+@router.get("/drivers/{driver_id}/download")
+async def download_driver(driver_id: int, db: Session = Depends(get_db)):
+    driver_service = DriverService(db)
+    driver = await driver_service.get_by_id(driver_id)
+    if not driver:
+        return {"error": "Driver no encontrado"}, 404
+
+    # Ruta completa del archivo
+    file_path = Path(DriverService.STORAGE_PATH) / driver.driver_filename
+
+    # Verificar si el archivo existe
+    if not file_path.is_file():
+        return {"error": "Archivo no encontrado"}, 404
+
+    # Responder el archivo para descarga
+    return FileResponse(path=file_path, filename=driver.driver_filename, media_type="application/octet-stream")
