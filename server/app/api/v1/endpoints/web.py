@@ -34,7 +34,14 @@ async def create_client_form(request: Request):
         {"request": request, "client": None}
     )
 
-
+@router.get("/clients/{client_id}/edit")
+async def edit_client_form(request: Request, client_id: int, db: Session = Depends(get_db)):
+    client_service = ClientService(db)
+    client = await client_service.get_by_id(client_id)
+    return templates.TemplateResponse(
+        "clients/form.html",
+        {"request": request, "client": client}
+    )
 @router.post("/clients/{client_id}/edit")
 async def edit_client(request: Request, client_id: int, db: Session = Depends(get_db)):
     try:
