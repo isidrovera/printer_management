@@ -8,6 +8,7 @@ class Client(BaseModel):
     __tablename__ = 'clients'
     
     name = Column(String, nullable=False)
+    direccion = Column(String, nullable=False)
     token = Column(String, unique=True, nullable=False)
     is_active = Column(Boolean, default=True)
     
