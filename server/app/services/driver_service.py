@@ -16,28 +16,21 @@ class DriverService:
        return self.db.query(PrinterDriver).filter(PrinterDriver.id == driver_id).first()
 
    async def store_driver(self, manufacturer: str, model: str, 
-                        driver_file: bytes, driver_inf: str = None, 
-                        description: str = None) -> PrinterDriver:
-       # Si no se proporciona `driver_inf`, intentar extraerlo del archivo ZIP
-       if not driver_inf:
-           try:
-               driver_inf = await self._find_inf_path(driver_file)
-           except ValueError as e:
-               raise ValueError(f"No se pudo almacenar el driver: {e}")
-       
-       # Crear instancia del modelo
-       driver = PrinterDriver(
-           manufacturer=manufacturer,
-           model=model,
-           driver_file=driver_file,
-           driver_inf=driver_inf,
-           description=description
-       )
-       # Guardar en la base de datos
-       self.db.add(driver)
-       self.db.commit()
-       self.db.refresh(driver)
-       return driver
+                           driver_file: bytes, filename: str, 
+                           description: str = None) -> PrinterDriver:
+        # Guarda el archivo ZIP directamente y elimina la lógica de extracción del .inf
+        driver = PrinterDriver(
+            manufacturer=manufacturer,
+            model=model,
+            driver_file=driver_file,  # Almacenar el archivo ZIP
+            driver_filename=filename,  # Preservar el nombre del archivo original
+            description=description
+        )
+        # Guardar en la base de datos
+        self.db.add(driver)
+        self.db.commit()
+        self.db.refresh(driver)
+        return driver
 
 
 

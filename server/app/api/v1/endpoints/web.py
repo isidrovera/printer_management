@@ -135,30 +135,35 @@ async def create_driver_form(request: Request):
 
 @router.post("/drivers/create")
 async def create_driver(request: Request, db: Session = Depends(get_db)):
-   try:
-       form = await request.form()
-       driver_file = form.get("driver_file")
-       if not driver_file:
-           raise ValueError("Se requiere archivo de driver")
+    try:
+        form = await request.form()
+        driver_file: UploadFile = form.get("driver_file")
+        if not driver_file:
+            raise ValueError("Se requiere archivo de driver")
 
-       contents = await driver_file.read()
-       driver_service = DriverService(db)
-       
-       driver = await driver_service.store_driver(
-           manufacturer=form.get("manufacturer"),
-           model=form.get("model"),
-           driver_file=contents,
-           description=form.get("description")
-       )
-       
-       logger.info(f"Driver creado: {driver.manufacturer} {driver.model}")
-       return RedirectResponse("/drivers", status_code=303)
-   except Exception as e:
-       logger.error(f"Error creando driver: {str(e)}")
-       return templates.TemplateResponse(
-           "drivers/form.html",
-           {"request": request, "driver": None, "error": str(e)}
-       )
+        # Lee el archivo como binario
+        file_content = await driver_file.read()
+        filename = driver_file.filename
+
+        # Llamar al servicio para guardar el driver
+        driver_service = DriverService(db)
+        driver = await driver_service.store_driver(
+            manufacturer=form.get("manufacturer"),
+            model=form.get("model"),
+            driver_file=file_content,
+            filename=filename,  # Pasa el nombre del archivo original
+            description=form.get("description")
+        )
+
+        logger.info(f"Driver creado: {driver.manufacturer} {driver.model}")
+        return RedirectResponse("/drivers", status_code=303)
+    except Exception as e:
+        logger.error(f"Error creando driver: {str(e)}")
+        return templates.TemplateResponse(
+            "drivers/form.html",
+            {"request": request, "driver": None, "error": str(e)}
+        )
+
 
 @router.get("/drivers/{driver_id}/edit")
 async def edit_driver_form(request: Request, driver_id: int, db: Session = Depends(get_db)):
