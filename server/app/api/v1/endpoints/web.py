@@ -153,15 +153,15 @@ async def edit_driver(request: Request, driver_id: int, db: Session = Depends(ge
            {"request": request, "driver_id": driver_id, "error": str(e)}
        )
 
-@router.post("/drivers/{driver_id}/delete")
+@router.delete("/drivers/{driver_id}")
 async def delete_driver(driver_id: int, db: Session = Depends(get_db)):
-   try:
-       driver_service = DriverService(db)
-       deleted = await driver_service.delete(driver_id)
-       if deleted:
-           logger.info(f"Driver {driver_id} eliminado")
-           return {"success": True}
-       return {"success": False, "error": "Driver no encontrado"}
-   except Exception as e:
-       logger.error(f"Error eliminando driver: {str(e)}")
-       return {"success": False, "error": str(e)}
+    try:
+        driver_service = DriverService(db)
+        deleted = await driver_service.delete(driver_id)
+        if deleted:
+            logger.info(f"Driver {driver_id} eliminado")
+            return {"success": True}
+        return {"success": False, "error": "Driver no encontrado"}
+    except Exception as e:
+        logger.error(f"Error eliminando driver: {str(e)}")
+        return {"success": False, "error": str(e)}
