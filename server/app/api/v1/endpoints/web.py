@@ -7,6 +7,7 @@ from app.db.session import get_db
 from app.services.client_service import ClientService
 from app.services.agent_service import AgentService
 from app.services.driver_service import DriverService
+from fastapi import File, UploadFile
 import logging
 
 logger = logging.getLogger(__name__)
@@ -92,6 +93,8 @@ async def create_driver_form(request: Request):
         "driver": None
     })
 
+
+
 @router.post("/drivers/create")
 async def create_driver(
     request: Request,
@@ -99,8 +102,11 @@ async def create_driver(
 ):
     try:
         form = await request.form()
-        file = form.get("driver_file")
-        contents = await file.read()
+        driver_file = form["driver_file"]
+        if not isinstance(driver_file, UploadFile):
+            raise ValueError("No file uploaded")
+
+        contents = await driver_file.read()
         
         driver = await DriverService(db).store_driver(
             manufacturer=form.get("manufacturer"),
@@ -108,6 +114,7 @@ async def create_driver(
             driver_file=contents,
             description=form.get("description")
         )
+        logger.info(f"Driver created successfully: {driver.manufacturer} {driver.model}")
         return RedirectResponse("/drivers", status_code=303)
     except Exception as e:
         logger.error(f"Error creating driver: {e}")
