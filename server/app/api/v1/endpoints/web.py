@@ -153,7 +153,7 @@ async def edit_driver(request: Request, driver_id: int, db: Session = Depends(ge
            {"request": request, "driver_id": driver_id, "error": str(e)}
        )
 
-@router.delete("/drivers/{driver_id}")
+@router.delete("/api/v1/drivers/{driver_id}")
 async def delete_driver(driver_id: int, db: Session = Depends(get_db)):
     try:
         driver_service = DriverService(db)
