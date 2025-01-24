@@ -79,72 +79,89 @@ async def list_agents(request: Request, db: Session = Depends(get_db)):
 
 @router.get("/drivers")
 async def list_drivers(request: Request, db: Session = Depends(get_db)):
-    driver_service = DriverService(db)
-    drivers = await driver_service.get_all()
-    return templates.TemplateResponse("drivers/list.html", {
-        "request": request, 
-        "drivers": drivers
-    })
+   driver_service = DriverService(db)
+   drivers = await driver_service.get_all()
+   return templates.TemplateResponse("drivers/list.html", {
+       "request": request,
+       "drivers": drivers
+   })
 
 @router.get("/drivers/create")
 async def create_driver_form(request: Request):
-    return templates.TemplateResponse("drivers/form.html", {
-        "request": request, 
-        "driver": None
-    })
-
-
+   return templates.TemplateResponse("drivers/form.html", {
+       "request": request,
+       "driver": None
+   })
 
 @router.post("/drivers/create")
-async def create_driver(
-    request: Request,
-    db: Session = Depends(get_db)
-):
-    try:
-        form = await request.form()
-        driver_file = form["driver_file"]
-        if not isinstance(driver_file, UploadFile):
-            raise ValueError("No file uploaded")
+async def create_driver(request: Request, db: Session = Depends(get_db)):
+   try:
+       form = await request.form()
+       driver_file = form.get("driver_file")
+       if not driver_file:
+           raise ValueError("Se requiere archivo de driver")
 
-        contents = await driver_file.read()
-        
-        driver = await DriverService(db).store_driver(
-            manufacturer=form.get("manufacturer"),
-            model=form.get("model"),
-            driver_file=contents,
-            description=form.get("description")
-        )
-        logger.info(f"Driver created successfully: {driver.manufacturer} {driver.model}")
-        return RedirectResponse("/drivers", status_code=303)
-    except Exception as e:
-        logger.error(f"Error creating driver: {e}")
-        return templates.TemplateResponse(
-            "drivers/form.html",
-            {"request": request, "driver": None, "error": str(e)}
-        )
+       contents = await driver_file.read()
+       driver_service = DriverService(db)
+       
+       driver = await driver_service.store_driver(
+           manufacturer=form.get("manufacturer"),
+           model=form.get("model"),
+           driver_file=contents,
+           description=form.get("description")
+       )
+       
+       logger.info(f"Driver creado: {driver.manufacturer} {driver.model}")
+       return RedirectResponse("/drivers", status_code=303)
+   except Exception as e:
+       logger.error(f"Error creando driver: {str(e)}")
+       return templates.TemplateResponse(
+           "drivers/form.html",
+           {"request": request, "driver": None, "error": str(e)}
+       )
 
 @router.get("/drivers/{driver_id}/edit")
 async def edit_driver_form(request: Request, driver_id: int, db: Session = Depends(get_db)):
-    driver = await DriverService(db).get_by_id(driver_id)
-    return templates.TemplateResponse("drivers/form.html", {
-        "request": request, 
-        "driver": driver
-    })
+   driver_service = DriverService(db)
+   driver = await driver_service.get_by_id(driver_id)
+   if not driver:
+       return RedirectResponse("/drivers", status_code=303)
+   return templates.TemplateResponse("drivers/form.html", {
+       "request": request,
+       "driver": driver
+   })
 
-@router.post("/drivers/{driver_id}/edit")
+@router.post("/drivers/{driver_id}/edit") 
 async def edit_driver(request: Request, driver_id: int, db: Session = Depends(get_db)):
-    try:
-        form = await request.form()
-        await DriverService(db).update(
-            driver_id=driver_id,
-            manufacturer=form.get("manufacturer"),
-            model=form.get("model"),
-            description=form.get("description")
-        )
-        return RedirectResponse("/drivers", status_code=303)
-    except Exception as e:
-        logger.error(f"Error updating driver: {e}")
-        return templates.TemplateResponse(
-            "drivers/form.html",
-            {"request": request, "driver": None, "error": str(e)}
-        )
+   try:
+       form = await request.form()
+       driver_service = DriverService(db)
+
+       driver = await driver_service.update(
+           driver_id,
+           manufacturer=form.get("manufacturer"),
+           model=form.get("model"),
+           description=form.get("description")
+       )
+       
+       logger.info(f"Driver actualizado: {driver.manufacturer} {driver.model}")
+       return RedirectResponse("/drivers", status_code=303)
+   except Exception as e:
+       logger.error(f"Error actualizando driver: {str(e)}")
+       return templates.TemplateResponse(
+           "drivers/form.html",
+           {"request": request, "driver_id": driver_id, "error": str(e)}
+       )
+
+@router.post("/drivers/{driver_id}/delete")
+async def delete_driver(driver_id: int, db: Session = Depends(get_db)):
+   try:
+       driver_service = DriverService(db)
+       deleted = await driver_service.delete(driver_id)
+       if deleted:
+           logger.info(f"Driver {driver_id} eliminado")
+           return {"success": True}
+       return {"success": False, "error": "Driver no encontrado"}
+   except Exception as e:
+       logger.error(f"Error eliminando driver: {str(e)}")
+       return {"success": False, "error": str(e)}

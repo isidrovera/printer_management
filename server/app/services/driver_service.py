@@ -6,62 +6,63 @@ import tempfile
 import zipfile
 
 class DriverService:
-    def __init__(self, db: Session):
-        self.db = db
+   def __init__(self, db: Session):
+       self.db = db
 
-    async def get_all(self) -> List[PrinterDriver]:
-        """
-        Devuelve todos los drivers de impresoras.
-        """
-        return self.db.query(PrinterDriver).all()
+   async def get_all(self) -> List[PrinterDriver]:
+       return self.db.query(PrinterDriver).all()
 
-    async def get_by_id(self, driver_id: int) -> Optional[PrinterDriver]:
-        """
-        Devuelve un driver específico por su ID.
-        """
-        return self.db.query(PrinterDriver).filter(PrinterDriver.id == driver_id).first()
+   async def get_by_id(self, driver_id: int) -> Optional[PrinterDriver]:
+       return self.db.query(PrinterDriver).filter(PrinterDriver.id == driver_id).first()
 
-    async def store_driver(self, manufacturer: str, model: str, 
-                           driver_file: BinaryIO, description: str = None) -> PrinterDriver:
-        """
-        Guarda un nuevo driver en la base de datos, leyendo el archivo binario y extrayendo el .inf.
-        """
-        driver_bytes = driver_file.read()
-        inf_path = await self._find_inf_path(driver_bytes)
-        
-        driver = PrinterDriver(
-            manufacturer=manufacturer,
-            model=model,
-            driver_file=driver_bytes,
-            inf_path=inf_path,
-            description=description
-        )
-        self.db.add(driver)
-        self.db.commit()
-        self.db.refresh(driver)
-        return driver
+   async def store_driver(self, manufacturer: str, model: str, driver_file: bytes, 
+                         description: str = None) -> PrinterDriver:
+       try:
+           inf_path = await self._find_inf_path(driver_file)
+           driver = PrinterDriver(
+               manufacturer=manufacturer,
+               model=model,
+               driver_file=driver_file,
+               inf_path=inf_path,
+               description=description
+           )
+           self.db.add(driver)
+           self.db.commit()
+           self.db.refresh(driver)
+           return driver
+       except Exception as e:
+           self.db.rollback()
+           raise
 
-    async def _find_inf_path(self, driver_bytes: bytes) -> str:
-        """
-        Encuentra el archivo .inf dentro del paquete de drivers.
-        """
-        with tempfile.NamedTemporaryFile() as tmp:
-            tmp.write(driver_bytes)
-            tmp.flush()
-            
-            with zipfile.ZipFile(tmp.name) as z:
-                inf_files = [f for f in z.namelist() if f.endswith('.inf')]
-                if not inf_files:
-                    raise ValueError("No .inf file found in driver package")
-                return inf_files[0]
+   async def update(self, driver_id: int, manufacturer: str, model: str, 
+                   description: str = None) -> PrinterDriver:
+       driver = await self.get_by_id(driver_id)
+       if not driver:
+           raise ValueError("Driver no encontrado")
+       
+       driver.manufacturer = manufacturer
+       driver.model = model
+       driver.description = description
+       
+       self.db.commit()
+       self.db.refresh(driver)
+       return driver
 
-    async def delete(self, driver_id: int) -> bool:
-        """
-        Elimina un driver por su ID.
-        """
-        driver = await self.get_by_id(driver_id)
-        if driver:
-            self.db.delete(driver)
-            self.db.commit()
-            return True
-        return False
+   async def delete(self, driver_id: int) -> bool:
+       driver = await self.get_by_id(driver_id)
+       if driver:
+           self.db.delete(driver)
+           self.db.commit()
+           return True
+       return False
+
+   async def _find_inf_path(self, driver_bytes: bytes) -> str:
+       with tempfile.NamedTemporaryFile() as tmp:
+           tmp.write(driver_bytes)
+           tmp.flush()
+           
+           with zipfile.ZipFile(tmp.name) as z:
+               inf_files = [f for f in z.namelist() if f.lower().endswith('.inf')]
+               if not inf_files:
+                   raise ValueError("No se encontró archivo .inf en el paquete")
+               return inf_files[0]
