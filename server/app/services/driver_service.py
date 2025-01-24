@@ -15,21 +15,21 @@ class DriverService:
    async def get_by_id(self, driver_id: int) -> Optional[PrinterDriver]:
        return self.db.query(PrinterDriver).filter(PrinterDriver.id == driver_id).first()
 
-   async def store_driver(self, manufacturer: str, model: str, driver_file: bytes, 
-                         description: str = None) -> PrinterDriver:
-       try:
-           inf_path = await self._find_inf_path(driver_file)
-           driver = PrinterDriver(
-               manufacturer=manufacturer,
-               model=model,
-               driver_file=driver_file,
-               inf_path=inf_path,
-               description=description
-           )
-           self.db.add(driver)
-           self.db.commit()
-           self.db.refresh(driver)
-           return driver
+   async def store_driver(self, manufacturer: str, model: str, 
+                        driver_file: bytes, driver_inf: str = None, 
+                        description: str = None) -> PrinterDriver:
+       driver = PrinterDriver(
+           manufacturer=manufacturer,
+           model=model,
+           driver_file=driver_file,
+           driver_inf=driver_inf,
+           description=description
+       )
+       self.db.add(driver)
+       self.db.commit()
+       self.db.refresh(driver)
+       return driver
+
        except Exception as e:
            self.db.rollback()
            raise
