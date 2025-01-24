@@ -6,28 +6,36 @@
        <h3>{{ "Editar" if driver else "Nuevo" }} Driver</h3>
    </div>
    <div class="card-body">
+       {% if error %}
+       <div class="alert alert-danger">
+           {{ error }}
+       </div>
+       {% endif %}
        <form method="POST" enctype="multipart/form-data">
            <div class="mb-3">
                <label class="form-label">Fabricante</label>
-               <input type="text" name="manufacturer" class="form-control" value="{{ driver.manufacturer if driver else '' }}" required>
+               <input type="text" name="manufacturer" class="form-control" 
+                      value="{{ driver.manufacturer if driver else '' }}" required>
            </div>
            <div class="mb-3">
                <label class="form-label">Modelo</label>
-               <input type="text" name="model" class="form-control" value="{{ driver.model if driver else '' }}" required>
+               <input type="text" name="model" class="form-control" 
+                      value="{{ driver.model if driver else '' }}" required>
            </div>
            {% if not driver %}
            <div class="mb-3">
                <label class="form-label">Archivo Driver (ZIP)</label>
                <input type="file" name="driver_file" class="form-control" accept=".zip" required>
+               <small class="text-muted">Seleccione un archivo .zip que contenga el driver y un archivo .inf.</small>
            </div>
            {% endif %}
            <div class="mb-3">
-            <label class="form-label">Archivo INF (opcional)</label>
-                <input type="text" name="driver_inf" class="form-control" 
-                    value="{{ driver.driver_inf if driver else '' }}"
-                    placeholder="nombre_archivo.inf">
-                <small class="text-muted">Nombre del archivo .inf dentro del ZIP</small>
-            </div>
+               <label class="form-label">Archivo INF (opcional)</label>
+               <input type="text" name="driver_inf" class="form-control" 
+                      value="{{ driver.driver_inf if driver else '' }}"
+                      placeholder="nombre_archivo.inf">
+               <small class="text-muted">Si no se especifica, el sistema intentará detectar automáticamente el archivo .inf dentro del ZIP.</small>
+           </div>
            <div class="mb-3">
                <label class="form-label">Descripción</label>
                <textarea name="description" class="form-control" rows="3">{{ driver.description if driver else '' }}</textarea>
