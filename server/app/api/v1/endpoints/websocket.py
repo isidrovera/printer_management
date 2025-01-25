@@ -8,6 +8,9 @@ from app.services.agent_service import AgentService
 from app.db.models import Client
 from typing import Dict
 
+websocket_logger = logging.getLogger("websocket")
+websocket_logger.setLevel(logging.DEBUG)
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -60,31 +63,30 @@ class ConnectionManager:
 
 @router.websocket("/register")
 async def register_websocket(websocket: WebSocket, db: Session = Depends(get_db)):
-   logger.error("Starting WebSocket connection")
+   websocket_logger.debug("Starting WebSocket connection")
    try:
-       logger.error(f"Connection headers: {dict(websocket.headers)}")
-       # First accept the connection
+       websocket_logger.debug(f"Connection headers: {dict(websocket.headers)}")
        await websocket.accept()
        
-       # Receive and validate data
        data = await websocket.receive_json()
-       logger.error(f"Raw data received: {data}")
+       websocket_logger.debug(f"Raw data received: {data}")
        
        client_token = data.get('client_token')
-       logger.error(f"Client token received: {client_token}")
+       websocket_logger.debug(f"Client token received: {client_token}")
        
        client = db.query(Client).filter(
            Client.token == client_token,
            Client.is_active == True
        ).first()
-       logger.error(f"Client found in DB: {client is not None}")
+       websocket_logger.debug(f"Client found in DB: {client is not None}")
        
        if not client:
-           raise ValueError(f"Invalid client token: {client_token}")
+           websocket_logger.error(f"Invalid client token: {client_token}")
+           raise ValueError("Invalid client token")
 
        agent_service = AgentService(db)
        system_info = data.get('system_info', {})
-       logger.error(f"System info: {system_info}")
+       websocket_logger.debug(f"System info: {system_info}")
        
        agent = await agent_service.register_agent(
            client_token=client_token,
@@ -96,12 +98,12 @@ async def register_websocket(websocket: WebSocket, db: Session = Depends(get_db)
        )
        
        response = {"status": "success", "agent_token": agent.token}
-       logger.error(f"Response to send: {response}")
+       websocket_logger.debug(f"Response to send: {response}")
        await websocket.send_json(response)
        
    except Exception as e:
-       logger.error(f"CRITICAL ERROR: {e}")
-       logger.error(traceback.format_exc())
+       websocket_logger.error(f"CRITICAL ERROR: {e}")
+       websocket_logger.error(traceback.format_exc())
        if not websocket.client_state.value:
            await websocket.accept()
        await websocket.close(code=403)
