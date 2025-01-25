@@ -1,4 +1,5 @@
 # server/app/api/v1/endpoints/websocket.py
+import sys
 import logging
 import traceback
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends
@@ -8,11 +9,15 @@ from app.services.agent_service import AgentService
 from app.db.models import Client
 from typing import Dict
 
+# Logging configuration
+handler = logging.StreamHandler(sys.stdout)
+handler.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+
 websocket_logger = logging.getLogger("websocket")
 websocket_logger.setLevel(logging.DEBUG)
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+websocket_logger.addHandler(handler)
 
 router = APIRouter()
 
@@ -112,42 +117,42 @@ manager = ConnectionManager()
 
 @router.websocket("/agent/{agent_token}")
 async def agent_websocket(websocket: WebSocket, agent_token: str, db: Session = Depends(get_db)):
-   logger.info(f"Agent websocket connection request: {agent_token}")
+   websocket_logger.info(f"Agent websocket connection request: {agent_token}")
    
    agent_service = AgentService(db)
    agent = await agent_service.validate_agent(agent_token)
    
    if not agent:
-       logger.warning(f"Invalid agent token: {agent_token}")
+       websocket_logger.warning(f"Invalid agent token: {agent_token}")
        await websocket.close(code=4001)
        return
    
-   logger.info(f"Agent validated: {agent_token}")
+   websocket_logger.info(f"Agent validated: {agent_token}")
    await manager.connect_agent(agent_token, websocket)
    
    try:
        while True:
            data = await websocket.receive_json()
-           logger.info(f"Message from agent {agent_token}: {data}")
+           websocket_logger.info(f"Message from agent {agent_token}: {data}")
            await manager.broadcast_status(f"Agent {agent_token}: {data}")
    except WebSocketDisconnect:
-       logger.info(f"Agent {agent_token} disconnected")
+       websocket_logger.info(f"Agent {agent_token} disconnected")
        manager.disconnect_agent(agent_token)
    except Exception as e:
-       logger.error(f"Error in agent websocket {agent_token}: {e}")
+       websocket_logger.error(f"Error in agent websocket {agent_token}: {e}")
        manager.disconnect_agent(agent_token)
 
-@router.websocket("/status") 
+@router.websocket("/status")
 async def status_websocket(websocket: WebSocket):
-   logger.info("Status websocket connection request")
+   websocket_logger.info("Status websocket connection request")
    await manager.connect_status(websocket)
    try:
        while True:
            data = await websocket.receive_text()
-           logger.debug(f"Status message received: {data}")
+           websocket_logger.debug(f"Status message received: {data}")
    except WebSocketDisconnect:
-       logger.info("Status connection disconnected")
+       websocket_logger.info("Status connection disconnected")
        manager.disconnect_status(websocket)
    except Exception as e:
-       logger.error(f"Error in status websocket: {e}")
+       websocket_logger.error(f"Error in status websocket: {e}")
        manager.disconnect_status(websocket)
