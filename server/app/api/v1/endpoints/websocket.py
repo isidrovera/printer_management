@@ -57,23 +57,30 @@ class ConnectionManager:
            except Exception as e:
                self.logger.error(f"Error sending to connection {conn_id}: {e}")
 
-manager = ConnectionManager()
+
 @router.websocket("/register")
 async def register_websocket(websocket: WebSocket, db: Session = Depends(get_db)):
     logger.info("Registration attempt started")
     try:
         await websocket.accept()
         data = await websocket.receive_json()
-        logger.info(f"Received data: {data}")
+        logger.info(f"Client trying to register with data: {data}")
         
-        # Verificar token en DB
+        if not data.get('client_token'):
+            logger.error("No client_token provided")
+            raise ValueError("client_token required")
+
         client = db.query(Client).filter(Client.token == data['client_token']).first()
-        logger.info(f"Client found: {client is not None}")
+        logger.info(f"Client lookup result: {client is not None}")
+        
         if not client:
+            logger.error(f"Invalid client token: {data['client_token']}")
             raise ValueError("Invalid client token")
 
         agent_service = AgentService(db)
         system_info = data.get('system_info', {})
+        logger.info(f"System info received: {system_info}")
+        
         agent = await agent_service.register_agent(
             client_token=data['client_token'],
             hostname=system_info.get('hostname'),
@@ -83,12 +90,14 @@ async def register_websocket(websocket: WebSocket, db: Session = Depends(get_db)
             system_info=system_info
         )
         
-        await websocket.send_json({"status": "success", "agent_token": agent.token})
+        response = {"status": "success", "agent_token": agent.token}
+        logger.info(f"Sending response: {response}")
+        await websocket.send_json(response)
         
     except Exception as e:
-        logger.error(f"Registration error: {str(e)}")
+        logger.error(f"Registration failed with error: {str(e)}")
         await websocket.close(code=403)
-
+manager = ConnectionManager()
 @router.websocket("/agent/{agent_token}")
 async def agent_websocket(
    websocket: WebSocket,
