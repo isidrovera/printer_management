@@ -58,7 +58,7 @@ class ConnectionManager:
                self.logger.error(f"Error sending to connection {conn_id}: {e}")
 
 
-@router.websocket("/register")
+@router.websocket("/ws/register")
 async def register_websocket(websocket: WebSocket, db: Session = Depends(get_db)):
     logger.info("Registration attempt started")
     try:
