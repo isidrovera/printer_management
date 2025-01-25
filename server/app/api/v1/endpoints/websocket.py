@@ -61,12 +61,17 @@ manager = ConnectionManager()
 @router.websocket("/register")
 async def register_websocket(websocket: WebSocket, db: Session = Depends(get_db)):
     try:
+        logger.info("Starting agent registration...")
         await websocket.accept()
+        
+        logger.info("Waiting for registration data...")
         data = await websocket.receive_json()
+        logger.info(f"Received registration data: {data}")
         
         agent_service = AgentService(db)
         system_info = data.get('system_info', {})
         
+        logger.info(f"Attempting registration with client_token: {data.get('client_token')}")
         agent = await agent_service.register_agent(
             client_token=data['client_token'],
             hostname=system_info.get('hostname'),
@@ -76,12 +81,13 @@ async def register_websocket(websocket: WebSocket, db: Session = Depends(get_db)
             system_info=system_info
         )
         
+        logger.info(f"Registration successful. Agent token: {agent.token}")
         await websocket.send_json({
             "status": "success",
             "agent_token": agent.token
         })
     except Exception as e:
-        logger.error(f"Registration error: {e}")
+        logger.error(f"Registration failed: {str(e)}", exc_info=True)
         await websocket.close(code=403)
 
 @router.websocket("/agent/{agent_token}")
