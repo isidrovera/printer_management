@@ -60,30 +60,31 @@ class ConnectionManager:
 
 @router.websocket("/register")
 async def register_websocket(websocket: WebSocket, db: Session = Depends(get_db)):
-   logger.warning("Pre-connection check")
+   logger.error("Starting WebSocket connection")
    try:
-       logger.warning(f"Headers: {websocket.headers}")
+       logger.error(f"Connection headers: {dict(websocket.headers)}")
+       # First accept the connection
        await websocket.accept()
-       logger.warning("WebSocket accepted") 
        
+       # Receive and validate data
        data = await websocket.receive_json()
-       logger.warning(f"Data received: {data}")
+       logger.error(f"Raw data received: {data}")
        
        client_token = data.get('client_token')
-       logger.warning(f"Looking for client token: {client_token}")
+       logger.error(f"Client token received: {client_token}")
        
        client = db.query(Client).filter(
            Client.token == client_token,
            Client.is_active == True
        ).first()
-       logger.warning(f"Client found: {client is not None}")
+       logger.error(f"Client found in DB: {client is not None}")
        
        if not client:
            raise ValueError(f"Invalid client token: {client_token}")
 
        agent_service = AgentService(db)
        system_info = data.get('system_info', {})
-       logger.warning(f"System info received: {system_info}")
+       logger.error(f"System info: {system_info}")
        
        agent = await agent_service.register_agent(
            client_token=client_token,
@@ -95,11 +96,14 @@ async def register_websocket(websocket: WebSocket, db: Session = Depends(get_db)
        )
        
        response = {"status": "success", "agent_token": agent.token}
-       logger.warning(f"Sending response: {response}")
+       logger.error(f"Response to send: {response}")
        await websocket.send_json(response)
        
    except Exception as e:
-       logger.error(f"Registration error: {str(e)}\n{traceback.format_exc()}")
+       logger.error(f"CRITICAL ERROR: {e}")
+       logger.error(traceback.format_exc())
+       if not websocket.client_state.value:
+           await websocket.accept()
        await websocket.close(code=403)
 
 manager = ConnectionManager()
