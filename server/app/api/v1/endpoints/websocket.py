@@ -68,7 +68,7 @@ class ConnectionManager:
 
 manager = ConnectionManager()
 
-@router.websocket("/register")
+@router.websocket("/api/v1/ws/register")
 async def register_websocket(websocket: WebSocket, db: Session = Depends(get_db)):
     """
     Endpoint para registrar un agente.
