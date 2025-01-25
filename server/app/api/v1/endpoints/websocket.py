@@ -62,15 +62,20 @@ manager = ConnectionManager()
 async def register_websocket(websocket: WebSocket, db: Session = Depends(get_db)):
     logger.info("Registration attempt started")
     try:
-        await websocket.accept()  # Aceptar la conexión primero
+        await websocket.accept()
         data = await websocket.receive_json()
         logger.info(f"Received data: {data}")
         
+        # Verificar token en DB
+        client = db.query(Client).filter(Client.token == data['client_token']).first()
+        logger.info(f"Client found: {client is not None}")
+        if not client:
+            raise ValueError("Invalid client token")
+
         agent_service = AgentService(db)
         system_info = data.get('system_info', {})
-        
         agent = await agent_service.register_agent(
-            client_token=data.get('client_token'),
+            client_token=data['client_token'],
             hostname=system_info.get('hostname'),
             username=system_info.get('username'),
             ip_address=system_info.get('ip_address'),
@@ -79,10 +84,9 @@ async def register_websocket(websocket: WebSocket, db: Session = Depends(get_db)
         )
         
         await websocket.send_json({"status": "success", "agent_token": agent.token})
+        
     except Exception as e:
         logger.error(f"Registration error: {str(e)}")
-        if not websocket.client_state.value:  # Si aún no está aceptada
-            await websocket.accept()
         await websocket.close(code=403)
 
 @router.websocket("/agent/{agent_token}")
