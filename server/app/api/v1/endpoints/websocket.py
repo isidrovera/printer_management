@@ -66,7 +66,7 @@ class ConnectionManager:
            except Exception as e:
                self.logger.error(f"Error sending to connection {conn_id}: {e}")
 
-@router.websocket("/register")
+@router.websocket("/api/v1/ws/register")
 async def register_websocket(websocket: WebSocket, db: Session = Depends(get_db)):
    websocket_logger.debug("Starting WebSocket connection")
    try:
