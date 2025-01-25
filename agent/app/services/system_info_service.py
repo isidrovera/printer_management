@@ -3,6 +3,7 @@ import platform
 import socket
 import psutil
 import os
+import uuid
 
 class SystemInfoService:
     async def get_system_info(self):

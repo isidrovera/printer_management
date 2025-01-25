@@ -58,6 +58,31 @@ class ConnectionManager:
                self.logger.error(f"Error sending to connection {conn_id}: {e}")
 
 manager = ConnectionManager()
+@router.websocket("/register")
+async def register_websocket(websocket: WebSocket, db: Session = Depends(get_db)):
+    try:
+        await websocket.accept()
+        data = await websocket.receive_json()
+        
+        agent_service = AgentService(db)
+        system_info = data.get('system_info', {})
+        
+        agent = await agent_service.register_agent(
+            client_token=data['client_token'],
+            hostname=system_info.get('hostname'),
+            username=system_info.get('username'),
+            ip_address=system_info.get('ip_address'),
+            device_type=system_info.get('device_type'),
+            system_info=system_info
+        )
+        
+        await websocket.send_json({
+            "status": "success",
+            "agent_token": agent.token
+        })
+    except Exception as e:
+        logger.error(f"Registration error: {e}")
+        await websocket.close(code=403)
 
 @router.websocket("/agent/{agent_token}")
 async def agent_websocket(
