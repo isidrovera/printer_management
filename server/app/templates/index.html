@@ -1,31 +1,180 @@
-{% extends "base.html" %}
-{% block title %}Inicio{% endblock %}
-{% block content %}
-<h1>Sistema de Gestión de Impresoras</h1>
-<div class="row mt-4">
-    <div class="col-md-4">
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestión de Impresoras</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            padding: 2rem;
+        }
+
+        .navbar {
+            background: white;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar h1 {
+            color: #1a1a1a;
+            font-size: 1.5rem;
+        }
+
+        .nav-icons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-icons i {
+            color: #666;
+            font-size: 1.2rem;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: background-color 0.3s;
+            cursor: pointer;
+        }
+
+        .nav-icons i:hover {
+            background-color: #f0f0f0;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            padding: 1rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .icon-circle {
+            background: #e8f0fe;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+        }
+
+        .icon-circle i {
+            color: #1a73e8;
+            font-size: 1.5rem;
+        }
+
+        .card h2 {
+            color: #1a1a1a;
+            margin-bottom: 1rem;
+        }
+
+        .card-link {
+            text-decoration: none;
+            color: #1a73e8;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-link:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            
+            .navbar {
+                padding: 1rem;
+            }
+
+            .navbar h1 {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <h1>Sistema de Gestión de Impresoras</h1>
+        <div class="nav-icons">
+            <i class="fas fa-bell"></i>
+            <i class="fas fa-cog"></i>
+        </div>
+    </nav>
+
+    <div class="dashboard-grid">
         <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Clientes</h5>
-                <a href="/clients" class="btn btn-primary">Gestionar</a>
+            <div class="icon-circle">
+                <i class="fas fa-users"></i>
             </div>
+            <h2>Clientes</h2>
+            <a href="/clients" class="card-link">
+                Gestionar
+                <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+
+        <div class="card">
+            <div class="icon-circle">
+                <i class="fas fa-user-tie"></i>
+            </div>
+            <h2>Agentes</h2>
+            <a href="/agents" class="card-link">
+                Gestionar
+                <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+
+        <div class="card">
+            <div class="icon-circle">
+                <i class="fas fa-print"></i>
+            </div>
+            <h2>Drivers</h2>
+            <a href="/drivers" class="card-link">
+                Gestionar
+                <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+
+        <div class="card">
+            <div class="icon-circle">
+                <i class="fas fa-chart-bar"></i>
+            </div>
+            <h2>Estadísticas</h2>
+            <a href="/stats" class="card-link">
+                Gestionar
+                <i class="fas fa-arrow-right"></i>
+            </a>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Agentes</h5>
-                <a href="/agents" class="btn btn-primary">Gestionar</a>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Drivers</h5>
-                <a href="/drivers" class="btn btn-primary">Gestionar</a>
-            </div>
-        </div>
-    </div>
-</div>
-{% endblock %}
+</body>
+</html>
