@@ -1,33 +1,134 @@
 {% extends "base.html" %}
-{% block title %}Clientes{% endblock %}
+{% block title %}Gestión de Clientes{% endblock %}
+
+{% block styles %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<link href="{{ url_for('static', filename='css/clients.css') }}" rel="stylesheet">
+{% endblock %}
+
 {% block content %}
-<div class="d-flex justify-content-between mb-4">
-   <h2>Clientes</h2>
-   <a href="/clients/create" class="btn btn-primary">Nuevo Cliente</a>
+<div class="clients-container">
+    <!-- Header con búsqueda y filtros -->
+    <header class="clients-header">
+        <div class="header-left">
+            <h2><i class="fas fa-users"></i> Clientes</h2>
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="searchInput" placeholder="Buscar clientes..." class="search-input">
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="filter-container">
+                <button class="filter-btn">
+                    <i class="fas fa-filter"></i> Filtros
+                </button>
+                <div class="filter-dropdown">
+                    <div class="filter-group">
+                        <label>Estado</label>
+                        <select id="statusFilter">
+                            <option value="all">Todos</option>
+                            <option value="active">Activos</option>
+                            <option value="inactive">Inactivos</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <a href="/clients/create" class="btn-new">
+                <i class="fas fa-plus"></i> Nuevo Cliente
+            </a>
+        </div>
+    </header>
+
+    <!-- Vista Kanban -->
+    <div class="kanban-container">
+        <!-- Columna Activos -->
+        <div class="kanban-column">
+            <div class="column-header active">
+                <i class="fas fa-check-circle"></i>
+                <h3>Activos</h3>
+                <span class="client-count" id="activeCount">0</span>
+            </div>
+            <div class="client-cards" id="activeClients">
+                {% for client in clients if client.is_active %}
+                <div class="client-card" data-id="{{ client.id }}">
+                    <div class="card-header">
+                        <span class="client-name">{{ client.name }}</span>
+                        <div class="card-actions">
+                            <button class="action-btn edit" onclick="location.href='/clients/{{ client.id }}/edit'">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn delete" onclick="confirmDelete('client', {{ client.id }})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="info-item">
+                            <i class="fas fa-fingerprint"></i>
+                            <span class="token">{{ client.token }}</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-id-card"></i>
+                            <span>ID: {{ client.id }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Columna Inactivos -->
+        <div class="kanban-column">
+            <div class="column-header inactive">
+                <i class="fas fa-times-circle"></i>
+                <h3>Inactivos</h3>
+                <span class="client-count" id="inactiveCount">0</span>
+            </div>
+            <div class="client-cards" id="inactiveClients">
+                {% for client in clients if not client.is_active %}
+                <div class="client-card" data-id="{{ client.id }}">
+                    <div class="card-header">
+                        <span class="client-name">{{ client.name }}</span>
+                        <div class="card-actions">
+                            <button class="action-btn edit" onclick="location.href='/clients/{{ client.id }}/edit'">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn delete" onclick="confirmDelete('client', {{ client.id }})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="info-item">
+                            <i class="fas fa-fingerprint"></i>
+                            <span class="token">{{ client.token }}</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-id-card"></i>
+                            <span>ID: {{ client.id }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de confirmación -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <h3><i class="fas fa-exclamation-triangle"></i> Confirmar Eliminación</h3>
+            <p>¿Estás seguro de que deseas eliminar este cliente?</p>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+                <button class="btn-confirm" onclick="deleteClient()">Eliminar</button>
+            </div>
+        </div>
+    </div>
 </div>
-<table class="table">
-   <thead>
-       <tr>
-           <th>ID</th>
-           <th>Nombre</th>
-           <th>Token</th>
-           <th>Estado</th>
-           <th>Acciones</th>
-       </tr>
-   </thead>
-   <tbody>
-       {% for client in clients %}
-       <tr>
-           <td>{{ client.id }}</td>
-           <td>{{ client.name }}</td>
-           <td>{{ client.token }}</td>
-           <td>{{ "Activo" if client.is_active else "Inactivo" }}</td>
-           <td>
-               <a href="/clients/{{ client.id }}/edit" class="btn btn-sm btn-warning">Editar</a>
-               <button onclick="confirmDelete('client', {{ client.id }})" class="btn btn-sm btn-danger">Eliminar</button>
-           </td>
-       </tr>
-       {% endfor %}
-   </tbody>
-</table>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/clients.js') }}"></script>
 {% endblock %}
