@@ -1,55 +1,78 @@
 {% extends "base.html" %}
 {% block title %}Drivers{% endblock %}
+
 {% block content %}
-<div class="d-flex justify-content-between mb-4">
-   <h2>Drivers</h2>
-   <a href="/drivers/create" class="btn btn-primary">Nuevo Driver</a>
+<div class="bg-white shadow-lg rounded-lg p-6 mx-auto max-w-7xl">
+    <div class="flex flex-col sm:flex-row justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">Drivers</h2>
+        <a href="/drivers/create" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors">
+            <i data-lucide="plus" class="h-5 w-5"></i>
+            <span class="ml-2">Nuevo Driver</span>
+        </a>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="min-w-full border-collapse border border-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fabricante</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Modelo</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Archivo</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descripción</th>
+                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for driver in drivers %}
+                <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ driver.manufacturer }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ driver.model }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ driver.driver_filename }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ driver.description }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <div class="flex items-center justify-end space-x-2">
+                            <a href="/drivers/{{ driver.id }}/edit" 
+                               class="inline-flex items-center px-3 py-2 bg-yellow-100 text-yellow-700 rounded-lg hover:bg-yellow-200 transition-colors">
+                                <i data-lucide="edit" class="h-4 w-4"></i>
+                                <span class="ml-1">Editar</span>
+                            </a>
+                            <a href="/drivers/{{ driver.id }}/download" 
+                               class="inline-flex items-center px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors">
+                                <i data-lucide="download" class="h-4 w-4"></i>
+                                <span class="ml-1">Descargar</span>
+                            </a>
+                            <button onclick="confirmDelete('driver', {{ driver.id }})" 
+                                    class="inline-flex items-center px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors">
+                                <i data-lucide="trash" class="h-4 w-4"></i>
+                                <span class="ml-1">Eliminar</span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
-<table class="table">
-   <thead>
-       <tr>
-           <th>Fabricante</th>
-           <th>Modelo</th>
-           <th>Archivo</th> <!-- Cambiado para reflejar que es el nombre del archivo -->
-           <th>Descripción</th>
-           <th>Acciones</th>
-       </tr>
-   </thead>
-   <tbody>
-       {% for driver in drivers %}
-       <tr>
-           <td>{{ driver.manufacturer }}</td>
-           <td>{{ driver.model }}</td>
-           <td>{{ driver.driver_filename }}</td> <!-- Mostrar el nombre del archivo -->
-           <td>{{ driver.description }}</td>
-           <td>
-               <a href="/drivers/{{ driver.id }}/edit" class="btn btn-sm btn-warning">Editar</a>
-               <a href="/drivers/{{ driver.id }}/download" class="btn btn-sm btn-info">Descargar</a>
-               <button onclick="confirmDelete('driver', {{ driver.id }})" class="btn btn-sm btn-danger">Eliminar</button>
-           </td>
-       </tr>
-       {% endfor %}
-   </tbody>
-</table>
+
 <script>
-    function confirmDelete(type, id) {
-        if (confirm('¿Estás seguro de eliminar este elemento?')) {
-            fetch(`/drivers/${id}`, {  // Removido /api/v1/
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    location.reload();
-                } else {
-                    alert(data.error || 'Error al eliminar');
-                }
-            });
-        }
+function confirmDelete(type, id) {
+    if (confirm('¿Estás seguro de eliminar este elemento?')) {
+        fetch(`/drivers/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert(data.error || 'Error al eliminar');
+            }
+        });
     }
+}
 </script>
 {% endblock %}
-
