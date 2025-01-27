@@ -7,104 +7,61 @@
 
 {% block content %}
 <div class="client-container">
-    <div class="client-header">
-        <h2 class="client-title">Clientes</h2>
-        <div class="view-controls">
-            <div class="view-toggle">
-                <button id="listViewBtn" class="view-btn active" aria-label="Vista Lista">
-                    <i data-lucide="layout-list"></i>
-                </button>
-                <button id="kanbanViewBtn" class="view-btn" aria-label="Vista Kanban">
-                    <i data-lucide="layout-grid"></i>
-                </button>
-            </div>
-            <a href="/clients/create" class="btn-new">
-                <i data-lucide="plus"></i>
-                <span>Nuevo Cliente</span>
-            </a>
+    <h2 class="client-title">Clientes</h2>
+    
+    <div class="view-controls mb-4">
+        <div class="view-toggle">
+            <button id="listViewBtn" class="view-btn active" aria-label="Vista Lista">
+                <i data-lucide="layout-list"></i>
+            </button>
+            <button id="kanbanViewBtn" class="view-btn" aria-label="Vista Kanban">
+                <i data-lucide="layout-grid"></i>
+            </button>
         </div>
+        <a href="/clients/create" class="btn-new">
+            <i data-lucide="plus"></i>
+            Nuevo Cliente
+        </a>
     </div>
 
     <!-- Vista Lista -->
     <div id="listView" class="list-view">
-        <div class="table-wrapper">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nombre</th>
-                        <th>Token</th>
-                        <th>Estado</th>
-                        <th class="actions-column">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for client in clients %}
-                    <tr>
-                        <td class="id-cell">{{ client.id }}</td>
-                        <td class="name-cell">
-                            <i data-lucide="user"></i>
-                            <span>{{ client.name }}</span>
-                        </td>
-                        <td class="token-cell">
-                            <i data-lucide="key"></i>
-                            <span>{{ client.token }}</span>
-                        </td>
-                        <td>
-                            <span class="status-badge {% if client.is_active %}active{% else %}inactive{% endif %}">
-                                <i data-lucide="circle"></i>
-                                {{ "Activo" if client.is_active else "Inactivo" }}
-                            </span>
-                        </td>
-                        <td class="actions-cell">
-                            <div class="action-buttons">
-                                <a href="/clients/{{ client.id }}/edit" class="btn-action btn-edit">
-                                    <i data-lucide="edit-2"></i>
-                                </a>
-                                <button onclick="confirmDelete('client', {{ client.id }})" class="btn-action btn-delete">
-                                    <i data-lucide="trash-2"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- Vista Kanban -->
-    <div id="kanbanView" class="kanban-view hidden">
-        <div class="cards-grid">
-            {% for client in clients %}
-            <div class="client-card">
-                <div class="card-header">
-                    <div class="card-title">
-                        <i data-lucide="user"></i>
-                        <span>{{ client.name }}</span>
-                    </div>
-                    <div class="card-status {% if client.is_active %}active{% else %}inactive{% endif %}">
-                        <i data-lucide="circle"></i>
-                        <span>{{ "Activo" if client.is_active else "Inactivo" }}</span>
-                    </div>
-                </div>
-                <div class="card-content">
-                    <div class="token-display">
-                        <i data-lucide="key"></i>
-                        <span>{{ client.token }}</span>
-                    </div>
-                </div>
-                <div class="card-actions">
-                    <a href="/clients/{{ client.id }}/edit" class="btn-action btn-edit">
-                        <i data-lucide="edit-2"></i>
-                    </a>
-                    <button onclick="confirmDelete('client', {{ client.id }})" class="btn-action btn-delete">
-                        <i data-lucide="trash-2"></i>
-                    </button>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Token</th>
+                    <th>Estado</th>
+                    <th class="actions-column">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for client in clients %}
+                <tr>
+                    <td>{{ client.id }}</td>
+                    <td>{{ client.name }}</td>
+                    <td class="token-cell">{{ client.token }}</td>
+                    <td>
+                        <span class="status-badge {% if client.is_active %}active{% else %}inactive{% endif %}">
+                            <span class="status-dot"></span>
+                            {{ "Activo" if client.is_active else "Inactivo" }}
+                        </span>
+                    </td>
+                    <td class="actions-cell">
+                        <div class="action-buttons">
+                            <button class="btn-action btn-edit">
+                                <i data-lucide="pen"></i>
+                            </button>
+                            <button class="btn-action btn-delete">
+                                <i data-lucide="trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
 {% endblock %}
