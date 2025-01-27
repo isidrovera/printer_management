@@ -1,26 +1,32 @@
-
 {% extends "base.html" %}
+
 {% block title %}{{ "Editar" if client else "Nuevo" }} Cliente{% endblock %}
+
 {% block content %}
-<div class="card">
-    <div class="card-header">
-        <h3>{{ "Editar" if client else "Nuevo" }} Cliente</h3>
-    </div>
-    <div class="card-body">
-        <form method="POST">
-            <div class="mb-3">
-                <label class="form-label">Nombre</label>
-                <input type="text" name="name" class="form-control" value="{{ client.name if client else '' }}" required>
-            </div>
-            {% if client %}
-                <div class="mb-3">
-                    <label class="form-label">Token</label>
-                    <input type="text" class="form-control" value="{{ client.token }}" readonly>
-                </div>
-            {% endif %}
-            <button type="submit" class="btn btn-primary">Guardar</button>
-            <a href="/clients" class="btn btn-secondary">Cancelar</a>
-        </form>
-    </div>
+<div class="bg-white shadow-lg rounded-lg p-6 mx-auto max-w-3xl">
+    <h3 class="text-xl font-semibold text-gray-800 mb-4">{{ "Editar" if client else "Nuevo" }} Cliente</h3>
+
+    <form method="POST" class="space-y-6">
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Nombre</label>
+            <input type="text" name="name" 
+                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500" 
+                   value="{{ client.name if client else '' }}" required>
+        </div>
+
+        {% if client %}
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Token</label>
+            <input type="text" 
+                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-gray-100 cursor-not-allowed" 
+                   value="{{ client.token }}" readonly>
+        </div>
+        {% endif %}
+
+        <div class="flex justify-end space-x-4">
+            <a href="/clients" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">Cancelar</a>
+            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Guardar</button>
+        </div>
+    </form>
 </div>
 {% endblock %}
