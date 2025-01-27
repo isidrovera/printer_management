@@ -6,7 +6,8 @@ from typing import List
 from fastapi.responses import JSONResponse
 
 # Crear el enrutador para los endpoints de drivers
-router = APIRouter(prefix="/api/v1")  # Añadir prefijo de API
+# Quita el prefijo de aquí
+router = APIRouter() # Añadir prefijo de API
 
 @router.get("/drivers", response_model=List[dict])
 def get_all_drivers(db: Session = Depends(get_db)):

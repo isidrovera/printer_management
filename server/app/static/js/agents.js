@@ -113,12 +113,19 @@ async function initializeDriverSelect() {
     if (!driverSelect) return;
 
     try {
-        // Usar la URL completa para el endpoint de drivers
+        console.group('Carga de Drivers');
+        console.log('Intentando cargar drivers...');
+        
         const response = await fetch('/api/v1/drivers', {
             method: 'GET',
             headers: {
                 'Accept': 'application/json'
             }
+        });
+
+        console.log('Respuesta de drivers:', {
+            status: response.status,
+            headers: Object.fromEntries(response.headers.entries())
         });
 
         if (!response.ok) {
@@ -132,6 +139,8 @@ async function initializeDriverSelect() {
             throw new Error('El formato de datos devuelto no es válido');
         }
 
+        console.log('Drivers recuperados:', drivers);
+
         // Poblar el select con los drivers
         driverSelect.innerHTML = '<option value="">Seleccione un driver</option>';
         drivers.forEach((driver) => {
@@ -140,9 +149,16 @@ async function initializeDriverSelect() {
             option.textContent = `${driver.manufacturer} - ${driver.model} (${driver.driver_filename})`;
             driverSelect.appendChild(option);
         });
+
+        console.log('Select de drivers poblado exitosamente');
+        console.groupEnd();
+
     } catch (error) {
-        console.error('Error inicializando drivers:', error);
-        showNotification('Error al cargar drivers. Verifique la conexión.', 'error');
+        console.groupEnd();
+        console.error('Error completo inicializando drivers:', error);
+        
+        // Mostrar notificación de error más detallada
+        showNotification(`Error al cargar drivers: ${error.message}`, 'error');
     }
 }
 
@@ -173,20 +189,34 @@ function closeModal(modalId) {
 
 // Función para mostrar notificaciones
 function showNotification(message, type = 'info') {
-    // Aquí puedes personalizar cómo mostrar las notificaciones
     console.log(`[${type.toUpperCase()}] ${message}`);
     
-    // Ejemplo de notificación (ajusta según tu implementación)
+    // Implementación de notificación visual
     const notificationContainer = document.getElementById('notification-container');
     if (notificationContainer) {
+        // Crear elemento de notificación
         const notification = document.createElement('div');
         notification.classList.add('notification', `notification-${type}`);
-        notification.textContent = message;
+        notification.innerHTML = `
+            <strong>${type.toUpperCase()}:</strong> 
+            ${message}
+            <button class="close-notification">&times;</button>
+        `;
+
+        // Añadir evento de cierre
+        const closeButton = notification.querySelector('.close-notification');
+        closeButton.addEventListener('click', () => {
+            notification.remove();
+        });
+
         notificationContainer.appendChild(notification);
 
         // Eliminar la notificación después de unos segundos
         setTimeout(() => {
-            notification.remove();
+            notification.classList.add('fade-out');
+            setTimeout(() => {
+                notification.remove();
+            }, 500);
         }, 5000);
     }
 }
