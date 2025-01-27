@@ -1,71 +1,40 @@
-/* Estilos base y variables */
+/* Variables */
 :root {
-    --blue-600: #2563eb;
-    --blue-700: #1d4ed8;
-    --gray-50: #f9fafb;
-    --gray-100: #f3f4f6;
-    --gray-200: #e5e7eb;
-    --gray-500: #6b7280;
-    --gray-600: #4b5563;
+    --primary-color: #4050F8;
+    --primary-hover: #3040E8;
+    --success-color: #10B981;
+    --success-bg: #ECFDF5;
+    --danger-color: #EF4444;
+    --danger-bg: #FEE2E2;
+    --gray-100: #F3F4F6;
+    --gray-200: #E5E7EB;
+    --gray-300: #D1D5DB;
+    --gray-500: #6B7280;
     --gray-700: #374151;
-    --amber-50: #fffbeb;
-    --amber-600: #d97706;
-    --red-50: #fef2f2;
-    --red-100: #fee2e2;
-    --red-500: #ef4444;
-    --red-600: #dc2626;
-    --red-700: #b91c1c;
-    --green-100: #dcfce7;
-    --green-500: #22c55e;
-    --green-700: #15803d;
 }
 
 /* Contenedor principal */
 .client-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 1.5rem 1rem;
-}
-
-/* Encabezado */
-.client-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-    gap: 1rem;
-}
-
-@media (max-width: 640px) {
-    .client-header {
-        flex-direction: column;
-        align-items: flex-start;
-    }
+    padding: 1rem;
 }
 
 .client-title {
     font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--gray-700);
-    margin: 0;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
 }
 
 /* Controles de vista */
 .view-controls {
     display: flex;
     gap: 1rem;
-}
-
-@media (max-width: 640px) {
-    .view-controls {
-        width: 100%;
-    }
+    margin-bottom: 1.5rem;
 }
 
 .view-toggle {
     display: flex;
     background-color: var(--gray-100);
-    border-radius: 0.5rem;
+    border-radius: 0.375rem;
     padding: 0.25rem;
 }
 
@@ -73,14 +42,9 @@
     padding: 0.5rem;
     border: none;
     background: none;
-    border-radius: 0.5rem;
-    color: var(--gray-600);
     cursor: pointer;
-    transition: all 0.2s;
-}
-
-.view-btn:hover {
-    background-color: var(--gray-200);
+    color: var(--gray-500);
+    border-radius: 0.25rem;
 }
 
 .view-btn.active {
@@ -92,55 +56,37 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    background-color: var(--blue-600);
-    color: white;
     padding: 0.5rem 1rem;
-    border-radius: 0.5rem;
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: 0.375rem;
     text-decoration: none;
-    transition: background-color 0.2s;
+    border: none;
 }
 
 .btn-new:hover {
-    background-color: var(--blue-700);
+    background-color: var(--primary-hover);
     color: white;
 }
 
 /* Tabla */
-.table-wrapper {
-    background-color: white;
-    border-radius: 0.5rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    overflow-x: auto;
-}
-
 .data-table {
     width: 100%;
     border-collapse: collapse;
+    margin-top: 1rem;
 }
 
 .data-table th {
-    background-color: var(--gray-50);
-    padding: 0.75rem 1rem;
     text-align: left;
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--gray-600);
+    padding: 0.75rem 1rem;
+    font-weight: 500;
+    color: var(--gray-700);
+    border-bottom: 1px solid var(--gray-200);
 }
 
 .data-table td {
     padding: 0.75rem 1rem;
-    border-top: 1px solid var(--gray-100);
-}
-
-.data-table tr:hover {
-    background-color: var(--gray-50);
-}
-
-/* Células específicas */
-.name-cell, .token-cell {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+    border-bottom: 1px solid var(--gray-200);
 }
 
 .token-cell {
@@ -148,141 +94,77 @@
     color: var(--gray-500);
 }
 
-/* Badge de estado */
+/* Estado */
 .status-badge {
     display: inline-flex;
     align-items: center;
-    gap: 0.25rem;
-    padding: 0.25rem 0.75rem;
-    border-radius: 9999px;
+    gap: 0.5rem;
     font-size: 0.875rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
 }
 
 .status-badge.active {
-    background-color: var(--green-100);
-    color: var(--green-700);
+    background-color: var(--success-bg);
+    color: var(--success-color);
 }
 
 .status-badge.inactive {
-    background-color: var(--red-100);
-    color: var(--red-700);
+    background-color: var(--danger-bg);
+    color: var(--danger-color);
+}
+
+.status-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.status-badge.active .status-dot {
+    background-color: var(--success-color);
+}
+
+.status-badge.inactive .status-dot {
+    background-color: var(--danger-color);
 }
 
 /* Botones de acción */
 .action-buttons {
     display: flex;
-    justify-content: flex-end;
     gap: 0.5rem;
+    justify-content: flex-start;
 }
 
 .btn-action {
     padding: 0.5rem;
     border: none;
     background: none;
-    border-radius: 0.5rem;
     cursor: pointer;
-    transition: all 0.2s;
+    border-radius: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .btn-edit {
-    color: var(--amber-600);
+    color: #F59E0B;
 }
 
 .btn-edit:hover {
-    background-color: var(--amber-50);
+    background-color: #FEF3C7;
 }
 
 .btn-delete {
-    color: var(--red-600);
+    color: var(--danger-color);
 }
 
 .btn-delete:hover {
-    background-color: var(--red-50);
-}
-
-/* Vista Kanban */
-.kanban-view {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1rem;
-}
-
-.client-card {
-    background-color: white;
-    border-radius: 0.5rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    padding: 1rem;
-}
-
-.card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.5rem;
-}
-
-.card-title {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-weight: 600;
-}
-
-.card-content {
-    margin: 1rem 0;
-}
-
-.token-display {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--gray-500);
-    font-family: monospace;
-    font-size: 0.875rem;
-    margin-bottom: 1rem;
-}
-
-.card-status {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    font-size: 0.875rem;
-}
-
-.card-status.active {
-    color: var(--green-500);
-}
-
-.card-status.inactive {
-    color: var(--red-500);
+    background-color: var(--danger-bg);
 }
 
 /* Iconos */
 [data-lucide] {
     width: 1.25rem;
     height: 1.25rem;
-}
-
-.status-badge [data-lucide="circle"] {
-    width: 0.5rem;
-    height: 0.5rem;
-    fill: currentColor;
-}
-
-/* Utilidades */
-.hidden {
-    display: none !important;
-}
-
-/* Responsive */
-@media (max-width: 640px) {
-    .view-toggle,
-    .btn-new {
-        width: 100%;
-        justify-content: center;
-    }
-    
-    .kanban-view {
-        grid-template-columns: 1fr;
-    }
 }
