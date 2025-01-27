@@ -2,7 +2,7 @@
 {% block title %}Clientes{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/clients.css') }}">
+<link href="/static/css/clients.css" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
@@ -110,6 +110,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.259.0/lucide.min.js"></script>
-<script src="{{ url_for('static', filename='js/clients.js') }}"></script>
+<script src="/static/js/clients.js"></script>
 {% endblock %}

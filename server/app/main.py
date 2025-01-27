@@ -1,5 +1,8 @@
 # server/main.py
 import logging
+import os
+from pathlib import Path
+
 logging.basicConfig(
     level=logging.DEBUG,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
@@ -28,8 +31,24 @@ app.add_middleware(
 )
 
 logger.info("Mounting static files...")
-app.mount("/static", StaticFiles(directory="app/static"), name="static")
+
+# Configurar las plantillas
 templates = Jinja2Templates(directory="app/templates")
+
+# Obtener la ruta absoluta del directorio static usando Path
+BASE_DIR = Path(__file__).resolve().parent.parent
+static_dir = BASE_DIR / "app" / "static"
+
+logger.debug(f"Static directory path: {static_dir}")
+logger.debug(f"Static directory exists: {static_dir.exists()}")
+
+# Listar archivos en el directorio static/css para debugging
+css_dir = static_dir / "css"
+if css_dir.exists():
+    logger.debug(f"CSS files: {[f.name for f in css_dir.iterdir()]}")
+
+# Montar archivos estáticos
+app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
 
 logger.info("Including routers...")
 app.include_router(api_router)
