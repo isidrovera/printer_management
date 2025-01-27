@@ -189,7 +189,8 @@ function initializeWebSocket() {
 
 // Conectar WebSocket
 function connectWebSocket() {
-    ws = new WebSocket(`ws://${window.location.host}/ws/api/v1/ws/status`);
+    // Corregir la ruta del WebSocket
+    ws = new WebSocket(`ws://${window.location.host}/api/v1/ws/status`);
     
     ws.onopen = () => {
         console.log('WebSocket conectado');
