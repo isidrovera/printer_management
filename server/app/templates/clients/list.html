@@ -9,31 +9,30 @@
 <div class="client-container">
     <h2 class="client-title">Clientes</h2>
     
-    <div class="view-controls mb-4">
-        <div class="view-toggle">
-            <button id="listViewBtn" class="view-btn active" aria-label="Vista Lista">
+    <div class="controls-section">
+        <div class="view-type-controls">
+            <button id="listViewBtn" class="view-btn active" title="Vista Lista">
                 <i data-lucide="layout-list"></i>
             </button>
-            <button id="kanbanViewBtn" class="view-btn" aria-label="Vista Kanban">
-                <i data-lucide="layout-grid"></i>
+            <button id="kanbanViewBtn" class="view-btn" title="Vista Kanban">
+                <i data-lucide="grid"></i>
             </button>
         </div>
-        <a href="/clients/create" class="btn-new">
-            <i data-lucide="plus"></i>
-            Nuevo Cliente
+        <a href="/clients/create" class="new-client-btn">
+            + Nuevo Cliente
         </a>
     </div>
 
     <!-- Vista Lista -->
     <div id="listView" class="list-view">
-        <table class="data-table">
+        <table class="client-table">
             <thead>
                 <tr>
                     <th>ID</th>
                     <th>Nombre</th>
                     <th>Token</th>
                     <th>Estado</th>
-                    <th class="actions-column">Acciones</th>
+                    <th style="text-align: right;">Acciones</th>
                 </tr>
             </thead>
             <tbody>
@@ -50,11 +49,11 @@
                     </td>
                     <td class="actions-cell">
                         <div class="action-buttons">
-                            <button class="btn-action btn-edit">
-                                <i data-lucide="pen"></i>
-                            </button>
-                            <button class="btn-action btn-delete">
-                                <i data-lucide="trash"></i>
+                            <a href="/clients/{{ client.id }}/edit" class="action-btn">
+                                <i data-lucide="pencil"></i>
+                            </a>
+                            <button onclick="confirmDelete('{{ client.id }}')" class="action-btn delete">
+                                <i data-lucide="trash-2"></i>
                             </button>
                         </div>
                     </td>
@@ -62,6 +61,39 @@
                 {% endfor %}
             </tbody>
         </table>
+    </div>
+
+    <!-- Vista Kanban -->
+    <div id="kanbanView" class="kanban-view hidden">
+        <div class="cards-grid">
+            {% for client in clients %}
+            <div class="client-card">
+                <div class="card-header">
+                    <span class="client-name">{{ client.name }}</span>
+                    <span class="status-badge {% if client.is_active %}active{% else %}inactive{% endif %}">
+                        <span class="status-dot"></span>
+                        {{ "Activo" if client.is_active else "Inactivo" }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <div class="token-info">
+                        <span class="token-label">Token:</span>
+                        <span class="token-value">{{ client.token }}</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="action-buttons">
+                        <a href="/clients/{{ client.id }}/edit" class="action-btn">
+                            <i data-lucide="pencil"></i>
+                        </a>
+                        <button onclick="confirmDelete('{{ client.id }}')" class="action-btn delete">
+                            <i data-lucide="trash-2"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
     </div>
 </div>
 {% endblock %}
