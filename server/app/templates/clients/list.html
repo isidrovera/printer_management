@@ -2,57 +2,69 @@
 {% block title %}Clientes{% endblock %}
 
 {% block content %}
-<div class="client-container">
-    <!-- Cabecera con controles -->
-    <div class="controls-section">
-        <h2 class="client-title">Clientes</h2>
-        
-        <div class="view-type-controls">
-            <button id="listViewBtn" class="view-btn active">
-                <i data-lucide="layout-list"></i>
-            </button>
-            <button id="kanbanViewBtn" class="view-btn">
-                <i data-lucide="grid"></i>
-            </button>
+<div class="container mx-auto px-4 py-6">
+    <!-- Header Section -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+        <h2 class="text-2xl font-bold">Clientes</h2>
+        <div class="flex gap-4 w-full sm:w-auto">
+            <!-- View Toggle Buttons -->
+            <div class="flex bg-gray-100 rounded-lg p-1">
+                <button id="listViewBtn" 
+                        class="p-2 rounded-lg transition-colors">
+                    <i data-lucide="layout-list" class="w-5 h-5"></i>
+                </button>
+                <button id="kanbanViewBtn" 
+                        class="p-2 rounded-lg transition-colors">
+                    <i data-lucide="layout-grid" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <!-- New Client Button -->
+            <a href="/clients/create" 
+               class="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                <i data-lucide="plus" class="w-5 h-5"></i>
+                <span>Nuevo Cliente</span>
+            </a>
         </div>
-        
-        <a href="/clients/create" class="new-client-btn">
-            <i data-lucide="plus"></i>
-            Nuevo Cliente
-        </a>
     </div>
 
-    <!-- Vista Lista -->
-    <div id="listView">
-        <table class="client-table">
-            <thead>
+    <!-- List View -->
+    <div id="listView" class="overflow-x-auto">
+        <table class="w-full bg-white rounded-lg shadow">
+            <thead class="bg-gray-50">
                 <tr>
-                    <th>ID</th>
-                    <th>Nombre</th>
-                    <th>Token</th>
-                    <th>Estado</th>
-                    <th class="actions-cell">Acciones</th>
+                    <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">ID</th>
+                    <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">Nombre</th>
+                    <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">Token</th>
+                    <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">Estado</th>
+                    <th class="px-4 py-3 text-right text-sm font-semibold text-gray-600">Acciones</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody class="divide-y divide-gray-100">
                 {% for client in clients %}
-                <tr>
-                    <td>{{ client.id }}</td>
-                    <td>{{ client.name }}</td>
-                    <td class="token-cell">{{ client.token }}</td>
-                    <td>
-                        <span class="status-badge {% if client.is_active %}active{% else %}inactive{% endif %}">
-                            <span class="status-dot"></span>
+                <tr class="hover:bg-gray-50">
+                    <td class="px-4 py-3 text-sm text-gray-600">{{ client.id }}</td>
+                    <td class="px-4 py-3 text-sm">{{ client.name }}</td>
+                    <td class="px-4 py-3 text-sm font-mono text-gray-500">{{ client.token }}</td>
+                    <td class="px-4 py-3">
+                        <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-sm 
+                            {% if client.is_active %}
+                            bg-green-100 text-green-700
+                            {% else %}
+                            bg-red-100 text-red-700
+                            {% endif %}">
+                            <i data-lucide="circle" class="w-2 h-2 {% if client.is_active %}text-green-500{% else %}text-red-500{% endif %} fill-current"></i>
                             {{ "Activo" if client.is_active else "Inactivo" }}
                         </span>
                     </td>
-                    <td class="actions-cell">
-                        <div class="action-buttons">
-                            <a href="/clients/{{ client.id }}/edit" class="action-btn edit" title="Editar">
-                                <i data-lucide="edit-2"></i>
+                    <td class="px-4 py-3">
+                        <div class="flex justify-end gap-2">
+                            <a href="/clients/{{ client.id }}/edit" 
+                               class="p-2 text-amber-600 hover:bg-amber-50 rounded-lg transition-colors">
+                                <i data-lucide="edit-2" class="w-4 h-4"></i>
                             </a>
-                            <button onclick="confirmDelete('{{ client.id }}')" class="action-btn delete" title="Eliminar">
-                                <i data-lucide="trash-2"></i>
+                            <button onclick="confirmDelete('client', {{ client.id }})"
+                                    class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
                             </button>
                         </div>
                     </td>
@@ -62,30 +74,37 @@
         </table>
     </div>
 
-    <!-- Vista Kanban -->
-    <div id="kanbanView" class="kanban-view hidden">
+    <!-- Kanban View -->
+    <div id="kanbanView" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {% for client in clients %}
-        <div class="client-card">
-            <div class="card-header">
-                <span class="client-name">{{ client.name }}</span>
-                <span class="status-badge {% if client.is_active %}active{% else %}inactive{% endif %}">
-                    <span class="status-dot"></span>
-                    {{ "Activo" if client.is_active else "Inactivo" }}
-                </span>
-            </div>
-            <div class="card-body">
-                <div class="token-info">
-                    <span class="token-label">Token:</span>
-                    <span class="token-value">{{ client.token }}</span>
+        <div class="bg-white rounded-lg shadow">
+            <div class="p-4">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="user" class="w-5 h-5 text-gray-500"></i>
+                        <span class="font-semibold">{{ client.name }}</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="circle" 
+                           class="w-3 h-3 {% if client.is_active %}text-green-500{% else %}text-red-500{% endif %} fill-current">
+                        </i>
+                        <span class="{% if client.is_active %}text-green-500{% else %}text-red-500{% endif %}">
+                            {{ "Activo" if client.is_active else "Inactivo" }}
+                        </span>
+                    </div>
                 </div>
-            </div>
-            <div class="card-footer">
-                <div class="action-buttons">
-                    <a href="/clients/{{ client.id }}/edit" class="action-btn edit" title="Editar">
-                        <i data-lucide="edit-2"></i>
+                <div class="flex items-center gap-2 text-gray-500 mb-4">
+                    <i data-lucide="key" class="w-4 h-4"></i>
+                    <span class="text-sm">{{ client.token }}</span>
+                </div>
+                <div class="flex justify-end gap-2">
+                    <a href="/clients/{{ client.id }}/edit"
+                       class="p-2 text-amber-600 hover:bg-amber-50 rounded-lg transition-colors">
+                        <i data-lucide="edit-2" class="w-4 h-4"></i>
                     </a>
-                    <button onclick="confirmDelete('{{ client.id }}')" class="action-btn delete" title="Eliminar">
-                        <i data-lucide="trash-2"></i>
+                    <button onclick="confirmDelete('client', {{ client.id }})"
+                            class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
                     </button>
                 </div>
             </div>
@@ -101,35 +120,36 @@ document.addEventListener('DOMContentLoaded', function() {
     const listViewBtn = document.getElementById('listViewBtn');
     const kanbanViewBtn = document.getElementById('kanbanViewBtn');
 
-    // Función para cambiar entre vistas
     function switchView(view) {
         if (view === 'list') {
             listView.classList.remove('hidden');
             kanbanView.classList.add('hidden');
-            listViewBtn.classList.add('active');
-            kanbanViewBtn.classList.remove('active');
+            listViewBtn.classList.add('bg-white', 'shadow-sm');
+            listViewBtn.classList.remove('text-gray-600', 'hover:bg-gray-200');
+            kanbanViewBtn.classList.remove('bg-white', 'shadow-sm');
+            kanbanViewBtn.classList.add('text-gray-600', 'hover:bg-gray-200');
         } else {
             kanbanView.classList.remove('hidden');
             listView.classList.add('hidden');
-            kanbanViewBtn.classList.add('active');
-            listViewBtn.classList.remove('active');
+            kanbanViewBtn.classList.add('bg-white', 'shadow-sm');
+            kanbanViewBtn.classList.remove('text-gray-600', 'hover:bg-gray-200');
+            listViewBtn.classList.remove('bg-white', 'shadow-sm');
+            listViewBtn.classList.add('text-gray-600', 'hover:bg-gray-200');
         }
         localStorage.setItem('preferredView', view);
     }
 
-    // Manejadores de eventos para los botones
     listViewBtn.addEventListener('click', () => switchView('list'));
     kanbanViewBtn.addEventListener('click', () => switchView('kanban'));
 
-    // Restaurar la vista preferida del usuario
+    // Restaurar vista preferida
     const preferredView = localStorage.getItem('preferredView') || 'list';
     switchView(preferredView);
 });
 
-// Función para confirmar eliminación
-function confirmDelete(id) {
+function confirmDelete(type, id) {
     if (confirm('¿Estás seguro de que deseas eliminar este cliente?')) {
-        console.log('Eliminando cliente:', id);
+        console.log(`Eliminando ${type} ${id}`);
     }
 }
 </script>
