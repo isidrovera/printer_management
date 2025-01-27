@@ -138,62 +138,7 @@
         </form>
     </div>
 </div>
-<!-- Segunda parte: El modal -->
-<div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden z-50" id="installPrinterModal">
-    <div class="bg-white rounded-lg shadow-lg max-w-md w-full mx-4">
-        <div class="p-4 border-b">
-            <h3 class="text-lg font-semibold text-gray-800">Instalar Impresora</h3>
-        </div>
-        <form id="installPrinterForm" class="p-4">
-            <!-- Importante: Este es el input hidden que estaba causando el error -->
-            <input type="hidden" id="agentToken" name="agentToken">
-            
-            <!-- Fabricante -->
-            <div class="mb-4">
-                <label for="manufacturer" class="block text-sm font-medium text-gray-700 mb-1">Fabricante</label>
-                <select id="manufacturer" name="manufacturer" required
-                        class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                    <option value="">Seleccione un fabricante</option>
-                    {% for manufacturer in manufacturers %}
-                    <option value="{{ manufacturer }}">{{ manufacturer }}</option>
-                    {% endfor %}
-                </select>
-            </div>
 
-            <!-- Modelo -->
-            <div class="mb-4">
-                <label for="model" class="block text-sm font-medium text-gray-700 mb-1">Modelo</label>
-                <select id="model" name="model" required disabled
-                        class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                    <option value="">Seleccione un modelo</option>
-                </select>
-            </div>
-
-            <!-- IP de la Impresora -->
-            <div class="mb-4">
-                <label for="printerIp" class="block text-sm font-medium text-gray-700 mb-1">IP de la Impresora</label>
-                <input type="text" id="printerIp" name="printerIp" required
-                       placeholder="192.168.1.100"
-                       pattern="^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
-                       class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                <p class="mt-1 text-sm text-gray-500">Formato: xxx.xxx.xxx.xxx</p>
-            </div>
-
-            <!-- Botones -->
-            <div class="mt-6 flex justify-end space-x-3">
-                <button type="button" 
-                        onclick="closeModal('installPrinterModal')"
-                        class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
-                    Cancelar
-                </button>
-                <button type="submit"
-                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                    Instalar
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
 
 <!-- También agregar estas funciones al script existente -->
 <script>
