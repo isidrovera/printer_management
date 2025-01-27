@@ -2,6 +2,8 @@
 :root {
     --blue-500: #3b82f6;
     --blue-600: #2563eb;
+    --blue-700: #1d4ed8;
+    --blue-100: #dbeafe;
     --gray-50: #f9fafb;
     --gray-100: #f3f4f6;
     --gray-200: #e5e7eb;
@@ -9,8 +11,10 @@
     --gray-400: #9ca3af;
     --gray-500: #6b7280;
     --gray-600: #4b5563;
+    --gray-800: #1f2937;
     --red-100: #fee2e2;
     --red-500: #ef4444;
+    --red-700: #b91c1c;
     --green-100: #dcfce7;
     --green-500: #22c55e;
 }
@@ -54,7 +58,7 @@
 .view-btn.active {
     background: white;
     color: var(--blue-600);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .new-client-btn {
@@ -146,22 +150,36 @@
     background: none;
     border-radius: 6px;
     cursor: pointer;
-    color: var(--gray-500);
+    color: var(--gray-600); /* Color inicial del botón */
     transition: all 0.2s;
     display: flex;
     align-items: center;
     justify-content: center;
+    font-size: 16px; /* Tamaño del ícono */
 }
 
 .action-btn:hover {
-    background: var(--gray-100);
+    background: var(--gray-200); /* Fondo al pasar el cursor */
+    color: var(--gray-800); /* Color del ícono al pasar el cursor */
+}
+
+.action-btn.delete {
+    color: var(--red-500); /* Color rojo para el botón de eliminar */
 }
 
 .action-btn.delete:hover {
-    background: var(--red-100);
-    color: var(--red-500);
+    background: var(--red-100); /* Fondo rojo claro al pasar el cursor */
+    color: var(--red-700); /* Color rojo oscuro del ícono al pasar el cursor */
 }
 
+.action-btn.edit {
+    color: var(--blue-500); /* Color azul para el botón de editar */
+}
+
+.action-btn.edit:hover {
+    background: var(--blue-100); /* Fondo azul claro al pasar el cursor */
+    color: var(--blue-700); /* Color azul oscuro del ícono al pasar el cursor */
+}
 
 /* Vista Kanban */
 .kanban-view {
@@ -173,7 +191,7 @@
 .client-card {
     background: white;
     border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     padding: 16px;
 }
 

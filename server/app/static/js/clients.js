@@ -1,6 +1,10 @@
-document.addEventListener('DOMContentLoaded', function() {
-    // Inicializar iconos
-    lucide.createIcons();
+document.addEventListener('DOMContentLoaded', function () {
+    // Inicializar iconos de Lucide
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    } else {
+        console.error('Lucide no está definido. Verifica que el script esté cargado correctamente.');
+    }
 
     // Elementos DOM
     const listViewBtn = document.getElementById('listViewBtn');
