@@ -14,9 +14,8 @@ const WS_CONFIG = {
 // Inicialización cuando el DOM está listo
 document.addEventListener('DOMContentLoaded', function () {
     initializeWebSocket();
-    initializeDriverSelect(); // Cargar marca, modelo y driver dinámicamente
-    initializeFormHandlers();
     initializeSearchFilter();
+    initializeFormHandlers();
 });
 
 // Inicializar WebSocket
@@ -51,40 +50,23 @@ function initializeWebSocket() {
     }
 }
 
-// Inicializar select de drivers (marca, modelo y archivo)
-async function initializeDriverSelect() {
-    const driverSelect = document.getElementById('driver');
-    if (!driverSelect) return;
+// Función para inicializar el filtro de búsqueda
+function initializeSearchFilter() {
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', function (e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('tbody tr');
 
-    try {
-        // Hacer la petición al backend para obtener los drivers
-        const response = await fetch('/api/v1/drivers'); // Endpoint para obtener drivers
-        if (!response.ok) {
-            throw new Error('Error al obtener la lista de drivers');
-        }
-
-        const drivers = await response.json();
-
-        // Validar que la respuesta sea un array
-        if (!Array.isArray(drivers)) {
-            throw new Error('El formato de datos devuelto no es válido');
-        }
-
-        // Poblar el select con los drivers
-        driverSelect.innerHTML = '<option value="">Seleccione un driver</option>';
-        drivers.forEach((driver) => {
-            const option = document.createElement('option');
-            option.value = driver.id; // Asignar el ID del driver como valor
-            option.textContent = `${driver.manufacturer} - ${driver.model} (${driver.driver_filename})`;
-            driverSelect.appendChild(option);
+            rows.forEach((row) => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
         });
-    } catch (error) {
-        console.error('Error inicializando drivers:', error);
-        showNotification('Error al cargar drivers', 'error');
     }
 }
 
-// Función para manejar formularios
+// Función para inicializar manejadores de formularios
 function initializeFormHandlers() {
     const installForm = document.getElementById('installPrinterForm');
     if (installForm) {
@@ -124,13 +106,54 @@ function initializeFormHandlers() {
     }
 }
 
-// Función para mostrar notificaciones
-function showNotification(message, type = 'info') {
-    // Implementa aquí tu lógica para mostrar notificaciones
-    console.log(`[${type.toUpperCase()}] ${message}`);
+// Función para inicializar el select de drivers
+async function initializeDriverSelect() {
+    const driverSelect = document.getElementById('driver');
+    if (!driverSelect) return;
+
+    try {
+        // Hacer la petición al backend para obtener los drivers
+        const response = await fetch('/api/v1/drivers'); // Endpoint para obtener drivers
+        if (!response.ok) {
+            throw new Error('Error al obtener la lista de drivers');
+        }
+
+        const drivers = await response.json();
+
+        // Validar que la respuesta sea un array
+        if (!Array.isArray(drivers)) {
+            throw new Error('El formato de datos devuelto no es válido');
+        }
+
+        // Poblar el select con los drivers
+        driverSelect.innerHTML = '<option value="">Seleccione un driver</option>';
+        drivers.forEach((driver) => {
+            const option = document.createElement('option');
+            option.value = driver.id; // Asignar el ID del driver como valor
+            option.textContent = `${driver.manufacturer} - ${driver.model} (${driver.driver_filename})`;
+            driverSelect.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Error inicializando drivers:', error);
+        showNotification('Error al cargar drivers', 'error');
+    }
 }
 
-// Función para cerrar modales
+// Función para mostrar el modal de instalación de impresora
+function showInstallPrinter(agentToken) {
+    currentAgentToken = agentToken;
+
+    const modal = document.getElementById('installPrinterModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        document.getElementById('installPrinterForm').reset(); // Resetear el formulario
+        initializeDriverSelect(); // Llenar el select de drivers
+    } else {
+        console.warn("El modal no existe en el DOM.");
+    }
+}
+
+// Función para cerrar un modal por ID
 function closeModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
@@ -141,34 +164,8 @@ function closeModal(modalId) {
     }
 }
 
-// Inicializar filtro de búsqueda
-function initializeSearchFilter() {
-    const searchInput = document.getElementById('searchInput');
-    if (searchInput) {
-        searchInput.addEventListener('input', function (e) {
-            const searchTerm = e.target.value.toLowerCase();
-            const rows = document.querySelectorAll('tbody tr');
-
-            rows.forEach((row) => {
-                const text = row.textContent.toLowerCase();
-                row.style.display = text.includes(searchTerm) ? '' : 'none';
-            });
-        });
-    }
-}
-// Función para mostrar el modal de instalación de impresora
-function showInstallPrinter(agentToken) {
-    currentAgentToken = agentToken;
-
-    const modal = document.getElementById('installPrinterModal');
-    if (modal) {
-        modal.classList.remove('hidden');
-
-        // Resetear el formulario
-        document.getElementById('installPrinterForm').reset();
-
-        // Resetear el select de drivers
-        const driverSelect = document.getElementById('driver');
-        driverSelect.innerHTML = '<option value="">Seleccione un driver</option>';
-    }
+// Función para mostrar notificaciones
+function showNotification(message, type = 'info') {
+    // Aquí puedes personalizar cómo mostrar las notificaciones
+    console.log(`[${type.toUpperCase()}] ${message}`);
 }
