@@ -1,167 +1,33 @@
 {% extends "base.html" %}
-{% block title %}Gestión de Clientes{% endblock %}
-
-{% block styles %}
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-<link href="{{ url_for('static', filename='css/clients.css') }}" rel="stylesheet">
-{% endblock %}
-
+{% block title %}Clientes{% endblock %}
 {% block content %}
-<!-- Navigation Bar -->
-<nav class="main-nav">
-    <div class="nav-content">
-        <h1 class="nav-title">Printer Management</h1>
-        <div class="nav-links">
-            <a href="/clientes" class="nav-link active">Clientes</a>
-            <a href="/agentes" class="nav-link">Agentes</a>
-            <a href="/drivers" class="nav-link">Drivers</a>
-        </div>
-    </div>
-</nav>
-
-<main class="main-content">
-    <!-- Header Section -->
-    <div class="content-header">
-        <div class="header-left">
-            <h2>Gestión de Clientes</h2>
-            <div class="search-container">
-                <i class="fas fa-search search-icon"></i>
-                <input type="text" placeholder="Buscar clientes..." class="search-input">
-            </div>
-        </div>
-        <div class="header-right">
-            <button class="btn-filter">
-                <i class="fas fa-filter"></i>
-                Filtros
-            </button>
-            <a href="/clients/new" class="btn-primary">
-                <i class="fas fa-plus"></i>
-                Nuevo Cliente
-            </a>
-        </div>
-    </div>
-
-    <!-- Filters Panel -->
-    <div class="filters-panel" id="filtersPanel">
-        <div class="filter-group">
-            <label>Estado</label>
-            <select class="select-filter">
-                <option value="todos">Todos</option>
-                <option value="activos">Activos</option>
-                <option value="inactivos">Inactivos</option>
-            </select>
-        </div>
-        <div class="filter-group">
-            <label>Ordenar por</label>
-            <select class="select-filter">
-                <option value="nombre">Nombre</option>
-                <option value="id">ID</option>
-                <option value="fecha">Fecha</option>
-            </select>
-        </div>
-    </div>
-
-    <!-- Client Cards -->
-    <div class="client-sections">
-        <!-- Active Clients -->
-        <section class="client-section">
-            <div class="section-header">
-                <h3>Activos</h3>
-                <span class="badge">{{ active_count }}</span>
-            </div>
-            <div class="client-grid">
-                {% for client in clients if client.is_active %}
-                <div class="client-card">
-                    <div class="card-header">
-                        <span class="client-name">{{ client.name }}</span>
-                        <span class="status-badge active">
-                            <i class="fas fa-check-circle"></i>
-                            Activo
-                        </span>
-                    </div>
-                    <div class="card-body">
-                        <div class="info-item">
-                            <i class="fas fa-fingerprint"></i>
-                            <span class="client-id">ID: {{ client.id }}</span>
-                        </div>
-                        <div class="info-item">
-                            <i class="fas fa-key"></i>
-                            <span class="client-token">{{ client.token }}</span>
-                        </div>
-                    </div>
-                    <div class="card-actions">
-                        <button class="btn-icon edit" onclick="location.href='/clients/{{ client.id }}/edit'">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="btn-icon delete" onclick="confirmDelete({{ client.id }})">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-        </section>
-
-        <!-- Inactive Clients -->
-        <section class="client-section">
-            <div class="section-header">
-                <h3>Inactivos</h3>
-                <span class="badge">{{ inactive_count }}</span>
-            </div>
-            <div class="client-grid">
-                {% for client in clients if not client.is_active %}
-                <div class="client-card">
-                    <div class="card-header">
-                        <span class="client-name">{{ client.name }}</span>
-                        <span class="status-badge inactive">
-                            <i class="fas fa-times-circle"></i>
-                            Inactivo
-                        </span>
-                    </div>
-                    <div class="card-body">
-                        <div class="info-item">
-                            <i class="fas fa-fingerprint"></i>
-                            <span class="client-id">ID: {{ client.id }}</span>
-                        </div>
-                        <div class="info-item">
-                            <i class="fas fa-key"></i>
-                            <span class="client-token">{{ client.token }}</span>
-                        </div>
-                    </div>
-                    <div class="card-actions">
-                        <button class="btn-icon edit" onclick="location.href='/clients/{{ client.id }}/edit'">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="btn-icon delete" onclick="confirmDelete({{ client.id }})">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-        </section>
-    </div>
-</main>
-
-<!-- Delete Confirmation Modal -->
-<div class="modal" id="deleteModal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3><i class="fas fa-exclamation-triangle"></i> Confirmar Eliminación</h3>
-            <button class="close-modal" onclick="closeModal()">×</button>
-        </div>
-        <div class="modal-body">
-            <p>¿Estás seguro de que deseas eliminar este cliente?</p>
-            <p class="text-warning">Esta acción no se puede deshacer.</p>
-        </div>
-        <div class="modal-footer">
-            <button class="btn-secondary" onclick="closeModal()">Cancelar</button>
-            <button class="btn-danger" onclick="deleteClient()">Eliminar</button>
-        </div>
-    </div>
+<div class="d-flex justify-content-between mb-4">
+   <h2>Clientes</h2>
+   <a href="/clients/create" class="btn btn-primary">Nuevo Cliente</a>
 </div>
-{% endblock %}
-
-{% block scripts %}
-<script src="{{ url_for('static', filename='js/clients.js') }}"></script>
+<table class="table">
+   <thead>
+       <tr>
+           <th>ID</th>
+           <th>Nombre</th>
+           <th>Token</th>
+           <th>Estado</th>
+           <th>Acciones</th>
+       </tr>
+   </thead>
+   <tbody>
+       {% for client in clients %}
+       <tr>
+           <td>{{ client.id }}</td>
+           <td>{{ client.name }}</td>
+           <td>{{ client.token }}</td>
+           <td>{{ "Activo" if client.is_active else "Inactivo" }}</td>
+           <td>
+               <a href="/clients/{{ client.id }}/edit" class="btn btn-sm btn-warning">Editar</a>
+               <button onclick="confirmDelete('client', {{ client.id }})" class="btn btn-sm btn-danger">Eliminar</button>
+           </td>
+       </tr>
+       {% endfor %}
+   </tbody>
+</table>
 {% endblock %}
