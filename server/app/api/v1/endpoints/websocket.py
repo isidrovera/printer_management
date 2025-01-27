@@ -76,7 +76,11 @@ async def register_websocket(websocket: WebSocket, db: Session = Depends(get_db)
     websocket_logger.debug("Starting WebSocket connection attempt")
     
     try:
-        # Intentar recibir y validar datos antes de aceptar la conexión
+        # Primero aceptamos la conexión
+        await websocket.accept()
+        websocket_logger.debug("WebSocket connection accepted")
+        
+        # Luego intentamos recibir y validar los datos
         try:
             data = await websocket.receive_json()
             websocket_logger.debug(f"Data received: {data}")
@@ -89,6 +93,7 @@ async def register_websocket(websocket: WebSocket, db: Session = Depends(get_db)
         client_token = data.get('client_token')
         if not client_token:
             websocket_logger.error("No client_token provided in the request")
+            await websocket.send_json({"status": "error", "message": "No client_token provided"})
             await websocket.close(code=4001)
             return
 
@@ -100,12 +105,12 @@ async def register_websocket(websocket: WebSocket, db: Session = Depends(get_db)
 
         if not client:
             websocket_logger.error(f"Invalid client token: {client_token}")
+            await websocket.send_json({"status": "error", "message": "Invalid client token"})
             await websocket.close(code=4002)
             return
 
-        # Si llegamos aquí, el cliente es válido, aceptamos la conexión
-        await websocket.accept()
-        websocket_logger.info(f"Client validated and connection accepted: {client_token}")
+        # Si llegamos aquí, el cliente es válido
+        websocket_logger.info(f"Client validated: {client_token}")
 
         # Registrar el agente
         system_info = data.get('system_info', {})
@@ -121,6 +126,18 @@ async def register_websocket(websocket: WebSocket, db: Session = Depends(get_db)
                 device_type=system_info.get('device_type', 'unknown'),
                 system_info=system_info
             )
+            
+            # Enviar respuesta exitosa al cliente
+            response = {"status": "success", "agent_token": agent.token}
+            websocket_logger.debug(f"Sending success response: {response}")
+            await websocket.send_json(response)
+
+            # Mantener la conexión abierta y escuchar mensajes
+            while True:
+                message = await websocket.receive_text()
+                websocket_logger.debug(f"Received message: {message}")
+                await websocket.send_json({"status": "received", "message": message})
+
         except HTTPException as e:
             websocket_logger.error(f"Agent registration failed: {e.detail}")
             await websocket.send_json({"status": "error", "message": e.detail})
@@ -129,29 +146,20 @@ async def register_websocket(websocket: WebSocket, db: Session = Depends(get_db)
         except Exception as e:
             websocket_logger.error(f"Unexpected error during agent registration: {e}")
             websocket_logger.error(traceback.format_exc())
+            await websocket.send_json({"status": "error", "message": "Internal server error"})
             await websocket.close(code=4004)
             return
 
-        # Enviar respuesta exitosa al cliente
-        response = {"status": "success", "agent_token": agent.token}
-        websocket_logger.debug(f"Sending success response: {response}")
-        await websocket.send_json(response)
-
-        # Mantener la conexión abierta hasta que el cliente se desconecte
-        try:
-            while True:
-                data = await websocket.receive_text()
-                websocket_logger.debug(f"Received message from client: {data}")
-                # Aquí puedes procesar los mensajes recibidos del cliente
-        except WebSocketDisconnect:
-            websocket_logger.info(f"Client disconnected gracefully: {client_token}")
-        except Exception as e:
-            websocket_logger.error(f"Connection error: {e}")
-
+    except WebSocketDisconnect:
+        websocket_logger.info("Client disconnected")
     except Exception as e:
         websocket_logger.error(f"Critical error in register_websocket: {e}")
         websocket_logger.error(traceback.format_exc())
-        await websocket.close(code=4005)
+        try:
+            await websocket.send_json({"status": "error", "message": "Internal server error"})
+            await websocket.close(code=4005)
+        except:
+            pass
 
 @router.websocket("/agent/{agent_token}")
 async def agent_websocket(websocket: WebSocket, agent_token: str, db: Session = Depends(get_db)):
