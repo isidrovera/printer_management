@@ -7,190 +7,156 @@
 {% endblock %}
 
 {% block content %}
-<div class="app-container">
-    <!-- Barra superior -->
-    <header class="top-bar">
-        <h1>Gestión de Clientes</h1>
-        <div class="top-actions">
-            <div class="search-wrapper">
-                <i class="fas fa-search"></i>
-                <input type="text" id="searchClients" placeholder="Buscar clientes...">
+<!-- Navigation Bar -->
+<nav class="main-nav">
+    <div class="nav-content">
+        <h1 class="nav-title">Printer Management</h1>
+        <div class="nav-links">
+            <a href="/clientes" class="nav-link active">Clientes</a>
+            <a href="/agentes" class="nav-link">Agentes</a>
+            <a href="/drivers" class="nav-link">Drivers</a>
+        </div>
+    </div>
+</nav>
+
+<main class="main-content">
+    <!-- Header Section -->
+    <div class="content-header">
+        <div class="header-left">
+            <h2>Gestión de Clientes</h2>
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" placeholder="Buscar clientes..." class="search-input">
             </div>
-            <button class="filter-btn">
+        </div>
+        <div class="header-right">
+            <button class="btn-filter">
                 <i class="fas fa-filter"></i>
-                <span>Filtros</span>
+                Filtros
             </button>
-            <div class="view-toggle">
-                <button class="view-btn active" data-view="kanban">
-                    <i class="fas fa-columns"></i>
-                </button>
-                <button class="view-btn" data-view="list">
-                    <i class="fas fa-list"></i>
-                </button>
-            </div>
-            <a href="/clients/new" class="new-client-btn">
+            <a href="/clients/new" class="btn-primary">
                 <i class="fas fa-plus"></i>
-                <span>Nuevo Cliente</span>
+                Nuevo Cliente
             </a>
         </div>
-    </header>
+    </div>
 
-    <!-- Panel de filtros -->
-    <div class="filter-panel" id="filterPanel">
+    <!-- Filters Panel -->
+    <div class="filters-panel" id="filtersPanel">
         <div class="filter-group">
             <label>Estado</label>
-            <select id="statusFilter">
-                <option value="all">Todos</option>
-                <option value="active">Activos</option>
-                <option value="inactive">Inactivos</option>
+            <select class="select-filter">
+                <option value="todos">Todos</option>
+                <option value="activos">Activos</option>
+                <option value="inactivos">Inactivos</option>
             </select>
         </div>
         <div class="filter-group">
             <label>Ordenar por</label>
-            <select id="sortFilter">
-                <option value="name">Nombre</option>
+            <select class="select-filter">
+                <option value="nombre">Nombre</option>
                 <option value="id">ID</option>
-                <option value="date">Fecha</option>
+                <option value="fecha">Fecha</option>
             </select>
         </div>
     </div>
 
-    <!-- Vista Kanban -->
-    <div class="kanban-view" id="kanbanView">
-        <div class="kanban-column">
-            <div class="column-header">
+    <!-- Client Cards -->
+    <div class="client-sections">
+        <!-- Active Clients -->
+        <section class="client-section">
+            <div class="section-header">
                 <h3>Activos</h3>
-                <span class="counter" id="activeCounter">0</span>
+                <span class="badge">{{ active_count }}</span>
             </div>
-            <div class="card-container" id="activeCards">
+            <div class="client-grid">
                 {% for client in clients if client.is_active %}
-                <div class="client-card" data-id="{{ client.id }}">
+                <div class="client-card">
                     <div class="card-header">
                         <span class="client-name">{{ client.name }}</span>
-                        <div class="status-badge active">
+                        <span class="status-badge active">
                             <i class="fas fa-check-circle"></i>
                             Activo
-                        </div>
+                        </span>
                     </div>
                     <div class="card-body">
-                        <div class="info-row">
-                            <i class="fas fa-id-card"></i>
-                            <span>ID: {{ client.id }}</span>
+                        <div class="info-item">
+                            <i class="fas fa-fingerprint"></i>
+                            <span class="client-id">ID: {{ client.id }}</span>
                         </div>
-                        <div class="info-row">
+                        <div class="info-item">
                             <i class="fas fa-key"></i>
-                            <span>{{ client.token }}</span>
+                            <span class="client-token">{{ client.token }}</span>
                         </div>
                     </div>
                     <div class="card-actions">
-                        <button class="edit-btn" onclick="location.href='/clients/{{ client.id }}/edit'">
+                        <button class="btn-icon edit" onclick="location.href='/clients/{{ client.id }}/edit'">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <button class="delete-btn" onclick="showDeleteModal({{ client.id }})">
+                        <button class="btn-icon delete" onclick="confirmDelete({{ client.id }})">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
                 </div>
                 {% endfor %}
             </div>
-        </div>
+        </section>
 
-        <div class="kanban-column">
-            <div class="column-header">
+        <!-- Inactive Clients -->
+        <section class="client-section">
+            <div class="section-header">
                 <h3>Inactivos</h3>
-                <span class="counter" id="inactiveCounter">0</span>
+                <span class="badge">{{ inactive_count }}</span>
             </div>
-            <div class="card-container" id="inactiveCards">
+            <div class="client-grid">
                 {% for client in clients if not client.is_active %}
-                <div class="client-card" data-id="{{ client.id }}">
+                <div class="client-card">
                     <div class="card-header">
                         <span class="client-name">{{ client.name }}</span>
-                        <div class="status-badge inactive">
+                        <span class="status-badge inactive">
                             <i class="fas fa-times-circle"></i>
                             Inactivo
-                        </div>
+                        </span>
                     </div>
                     <div class="card-body">
-                        <div class="info-row">
-                            <i class="fas fa-id-card"></i>
-                            <span>ID: {{ client.id }}</span>
+                        <div class="info-item">
+                            <i class="fas fa-fingerprint"></i>
+                            <span class="client-id">ID: {{ client.id }}</span>
                         </div>
-                        <div class="info-row">
+                        <div class="info-item">
                             <i class="fas fa-key"></i>
-                            <span>{{ client.token }}</span>
+                            <span class="client-token">{{ client.token }}</span>
                         </div>
                     </div>
                     <div class="card-actions">
-                        <button class="edit-btn" onclick="location.href='/clients/{{ client.id }}/edit'">
+                        <button class="btn-icon edit" onclick="location.href='/clients/{{ client.id }}/edit'">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <button class="delete-btn" onclick="showDeleteModal({{ client.id }})">
+                        <button class="btn-icon delete" onclick="confirmDelete({{ client.id }})">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
                 </div>
                 {% endfor %}
             </div>
+        </section>
+    </div>
+</main>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal" id="deleteModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-exclamation-triangle"></i> Confirmar Eliminación</h3>
+            <button class="close-modal" onclick="closeModal()">×</button>
         </div>
-    </div>
-
-    <!-- Vista Lista -->
-    <div class="list-view" id="listView" style="display: none;">
-        <table class="clients-table">
-            <thead>
-                <tr>
-                    <th>Nombre</th>
-                    <th>ID</th>
-                    <th>Token</th>
-                    <th>Estado</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for client in clients %}
-                <tr data-id="{{ client.id }}">
-                    <td>{{ client.name }}</td>
-                    <td>{{ client.id }}</td>
-                    <td>{{ client.token }}</td>
-                    <td>
-                        <div class="status-badge {{ 'active' if client.is_active else 'inactive' }}">
-                            <i class="fas fa-{{ 'check' if client.is_active else 'times' }}-circle"></i>
-                            {{ 'Activo' if client.is_active else 'Inactivo' }}
-                        </div>
-                    </td>
-                    <td>
-                        <div class="table-actions">
-                            <button class="edit-btn" onclick="location.href='/clients/{{ client.id }}/edit'">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="delete-btn" onclick="showDeleteModal({{ client.id }})">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Modal de eliminación -->
-    <div class="modal" id="deleteModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3><i class="fas fa-exclamation-triangle"></i> Confirmar Eliminación</h3>
-                <button class="close-modal" onclick="closeModal()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <p>¿Estás seguro de que deseas eliminar este cliente?</p>
-                <p>Esta acción no se puede deshacer.</p>
-            </div>
-            <div class="modal-footer">
-                <button class="cancel-btn" onclick="closeModal()">Cancelar</button>
-                <button class="confirm-btn" onclick="deleteClient()">Eliminar</button>
-            </div>
+        <div class="modal-body">
+            <p>¿Estás seguro de que deseas eliminar este cliente?</p>
+            <p class="text-warning">Esta acción no se puede deshacer.</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" onclick="closeModal()">Cancelar</button>
+            <button class="btn-danger" onclick="deleteClient()">Eliminar</button>
         </div>
     </div>
 </div>
