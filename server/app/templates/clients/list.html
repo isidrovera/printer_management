@@ -2,192 +2,177 @@
 {% block title %}Clientes{% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-gray-50 p-4">
-    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
-        <!-- Header Section -->
-        <div class="p-6 border-b border-gray-200">
-            <div class="flex flex-col lg:flex-row justify-between items-center space-y-4 lg:space-y-0">
-                <div class="flex items-center space-x-3">
-                    <i data-lucide="users" class="h-8 w-8 text-blue-600"></i>
-                    <h1 class="text-2xl font-bold text-gray-900">Gestión de Clientes</h1>
+<div class="bg-white shadow-lg rounded-lg p-6 mx-auto max-w-7xl">
+    <!-- Mantenemos el header igual -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">Clientes</h2>
+        
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto">
+            <!-- Barra de búsqueda -->
+            <div class="relative flex-grow sm:flex-grow-0">
+                <input type="text" 
+                       id="searchInput" 
+                       placeholder="Buscar clientes..." 
+                       class="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <i data-lucide="search" class="absolute right-3 top-2.5 h-5 w-5 text-gray-400"></i>
+            </div>
+
+            <!-- Controles de vista -->
+            <div class="flex items-center gap-2">
+                <div class="flex bg-gray-100 p-1 rounded-lg">
+                    <button id="listViewBtn" 
+                            class="flex items-center p-2 rounded-md transition-all"
+                            aria-label="Vista Lista">
+                        <i data-lucide="layout-list" class="h-5 w-5"></i>
+                    </button>
+                    <button id="kanbanViewBtn"
+                            class="flex items-center p-2 rounded-md transition-all"
+                            aria-label="Vista Kanban">
+                        <i data-lucide="grid" class="h-5 w-5"></i>
+                    </button>
                 </div>
                 
-                <div class="flex flex-col sm:flex-row items-center gap-4">
-                    <!-- Barra de búsqueda -->
-                    <div class="relative">
-                        <input type="text" 
-                               id="searchInput" 
-                               placeholder="Buscar clientes..." 
-                               class="w-full sm:w-64 pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
-                        <i data-lucide="search" class="absolute left-3 top-2.5 h-5 w-5 text-gray-400"></i>
-                    </div>
-
-                    <!-- Controles de vista -->
-                    <div class="flex items-center gap-2">
-                        <div class="flex bg-gray-100 p-1 rounded-lg">
-                            <button id="listViewBtn" 
-                                    class="flex items-center p-2 rounded-md transition-all"
-                                    aria-label="Vista Lista">
-                                <i data-lucide="list" class="h-5 w-5"></i>
-                            </button>
-                            <button id="kanbanViewBtn"
-                                    class="flex items-center p-2 rounded-md transition-all"
-                                    aria-label="Vista Kanban">
-                                <i data-lucide="layout-grid" class="h-5 w-5"></i>
-                            </button>
-                        </div>
-                        
-                        <a href="/clients/create" 
-                           class="inline-flex items-center px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
-                            <i data-lucide="plus" class="h-5 w-5 mr-2"></i>
-                            Nuevo Cliente
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Vista Lista -->
-        <div id="listView" class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Token</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                    {% for client in clients %}
-                    <tr class="hover:bg-gray-50 transition-colors">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ client.id }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center">
-                                <div class="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
-                                    <i data-lucide="user" class="h-4 w-4 text-blue-600"></i>
-                                </div>
-                                <div class="ml-3">
-                                    <div class="text-sm font-medium text-gray-900">{{ client.name }}</div>
-                                    <div class="text-sm text-gray-500">Cliente #{{ client.id }}</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center">
-                                <span class="font-mono text-sm text-gray-500">{{ client.token }}</span>
-                                <button onclick="copyToClipboard('{{ client.token }}')" 
-                                        class="ml-2 text-gray-400 hover:text-gray-600"
-                                        title="Copiar token">
-                                    <i data-lucide="copy" class="h-4 w-4"></i>
-                                </button>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                       {% if client.is_active %}
-                                       bg-green-100 text-green-800
-                                       {% else %}
-                                       bg-red-100 text-red-800
-                                       {% endif %}">
-                                <span class="w-2 h-2 mr-2 rounded-full
-                                       {% if client.is_active %}
-                                       bg-green-400
-                                       {% else %}
-                                       bg-red-400
-                                       {% endif %}"></span>
-                                {{ "Activo" if client.is_active else "Inactivo" }}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right">
-                            <div class="flex items-center justify-end space-x-2">
-                                <a href="/clients/{{ client.id }}/edit" 
-                                   class="p-2 text-amber-600 hover:bg-amber-50 rounded-lg transition-colors tooltip"
-                                   data-tooltip="Editar cliente">
-                                    <i data-lucide="pencil" class="h-5 w-5"></i>
-                                </a>
-                                <button onclick="confirmDelete('{{ client.id }}')"
-                                        class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors tooltip"
-                                        data-tooltip="Eliminar cliente">
-                                    <i data-lucide="trash-2" class="h-5 w-5"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-
-        <!-- Vista Kanban -->
-        <div id="kanbanView" class="hidden p-6">
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {% for client in clients %}
-                <div class="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-all">
-                    <div class="p-5">
-                        <!-- Header con Avatar y Estado -->
-                        <div class="flex justify-between items-start mb-4">
-                            <div class="flex items-center">
-                                <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                                    <i data-lucide="user" class="h-5 w-5 text-blue-600"></i>
-                                </div>
-                                <div class="ml-3">
-                                    <h3 class="text-lg font-medium text-gray-900">{{ client.name }}</h3>
-                                    <p class="text-sm text-gray-500">Cliente #{{ client.id }}</p>
-                                </div>
-                            </div>
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                       {% if client.is_active %}
-                                       bg-green-100 text-green-800
-                                       {% else %}
-                                       bg-red-100 text-red-800
-                                       {% endif %}">
-                                <span class="w-2 h-2 mr-2 rounded-full
-                                       {% if client.is_active %}
-                                       bg-green-400
-                                       {% else %}
-                                       bg-red-400
-                                       {% endif %}"></span>
-                                {{ "Activo" if client.is_active else "Inactivo" }}
-                            </span>
-                        </div>
-
-                        <!-- Token con botón de copiar -->
-                        <div class="mt-4">
-                            <label class="text-xs font-medium text-gray-500 uppercase">Token</label>
-                            <div class="mt-1 flex items-center justify-between p-2 bg-gray-50 rounded-lg">
-                                <code class="text-sm text-gray-600 font-mono">{{ client.token }}</code>
-                                <button onclick="copyToClipboard('{{ client.token }}')"
-                                        class="text-gray-400 hover:text-gray-600"
-                                        title="Copiar token">
-                                    <i data-lucide="copy" class="h-4 w-4"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Acciones -->
-                        <div class="mt-6 flex justify-end space-x-2">
-                            <a href="/clients/{{ client.id }}/edit" 
-                               class="p-2 text-amber-600 hover:bg-amber-50 rounded-lg transition-colors tooltip"
-                               data-tooltip="Editar cliente">
-                                <i data-lucide="pencil" class="h-5 w-5"></i>
-                            </a>
-                            <button onclick="confirmDelete('{{ client.id }}')"
-                                    class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors tooltip"
-                                    data-tooltip="Eliminar cliente">
-                                <i data-lucide="trash-2" class="h-5 w-5"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
+                <a href="/clients/create" 
+                   class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors">
+                    <i data-lucide="plus" class="h-5 w-5"></i>
+                    <span>Nuevo Cliente</span>
+                </a>
             </div>
         </div>
     </div>
+
+    <!-- Vista Lista con botones modificados -->
+    <div id="listView" class="overflow-x-auto">
+        <table class="w-full border-collapse">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Token</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200 bg-white">
+                {% for client in clients %}
+                <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ client.id }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ client.name }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-500">{{ client.token }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                   {% if client.is_active %}
+                                   bg-green-100 text-green-800
+                                   {% else %}
+                                   bg-red-100 text-red-800
+                                   {% endif %}">
+                            <span class="w-2 h-2 mr-2 rounded-full
+                                   {% if client.is_active %}
+                                   bg-green-400
+                                   {% else %}
+                                   bg-red-400
+                                   {% endif %}"></span>
+                            {{ "Activo" if client.is_active else "Inactivo" }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <div class="flex items-center justify-end space-x-2">
+                            <a href="/clients/{{ client.id }}/edit" 
+                               class="p-2 bg-amber-100 text-amber-700 rounded-lg hover:bg-amber-200 transition-colors"
+                               title="Editar Cliente">
+                                <i data-lucide="pencil" class="h-5 w-5"></i>
+                            </a>
+                            <button onclick="confirmDelete('{{ client.id }}')"
+                                    class="p-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
+                                    title="Eliminar Cliente">
+                                <i data-lucide="trash" class="h-5 w-5"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Vista Kanban con botones modificados -->
+    <div id="kanbanView" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+        {% for client in clients %}
+        <div class="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+            <div class="p-5">
+                <div class="flex justify-between items-center mb-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="flex-shrink-0">
+                            <i data-lucide="user" class="h-6 w-6 text-gray-400"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-900">{{ client.name }}</h3>
+                            <p class="text-sm text-gray-500">#{{ client.id }}</p>
+                        </div>
+                    </div>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                               {% if client.is_active %}
+                               bg-green-100 text-green-800
+                               {% else %}
+                               bg-red-100 text-red-800
+                               {% endif %}">
+                        <span class="w-2 h-2 mr-2 rounded-full
+                               {% if client.is_active %}
+                               bg-green-400
+                               {% else %}
+                               bg-red-400
+                               {% endif %}"></span>
+                        {{ "Activo" if client.is_active else "Inactivo" }}
+                    </span>
+                </div>
+                <div class="mt-4">
+                    <div class="text-sm text-gray-500">Token</div>
+                    <div class="mt-1 font-mono text-sm text-gray-900">{{ client.token }}</div>
+                </div>
+                <div class="mt-6 flex justify-end space-x-2">
+                    <a href="/clients/{{ client.id }}/edit" 
+                       class="p-2 bg-amber-100 text-amber-700 rounded-lg hover:bg-amber-200 transition-colors"
+                       title="Editar Cliente">
+                        <i data-lucide="pencil" class="h-5 w-5"></i>
+                    </a>
+                    <button onclick="confirmDelete('{{ client.id }}')"
+                            class="p-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
+                            title="Eliminar Cliente">
+                        <i data-lucide="trash" class="h-5 w-5"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
 </div>
 
+<style>
+/* Estilos para tooltips */
+[title] {
+    position: relative;
+    cursor: pointer;
+}
+
+[title]:hover:after {
+    content: attr(title);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 4px 8px;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    font-size: 12px;
+    white-space: nowrap;
+    border-radius: 4px;
+    margin-bottom: 5px;
+    z-index: 10;
+}
+</style>
+
 <script>
+// Mantenemos el mismo JavaScript
 document.addEventListener('DOMContentLoaded', function() {
     const listView = document.getElementById('listView');
     const kanbanView = document.getElementById('kanbanView');
@@ -195,10 +180,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const kanbanViewBtn = document.getElementById('kanbanViewBtn');
     const searchInput = document.getElementById('searchInput');
 
-    // Inicializar los iconos de Lucide
-    lucide.createIcons();
-
-    // Función para actualizar los botones de vista
     function updateViewButtons(activeView) {
         if (activeView === 'list') {
             listViewBtn.classList.add('bg-white', 'shadow', 'text-blue-600');
@@ -213,7 +194,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Función para cambiar entre vistas
     function switchView(view) {
         if (view === 'list') {
             listView.classList.remove('hidden');
@@ -226,15 +206,13 @@ document.addEventListener('DOMContentLoaded', function() {
         localStorage.setItem('preferredView', view);
     }
 
-    // Event listeners para los botones de vista
     listViewBtn.addEventListener('click', () => switchView('list'));
     kanbanViewBtn.addEventListener('click', () => switchView('kanban'));
 
-    // Función de búsqueda
     searchInput.addEventListener('input', function(e) {
         const searchTerm = e.target.value.toLowerCase();
         const rows = document.querySelectorAll('tbody tr');
-        const cards = document.querySelectorAll('#kanbanView > div > div');
+        const cards = document.querySelectorAll('#kanbanView > div');
 
         rows.forEach(row => {
             const text = row.textContent.toLowerCase();
@@ -247,235 +225,14 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Función para copiar al portapapeles
-    window.copyToClipboard = function(text) {
-        navigator.clipboard.writeText(text).then(() => {
-            // Mostrar notificación de éxito
-            const notification = document.createElement('div');
-            notification.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg';
-            notification.textContent = '¡Token copiado al portapapeles!';
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.remove();
-            }, 2000);
-        }).catch(err => {
-            console.error('Error al copiar:', err);
-        });
-    };
-
-    // Función para confirmar eliminación
-    window.confirmDelete = function(id) {
-        if (confirm('¿Estás seguro de que deseas eliminar este cliente?')) {
-            // Aquí iría la lógica de eliminación
-            console.log('Eliminando cliente:', id);
-        }
-    };
-
-    // Cargar la vista preferida
     const preferredView = localStorage.getItem('preferredView') || 'list';
     switchView(preferredView);
 });
-</script>
 
-<style>
-/* Estilos para tooltips */
-.tooltip {
-    position: relative;
+function confirmDelete(id) {
+    if (confirm('¿Estás seguro de que deseas eliminar este cliente?')) {
+        console.log('Eliminando cliente:', id);
+    }
 }
-
-.tooltip:before {
-    content: attr(data-tooltip);
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 4px 8px
-
-}
-/* Continuación de los estilos */
-.tooltip:before {
-    background-color: rgba(0, 0, 0, 0.8);
-    border-radius: 4px;
-    color: white;
-    font-size: 12px;
-    opacity: 0;
-    pointer-events: none;
-    transition: all 0.15s ease;
-    white-space: nowrap;
-    z-index: 10;
-}
-
-.tooltip:hover:before {
-    opacity: 1;
-    transform: translateX(-50%) translateY(-8px);
-}
-</style>
-{% endblock %}
-
-{# clients/edit.html #}
-{% extends "base.html" %}
-{% block title %}Editar Cliente{% endblock %}
-
-{% block content %}
-<div class="min-h-screen bg-gray-50 p-4">
-    <div class="max-w-4xl mx-auto">
-        <!-- Breadcrumb -->
-        <nav class="mb-4 flex items-center space-x-2 text-sm text-gray-500">
-            <a href="/clients" class="hover:text-blue-600 flex items-center">
-                <i data-lucide="users" class="h-4 w-4 mr-1"></i>
-                Clientes
-            </a>
-            <i data-lucide="chevron-right" class="h-4 w-4"></i>
-            <span class="text-gray-900">Editar Cliente</span>
-        </nav>
-
-        <!-- Formulario Principal -->
-        <div class="bg-white shadow-lg rounded-lg overflow-hidden">
-            <div class="p-6 border-b border-gray-200">
-                <div class="flex items-center space-x-3">
-                    <div class="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
-                        <i data-lucide="user-cog" class="h-6 w-6 text-blue-600"></i>
-                    </div>
-                    <div>
-                        <h1 class="text-2xl font-bold text-gray-900">Editar Cliente</h1>
-                        <p class="text-sm text-gray-500">Modifica los datos del cliente {{ client.name }}</p>
-                    </div>
-                </div>
-            </div>
-
-            <form action="/clients/{{ client.id }}/edit" method="POST" class="p-6">
-                <div class="space-y-6">
-                    <!-- Información General -->
-                    <div class="bg-gray-50 rounded-lg p-4">
-                        <h3 class="text-lg font-medium text-gray-900 mb-4">Información General</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <!-- Campo Nombre -->
-                            <div>
-                                <label for="name" class="block text-sm font-medium text-gray-700">
-                                    Nombre del Cliente
-                                </label>
-                                <div class="mt-1 relative">
-                                    <input type="text" 
-                                           id="name" 
-                                           name="name" 
-                                           value="{{ client.name }}"
-                                           class="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                                           required>
-                                </div>
-                            </div>
-
-                            <!-- Campo Estado -->
-                            <div>
-                                <label for="status" class="block text-sm font-medium text-gray-700">
-                                    Estado
-                                </label>
-                                <div class="mt-1">
-                                    <select id="status" 
-                                            name="status"
-                                            class="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
-                                        <option value="active" {% if client.is_active %}selected{% endif %}>
-                                            Activo
-                                        </option>
-                                        <option value="inactive" {% if not client.is_active %}selected{% endif %}>
-                                            Inactivo
-                                        </option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Sección Token -->
-                    <div class="bg-gray-50 rounded-lg p-4">
-                        <h3 class="text-lg font-medium text-gray-900 mb-4">Token de Acceso</h3>
-                        <div class="space-y-4">
-                            <div>
-                                <label for="token" class="block text-sm font-medium text-gray-700">
-                                    Token Actual
-                                </label>
-                                <div class="mt-1 flex rounded-lg shadow-sm">
-                                    <input type="text" 
-                                           id="token" 
-                                           name="token" 
-                                           value="{{ client.token }}"
-                                           class="flex-1 block w-full px-4 py-2 border border-gray-300 rounded-l-lg font-mono text-sm bg-gray-50"
-                                           readonly>
-                                    <button type="button" 
-                                            onclick="copyToClipboard('{{ client.token }}')"
-                                            class="inline-flex items-center px-4 py-2 border border-l-0 border-gray-300 rounded-r-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
-                                            title="Copiar token">
-                                        <i data-lucide="copy" class="h-5 w-5"></i>
-                                    </button>
-                                </div>
-                                <p class="mt-1 text-sm text-gray-500">
-                                    Este es el token único del cliente para autenticación
-                                </p>
-                            </div>
-
-                            <div>
-                                <button type="button"
-                                        onclick="generateNewToken()"
-                                        class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
-                                    <i data-lucide="refresh-cw" class="h-5 w-5 mr-2"></i>
-                                    Generar Nuevo Token
-                                </button>
-                                <p class="mt-1 text-sm text-gray-500">
-                                    ¡Atención! Generar un nuevo token invalidará el anterior
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Botones de Acción -->
-                <div class="mt-6 flex justify-end space-x-3 border-t pt-6">
-                    <a href="/clients" 
-                       class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
-                        <i data-lucide="x" class="h-5 w-5 mr-2"></i>
-                        Cancelar
-                    </a>
-                    <button type="submit"
-                            class="inline-flex items-center px-4 py-2 border border-transparent rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
-                        <i data-lucide="save" class="h-5 w-5 mr-2"></i>
-                        Guardar Cambios
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Inicializar los iconos de Lucide
-    lucide.createIcons();
-
-    // Función para copiar al portapapeles
-    window.copyToClipboard = function(text) {
-        navigator.clipboard.writeText(text).then(() => {
-            // Mostrar notificación de éxito
-            const notification = document.createElement('div');
-            notification.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transition-opacity duration-500';
-            notification.textContent = '¡Token copiado al portapapeles!';
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.style.opacity = '0';
-                setTimeout(() => notification.remove(), 500);
-            }, 2000);
-        }).catch(err => {
-            console.error('Error al copiar:', err);
-        });
-    };
-
-    // Función para generar nuevo token
-    window.generateNewToken = function() {
-        if (confirm('¿Estás seguro de que deseas generar un nuevo token? El token actual dejará de funcionar.')) {
-            // Aquí iría la lógica para generar un nuevo token
-            console.log('Generando nuevo token...');
-        }
-    };
-});
 </script>
 {% endblock %}
