@@ -2,7 +2,7 @@
 {% block title %}Agentes{% endblock %}
 
 {% block content %}
-<div class="bg-white shadow-lg rounded-lg p-6 mx-auto max-w-7xl mt-6">
+<div class="bg-white shadow-lg rounded-lg p-6 mx-auto max-w-7xl">
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <h2 class="text-2xl font-bold text-gray-800">Gestión de Agentes</h2>
 
@@ -83,6 +83,7 @@
     </div>
     {% endif %}
 </div>
+
 <!-- Modal Instalar Impresora -->
 <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden z-50" id="installPrinterModal">
     <div class="bg-white rounded-lg shadow-lg max-w-md w-full mx-4">
@@ -139,151 +140,31 @@
     </div>
 </div>
 
+<!-- Modal de Confirmación de Eliminación -->
+<div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden z-50" id="deleteConfirmModal">
+    <div class="bg-white rounded-lg shadow-lg max-w-md w-full mx-4">
+        <div class="p-4 border-b">
+            <h3 class="text-lg font-semibold text-gray-800">Confirmar Eliminación</h3>
+        </div>
+        <div class="p-4">
+            <p class="text-gray-600">¿Está seguro que desea eliminar este agente? Esta acción no se puede deshacer.</p>
+        </div>
+        <div class="p-4 border-t flex justify-end space-x-3">
+            <button type="button"
+                    onclick="closeModal('deleteConfirmModal')"
+                    class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+                Cancelar
+            </button>
+            <button type="button"
+                    onclick="deleteAgent()"
+                    class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                Eliminar
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
 
-<!-- También agregar estas funciones al script existente -->
-<script>
-let currentAgentToken = '';
-
-function showInstallPrinter(agentToken) {
-    // Primero guardamos el token
-    currentAgentToken = agentToken;
-    
-    // Asignamos el valor al input hidden si existe
-    const tokenInput = document.getElementById('agentToken');
-    if (tokenInput) {
-        tokenInput.value = agentToken;
-    }
-    
-    // Mostramos el modal
-    const modal = document.getElementById('installPrinterModal');
-    if (modal) {
-        modal.classList.remove('hidden');
-    }
-}
-
-function closeModal(modalId) {
-    document.getElementById(modalId).classList.add('hidden');
-    if (modalId === 'installPrinterModal') {
-        document.getElementById('installPrinterForm').reset();
-    }
-}
-
-// Manejar el envío del formulario de instalación
-document.getElementById('installPrinterForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-
-    const manufacturer = document.getElementById('manufacturer').value;
-    const model = document.getElementById('model').value;
-    const printerIp = document.getElementById('printerIp').value;
-
-    if (!manufacturer || !model || !printerIp) {
-        showNotification('Por favor complete todos los campos', 'error');
-        return;
-    }
-
-    try {
-        const response = await fetch(`/api/v1/printers/install/${currentAgentToken}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                printer_ip: printerIp,
-                manufacturer: manufacturer,
-                model: model
-            })
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-            showNotification('Comando de instalación enviado correctamente', 'success');
-            closeModal('installPrinterModal');
-        } else {
-            throw new Error(data.detail || 'Error al enviar el comando de instalación');
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        showNotification(error.message, 'error');
-    }
-});
-
-// Actualizar modelos cuando se selecciona un fabricante
-document.getElementById('manufacturer').addEventListener('change', async function(e) {
-    const manufacturer = e.target.value;
-    const modelSelect = document.getElementById('model');
-    
-    modelSelect.disabled = true;
-    modelSelect.innerHTML = '<option value="">Cargando modelos...</option>';
-
-    if (!manufacturer) {
-        modelSelect.innerHTML = '<option value="">Seleccione un modelo</option>';
-        return;
-    }
-
-    try {
-        const response = await fetch(`/api/v1/printers/models/${manufacturer}`);
-        const models = await response.json();
-
-        modelSelect.innerHTML = '<option value="">Seleccione un modelo</option>';
-        models.forEach(model => {
-            const option = document.createElement('option');
-            option.value = model;
-            option.textContent = model;
-            modelSelect.appendChild(option);
-        });
-    } catch (error) {
-        console.error('Error:', error);
-        showNotification('Error al cargar los modelos', 'error');
-    } finally {
-        modelSelect.disabled = false;
-    }
-});</script>
-
-<script>
-// Notificaciones
-function showNotification(message, type = 'info') {
-    const notification = document.createElement('div');
-    notification.className = `fixed bottom-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50 ${
-        type === 'success' ? 'bg-green-500' :
-        type === 'error' ? 'bg-red-500' :
-        'bg-blue-500'
-    } text-white`;
-    notification.textContent = message;
-
-    // Agregar al DOM
-    document.body.appendChild(notification);
-
-    // Remover después de 3 segundos
-    setTimeout(() => {
-        notification.remove();
-    }, 3000);
-}
-
-// Manejar clics fuera de los modales
-window.addEventListener('click', function(event) {
-    const modals = document.querySelectorAll('.fixed.inset-0');
-    modals.forEach(modal => {
-        if (event.target === modal) {
-            modal.classList.add('hidden');
-        }
-    });
-});
-
-// Búsqueda en tiempo real
-document.getElementById('searchInput').addEventListener('input', function(e) {
-    const searchTerm = e.target.value.toLowerCase();
-    const rows = document.querySelectorAll('tbody tr');
-
-    rows.forEach(row => {
-        const text = row.textContent.toLowerCase();
-        row.style.display = text.includes(searchTerm) ? '' : 'none';
-    });
-});
-
-// Inicializar los íconos de Lucide
-if (typeof lucide !== 'undefined') {
-    lucide.createIcons();
-}
-</script>
+{% block scripts %}
+<script src="/static/js/agents.js"></script>
 {% endblock %}

@@ -31,9 +31,12 @@
         {% block content %}{% endblock %}
     </main>
 
-    <!-- Scripts -->
+    <!-- Scripts Básicos -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.259.0/lucide.min.js"></script>
-    <script src="/static/js/main.js"></script>
+    
+    <!-- Scripts Personalizados -->
+    {% block scripts %}{% endblock %}
+    
     {% block extra_js %}{% endblock %}
 </body>
 </html>
