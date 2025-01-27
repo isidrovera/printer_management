@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', function () {
     initializeWebSocket();
     initializeSearchFilter();
     initializeFormHandlers();
+    initializeDriverSelect(); // Añadido para cargar drivers al inicio
 });
 
 // Inicializar WebSocket
@@ -112,10 +113,16 @@ async function initializeDriverSelect() {
     if (!driverSelect) return;
 
     try {
-        // Hacer la petición al backend para obtener los drivers
-        const response = await fetch('/api/v1/drivers'); // Endpoint para obtener drivers
+        // Usar la URL completa para el endpoint de drivers
+        const response = await fetch('/api/v1/drivers', {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+
         if (!response.ok) {
-            throw new Error('Error al obtener la lista de drivers');
+            throw new Error(`Error al obtener drivers. Status: ${response.status}`);
         }
 
         const drivers = await response.json();
@@ -135,7 +142,7 @@ async function initializeDriverSelect() {
         });
     } catch (error) {
         console.error('Error inicializando drivers:', error);
-        showNotification('Error al cargar drivers', 'error');
+        showNotification('Error al cargar drivers. Verifique la conexión.', 'error');
     }
 }
 
@@ -168,4 +175,18 @@ function closeModal(modalId) {
 function showNotification(message, type = 'info') {
     // Aquí puedes personalizar cómo mostrar las notificaciones
     console.log(`[${type.toUpperCase()}] ${message}`);
+    
+    // Ejemplo de notificación (ajusta según tu implementación)
+    const notificationContainer = document.getElementById('notification-container');
+    if (notificationContainer) {
+        const notification = document.createElement('div');
+        notification.classList.add('notification', `notification-${type}`);
+        notification.textContent = message;
+        notificationContainer.appendChild(notification);
+
+        // Eliminar la notificación después de unos segundos
+        setTimeout(() => {
+            notification.remove();
+        }, 5000);
+    }
 }

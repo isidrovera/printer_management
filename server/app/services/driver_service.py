@@ -6,16 +6,26 @@ import tempfile
 import zipfile
 import os
 from pathlib import Path
-
+import logging
 
 class DriverService:
     STORAGE_PATH = "/var/www/printer_drivers"
 
     def __init__(self, db: Session):
         self.db = db
+        self.logger = logging.getLogger(__name__)
 
     def get_all(self) -> List[PrinterDriver]:
-        return self.db.query(PrinterDriver).all()
+        """
+        Obtener todos los drivers, con log de errores si ocurre algo.
+        """
+        try:
+            drivers = self.db.query(PrinterDriver).all()
+            self.logger.info(f"Recuperados {len(drivers)} drivers")
+            return drivers
+        except Exception as e:
+            self.logger.error(f"Error al recuperar drivers: {e}")
+            raise
 
     def get_by_id(self, driver_id: int) -> Optional[PrinterDriver]:
         return self.db.query(PrinterDriver).filter(PrinterDriver.id == driver_id).first()
