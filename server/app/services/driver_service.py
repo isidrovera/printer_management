@@ -1,5 +1,5 @@
 # app/services/driver_service.py
-from typing import List, Optional, BinaryIO
+from typing import List, Optional
 from sqlalchemy.orm import Session
 from app.db.models.printer_driver import PrinterDriver
 import tempfile
@@ -7,70 +7,77 @@ import zipfile
 import os
 from pathlib import Path
 
+
 class DriverService:
-   STORAGE_PATH = "/var/www/printer_drivers"
-   def __init__(self, db: Session):
-       self.db = db
+    STORAGE_PATH = "/var/www/printer_drivers"
 
-   async def get_all(self) -> List[PrinterDriver]:
-       return self.db.query(PrinterDriver).all()
+    def __init__(self, db: Session):
+        self.db = db
 
-   async def get_by_id(self, driver_id: int) -> Optional[PrinterDriver]:
-       return self.db.query(PrinterDriver).filter(PrinterDriver.id == driver_id).first()
+    def get_all(self) -> List[PrinterDriver]:
+        return self.db.query(PrinterDriver).all()
 
-   async def store_driver(self, manufacturer: str, model: str, driver_file: bytes, filename: str, description: str = None):
-        # Crear el directorio de almacenamiento si no existe
-        os.makedirs(self.STORAGE_PATH, exist_ok=True)
+    def get_by_id(self, driver_id: int) -> Optional[PrinterDriver]:
+        return self.db.query(PrinterDriver).filter(PrinterDriver.id == driver_id).first()
 
-        # Ruta completa donde se guardará el archivo
-        file_path = Path(self.STORAGE_PATH) / filename
+    def store_driver(self, manufacturer: str, model: str, driver_file: bytes, filename: str, description: str = None) -> PrinterDriver:
+        # Validar si el driver ya existe
+        existing_driver = self.db.query(PrinterDriver).filter_by(manufacturer=manufacturer, model=model).first()
+        if existing_driver:
+            raise ValueError(f"Ya existe un driver para el modelo {model} del fabricante {manufacturer}")
 
-        # Guardar el archivo en el sistema de archivos
-        with open(file_path, "wb") as f:
-            f.write(driver_file)
+        try:
+            os.makedirs(self.STORAGE_PATH, exist_ok=True)
+            file_path = Path(self.STORAGE_PATH) / filename
 
-        # Crear el registro en la base de datos
-        driver = PrinterDriver(
-            manufacturer=manufacturer,
-            model=model,
-            driver_filename=filename,  # Guardamos solo el nombre del archivo
-            description=description
-        )
-        self.db.add(driver)
+            # Guardar el archivo
+            with open(file_path, "wb") as f:
+                f.write(driver_file)
+
+            # Crear registro en la base de datos
+            driver = PrinterDriver(
+                manufacturer=manufacturer,
+                model=model,
+                driver_filename=filename,
+                description=description
+            )
+            self.db.add(driver)
+            self.db.commit()
+            self.db.refresh(driver)
+            return driver
+        except Exception as e:
+            if os.path.exists(file_path):
+                os.remove(file_path)  # Limpieza del archivo en caso de error
+            self.db.rollback()
+            raise RuntimeError(f"Error al guardar el driver: {e}")
+
+    def update(self, driver_id: int, manufacturer: str, model: str, description: str = None) -> PrinterDriver:
+        driver = self.get_by_id(driver_id)
+        if not driver:
+            raise ValueError("Driver no encontrado")
+
+        driver.manufacturer = manufacturer
+        driver.model = model
+        driver.description = description
+
         self.db.commit()
         self.db.refresh(driver)
         return driver
 
+    def delete(self, driver_id: int) -> bool:
+        driver = self.get_by_id(driver_id)
+        if driver:
+            self.db.delete(driver)
+            self.db.commit()
+            return True
+        return False
 
-   async def update(self, driver_id: int, manufacturer: str, model: str, 
-                   description: str = None) -> PrinterDriver:
-       driver = await self.get_by_id(driver_id)
-       if not driver:
-           raise ValueError("Driver no encontrado")
-       
-       driver.manufacturer = manufacturer
-       driver.model = model
-       driver.description = description
-       
-       self.db.commit()
-       self.db.refresh(driver)
-       return driver
-
-   async def delete(self, driver_id: int) -> bool:
-       driver = await self.get_by_id(driver_id)
-       if driver:
-           self.db.delete(driver)
-           self.db.commit()
-           return True
-       return False
-
-   async def _find_inf_path(self, driver_bytes: bytes) -> str:
-       with tempfile.NamedTemporaryFile() as tmp:
-           tmp.write(driver_bytes)
-           tmp.flush()
-           
-           with zipfile.ZipFile(tmp.name) as z:
-               inf_files = [f for f in z.namelist() if f.lower().endswith('.inf')]
-               if not inf_files:
-                   raise ValueError("No se encontró archivo .inf en el paquete")
-               return inf_files[0]
+    def _find_inf_path(self, driver_bytes: bytes) -> List[str]:
+        with tempfile.NamedTemporaryFile() as tmp:
+            tmp.write(driver_bytes)
+            tmp.flush()
+            with zipfile.ZipFile(tmp.name) as z:
+                inf_files = [f for f in z.namelist() if f.lower().endswith('.inf')]
+                if not inf_files:
+                    raise ValueError("No se encontró ningún archivo .inf en el paquete")
+                return inf_files
