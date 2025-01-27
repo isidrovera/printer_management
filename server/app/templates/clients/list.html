@@ -1,138 +1,112 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clientes</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.259.0/lucide.min.js"></script>
-</head>
-<body class="bg-gray-100">
-    <div class="container mx-auto px-4 py-6">
-        <!-- Encabezado y controles -->
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-            <h2 class="text-2xl font-bold">Clientes</h2>
-            <div class="flex gap-4 w-full sm:w-auto">
-                <div class="flex bg-gray-100 rounded-lg p-1">
-                    <button id="listViewBtn" class="p-2 rounded-lg bg-white shadow-sm">
-                        <i data-lucide="layout-list" class="text-gray-600"></i>
-                    </button>
-                    <button id="kanbanViewBtn" class="p-2 rounded-lg text-gray-600 hover:bg-gray-200">
-                        <i data-lucide="grid"></i>
-                    </button>
-                </div>
-                <a href="/clients/create" class="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-                    <i data-lucide="plus"></i>
-                    <span>Nuevo Cliente</span>
-                </a>
-            </div>
-        </div>
+{% extends "base.html" %}
+{% block title %}Clientes{% endblock %}
 
-        <!-- Vista Lista -->
-        <div id="listView" class="overflow-x-auto">
-            <table class="w-full bg-white rounded-lg shadow">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">ID</th>
-                        <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">Nombre</th>
-                        <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">Token</th>
-                        <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">Estado</th>
-                        <th class="px-4 py-3 text-right text-sm font-semibold text-gray-600">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-100">
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-4 py-3 text-sm text-gray-600">1</td>
-                        <td class="px-4 py-3 text-sm">Cliente 1</td>
-                        <td class="px-4 py-3 text-sm font-mono text-gray-500">token123</td>
-                        <td class="px-4 py-3">
-                            <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-sm bg-green-100 text-green-700">
-                                <span class="w-2 h-2 bg-green-500 rounded-full"></span> Activo
-                            </span>
-                        </td>
-                        <td class="px-4 py-3">
-                            <div class="flex justify-end gap-2">
-                                <button class="p-2 text-amber-600 hover:bg-amber-50 rounded-lg transition-colors">
-                                    <i data-lucide="edit-2"></i>
-                                </button>
-                                <button class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
-                                    <i data-lucide="trash-2"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-4 py-3 text-sm text-gray-600">2</td>
-                        <td class="px-4 py-3 text-sm">Cliente 2</td>
-                        <td class="px-4 py-3 text-sm font-mono text-gray-500">token456</td>
-                        <td class="px-4 py-3">
-                            <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-sm bg-red-100 text-red-700">
-                                <span class="w-2 h-2 bg-red-500 rounded-full"></span> Inactivo
-                            </span>
-                        </td>
-                        <td class="px-4 py-3">
-                            <div class="flex justify-end gap-2">
-                                <button class="p-2 text-amber-600 hover:bg-amber-50 rounded-lg transition-colors">
-                                    <i data-lucide="edit-2"></i>
-                                </button>
-                                <button class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
-                                    <i data-lucide="trash-2"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <!-- Vista Kanban -->
-        <div id="kanbanView" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div class="bg-white shadow rounded-lg p-4">
-                <div class="flex items-center justify-between mb-2">
-                    <div class="flex items-center gap-2">
-                        <i data-lucide="user" class="text-gray-500"></i>
-                        <span class="font-semibold">Cliente 1</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span class="w-2 h-2 bg-green-500 rounded-full"></span>
-                        <span class="text-green-500">Activo</span>
-                    </div>
-                </div>
-                <div class="flex items-center gap-2 text-gray-500 mb-4">
-                    <i data-lucide="key"></i>
-                    <span class="text-sm">token123</span>
-                </div>
-                <div class="flex justify-end gap-2">
-                    <button class="p-2 text-amber-600 hover:bg-amber-50 rounded-lg transition-colors">
-                        <i data-lucide="edit-2"></i>
-                    </button>
-                    <button class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
-                        <i data-lucide="trash-2"></i>
-                    </button>
-                </div>
+{% block content %}
+<div class="bg-white shadow rounded-lg p-6">
+    <!-- Título y Controles -->
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-xl font-bold text-gray-800">Clientes</h2>
+        <div class="flex items-center space-x-4">
+            <!-- Botones de vista -->
+            <div class="flex space-x-2">
+                <button id="listViewBtn" class="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 focus:ring-2 focus:ring-blue-500">
+                    <i data-lucide="layout-list" class="text-gray-600"></i>
+                </button>
+                <button id="kanbanViewBtn" class="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 focus:ring-2 focus:ring-blue-500">
+                    <i data-lucide="grid" class="text-gray-600"></i>
+                </button>
             </div>
+            <!-- Botón "Nuevo Cliente" -->
+            <a href="/clients/create" class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 focus:ring-2 focus:ring-blue-300">
+                <i data-lucide="plus"></i> Nuevo Cliente
+            </a>
         </div>
     </div>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            lucide.createIcons();
+    <!-- Vista Lista -->
+    <div id="listView" class="list-view">
+        <table class="w-full table-auto border-collapse bg-white shadow rounded-lg">
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">ID</th>
+                    <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Nombre</th>
+                    <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Token</th>
+                    <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Estado</th>
+                    <th class="px-4 py-2 text-right text-sm font-semibold text-gray-600">Acciones</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                {% for client in clients %}
+                <tr class="hover:bg-gray-50">
+                    <td class="px-4 py-2 text-sm text-gray-800">{{ client.id }}</td>
+                    <td class="px-4 py-2 text-sm text-gray-800">{{ client.name }}</td>
+                    <td class="px-4 py-2 text-sm font-mono text-gray-500">{{ client.token }}</td>
+                    <td class="px-4 py-2">
+                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold 
+                                    {% if client.is_active %}
+                                    bg-green-100 text-green-600
+                                    {% else %}
+                                    bg-red-100 text-red-600
+                                    {% endif %}">
+                            <span class="w-2 h-2 rounded-full mr-2 
+                                    {% if client.is_active %} bg-green-500 
+                                    {% else %} bg-red-500 
+                                    {% endif %}"></span>
+                            {{ "Activo" if client.is_active else "Inactivo" }}
+                        </span>
+                    </td>
+                    <td class="px-4 py-2 text-right">
+                        <div class="flex items-center space-x-2 justify-end">
+                            <a href="/clients/{{ client.id }}/edit" class="text-blue-500 hover:text-blue-700">
+                                <i data-lucide="edit-2"></i>
+                            </a>
+                            <button onclick="confirmDelete('{{ client.id }}')" class="text-red-500 hover:text-red-700">
+                                <i data-lucide="trash-2"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
-            const listView = document.getElementById("listView");
-            const kanbanView = document.getElementById("kanbanView");
-            const listViewBtn = document.getElementById("listViewBtn");
-            const kanbanViewBtn = document.getElementById("kanbanViewBtn");
-
-            listViewBtn.addEventListener("click", () => {
-                listView.classList.remove("hidden");
-                kanbanView.classList.add("hidden");
-            });
-
-            kanbanViewBtn.addEventListener("click", () => {
-                kanbanView.classList.remove("hidden");
-                listView.classList.add("hidden");
-            });
-        });
-    </script>
-</body>
-</html>
+    <!-- Vista Kanban -->
+    <div id="kanbanView" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
+        {% for client in clients %}
+        <div class="bg-white shadow rounded-lg p-4 border">
+            <div class="flex justify-between items-center mb-4">
+                <div class="flex items-center space-x-2">
+                    <i data-lucide="user" class="text-gray-600"></i>
+                    <span class="font-semibold text-gray-800">{{ client.name }}</span>
+                </div>
+                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold 
+                            {% if client.is_active %}
+                            bg-green-100 text-green-600
+                            {% else %}
+                            bg-red-100 text-red-600
+                            {% endif %}">
+                    <span class="w-2 h-2 rounded-full mr-2 
+                            {% if client.is_active %} bg-green-500 
+                            {% else %} bg-red-500 
+                            {% endif %}"></span>
+                    {{ "Activo" if client.is_active else "Inactivo" }}
+                </span>
+            </div>
+            <div class="mb-4">
+                <p class="text-sm text-gray-600">Token:</p>
+                <p class="text-sm font-mono text-gray-800">{{ client.token }}</p>
+            </div>
+            <div class="flex justify-end space-x-2">
+                <a href="/clients/{{ client.id }}/edit" class="text-blue-500 hover:text-blue-700">
+                    <i data-lucide="edit-2"></i>
+                </a>
+                <button onclick="confirmDelete('{{ client.id }}')" class="text-red-500 hover:text-red-700">
+                    <i data-lucide="trash-2"></i>
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
