@@ -9,11 +9,19 @@ let ws;
 let reconnectAttempts = 0;
 const MAX_RECONNECT_ATTEMPTS = 5;
 
+// Configuración WebSocket
+const WS_CONFIG = {
+    url: `ws://${window.location.host}/ws/status`,
+    reconnectInterval: 1000,
+    maxReconnectAttempts: 5
+};
+
 // Inicialización cuando el DOM está listo
 document.addEventListener('DOMContentLoaded', function() {
     initializeWebSocket();
     initializeSearchFilter();
     initializeFormHandlers();
+    initializeManufacturerSelect();
 });
 
 // Función para mostrar el modal de instalación de impresora
@@ -24,20 +32,10 @@ function showInstallPrinter(agentToken) {
         modal.classList.remove('hidden');
         // Resetear el formulario
         document.getElementById('installPrinterForm').reset();
-        // Actualizar el token oculto
-        const tokenInput = document.getElementById('agentToken');
-        if (tokenInput) {
-            tokenInput.value = agentToken;
-        }
-    }
-}
-
-// Función para mostrar el modal de confirmación de eliminación
-function confirmDelete(agentId) {
-    agentToDelete = agentId;
-    const modal = document.getElementById('deleteConfirmModal');
-    if (modal) {
-        modal.classList.remove('hidden');
+        // Resetear el select de modelos
+        const modelSelect = document.getElementById('model');
+        modelSelect.innerHTML = '<option value="">Seleccione un modelo</option>';
+        modelSelect.disabled = true;
     }
 }
 
@@ -49,32 +47,6 @@ function closeModal(modalId) {
         if (modalId === 'installPrinterModal') {
             document.getElementById('installPrinterForm').reset();
         }
-    }
-}
-
-// Función para eliminar un agente
-async function deleteAgent() {
-    if (!agentToDelete) return;
-
-    try {
-        const response = await fetch(`/api/v1/agents/${agentToDelete}`, {
-            method: 'DELETE',
-        });
-
-        if (response.ok) {
-            showNotification('Agente eliminado correctamente', 'success');
-            // Recargar la página después de un breve retraso
-            setTimeout(() => window.location.reload(), 1000);
-        } else {
-            const data = await response.json();
-            throw new Error(data.detail || 'Error al eliminar el agente');
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        showNotification(error.message, 'error');
-    } finally {
-        closeModal('deleteConfirmModal');
-        agentToDelete = null;
     }
 }
 
@@ -122,11 +94,30 @@ function initializeFormHandlers() {
             }
         });
     }
+}
 
-    // Manejar cambios en el selector de fabricante
+// Inicializar select de fabricantes y modelos
+async function initializeManufacturerSelect() {
     const manufacturerSelect = document.getElementById('manufacturer');
-    if (manufacturerSelect) {
+    if (!manufacturerSelect) return;
+
+    try {
+        const response = await fetch('/api/v1/printers/manufacturers');
+        const manufacturers = await response.json();
+
+        manufacturerSelect.innerHTML = '<option value="">Seleccione un fabricante</option>';
+        manufacturers.forEach(manufacturer => {
+            const option = document.createElement('option');
+            option.value = manufacturer;
+            option.textContent = manufacturer;
+            manufacturerSelect.appendChild(option);
+        });
+
+        // Agregar evento para cargar modelos
         manufacturerSelect.addEventListener('change', loadModels);
+    } catch (error) {
+        console.error('Error cargando fabricantes:', error);
+        showNotification('Error al cargar fabricantes', 'error');
     }
 }
 
@@ -166,6 +157,63 @@ async function loadModels(e) {
     }
 }
 
+// Inicializar WebSocket
+function connectWebSocket() {
+    try {
+        console.log('Intentando conectar WebSocket a:', WS_CONFIG.url);
+        ws = new WebSocket(WS_CONFIG.url);
+        
+        ws.onopen = () => {
+            console.log('WebSocket conectado exitosamente');
+            reconnectAttempts = 0;
+        };
+
+        ws.onmessage = (event) => {
+            try {
+                const data = JSON.parse(event.data);
+                console.log('Mensaje recibido:', data);
+                handleWebSocketMessage(data);
+            } catch (error) {
+                console.error('Error al procesar mensaje:', error);
+            }
+        };
+
+        ws.onclose = (event) => {
+            console.log('WebSocket desconectado. Código:', event.code, 'Razón:', event.reason);
+            if (reconnectAttempts < WS_CONFIG.maxReconnectAttempts) {
+                reconnectAttempts++;
+                console.log(`Reintentando conexión ${reconnectAttempts}/${WS_CONFIG.maxReconnectAttempts}`);
+                setTimeout(connectWebSocket, WS_CONFIG.reconnectInterval * reconnectAttempts);
+            } else {
+                console.log('Número máximo de intentos de reconexión alcanzado');
+                showNotification('Se perdió la conexión con el servidor', 'error');
+            }
+        };
+
+        ws.onerror = (error) => {
+            console.error('Error en WebSocket:', error);
+        };
+    } catch (error) {
+        console.error('Error al crear conexión WebSocket:', error);
+        showNotification('Error al conectar con el servidor', 'error');
+    }
+}
+
+// Manejar mensajes del WebSocket
+function handleWebSocketMessage(data) {
+    if (data.type === 'status_update') {
+        updateAgentStatus(data.agent_id, data.status);
+    } else if (data.type === 'printer_installation_status') {
+        handlePrinterInstallationStatus(data);
+    }
+}
+
+// Manejar estado de instalación de impresora
+function handlePrinterInstallationStatus(data) {
+    const status = data.success ? 'success' : 'error';
+    showNotification(data.message, status);
+}
+
 // Inicializar filtro de búsqueda
 function initializeSearchFilter() {
     const searchInput = document.getElementById('searchInput');
@@ -182,53 +230,6 @@ function initializeSearchFilter() {
     }
 }
 
-// Inicializar WebSocket
-function initializeWebSocket() {
-    connectWebSocket();
-}
-
-// Conectar WebSocket
-function connectWebSocket() {
-    // Corregir la ruta del WebSocket
-    ws = new WebSocket(`ws://${window.location.host}/api/v1/ws/status`);
-    
-    ws.onopen = () => {
-        console.log('WebSocket conectado');
-        reconnectAttempts = 0;
-    };
-
-    ws.onmessage = (event) => {
-        try {
-            const data = JSON.parse(event.data);
-            handleWebSocketMessage(data);
-        } catch (error) {
-            console.error('Error parsing WebSocket message:', error);
-        }
-    };
-
-    ws.onclose = () => {
-        console.log('WebSocket desconectado');
-        if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
-            reconnectAttempts++;
-            console.log(`Reintentando conexión ${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS}`);
-            setTimeout(connectWebSocket, 1000 * reconnectAttempts);
-        }
-    };
-
-    ws.onerror = (error) => {
-        console.error('WebSocket error:', error);
-    };
-}
-
-// Manejar mensajes del WebSocket
-function handleWebSocketMessage(data) {
-    if (data.type === 'status_update') {
-        updateAgentStatus(data.agent_id, data.status);
-    } else if (data.type === 'installation_status') {
-        handleInstallationStatus(data);
-    }
-}
-
 // Actualizar estado del agente en la UI
 function updateAgentStatus(agentId, status) {
     const row = document.querySelector(`tr[data-agent-id="${agentId}"]`);
@@ -237,7 +238,6 @@ function updateAgentStatus(agentId, status) {
         if (statusCell) {
             const statusSpan = statusCell.querySelector('span');
             if (statusSpan) {
-                // Actualizar clases y texto
                 statusSpan.className = `inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                     status === 'online' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                 }`;
@@ -263,10 +263,4 @@ function updateAgentStatus(agentId, status) {
             }
         }
     }
-}
-
-// Manejar estado de instalación
-function handleInstallationStatus(data) {
-    const status = data.success ? 'success' : 'error';
-    showNotification(data.message, status);
 }
