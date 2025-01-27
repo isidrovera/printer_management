@@ -162,6 +162,7 @@
     color: var(--red-500);
 }
 
+
 /* Vista Kanban */
 .kanban-view {
     display: grid;
