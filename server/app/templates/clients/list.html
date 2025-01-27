@@ -1,290 +1,67 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clientes</title>
-    <!-- Lucide Icons -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.309.0/umd/lucide.min.js"></script>
-    <style>
-        :root {
-            --blue-600: #2563eb;
-            --blue-700: #1d4ed8;
-            --amber-600: #d97706;
-            --red-600: #dc2626;
-            --green-500: #22c55e;
-            --red-500: #ef4444;
-        }
+{% extends "base.html" %}
+{% block title %}Clientes{% endblock %}
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/clients.css') }}">
+{% endblock %}
 
-        body {
-            font-family: system-ui, -apple-system, sans-serif;
-            background-color: #f9fafb;
-            color: #1f2937;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 1.5rem 1rem;
-        }
-
-        .header {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        @media (min-width: 640px) {
-            .header {
-                flex-direction: row;
-                justify-content: space-between;
-                align-items: center;
-            }
-        }
-
-        .title {
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-
-        .controls {
-            display: flex;
-            gap: 1rem;
-            width: 100%;
-        }
-
-        @media (min-width: 640px) {
-            .controls {
-                width: auto;
-            }
-        }
-
-        .view-toggle {
-            display: flex;
-            background-color: #f3f4f6;
-            border-radius: 0.5rem;
-            padding: 0.25rem;
-        }
-
-        .view-toggle button {
-            padding: 0.5rem;
-            border: none;
-            background: none;
-            border-radius: 0.5rem;
-            cursor: pointer;
-            color: #4b5563;
-        }
-
-        .view-toggle button.active {
-            background-color: white;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-
-        .btn-new {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            background-color: var(--blue-600);
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            text-decoration: none;
-            border: none;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .btn-new:hover {
-            background-color: var(--blue-700);
-        }
-
-        /* Table View */
-        .table-container {
-            overflow-x: auto;
-            background-color: white;
-            border-radius: 0.5rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th {
-            background-color: #f9fafb;
-            padding: 0.75rem 1rem;
-            text-align: left;
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: #4b5563;
-        }
-
-        td {
-            padding: 0.75rem 1rem;
-            border-top: 1px solid #f3f4f6;
-        }
-
-        tr:hover {
-            background-color: #f9fafb;
-        }
-
-        /* Kanban View */
-        .kanban-view {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1rem;
-            display: none;
-        }
-
-        .card {
-            background-color: white;
-            border-radius: 0.5rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            padding: 1rem;
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.5rem;
-        }
-
-        .card-name {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-weight: 600;
-        }
-
-        .card-status {
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-            font-size: 0.875rem;
-        }
-
-        .card-token {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: #6b7280;
-            font-size: 0.875rem;
-            margin-bottom: 1rem;
-        }
-
-        .card-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 0.5rem;
-        }
-
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.25rem;
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.875rem;
-        }
-
-        .status-badge.active {
-            background-color: #dcfce7;
-            color: #15803d;
-        }
-
-        .status-badge.inactive {
-            background-color: #fee2e2;
-            color: #b91c1c;
-        }
-
-        .btn-action {
-            padding: 0.5rem;
-            border: none;
-            background: none;
-            border-radius: 0.5rem;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .btn-edit {
-            color: var(--amber-600);
-        }
-
-        .btn-edit:hover {
-            background-color: #fef3c7;
-        }
-
-        .btn-delete {
-            color: var(--red-600);
-        }
-
-        .btn-delete:hover {
-            background-color: #fee2e2;
-        }
-
-        .hidden {
-            display: none;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h2 class="title">Clientes</h2>
-            <div class="controls">
-                <div class="view-toggle">
-                    <button id="listView" class="active">
-                        <i data-lucide="layout-list"></i>
-                    </button>
-                    <button id="kanbanView">
-                        <i data-lucide="layout-grid"></i>
-                    </button>
-                </div>
-                <a href="/clients/create" class="btn-new">
-                    <i data-lucide="plus"></i>
-                    <span>Nuevo Cliente</span>
-                </a>
+{% block content %}
+<div class="client-container">
+    <div class="client-header">
+        <h2 class="client-title">Clientes</h2>
+        <div class="view-controls">
+            <div class="view-toggle">
+                <button id="listViewBtn" class="view-btn active" aria-label="Vista Lista">
+                    <i data-lucide="layout-list"></i>
+                </button>
+                <button id="kanbanViewBtn" class="view-btn" aria-label="Vista Kanban">
+                    <i data-lucide="layout-grid"></i>
+                </button>
             </div>
+            <a href="/clients/create" class="btn-new">
+                <i data-lucide="plus"></i>
+                <span>Nuevo Cliente</span>
+            </a>
         </div>
+    </div>
 
-        <div id="tableView" class="table-container">
-            <table>
+    <!-- Vista Lista -->
+    <div id="listView" class="list-view">
+        <div class="table-container">
+            <table class="client-table">
                 <thead>
                     <tr>
                         <th>ID</th>
                         <th>Nombre</th>
                         <th>Token</th>
                         <th>Estado</th>
-                        <th style="text-align: right">Acciones</th>
+                        <th class="actions-column">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for client in clients %}
                     <tr>
                         <td>{{ client.id }}</td>
-                        <td>{{ client.name }}</td>
-                        <td style="font-family: monospace">{{ client.token }}</td>
+                        <td class="name-cell">
+                            <i data-lucide="user" class="client-icon"></i>
+                            {{ client.name }}
+                        </td>
+                        <td class="token-cell">
+                            <i data-lucide="key" class="token-icon"></i>
+                            {{ client.token }}
+                        </td>
                         <td>
                             <span class="status-badge {% if client.is_active %}active{% else %}inactive{% endif %}">
-                                <i data-lucide="circle" style="width: 8px; height: 8px; fill: currentColor"></i>
+                                <i data-lucide="circle" class="status-icon"></i>
                                 {{ "Activo" if client.is_active else "Inactivo" }}
                             </span>
                         </td>
-                        <td>
-                            <div class="card-actions">
-                                <a href="/clients/{{ client.id }}/edit" class="btn-action btn-edit">
+                        <td class="actions-cell">
+                            <div class="action-buttons">
+                                <a href="/clients/{{ client.id }}/edit" class="btn-action btn-edit" title="Editar">
                                     <i data-lucide="edit-2"></i>
                                 </a>
-                                <button onclick="confirmDelete('client', {{ client.id }})" class="btn-action btn-delete">
+                                <button onclick="confirmDelete('client', {{ client.id }})" class="btn-action btn-delete" title="Eliminar">
                                     <i data-lucide="trash-2"></i>
                                 </button>
                             </div>
@@ -294,31 +71,34 @@
                 </tbody>
             </table>
         </div>
+    </div>
 
-        <div id="kanbanView" class="kanban-view">
+    <!-- Vista Kanban -->
+    <div id="kanbanView" class="kanban-view hidden">
+        <div class="cards-grid">
             {% for client in clients %}
-            <div class="card">
+            <div class="client-card">
                 <div class="card-header">
-                    <div class="card-name">
-                        <i data-lucide="user"></i>
+                    <div class="card-title">
+                        <i data-lucide="user" class="client-icon"></i>
                         <span>{{ client.name }}</span>
                     </div>
-                    <div class="card-status">
-                        <i data-lucide="circle" style="width: 12px; height: 12px; {% if client.is_active %}color: var(--green-500){% else %}color: var(--red-500){% endif %}; fill: currentColor"></i>
-                        <span style="{% if client.is_active %}color: var(--green-500){% else %}color: var(--red-500){% endif %}">
-                            {{ "Activo" if client.is_active else "Inactivo" }}
-                        </span>
+                    <span class="card-status {% if client.is_active %}active{% else %}inactive{% endif %}">
+                        <i data-lucide="circle" class="status-icon"></i>
+                        {{ "Activo" if client.is_active else "Inactivo" }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <div class="token-display">
+                        <i data-lucide="key" class="token-icon"></i>
+                        <span class="token-text">{{ client.token }}</span>
                     </div>
                 </div>
-                <div class="card-token">
-                    <i data-lucide="key"></i>
-                    <span>{{ client.token }}</span>
-                </div>
                 <div class="card-actions">
-                    <a href="/clients/{{ client.id }}/edit" class="btn-action btn-edit">
+                    <a href="/clients/{{ client.id }}/edit" class="btn-action btn-edit" title="Editar">
                         <i data-lucide="edit-2"></i>
                     </a>
-                    <button onclick="confirmDelete('client', {{ client.id }})" class="btn-action btn-delete">
+                    <button onclick="confirmDelete('client', {{ client.id }})" class="btn-action btn-delete" title="Eliminar">
                         <i data-lucide="trash-2"></i>
                     </button>
                 </div>
@@ -326,38 +106,10 @@
             {% endfor %}
         </div>
     </div>
+</div>
+{% endblock %}
 
-    <script>
-        // Inicializar los iconos de Lucide
-        lucide.createIcons();
-
-        // Funcionalidad para cambiar entre vistas
-        const listViewBtn = document.getElementById('listView');
-        const kanbanViewBtn = document.getElementById('kanbanView');
-        const tableView = document.getElementById('tableView');
-        const kanbanView = document.getElementById('kanbanView');
-
-        listViewBtn.addEventListener('click', () => {
-            listViewBtn.classList.add('active');
-            kanbanViewBtn.classList.remove('active');
-            tableView.style.display = 'block';
-            kanbanView.style.display = 'none';
-        });
-
-        kanbanViewBtn.addEventListener('click', () => {
-            kanbanViewBtn.classList.add('active');
-            listViewBtn.classList.remove('active');
-            kanbanView.style.display = 'grid';
-            tableView.style.display = 'none';
-        });
-
-        // Función para confirmar eliminación
-        function confirmDelete(type, id) {
-            if (confirm('¿Estás seguro de que deseas eliminar este cliente?')) {
-                // Aquí iría la lógica de eliminación
-                console.log(`Eliminando ${type} ${id}`);
-            }
-        }
-    </script>
-</body>
-</html>
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.259.0/lucide.min.js"></script>
+<script src="{{ url_for('static', filename='js/clients.js') }}"></script>
+{% endblock %}

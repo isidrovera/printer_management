@@ -1,0 +1,356 @@
+/* Variables de Color */
+:root {
+    --primary-color: #4338ca;
+    --primary-hover: #3730a3;
+    --success-color: #22c55e;
+    --success-bg: #dcfce7;
+    --danger-color: #ef4444;
+    --danger-bg: #fee2e2;
+    --warning-color: #f59e0b;
+    --warning-bg: #fef3c7;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --white: #ffffff;
+}
+
+/* Reset básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background-color: var(--gray-50);
+    color: var(--gray-700);
+    line-height: 1.5;
+}
+
+/* Contenedor Principal */
+.client-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1.5rem;
+}
+
+/* Encabezado */
+.client-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.client-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--gray-700);
+    margin: 0;
+}
+
+.view-controls {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+/* Botones de Vista */
+.view-toggle {
+    display: flex;
+    background-color: var(--gray-100);
+    border-radius: 0.5rem;
+    padding: 0.25rem;
+}
+
+.view-btn {
+    padding: 0.5rem;
+    border: none;
+    background: none;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    color: var(--gray-500);
+    transition: all 0.2s ease;
+}
+
+.view-btn:hover {
+    color: var(--gray-700);
+    background-color: var(--gray-200);
+}
+
+.view-btn.active {
+    background-color: var(--white);
+    color: var(--gray-700);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.btn-new {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background-color: var(--primary-color);
+    color: var(--white);
+    border-radius: 0.5rem;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-new:hover {
+    background-color: var(--primary-hover);
+}
+
+.btn-new i {
+    width: 20px;
+    height: 20px;
+}
+
+/* Tabla */
+.table-container {
+    background-color: var(--white);
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    overflow-x: auto;
+    margin-bottom: 2rem;
+}
+
+.client-table {
+    width: 100%;
+    border-collapse: collapse;
+    white-space: nowrap;
+}
+
+.client-table th {
+    background-color: var(--gray-50);
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: var(--gray-600);
+    font-size: 0.875rem;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.client-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--gray-100);
+    color: var(--gray-700);
+}
+
+.client-table tr:last-child td {
+    border-bottom: none;
+}
+
+.client-table tr:hover {
+    background-color: var(--gray-50);
+}
+
+/* Células de la tabla */
+.name-cell, 
+.token-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.token-cell {
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+    color: var(--gray-500);
+    font-size: 0.875rem;
+}
+
+.client-icon,
+.token-icon {
+    width: 18px;
+    height: 18px;
+    color: var(--gray-400);
+}
+
+/* Badges de Estado */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.status-badge.active {
+    background-color: var(--success-bg);
+    color: var(--success-color);
+}
+
+.status-badge.inactive {
+    background-color: var(--danger-bg);
+    color: var(--danger-color);
+}
+
+.status-icon {
+    width: 8px;
+    height: 8px;
+}
+
+/* Vista Kanban */
+.kanban-view {
+    margin-top: 1rem;
+}
+
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+}
+
+.client-card {
+    background-color: var(--white);
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    padding: 1rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.client-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.card-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: var(--gray-700);
+}
+
+.card-body {
+    margin-bottom: 1rem;
+}
+
+.token-display {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--gray-500);
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+    font-size: 0.875rem;
+    padding: 0.5rem;
+    background-color: var(--gray-50);
+    border-radius: 0.375rem;
+}
+
+/* Botones de Acción */
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+}
+
+.btn-action {
+    padding: 0.5rem;
+    border: none;
+    background: none;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-action i {
+    width: 18px;
+    height: 18px;
+}
+
+.btn-edit {
+    color: var(--warning-color);
+}
+
+.btn-edit:hover {
+    background-color: var(--warning-bg);
+}
+
+.btn-delete {
+    color: var(--danger-color);
+}
+
+.btn-delete:hover {
+    background-color: var(--danger-bg);
+}
+
+/* Utilidades */
+.hidden {
+    display: none !important;
+}
+
+/* Responsividad */
+@media (max-width: 768px) {
+    .client-container {
+        padding: 1rem;
+    }
+
+    .client-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .view-controls {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .view-toggle {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .btn-new {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .cards-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .table-container {
+        margin: 0 -1rem;
+        border-radius: 0;
+    }
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.kanban-view,
+.list-view {
+    animation: fadeIn 0.3s ease-out;
+}
