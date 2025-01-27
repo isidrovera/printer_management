@@ -36,28 +36,26 @@ document.addEventListener('DOMContentLoaded', function() {
 // Función para confirmar eliminación
 function confirmDelete(clientId) {
     if (confirm('¿Estás seguro de que deseas eliminar este cliente?')) {
-        // Aquí iría la lógica de eliminación
-        console.log('Eliminando cliente:', clientId);
-        
-        // Ejemplo de petición DELETE
+        const deleteButton = document.querySelector(`button[data-client-id="${clientId}"]`);
+        deleteButton.disabled = true;
+
         fetch(`/clients/${clientId}`, {
             method: 'DELETE',
             headers: {
-                'Content-Type': 'application/json'
-            }
+                'Content-Type': 'application/json',
+            },
         })
-        .then(response => {
-            if (response.ok) {
-                // Eliminar elemento del DOM
-                const elements = document.querySelectorAll(`[data-client-id="${clientId}"]`);
-                elements.forEach(el => el.remove());
-            } else {
-                throw new Error('Error al eliminar');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Error al eliminar el cliente');
-        });
+            .then((response) => {
+                if (response.ok) {
+                    document.querySelector(`[data-client-id="${clientId}"]`).remove();
+                } else {
+                    throw new Error('Error al eliminar el cliente');
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                alert('Error al eliminar el cliente');
+                deleteButton.disabled = false;
+            });
     }
 }

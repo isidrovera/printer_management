@@ -7,20 +7,21 @@
 
 {% block content %}
 <div class="client-container">
-    <h2 class="client-title">Clientes</h2>
-    
-    <div class="controls-section">
-        <div class="view-type-controls">
-            <button id="listViewBtn" class="view-btn active" title="Vista Lista">
-                <i data-lucide="layout-list"></i>
-            </button>
-            <button id="kanbanViewBtn" class="view-btn" title="Vista Kanban">
-                <i data-lucide="grid"></i>
-            </button>
+    <div class="flex-row space-between">
+        <h2 class="client-title">Clientes</h2>
+        <div class="controls-section">
+            <div class="view-type-controls">
+                <button id="listViewBtn" class="view-btn active" title="Vista Lista">
+                    <i data-lucide="layout-list"></i>
+                </button>
+                <button id="kanbanViewBtn" class="view-btn" title="Vista Kanban">
+                    <i data-lucide="grid"></i>
+                </button>
+            </div>
+            <a href="/clients/create" class="new-client-btn">
+                <i data-lucide="plus"></i> Nuevo Cliente
+            </a>
         </div>
-        <a href="/clients/create" class="new-client-btn">
-            + Nuevo Cliente
-        </a>
     </div>
 
     <!-- Vista Lista -->
@@ -37,7 +38,7 @@
             </thead>
             <tbody>
                 {% for client in clients %}
-                <tr>
+                <tr data-client-id="{{ client.id }}">
                     <td>{{ client.id }}</td>
                     <td>{{ client.name }}</td>
                     <td class="token-cell">{{ client.token }}</td>
@@ -50,7 +51,7 @@
                     <td class="actions-cell">
                         <div class="action-buttons">
                             <a href="/clients/{{ client.id }}/edit" class="action-btn">
-                                <i data-lucide="pencil"></i>
+                                <i data-lucide="edit-2"></i>
                             </a>
                             <button onclick="confirmDelete('{{ client.id }}')" class="action-btn delete">
                                 <i data-lucide="trash-2"></i>
@@ -67,9 +68,12 @@
     <div id="kanbanView" class="kanban-view hidden">
         <div class="cards-grid">
             {% for client in clients %}
-            <div class="client-card">
+            <div class="client-card" data-client-id="{{ client.id }}">
                 <div class="card-header">
-                    <span class="client-name">{{ client.name }}</span>
+                    <div class="flex-row">
+                        <i data-lucide="user"></i>
+                        <span class="client-name">{{ client.name }}</span>
+                    </div>
                     <span class="status-badge {% if client.is_active %}active{% else %}inactive{% endif %}">
                         <span class="status-dot"></span>
                         {{ "Activo" if client.is_active else "Inactivo" }}
@@ -84,7 +88,7 @@
                 <div class="card-footer">
                     <div class="action-buttons">
                         <a href="/clients/{{ client.id }}/edit" class="action-btn">
-                            <i data-lucide="pencil"></i>
+                            <i data-lucide="edit-2"></i>
                         </a>
                         <button onclick="confirmDelete('{{ client.id }}')" class="action-btn delete">
                             <i data-lucide="trash-2"></i>
