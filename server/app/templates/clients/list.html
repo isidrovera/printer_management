@@ -3,7 +3,6 @@
 
 {% block content %}
 <div class="bg-white shadow-lg rounded-lg p-6 mx-auto max-w-7xl">
-    <!-- Mantenemos el header igual -->
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <h2 class="text-2xl font-bold text-gray-800">Clientes</h2>
         
@@ -41,7 +40,7 @@
         </div>
     </div>
 
-    <!-- Vista Lista con botones modificados -->
+    <!-- Vista Lista -->
     <div id="listView" class="overflow-x-auto">
         <table class="w-full border-collapse">
             <thead class="bg-gray-50">
@@ -78,24 +77,25 @@
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div class="flex items-center justify-end space-x-2">
                             <a href="/clients/{{ client.id }}/edit" 
-                               class="p-2 bg-amber-100 text-amber-700 rounded-lg hover:bg-amber-200 transition-colors"
-                               title="Editar Cliente">
-                                <i data-lucide="pencil" class="h-5 w-5"></i>
+                               class="inline-flex items-center p-2 bg-amber-100 text-amber-700 rounded-lg hover:bg-amber-200 transition-colors"
+                               title="Editar">
+                                <i data-lucide="pencil" class="h-4 w-4"></i>
                             </a>
                             <button onclick="confirmDelete('{{ client.id }}')"
-                                    class="p-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
-                                    title="Eliminar Cliente">
-                                <i data-lucide="trash" class="h-5 w-5"></i>
+                                    class="inline-flex items-center p-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
+                                    title="Eliminar">
+                                <i data-lucide="trash" class="h-4 w-4"></i>
                             </button>
                         </div>
                     </td>
+                    
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 
-    <!-- Vista Kanban con botones modificados -->
+    <!-- Vista Kanban -->
     <div id="kanbanView" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
         {% for client in clients %}
         <div class="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow">
@@ -131,14 +131,16 @@
                 </div>
                 <div class="mt-6 flex justify-end space-x-2">
                     <a href="/clients/{{ client.id }}/edit" 
-                       class="p-2 bg-amber-100 text-amber-700 rounded-lg hover:bg-amber-200 transition-colors"
-                       title="Editar Cliente">
-                        <i data-lucide="pencil" class="h-5 w-5"></i>
+                       class="inline-flex items-center px-3 py-2 bg-amber-100 text-amber-700 rounded-lg hover:bg-amber-200 transition-colors"
+                       title="Editar">
+                        <i data-lucide="pencil" class="h-4 w-4"></i>
+                        <span class="ml-1">Editar</span>
                     </a>
                     <button onclick="confirmDelete('{{ client.id }}')"
-                            class="p-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
-                            title="Eliminar Cliente">
-                        <i data-lucide="trash" class="h-5 w-5"></i>
+                            class="inline-flex items-center px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
+                            title="Eliminar">
+                        <i data-lucide="trash" class="h-4 w-4"></i>
+                        <span class="ml-1">Eliminar</span>
                     </button>
                 </div>
             </div>
@@ -147,32 +149,7 @@
     </div>
 </div>
 
-<style>
-/* Estilos para tooltips */
-[title] {
-    position: relative;
-    cursor: pointer;
-}
-
-[title]:hover:after {
-    content: attr(title);
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 4px 8px;
-    background-color: rgba(0, 0, 0, 0.8);
-    color: white;
-    font-size: 12px;
-    white-space: nowrap;
-    border-radius: 4px;
-    margin-bottom: 5px;
-    z-index: 10;
-}
-</style>
-
 <script>
-// Mantenemos el mismo JavaScript
 document.addEventListener('DOMContentLoaded', function() {
     const listView = document.getElementById('listView');
     const kanbanView = document.getElementById('kanbanView');
