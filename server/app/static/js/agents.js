@@ -17,45 +17,75 @@ const WS_CONFIG = {
 };
 
 // Inicialización cuando el DOM está listo
-document.addEventListener('DOMContentLoaded', function() {
-    initializeWebSocket();
+document.addEventListener('DOMContentLoaded', function () {
+    initializeWebSocket(); // Llamada corregida y consistente
     initializeSearchFilter();
     initializeFormHandlers();
     initializeManufacturerSelect();
 });
 
-// Función para mostrar el modal de instalación de impresora
-function showInstallPrinter(agentToken) {
-    currentAgentToken = agentToken;
-    const modal = document.getElementById('installPrinterModal');
-    if (modal) {
-        modal.classList.remove('hidden');
-        // Resetear el formulario
-        document.getElementById('installPrinterForm').reset();
-        // Resetear el select de modelos
-        const modelSelect = document.getElementById('model');
-        modelSelect.innerHTML = '<option value="">Seleccione un modelo</option>';
-        modelSelect.disabled = true;
+// Función para inicializar el WebSocket
+function initializeWebSocket() {
+    try {
+        console.log('Intentando conectar WebSocket a:', WS_CONFIG.url);
+        ws = new WebSocket(WS_CONFIG.url);
+        
+        ws.onopen = () => {
+            console.log('WebSocket conectado exitosamente');
+            reconnectAttempts = 0;
+        };
+
+        ws.onmessage = (event) => {
+            try {
+                const data = JSON.parse(event.data);
+                console.log('Mensaje recibido:', data);
+                handleWebSocketMessage(data);
+            } catch (error) {
+                console.error('Error al procesar mensaje:', error);
+            }
+        };
+
+        ws.onclose = (event) => {
+            console.log('WebSocket desconectado. Código:', event.code, 'Razón:', event.reason);
+            if (reconnectAttempts < WS_CONFIG.maxReconnectAttempts) {
+                reconnectAttempts++;
+                console.log(`Reintentando conexión ${reconnectAttempts}/${WS_CONFIG.maxReconnectAttempts}`);
+                setTimeout(initializeWebSocket, WS_CONFIG.reconnectInterval * reconnectAttempts);
+            } else {
+                console.log('Número máximo de intentos de reconexión alcanzado');
+                showNotification('Se perdió la conexión con el servidor', 'error');
+            }
+        };
+
+        ws.onerror = (error) => {
+            console.error('Error en WebSocket:', error);
+        };
+    } catch (error) {
+        console.error('Error al crear conexión WebSocket:', error);
+        showNotification('Error al conectar con el servidor', 'error');
     }
 }
 
-// Función para cerrar modales
-function closeModal(modalId) {
-    const modal = document.getElementById(modalId);
-    if (modal) {
-        modal.classList.add('hidden');
-        if (modalId === 'installPrinterModal') {
-            document.getElementById('installPrinterForm').reset();
-        }
+// Manejar mensajes del WebSocket
+function handleWebSocketMessage(data) {
+    if (data.type === 'status_update') {
+        updateAgentStatus(data.agent_id, data.status);
+    } else if (data.type === 'printer_installation_status') {
+        handlePrinterInstallationStatus(data);
     }
+}
+
+// Manejar estado de instalación de impresora
+function handlePrinterInstallationStatus(data) {
+    const status = data.success ? 'success' : 'error';
+    showNotification(data.message, status);
 }
 
 // Inicializar manejadores de formularios
 function initializeFormHandlers() {
-    // Manejar el envío del formulario de instalación
     const installForm = document.getElementById('installPrinterForm');
     if (installForm) {
-        installForm.addEventListener('submit', async function(e) {
+        installForm.addEventListener('submit', async function (e) {
             e.preventDefault();
 
             const manufacturer = document.getElementById('manufacturer').value;
@@ -96,7 +126,7 @@ function initializeFormHandlers() {
     }
 }
 
-// Inicializar select de fabricantes y modelos
+// Inicializar select de fabricantes
 async function initializeManufacturerSelect() {
     const manufacturerSelect = document.getElementById('manufacturer');
     if (!manufacturerSelect) return;
@@ -113,7 +143,6 @@ async function initializeManufacturerSelect() {
             manufacturerSelect.appendChild(option);
         });
 
-        // Agregar evento para cargar modelos
         manufacturerSelect.addEventListener('change', loadModels);
     } catch (error) {
         console.error('Error cargando fabricantes:', error);
@@ -121,11 +150,11 @@ async function initializeManufacturerSelect() {
     }
 }
 
-// Cargar modelos según el fabricante seleccionado
+// Cargar modelos según fabricante
 async function loadModels(e) {
     const manufacturer = e.target.value;
     const modelSelect = document.getElementById('model');
-    
+
     if (!modelSelect) return;
 
     modelSelect.disabled = true;
@@ -157,68 +186,11 @@ async function loadModels(e) {
     }
 }
 
-// Inicializar WebSocket
-function connectWebSocket() {
-    try {
-        console.log('Intentando conectar WebSocket a:', WS_CONFIG.url);
-        ws = new WebSocket(WS_CONFIG.url);
-        
-        ws.onopen = () => {
-            console.log('WebSocket conectado exitosamente');
-            reconnectAttempts = 0;
-        };
-
-        ws.onmessage = (event) => {
-            try {
-                const data = JSON.parse(event.data);
-                console.log('Mensaje recibido:', data);
-                handleWebSocketMessage(data);
-            } catch (error) {
-                console.error('Error al procesar mensaje:', error);
-            }
-        };
-
-        ws.onclose = (event) => {
-            console.log('WebSocket desconectado. Código:', event.code, 'Razón:', event.reason);
-            if (reconnectAttempts < WS_CONFIG.maxReconnectAttempts) {
-                reconnectAttempts++;
-                console.log(`Reintentando conexión ${reconnectAttempts}/${WS_CONFIG.maxReconnectAttempts}`);
-                setTimeout(connectWebSocket, WS_CONFIG.reconnectInterval * reconnectAttempts);
-            } else {
-                console.log('Número máximo de intentos de reconexión alcanzado');
-                showNotification('Se perdió la conexión con el servidor', 'error');
-            }
-        };
-
-        ws.onerror = (error) => {
-            console.error('Error en WebSocket:', error);
-        };
-    } catch (error) {
-        console.error('Error al crear conexión WebSocket:', error);
-        showNotification('Error al conectar con el servidor', 'error');
-    }
-}
-
-// Manejar mensajes del WebSocket
-function handleWebSocketMessage(data) {
-    if (data.type === 'status_update') {
-        updateAgentStatus(data.agent_id, data.status);
-    } else if (data.type === 'printer_installation_status') {
-        handlePrinterInstallationStatus(data);
-    }
-}
-
-// Manejar estado de instalación de impresora
-function handlePrinterInstallationStatus(data) {
-    const status = data.success ? 'success' : 'error';
-    showNotification(data.message, status);
-}
-
 // Inicializar filtro de búsqueda
 function initializeSearchFilter() {
     const searchInput = document.getElementById('searchInput');
     if (searchInput) {
-        searchInput.addEventListener('input', function(e) {
+        searchInput.addEventListener('input', function (e) {
             const searchTerm = e.target.value.toLowerCase();
             const rows = document.querySelectorAll('tbody tr');
 
@@ -241,25 +213,7 @@ function updateAgentStatus(agentId, status) {
                 statusSpan.className = `inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                     status === 'online' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                 }`;
-                const indicator = statusSpan.querySelector('span');
-                if (indicator) {
-                    indicator.className = `w-2 h-2 mr-2 rounded-full ${
-                        status === 'online' ? 'bg-green-400' : 'bg-red-400'
-                    }`;
-                }
                 statusSpan.lastChild.textContent = status.charAt(0).toUpperCase() + status.slice(1);
-            }
-        }
-
-        // Actualizar botón de instalación
-        const installButton = row.querySelector('button[onclick^="showInstallPrinter"]');
-        if (installButton) {
-            if (status === 'online') {
-                installButton.removeAttribute('disabled');
-                installButton.classList.remove('opacity-50', 'cursor-not-allowed');
-            } else {
-                installButton.setAttribute('disabled', '');
-                installButton.classList.add('opacity-50', 'cursor-not-allowed');
             }
         }
     }
