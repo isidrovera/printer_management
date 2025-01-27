@@ -4,109 +4,97 @@
 let currentAgentToken = '';
 let agentToDelete = null;
 
+// Configuración WebSocket
+const WS_CONFIG = {
+    url: `ws://${window.location.host}/ws/status`,
+    reconnectInterval: 1000,
+    maxReconnectAttempts: 5
+};
+
 // Inicialización cuando el DOM está listo
 document.addEventListener('DOMContentLoaded', function () {
-    initializeManufacturerSelect();
-    initializeSearchFilter();
-    initializeFormHandlers();
     initializeWebSocket();
+    initializeDriverSelect(); // Cargar marca, modelo y driver dinámicamente
+    initializeFormHandlers();
+    initializeSearchFilter();
 });
 
-// Función para inicializar select de fabricantes
-async function initializeManufacturerSelect() {
-    const manufacturerSelect = document.getElementById('manufacturer');
-    if (!manufacturerSelect) return;
-
+// Inicializar WebSocket
+function initializeWebSocket() {
     try {
-        // Hacer la petición al backend para obtener fabricantes y modelos
-        const response = await fetch('/api/v1/printers/manufacturers');
-        if (!response.ok) {
-            throw new Error('Error al obtener la lista de fabricantes');
-        }
+        console.log('Intentando conectar WebSocket a:', WS_CONFIG.url);
+        const ws = new WebSocket(WS_CONFIG.url);
 
-        const manufacturers = await response.json();
+        ws.onopen = () => {
+            console.log('WebSocket conectado exitosamente');
+        };
 
-        // Validar que la respuesta sea un array
-        if (!Array.isArray(manufacturers)) {
-            throw new Error('El formato de datos devuelto es inválido');
-        }
+        ws.onmessage = (event) => {
+            try {
+                const data = JSON.parse(event.data);
+                console.log('Mensaje recibido:', data);
+                // Maneja los datos según el tipo
+            } catch (error) {
+                console.error('Error al procesar mensaje:', error);
+            }
+        };
 
-        // Poblar el select con los fabricantes
-        manufacturerSelect.innerHTML = '<option value="">Seleccione un fabricante</option>';
-        manufacturers.forEach((manufacturer) => {
-            const option = document.createElement('option');
-            option.value = manufacturer;
-            option.textContent = manufacturer;
-            manufacturerSelect.appendChild(option);
-        });
+        ws.onclose = (event) => {
+            console.warn('WebSocket cerrado. Código:', event.code);
+        };
 
-        // Agregar un evento para cargar modelos según el fabricante seleccionado
-        manufacturerSelect.addEventListener('change', loadModels);
+        ws.onerror = (error) => {
+            console.error('Error en WebSocket:', error);
+        };
     } catch (error) {
-        console.error('Error inicializando fabricantes:', error);
-        showNotification('Error al cargar fabricantes', 'error');
+        console.error('Error al crear conexión WebSocket:', error);
     }
 }
 
-// Función para cargar modelos según el fabricante seleccionado
-async function loadModels(e) {
-    const manufacturer = e.target.value;
-    const modelSelect = document.getElementById('model');
-    if (!modelSelect) return;
-
-    modelSelect.disabled = true;
-    modelSelect.innerHTML = '<option value="">Cargando modelos...</option>';
+// Inicializar select de drivers (marca, modelo y archivo)
+async function initializeDriverSelect() {
+    const driverSelect = document.getElementById('driver');
+    if (!driverSelect) return;
 
     try {
-        if (!manufacturer) {
-            modelSelect.innerHTML = '<option value="">Seleccione un modelo</option>';
-            modelSelect.disabled = false;
-            return;
-        }
-
-        // Hacer la petición al backend para obtener los modelos
-        const response = await fetch(`/api/v1/printers/models/${manufacturer}`);
+        // Hacer la petición al backend para obtener los drivers
+        const response = await fetch('/api/v1/drivers'); // Endpoint para obtener drivers
         if (!response.ok) {
-            throw new Error('Error al obtener la lista de modelos');
+            throw new Error('Error al obtener la lista de drivers');
         }
 
-        const models = await response.json();
+        const drivers = await response.json();
 
         // Validar que la respuesta sea un array
-        if (!Array.isArray(models)) {
-            throw new Error('El formato de datos devuelto es inválido');
+        if (!Array.isArray(drivers)) {
+            throw new Error('El formato de datos devuelto no es válido');
         }
 
-        // Poblar el select con los modelos
-        modelSelect.innerHTML = '<option value="">Seleccione un modelo</option>';
-        models.forEach((model) => {
+        // Poblar el select con los drivers
+        driverSelect.innerHTML = '<option value="">Seleccione un driver</option>';
+        drivers.forEach((driver) => {
             const option = document.createElement('option');
-            option.value = model;
-            option.textContent = model;
-            modelSelect.appendChild(option);
+            option.value = driver.id; // Asignar el ID del driver como valor
+            option.textContent = `${driver.manufacturer} - ${driver.model} (${driver.driver_filename})`;
+            driverSelect.appendChild(option);
         });
-
     } catch (error) {
-        console.error('Error al cargar modelos:', error);
-        showNotification('Error al cargar modelos', 'error');
-        modelSelect.innerHTML = '<option value="">Error al cargar modelos</option>';
-    } finally {
-        modelSelect.disabled = false;
+        console.error('Error inicializando drivers:', error);
+        showNotification('Error al cargar drivers', 'error');
     }
 }
 
-// Función para inicializar manejadores de formularios
+// Función para manejar formularios
 function initializeFormHandlers() {
     const installForm = document.getElementById('installPrinterForm');
     if (installForm) {
         installForm.addEventListener('submit', async function (e) {
             e.preventDefault();
 
-            const manufacturer = document.getElementById('manufacturer').value;
-            const model = document.getElementById('model').value;
+            const driverId = document.getElementById('driver').value;
             const printerIp = document.getElementById('printerIp').value;
 
-            if (!manufacturer || !model || !printerIp) {
+            if (!driverId || !printerIp) {
                 showNotification('Por favor complete todos los campos', 'error');
                 return;
             }
@@ -114,18 +102,14 @@ function initializeFormHandlers() {
             try {
                 const response = await fetch(`/api/v1/printers/install/${currentAgentToken}`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         printer_ip: printerIp,
-                        manufacturer: manufacturer,
-                        model: model,
+                        driver_id: driverId
                     }),
                 });
 
                 const data = await response.json();
-
                 if (response.ok) {
                     showNotification('Comando de instalación enviado correctamente', 'success');
                     closeModal('installPrinterModal');
@@ -142,7 +126,7 @@ function initializeFormHandlers() {
 
 // Función para mostrar notificaciones
 function showNotification(message, type = 'info') {
-    // Implementa aquí tu lógica para mostrar notificaciones (puedes usar un framework o crear una función propia)
+    // Implementa aquí tu lógica para mostrar notificaciones
     console.log(`[${type.toUpperCase()}] ${message}`);
 }
 
@@ -157,7 +141,7 @@ function closeModal(modalId) {
     }
 }
 
-// Función para inicializar filtro de búsqueda
+// Inicializar filtro de búsqueda
 function initializeSearchFilter() {
     const searchInput = document.getElementById('searchInput');
     if (searchInput) {
@@ -171,9 +155,4 @@ function initializeSearchFilter() {
             });
         });
     }
-}
-
-// Inicializar WebSocket
-function initializeWebSocket() {
-    // Implementación de WebSocket aquí
 }
