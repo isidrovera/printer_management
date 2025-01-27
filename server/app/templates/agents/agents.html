@@ -83,6 +83,150 @@
     </div>
     {% endif %}
 </div>
+<!-- Modal Instalar Impresora -->
+<div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden z-50" id="installPrinterModal">
+    <div class="bg-white rounded-lg shadow-lg max-w-md w-full mx-4">
+        <div class="p-4 border-b">
+            <h3 class="text-lg font-semibold text-gray-800">Instalar Impresora</h3>
+        </div>
+        <form id="installPrinterForm" class="p-4">
+            <input type="hidden" id="agentToken" name="agentToken">
+            
+            <!-- Fabricante -->
+            <div class="mb-4">
+                <label for="manufacturer" class="block text-sm font-medium text-gray-700 mb-1">Fabricante</label>
+                <select id="manufacturer" name="manufacturer" required
+                        class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    <option value="">Seleccione un fabricante</option>
+                    {% for manufacturer in manufacturers %}
+                    <option value="{{ manufacturer }}">{{ manufacturer }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Modelo -->
+            <div class="mb-4">
+                <label for="model" class="block text-sm font-medium text-gray-700 mb-1">Modelo</label>
+                <select id="model" name="model" required disabled
+                        class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    <option value="">Seleccione un modelo</option>
+                </select>
+            </div>
+
+            <!-- IP de la Impresora -->
+            <div class="mb-4">
+                <label for="printerIp" class="block text-sm font-medium text-gray-700 mb-1">IP de la Impresora</label>
+                <input type="text" id="printerIp" name="printerIp" required
+                       placeholder="192.168.1.100"
+                       pattern="^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
+                       class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                <p class="mt-1 text-sm text-gray-500">Formato: xxx.xxx.xxx.xxx</p>
+            </div>
+
+            <!-- Botones -->
+            <div class="mt-6 flex justify-end space-x-3">
+                <button type="button" 
+                        onclick="closeModal('installPrinterModal')"
+                        class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+                    Cancelar
+                </button>
+                <button type="submit"
+                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                    Instalar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- También agregar estas funciones al script existente -->
+<script>
+let currentAgentToken = '';
+
+function showInstallPrinter(agentToken) {
+    currentAgentToken = agentToken;
+    document.getElementById('agentToken').value = agentToken;
+    document.getElementById('installPrinterModal').classList.remove('hidden');
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).classList.add('hidden');
+    if (modalId === 'installPrinterModal') {
+        document.getElementById('installPrinterForm').reset();
+    }
+}
+
+// Manejar el envío del formulario de instalación
+document.getElementById('installPrinterForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const manufacturer = document.getElementById('manufacturer').value;
+    const model = document.getElementById('model').value;
+    const printerIp = document.getElementById('printerIp').value;
+
+    if (!manufacturer || !model || !printerIp) {
+        showNotification('Por favor complete todos los campos', 'error');
+        return;
+    }
+
+    try {
+        const response = await fetch(`/api/v1/printers/install/${currentAgentToken}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                printer_ip: printerIp,
+                manufacturer: manufacturer,
+                model: model
+            })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            showNotification('Comando de instalación enviado correctamente', 'success');
+            closeModal('installPrinterModal');
+        } else {
+            throw new Error(data.detail || 'Error al enviar el comando de instalación');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showNotification(error.message, 'error');
+    }
+});
+
+// Actualizar modelos cuando se selecciona un fabricante
+document.getElementById('manufacturer').addEventListener('change', async function(e) {
+    const manufacturer = e.target.value;
+    const modelSelect = document.getElementById('model');
+    
+    modelSelect.disabled = true;
+    modelSelect.innerHTML = '<option value="">Cargando modelos...</option>';
+
+    if (!manufacturer) {
+        modelSelect.innerHTML = '<option value="">Seleccione un modelo</option>';
+        return;
+    }
+
+    try {
+        const response = await fetch(`/api/v1/printers/models/${manufacturer}`);
+        const models = await response.json();
+
+        modelSelect.innerHTML = '<option value="">Seleccione un modelo</option>';
+        models.forEach(model => {
+            const option = document.createElement('option');
+            option.value = model;
+            option.textContent = model;
+            modelSelect.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Error:', error);
+        showNotification('Error al cargar los modelos', 'error');
+    } finally {
+        modelSelect.disabled = false;
+    }
+});</script>
 
 <script>
 // Notificaciones
