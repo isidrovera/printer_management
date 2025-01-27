@@ -2,8 +2,10 @@
 {% block title %}Clientes{% endblock %}
 
 {% block content %}
+<!-- Mantenemos todo igual hasta la parte de los botones de acción en la vista lista -->
+
 <div class="bg-white shadow-lg rounded-lg p-6 mx-auto max-w-7xl">
-    <!-- Cabecera con búsqueda -->
+    <!-- Mantenemos el header y la búsqueda igual -->
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <h2 class="text-2xl font-bold text-gray-800">Clientes</h2>
         
@@ -78,12 +80,12 @@
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div class="flex items-center justify-end space-x-3">
                             <a href="/clients/{{ client.id }}/edit" 
-                               class="text-blue-600 hover:text-blue-900 transition-colors"
+                               class="p-2 text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
                                title="Editar">
                                 <i data-lucide="edit-2" class="h-5 w-5"></i>
                             </a>
                             <button onclick="confirmDelete('{{ client.id }}')"
-                                    class="text-red-600 hover:text-red-900 transition-colors"
+                                    class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                                     title="Eliminar">
                                 <i data-lucide="trash-2" class="h-5 w-5"></i>
                             </button>
@@ -131,12 +133,12 @@
                 </div>
                 <div class="mt-6 flex justify-end space-x-3">
                     <a href="/clients/{{ client.id }}/edit" 
-                       class="text-blue-600 hover:text-blue-900 transition-colors"
+                       class="p-2 text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
                        title="Editar">
                         <i data-lucide="edit-2" class="h-5 w-5"></i>
                     </a>
                     <button onclick="confirmDelete('{{ client.id }}')"
-                            class="text-red-600 hover:text-red-900 transition-colors"
+                            class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                             title="Eliminar">
                         <i data-lucide="trash-2" class="h-5 w-5"></i>
                     </button>
@@ -148,6 +150,7 @@
 </div>
 
 <script>
+// Mantenemos el mismo JavaScript
 document.addEventListener('DOMContentLoaded', function() {
     const listView = document.getElementById('listView');
     const kanbanView = document.getElementById('kanbanView');
@@ -155,7 +158,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const kanbanViewBtn = document.getElementById('kanbanViewBtn');
     const searchInput = document.getElementById('searchInput');
 
-    // Función para actualizar el estado de los botones
     function updateViewButtons(activeView) {
         if (activeView === 'list') {
             listViewBtn.classList.add('bg-white', 'shadow', 'text-blue-600');
@@ -170,7 +172,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Función para cambiar entre vistas
     function switchView(view) {
         if (view === 'list') {
             listView.classList.remove('hidden');
@@ -183,38 +184,31 @@ document.addEventListener('DOMContentLoaded', function() {
         localStorage.setItem('preferredView', view);
     }
 
-    // Manejadores de eventos para los botones
     listViewBtn.addEventListener('click', () => switchView('list'));
     kanbanViewBtn.addEventListener('click', () => switchView('kanban'));
 
-    // Filtrado de clientes
     searchInput.addEventListener('input', function(e) {
         const searchTerm = e.target.value.toLowerCase();
         const rows = document.querySelectorAll('tbody tr');
         const cards = document.querySelectorAll('#kanbanView > div');
 
-        // Filtrar en vista lista
         rows.forEach(row => {
             const text = row.textContent.toLowerCase();
             row.style.display = text.includes(searchTerm) ? '' : 'none';
         });
 
-        // Filtrar en vista kanban
         cards.forEach(card => {
             const text = card.textContent.toLowerCase();
             card.style.display = text.includes(searchTerm) ? '' : 'none';
         });
     });
 
-    // Restaurar la vista preferida del usuario
     const preferredView = localStorage.getItem('preferredView') || 'list';
     switchView(preferredView);
 });
 
-// Función para confirmar eliminación
 function confirmDelete(id) {
     if (confirm('¿Estás seguro de que deseas eliminar este cliente?')) {
-        // Aquí iría la lógica de eliminación
         console.log('Eliminando cliente:', id);
     }
 }
