@@ -156,3 +156,19 @@ function initializeSearchFilter() {
         });
     }
 }
+// Función para mostrar el modal de instalación de impresora
+function showInstallPrinter(agentToken) {
+    currentAgentToken = agentToken;
+
+    const modal = document.getElementById('installPrinterModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+
+        // Resetear el formulario
+        document.getElementById('installPrinterForm').reset();
+
+        // Resetear el select de drivers
+        const driverSelect = document.getElementById('driver');
+        driverSelect.innerHTML = '<option value="">Seleccione un driver</option>';
+    }
+}
