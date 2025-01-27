@@ -27,8 +27,8 @@
 
     <!-- Vista Lista -->
     <div id="listView" class="list-view">
-        <div class="table-container">
-            <table class="client-table">
+        <div class="table-wrapper">
+            <table class="data-table">
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -41,27 +41,27 @@
                 <tbody>
                     {% for client in clients %}
                     <tr>
-                        <td>{{ client.id }}</td>
+                        <td class="id-cell">{{ client.id }}</td>
                         <td class="name-cell">
-                            <i data-lucide="user" class="client-icon"></i>
-                            {{ client.name }}
+                            <i data-lucide="user"></i>
+                            <span>{{ client.name }}</span>
                         </td>
                         <td class="token-cell">
-                            <i data-lucide="key" class="token-icon"></i>
-                            {{ client.token }}
+                            <i data-lucide="key"></i>
+                            <span>{{ client.token }}</span>
                         </td>
                         <td>
                             <span class="status-badge {% if client.is_active %}active{% else %}inactive{% endif %}">
-                                <i data-lucide="circle" class="status-icon"></i>
+                                <i data-lucide="circle"></i>
                                 {{ "Activo" if client.is_active else "Inactivo" }}
                             </span>
                         </td>
                         <td class="actions-cell">
                             <div class="action-buttons">
-                                <a href="/clients/{{ client.id }}/edit" class="btn-action btn-edit" title="Editar">
+                                <a href="/clients/{{ client.id }}/edit" class="btn-action btn-edit">
                                     <i data-lucide="edit-2"></i>
                                 </a>
-                                <button onclick="confirmDelete('client', {{ client.id }})" class="btn-action btn-delete" title="Eliminar">
+                                <button onclick="confirmDelete('client', {{ client.id }})" class="btn-action btn-delete">
                                     <i data-lucide="trash-2"></i>
                                 </button>
                             </div>
@@ -80,25 +80,25 @@
             <div class="client-card">
                 <div class="card-header">
                     <div class="card-title">
-                        <i data-lucide="user" class="client-icon"></i>
+                        <i data-lucide="user"></i>
                         <span>{{ client.name }}</span>
                     </div>
-                    <span class="card-status {% if client.is_active %}active{% else %}inactive{% endif %}">
-                        <i data-lucide="circle" class="status-icon"></i>
-                        {{ "Activo" if client.is_active else "Inactivo" }}
-                    </span>
+                    <div class="card-status {% if client.is_active %}active{% else %}inactive{% endif %}">
+                        <i data-lucide="circle"></i>
+                        <span>{{ "Activo" if client.is_active else "Inactivo" }}</span>
+                    </div>
                 </div>
-                <div class="card-body">
+                <div class="card-content">
                     <div class="token-display">
-                        <i data-lucide="key" class="token-icon"></i>
-                        <span class="token-text">{{ client.token }}</span>
+                        <i data-lucide="key"></i>
+                        <span>{{ client.token }}</span>
                     </div>
                 </div>
                 <div class="card-actions">
-                    <a href="/clients/{{ client.id }}/edit" class="btn-action btn-edit" title="Editar">
+                    <a href="/clients/{{ client.id }}/edit" class="btn-action btn-edit">
                         <i data-lucide="edit-2"></i>
                     </a>
-                    <button onclick="confirmDelete('client', {{ client.id }})" class="btn-action btn-delete" title="Eliminar">
+                    <button onclick="confirmDelete('client', {{ client.id }})" class="btn-action btn-delete">
                         <i data-lucide="trash-2"></i>
                     </button>
                 </div>
@@ -110,5 +110,6 @@
 {% endblock %}
 
 {% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.259.0/lucide.min.js"></script>
 <script src="/static/js/clients.js"></script>
 {% endblock %}
