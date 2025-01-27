@@ -1,24 +1,23 @@
 {% extends "base.html" %}
 {% block title %}Clientes{% endblock %}
 
-{% block extra_css %}
-<link href="/static/css/clients.css" rel="stylesheet">
-{% endblock %}
-
 {% block content %}
-<div class="client-container">
-    <div class="flex-row space-between">
-        <h2 class="client-title">Clientes</h2>
-        <div class="controls-section">
-            <div class="view-type-controls">
-                <button id="listViewBtn" class="view-btn active" title="Vista Lista">
-                    <i data-lucide="layout-list"></i>
+<div class="bg-white shadow rounded-lg p-6">
+    <!-- Título y Controles -->
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-xl font-bold text-gray-800">Clientes</h2>
+        <div class="flex items-center space-x-4">
+            <!-- Botones de vista -->
+            <div class="flex space-x-2">
+                <button id="listViewBtn" class="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 focus:ring-2 focus:ring-blue-500">
+                    <i data-lucide="layout-list" class="text-gray-600"></i>
                 </button>
-                <button id="kanbanViewBtn" class="view-btn" title="Vista Kanban">
-                    <i data-lucide="grid"></i>
+                <button id="kanbanViewBtn" class="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 focus:ring-2 focus:ring-blue-500">
+                    <i data-lucide="grid" class="text-gray-600"></i>
                 </button>
             </div>
-            <a href="/clients/create" class="new-client-btn">
+            <!-- Botón "Nuevo Cliente" -->
+            <a href="/clients/create" class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 focus:ring-2 focus:ring-blue-300">
                 <i data-lucide="plus"></i> Nuevo Cliente
             </a>
         </div>
@@ -26,34 +25,42 @@
 
     <!-- Vista Lista -->
     <div id="listView" class="list-view">
-        <table class="client-table">
-            <thead>
+        <table class="w-full table-auto border-collapse bg-white shadow rounded-lg">
+            <thead class="bg-gray-100">
                 <tr>
-                    <th>ID</th>
-                    <th>Nombre</th>
-                    <th>Token</th>
-                    <th>Estado</th>
-                    <th style="text-align: right;">Acciones</th>
+                    <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">ID</th>
+                    <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Nombre</th>
+                    <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Token</th>
+                    <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Estado</th>
+                    <th class="px-4 py-2 text-right text-sm font-semibold text-gray-600">Acciones</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody class="divide-y divide-gray-200">
                 {% for client in clients %}
-                <tr data-client-id="{{ client.id }}">
-                    <td>{{ client.id }}</td>
-                    <td>{{ client.name }}</td>
-                    <td class="token-cell">{{ client.token }}</td>
-                    <td>
-                        <span class="status-badge {% if client.is_active %}active{% else %}inactive{% endif %}">
-                            <span class="status-dot"></span>
+                <tr class="hover:bg-gray-50">
+                    <td class="px-4 py-2 text-sm text-gray-800">{{ client.id }}</td>
+                    <td class="px-4 py-2 text-sm text-gray-800">{{ client.name }}</td>
+                    <td class="px-4 py-2 text-sm font-mono text-gray-500">{{ client.token }}</td>
+                    <td class="px-4 py-2">
+                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold 
+                                    {% if client.is_active %}
+                                    bg-green-100 text-green-600
+                                    {% else %}
+                                    bg-red-100 text-red-600
+                                    {% endif %}">
+                            <span class="w-2 h-2 rounded-full mr-2 
+                                    {% if client.is_active %} bg-green-500 
+                                    {% else %} bg-red-500 
+                                    {% endif %}"></span>
                             {{ "Activo" if client.is_active else "Inactivo" }}
                         </span>
                     </td>
-                    <td class="actions-cell">
-                        <div class="action-buttons">
-                            <a href="/clients/{{ client.id }}/edit" class="action-btn">
+                    <td class="px-4 py-2 text-right">
+                        <div class="flex items-center space-x-2 justify-end">
+                            <a href="/clients/{{ client.id }}/edit" class="text-blue-500 hover:text-blue-700">
                                 <i data-lucide="edit-2"></i>
                             </a>
-                            <button onclick="confirmDelete('{{ client.id }}')" class="action-btn delete">
+                            <button onclick="confirmDelete('{{ client.id }}')" class="text-red-500 hover:text-red-700">
                                 <i data-lucide="trash-2"></i>
                             </button>
                         </div>
@@ -65,44 +72,41 @@
     </div>
 
     <!-- Vista Kanban -->
-    <div id="kanbanView" class="kanban-view hidden">
-        <div class="cards-grid">
-            {% for client in clients %}
-            <div class="client-card" data-client-id="{{ client.id }}">
-                <div class="card-header">
-                    <div class="flex-row">
-                        <i data-lucide="user"></i>
-                        <span class="client-name">{{ client.name }}</span>
-                    </div>
-                    <span class="status-badge {% if client.is_active %}active{% else %}inactive{% endif %}">
-                        <span class="status-dot"></span>
-                        {{ "Activo" if client.is_active else "Inactivo" }}
-                    </span>
+    <div id="kanbanView" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
+        {% for client in clients %}
+        <div class="bg-white shadow rounded-lg p-4 border">
+            <div class="flex justify-between items-center mb-4">
+                <div class="flex items-center space-x-2">
+                    <i data-lucide="user" class="text-gray-600"></i>
+                    <span class="font-semibold text-gray-800">{{ client.name }}</span>
                 </div>
-                <div class="card-body">
-                    <div class="token-info">
-                        <span class="token-label">Token:</span>
-                        <span class="token-value">{{ client.token }}</span>
-                    </div>
-                </div>
-                <div class="card-footer">
-                    <div class="action-buttons">
-                        <a href="/clients/{{ client.id }}/edit" class="action-btn">
-                            <i data-lucide="edit-2"></i>
-                        </a>
-                        <button onclick="confirmDelete('{{ client.id }}')" class="action-btn delete">
-                            <i data-lucide="trash-2"></i>
-                        </button>
-                    </div>
-                </div>
+                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold 
+                            {% if client.is_active %}
+                            bg-green-100 text-green-600
+                            {% else %}
+                            bg-red-100 text-red-600
+                            {% endif %}">
+                    <span class="w-2 h-2 rounded-full mr-2 
+                            {% if client.is_active %} bg-green-500 
+                            {% else %} bg-red-500 
+                            {% endif %}"></span>
+                    {{ "Activo" if client.is_active else "Inactivo" }}
+                </span>
             </div>
-            {% endfor %}
+            <div class="mb-4">
+                <p class="text-sm text-gray-600">Token:</p>
+                <p class="text-sm font-mono text-gray-800">{{ client.token }}</p>
+            </div>
+            <div class="flex justify-end space-x-2">
+                <a href="/clients/{{ client.id }}/edit" class="text-blue-500 hover:text-blue-700">
+                    <i data-lucide="edit-2"></i>
+                </a>
+                <button onclick="confirmDelete('{{ client.id }}')" class="text-red-500 hover:text-red-700">
+                    <i data-lucide="trash-2"></i>
+                </button>
+            </div>
         </div>
+        {% endfor %}
     </div>
 </div>
-{% endblock %}
-
-{% block extra_js %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.259.0/lucide.min.js"></script>
-<script src="/static/js/clients.js"></script>
 {% endblock %}
