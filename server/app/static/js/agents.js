@@ -119,7 +119,8 @@ async function initializeDriverSelect() {
         const response = await fetch('/api/v1/drivers', {
             method: 'GET',
             headers: {
-                'Accept': 'application/json'
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
             }
         });
 
@@ -130,6 +131,12 @@ async function initializeDriverSelect() {
 
         if (!response.ok) {
             throw new Error(`Error al obtener drivers. Status: ${response.status}`);
+        }
+
+        // Verificar el tipo de contenido
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            throw new Error(`Tipo de contenido inválido: ${contentType}`);
         }
 
         const drivers = await response.json();
@@ -145,7 +152,7 @@ async function initializeDriverSelect() {
         driverSelect.innerHTML = '<option value="">Seleccione un driver</option>';
         drivers.forEach((driver) => {
             const option = document.createElement('option');
-            option.value = driver.id; // Asignar el ID del driver como valor
+            option.value = driver.id;
             option.textContent = `${driver.manufacturer} - ${driver.model} (${driver.driver_filename})`;
             driverSelect.appendChild(option);
         });
@@ -156,8 +163,6 @@ async function initializeDriverSelect() {
     } catch (error) {
         console.groupEnd();
         console.error('Error completo inicializando drivers:', error);
-        
-        // Mostrar notificación de error más detallada
         showNotification(`Error al cargar drivers: ${error.message}`, 'error');
     }
 }
