@@ -68,7 +68,7 @@ class ConnectionManager:
 
 manager = ConnectionManager()
 
-@router.websocket("/api/v1/ws/register")
+@router.websocket("/register")
 async def register_websocket(websocket: WebSocket, db: Session = Depends(get_db)):
     """
     Endpoint para registrar un agente.
@@ -161,7 +161,7 @@ async def register_websocket(websocket: WebSocket, db: Session = Depends(get_db)
         except:
             pass
 
-@router.websocket("/api/v1/ws/agent/{agent_token}")
+@router.websocket("/agent/{agent_token}")
 async def agent_websocket(websocket: WebSocket, agent_token: str, db: Session = Depends(get_db)):
     websocket_logger.info(f"Agent websocket connection request: {agent_token}")
     
@@ -193,7 +193,7 @@ async def agent_websocket(websocket: WebSocket, agent_token: str, db: Session = 
         websocket_logger.error(f"Critical error in agent_websocket: {e}")
         await websocket.close(code=4003)
 
-@router.websocket("/api/v1/ws/status")
+@router.websocket("/status")
 async def status_websocket(websocket: WebSocket):
     websocket_logger.info("Status websocket connection request")
     try:
