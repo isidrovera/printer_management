@@ -2,18 +2,20 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.db.session import get_db
-from app.services.driver_service import DriverService
+from app.services.printer_driver_service import PrinterDriverService  # Cambiado a PrinterDriverService
 from typing import List
 from fastapi.responses import JSONResponse
 
 router = APIRouter()
 
-# Endpoint para obtener todos los drivers
-@router.get("/", response_model=List[dict])  # Cambiado a "/" para coincidir con la documentación
+@router.get("/", response_model=List[dict])
 async def get_all_drivers(db: Session = Depends(get_db)):
+    """
+    Endpoint para obtener todos los drivers disponibles.
+    """
     try:
-        driver_service = DriverService(db)
-        drivers = driver_service.get_all()
+        driver_service = PrinterDriverService(db)  # Cambiado a PrinterDriverService
+        drivers = await driver_service.get_drivers()  # Usando el método correcto
         
         print(f"GET /drivers - Número de drivers encontrados: {len(drivers) if drivers else 0}")
         
@@ -40,13 +42,13 @@ async def get_all_drivers(db: Session = Depends(get_db)):
             detail=f"Error interno al recuperar drivers: {str(e)}"
         )
 
-# Endpoint para obtener un driver específico
 @router.get("/{driver_id}", response_model=dict)
-async def get_driver(driver_id: int, db: Session = Depends(get_db)):
+async def get_driver_by_id(driver_id: int, db: Session = Depends(get_db)):
     try:
-        driver_service = DriverService(db)
-        driver = driver_service.get_by_id(driver_id)
-
+        driver_service = PrinterDriverService(db)
+        # Como PrinterDriverService no tiene get_by_id, usamos una consulta directa
+        driver = db.query(PrinterDriver).filter(PrinterDriver.id == driver_id).first()
+        
         if not driver:
             raise HTTPException(
                 status_code=404,
@@ -60,6 +62,9 @@ async def get_driver(driver_id: int, db: Session = Depends(get_db)):
             "driver_filename": driver.driver_filename,
             "description": driver.description or "",
         }
+
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(
             status_code=500,
