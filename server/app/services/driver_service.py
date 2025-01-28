@@ -114,3 +114,34 @@ class DriverService:
         except Exception as e:
             self.db.rollback()
             raise HTTPException(status_code=500, detail=f"Error al eliminar el driver: {str(e)}")
+
+            
+    async def get_driver_for_installation(self, driver_id: int) -> Dict:
+        """
+        Obtiene toda la información necesaria para instalar un driver.
+        """
+        # Obtener el driver por ID
+        driver = await self.get_by_id(driver_id)
+        if not driver:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Driver con ID {driver_id} no encontrado"
+            )
+
+        # Validar que el archivo del driver exista
+        driver_path = Path(settings.DRIVERS_STORAGE_PATH) / driver.driver_filename
+        if not driver_path.exists():
+            raise HTTPException(
+                status_code=404,
+                detail=f"Archivo del driver {driver.driver_filename} no encontrado en {settings.DRIVERS_STORAGE_PATH}"
+            )
+
+        # Retornar la información del driver
+        return {
+            "driver_name": f"{driver.manufacturer} {driver.model}",
+            "driver_path": str(driver_path),
+            "manufacturer": driver.manufacturer,
+            "model": driver.model,
+            "driver_filename": driver.driver_filename,
+            "description": driver.description,
+        }
