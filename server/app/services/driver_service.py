@@ -3,6 +3,8 @@ from typing import List, Optional, Dict
 from sqlalchemy.orm import Session
 from app.db.models.printer_driver import PrinterDriver
 from app.services.driver_storage import DriverStorage
+from pathlib import Path
+import os
 from fastapi import HTTPException
 
 class DriverService:
@@ -115,7 +117,7 @@ class DriverService:
             self.db.rollback()
             raise HTTPException(status_code=500, detail=f"Error al eliminar el driver: {str(e)}")
 
-            
+
     async def get_driver_for_installation(self, driver_id: int) -> Dict:
         """
         Obtiene toda la información necesaria para instalar un driver.
