@@ -52,7 +52,7 @@ app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
 
 logger.info("Including routers...")
 app.include_router(api_router)
-
+app.include_router(api_router, prefix="/api/v1")
 logger.info("Creating database tables...")
 Base.metadata.create_all(bind=engine)
 

@@ -1,3 +1,4 @@
+# app/api/v1/endpoints/drivers.py
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.db.session import get_db
@@ -5,22 +6,20 @@ from app.services.driver_service import DriverService
 from typing import List
 from fastapi.responses import JSONResponse
 
-# Crear el enrutador para los endpoints de drivers
 router = APIRouter()
 
-@router.get("", response_model=List[dict])  # Cambiado de "/drivers" a ""
-def get_all_drivers(db: Session = Depends(get_db)):
-    """
-    Endpoint para obtener todos los drivers disponibles.
-    """
+# Endpoint para obtener todos los drivers
+@router.get("/", response_model=List[dict])  # Cambiado a "/" para coincidir con la documentación
+async def get_all_drivers(db: Session = Depends(get_db)):
     try:
         driver_service = DriverService(db)
         drivers = driver_service.get_all()
-
+        
+        print(f"GET /drivers - Número de drivers encontrados: {len(drivers) if drivers else 0}")
+        
         if not drivers:
             return JSONResponse(content=[], status_code=200)
 
-        # Estructurar los datos para el frontend
         driver_list = [
             {
                 "id": driver.id,
@@ -35,18 +34,15 @@ def get_all_drivers(db: Session = Depends(get_db)):
         return driver_list
 
     except Exception as e:
-        # Manejo de errores más detallado
+        print(f"Error en get_all_drivers: {str(e)}")
         raise HTTPException(
             status_code=500, 
             detail=f"Error interno al recuperar drivers: {str(e)}"
         )
 
-# Puedes agregar más endpoints relacionados con drivers aquí si los necesitas
+# Endpoint para obtener un driver específico
 @router.get("/{driver_id}", response_model=dict)
-def get_driver(driver_id: int, db: Session = Depends(get_db)):
-    """
-    Endpoint para obtener un driver específico por ID.
-    """
+async def get_driver(driver_id: int, db: Session = Depends(get_db)):
     try:
         driver_service = DriverService(db)
         driver = driver_service.get_by_id(driver_id)
@@ -64,9 +60,6 @@ def get_driver(driver_id: int, db: Session = Depends(get_db)):
             "driver_filename": driver.driver_filename,
             "description": driver.description or "",
         }
-
-    except HTTPException:
-        raise
     except Exception as e:
         raise HTTPException(
             status_code=500,
