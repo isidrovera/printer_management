@@ -82,23 +82,28 @@ function initializeFormHandlers() {
                 return;
             }
 
+            // En la función initializeFormHandlers de agents.js
             try {
                 const response = await fetch(`/api/v1/printers/install/${currentAgentToken}`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
                     body: JSON.stringify({
                         printer_ip: printerIp,
-                        driver_id: driverId
+                        driver_id: parseInt(driverId)  // Asegurarnos que es un número
                     }),
                 });
 
-                const data = await response.json();
-                if (response.ok) {
-                    showNotification('Comando de instalación enviado correctamente', 'success');
-                    closeModal('installPrinterModal');
-                } else {
-                    throw new Error(data.detail || 'Error al enviar el comando de instalación');
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || 'Error al enviar el comando de instalación');
                 }
+
+                const data = await response.json();
+                showNotification('Comando de instalación enviado correctamente', 'success');
+                closeModal('installPrinterModal');
             } catch (error) {
                 console.error('Error al enviar formulario:', error);
                 showNotification(error.message, 'error');
@@ -107,7 +112,7 @@ function initializeFormHandlers() {
     }
 }
 
-// Función para inicializar el select de drivers
+
 // Función para inicializar el select de drivers
 async function initializeDriverSelect() {
     const driverSelect = document.getElementById('driver');
