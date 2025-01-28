@@ -210,11 +210,12 @@ async def delete_driver(driver_id: int, db: Session = Depends(get_db)):
         if not driver:
             return {"success": False, "error": "Driver no encontrado"}, 404
             
-        deleted = await driver_service.delete(driver_id)
+        deleted = await driver_service.delete_driver(driver_id)  # ← Método corregido
         return {"success": True} if deleted else {"success": False, "error": "Error al eliminar"}
     except Exception as e:
         logger.error(f"Error eliminando driver: {str(e)}")
         return {"success": False, "error": str(e)}
+
 
 
 @router.get("/drivers/{driver_id}/download")
