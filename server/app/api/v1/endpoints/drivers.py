@@ -2,20 +2,21 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.db.session import get_db
-from app.services.printer_driver_service import PrinterDriverService  # Cambiado a PrinterDriverService
+from app.services.driver_service import DriverService
 from typing import List
 from fastapi.responses import JSONResponse
 
 router = APIRouter()
 
+@router.get("/test")
+async def test_drivers_endpoint():
+    return {"message": "Drivers endpoint está funcionando"}
+
 @router.get("/", response_model=List[dict])
 async def get_all_drivers(db: Session = Depends(get_db)):
-    """
-    Endpoint para obtener todos los drivers disponibles.
-    """
     try:
-        driver_service = PrinterDriverService(db)  # Cambiado a PrinterDriverService
-        drivers = await driver_service.get_drivers()  # Usando el método correcto
+        driver_service = DriverService(db)
+        drivers = await driver_service.get_all()
         
         print(f"GET /drivers - Número de drivers encontrados: {len(drivers) if drivers else 0}")
         
@@ -45,9 +46,8 @@ async def get_all_drivers(db: Session = Depends(get_db)):
 @router.get("/{driver_id}", response_model=dict)
 async def get_driver_by_id(driver_id: int, db: Session = Depends(get_db)):
     try:
-        driver_service = PrinterDriverService(db)
-        # Como PrinterDriverService no tiene get_by_id, usamos una consulta directa
-        driver = db.query(PrinterDriver).filter(PrinterDriver.id == driver_id).first()
+        driver_service = DriverService(db)
+        driver = await driver_service.get_by_id(driver_id)
         
         if not driver:
             raise HTTPException(
@@ -62,7 +62,6 @@ async def get_driver_by_id(driver_id: int, db: Session = Depends(get_db)):
             "driver_filename": driver.driver_filename,
             "description": driver.description or "",
         }
-
     except HTTPException:
         raise
     except Exception as e:

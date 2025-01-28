@@ -15,7 +15,7 @@ class DriverService:
         self.db = db
         self.logger = logging.getLogger(__name__)
 
-    def get_all(self) -> List[PrinterDriver]:
+    async def get_all(self) -> List[PrinterDriver]:
         """
         Obtener todos los drivers, con log de errores si ocurre algo.
         """
@@ -27,10 +27,10 @@ class DriverService:
             self.logger.error(f"Error al recuperar drivers: {e}")
             raise
 
-    def get_by_id(self, driver_id: int) -> Optional[PrinterDriver]:
+    async def get_by_id(self, driver_id: int) -> Optional[PrinterDriver]:
         return self.db.query(PrinterDriver).filter(PrinterDriver.id == driver_id).first()
 
-    def store_driver(self, manufacturer: str, model: str, driver_file: bytes, filename: str, description: str = None) -> PrinterDriver:
+    async def store_driver(self, manufacturer: str, model: str, driver_file: bytes, filename: str, description: str = None) -> PrinterDriver:
         # Validar si el driver ya existe
         existing_driver = self.db.query(PrinterDriver).filter_by(manufacturer=manufacturer, model=model).first()
         if existing_driver:
@@ -61,8 +61,8 @@ class DriverService:
             self.db.rollback()
             raise RuntimeError(f"Error al guardar el driver: {e}")
 
-    def update(self, driver_id: int, manufacturer: str, model: str, description: str = None) -> PrinterDriver:
-        driver = self.get_by_id(driver_id)
+    async def update(self, driver_id: int, manufacturer: str, model: str, description: str = None) -> PrinterDriver:
+        driver = await self.get_by_id(driver_id)
         if not driver:
             raise ValueError("Driver no encontrado")
 
@@ -74,20 +74,10 @@ class DriverService:
         self.db.refresh(driver)
         return driver
 
-    def delete(self, driver_id: int) -> bool:
-        driver = self.get_by_id(driver_id)
+    async def delete(self, driver_id: int) -> bool:
+        driver = await self.get_by_id(driver_id)
         if driver:
             self.db.delete(driver)
             self.db.commit()
             return True
         return False
-
-    def _find_inf_path(self, driver_bytes: bytes) -> List[str]:
-        with tempfile.NamedTemporaryFile() as tmp:
-            tmp.write(driver_bytes)
-            tmp.flush()
-            with zipfile.ZipFile(tmp.name) as z:
-                inf_files = [f for f in z.namelist() if f.lower().endswith('.inf')]
-                if not inf_files:
-                    raise ValueError("No se encontró ningún archivo .inf en el paquete")
-                return inf_files
