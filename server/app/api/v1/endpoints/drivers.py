@@ -1,5 +1,4 @@
 # app/api/v1/endpoints/drivers.py
-# app/api/v1/endpoints/drivers.py
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.db.session import get_db
@@ -8,20 +7,19 @@ from typing import List
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 
-# Quitar el prefijo aquí
 router = APIRouter()
 
-@router.get("/api/v1/drivers/test")
+@router.get("/test")  # Será accesible en /api/v1/drivers/test
 async def test_drivers_endpoint():
     return JSONResponse(
         content={"message": "Drivers endpoint está funcionando"},
         headers={"Content-Type": "application/json"}
     )
 
-@router.get("/api/v1/drivers", response_class=JSONResponse)
+@router.get("/")  # Será accesible en /api/v1/drivers
 async def get_all_drivers(db: Session = Depends(get_db)):
     try:
-        print("Endpoint /api/v1/drivers llamado")
+        print("Endpoint drivers llamado")
         driver_service = DriverService(db)
         drivers = await driver_service.get_all()
         
@@ -51,7 +49,7 @@ async def get_all_drivers(db: Session = Depends(get_db)):
             headers={"Content-Type": "application/json"}
         )
 
-@router.get("/api/v1/drivers/{driver_id}")
+@router.get("/{driver_id}")  # Será accesible en /api/v1/drivers/{driver_id}
 async def get_driver_by_id(driver_id: int, db: Session = Depends(get_db)):
     try:
         driver_service = DriverService(db)
