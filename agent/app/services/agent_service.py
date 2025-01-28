@@ -3,12 +3,13 @@ import logging
 import asyncio
 import websockets
 import json
-from ..core.config import settings
-from .system_info_service import SystemInfoService
-from .printer_service import PrinterService
 import base64
 import tempfile
 import os
+from ..core.config import settings
+from .system_info_service import SystemInfoService
+from .printer_service import PrinterService
+
 # Configurar logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -41,16 +42,15 @@ class AgentService:
         logger.debug(f"Registration data to send: {json.dumps(registration_data, indent=4)}")
         
         try:
-            # Notar que agregamos /ws/ en la URL
             ws_url = f"{settings.SERVER_URL}/api/v1/ws/register"
             logger.debug(f"Connecting to registration endpoint: {ws_url}")
             
             async with websockets.connect(ws_url) as ws:
-                # Enviamos los datos de registro
+                # Enviar los datos de registro
                 await ws.send(json.dumps(registration_data))
                 logger.info("Registration data sent successfully.")
 
-                # Esperamos la respuesta
+                # Esperar la respuesta
                 response = await ws.recv()
                 logger.debug(f"Response received: {response}")
                 data = json.loads(response)
@@ -85,7 +85,6 @@ class AgentService:
         """Conecta el agente al servidor usando el token existente."""
         while True:
             try:
-                # Notar que agregamos /ws/ en la URL
                 ws_url = f"{settings.SERVER_URL}/api/v1/ws/agent/{settings.AGENT_TOKEN}"
                 logger.debug(f"Connecting to agent endpoint: {ws_url}")
                 
@@ -154,9 +153,12 @@ class AgentService:
         try:
             # Decodificar el archivo comprimido de Base64 a binario
             driver_data_base64 = data.get('driver_data')
+            if not driver_data_base64:
+                raise ValueError("Driver data not provided in the command.")
+            
             driver_binary_data = base64.b64decode(driver_data_base64)
 
-            # Crear un directorio temporal para almacenar el archivo
+            # Crear un directorio temporal para guardar el archivo comprimido
             with tempfile.TemporaryDirectory() as temp_dir:
                 compressed_driver_path = os.path.join(temp_dir, "driver.zip")
 
@@ -164,20 +166,15 @@ class AgentService:
                 with open(compressed_driver_path, "wb") as f:
                     f.write(driver_binary_data)
 
-                # Descomprimir el archivo
-                extracted_driver_path = await self.printer_service._extract_driver(
-                    compressed_driver_path, temp_dir
-                )
-
-                # Instalar la impresora
+                # Instalar la impresora utilizando el servicio de impresoras
                 result = await self.printer_service.install(
-                    extracted_driver_path,
+                    compressed_driver_path,
                     data.get('printer_ip'),
                     data.get('manufacturer'),
                     data.get('model')
                 )
                 
-                # Responder al servidor con el resultado
+                # Enviar el resultado al servidor
                 logger.info(f"Printer installation result: {result}")
                 await websocket.send(json.dumps({
                     'type': 'installation_result',

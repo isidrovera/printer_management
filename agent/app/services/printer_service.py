@@ -7,27 +7,36 @@ import platform
 import logging
 
 class PrinterService:
-    async def install(self, driver_data: bytes, printer_ip: str, manufacturer: str, model: str):
+    async def install(self, compressed_driver_path: str, printer_ip: str, manufacturer: str, model: str):
         """
-        Instala una impresora con el driver proporcionado.
+        Descomprime el archivo del driver e instala la impresora.
         """
         try:
             with tempfile.TemporaryDirectory() as temp_dir:
-                # Descomprimir el archivo y obtener el camino al archivo .inf
-                driver_path = await self._extract_driver(driver_data, temp_dir)
+                # Descomprimir el archivo ZIP
+                with zipfile.ZipFile(compressed_driver_path, 'r') as zip_ref:
+                    zip_ref.extractall(temp_dir)
 
-                # Instalar según el sistema operativo
+                # Buscar el archivo .inf en el contenido descomprimido
+                inf_files = [
+                    os.path.join(temp_dir, f) for f in os.listdir(temp_dir) if f.endswith('.inf')
+                ]
+                if not inf_files:
+                    raise Exception("No se encontró archivo .inf en el driver descomprimido.")
+
+                inf_path = inf_files[0]  # Usar el primer archivo .inf encontrado
+
+                # Instalar el driver según el sistema operativo
                 if platform.system() == 'Windows':
-                    return await self._install_windows(driver_path, printer_ip, manufacturer, model)
+                    return await self._install_windows(inf_path, printer_ip, manufacturer, model)
                 else:
-                    return await self._install_linux(driver_path, printer_ip, manufacturer, model)
+                    return await self._install_linux(inf_path, printer_ip, manufacturer, model)
         except Exception as e:
             logging.error(f"Error installing printer: {str(e)}")
             return {
                 'success': False,
                 'message': f"Error en instalación: {str(e)}"
             }
-
     async def _extract_driver(self, driver_data: bytes, temp_dir: str):
         """
         Descomprime el archivo de driver y busca el archivo .inf.
