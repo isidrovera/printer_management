@@ -14,7 +14,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
-from app.api.v1.api import api_router, web_router  # Importamos ambos routers
+from app.api.v1.api import api_router, web_router
 from app.db.session import engine
 from app.db.base import Base
 

@@ -40,7 +40,7 @@ class AgentService:
         
         try:
             # Notar que agregamos /ws/ en la URL
-            ws_url = f"{settings.SERVER_URL}/ws/api/v1/ws/register"
+            ws_url = f"{settings.SERVER_URL}/api/v1/ws/register"
             logger.debug(f"Connecting to registration endpoint: {ws_url}")
             
             async with websockets.connect(ws_url) as ws:
@@ -84,7 +84,7 @@ class AgentService:
         while True:
             try:
                 # Notar que agregamos /ws/ en la URL
-                ws_url = f"{settings.SERVER_URL}/ws/agent/{settings.AGENT_TOKEN}"
+                ws_url = f"{settings.SERVER_URL}/api/v1/ws/agent/{settings.AGENT_TOKEN}"
                 logger.debug(f"Connecting to agent endpoint: {ws_url}")
                 
                 async with websockets.connect(ws_url) as ws:
