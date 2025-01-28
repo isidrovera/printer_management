@@ -66,6 +66,27 @@ class ConnectionManager:
             except Exception as e:
                 self.logger.error(f"Error sending to connection {conn_id}: {e}")
 
+    async def send_install_printer_command(self, agent_token: str, printer_data: dict):
+        """Envía comando de instalación de impresora a un agente específico."""
+        if agent_token not in self.agent_connections:
+            raise ValueError(f"Agent {agent_token} not connected")
+        
+        websocket = self.agent_connections[agent_token]
+        command = {
+            "type": "install_printer",
+            "printer_ip": printer_data["printer_ip"],
+            "manufacturer": printer_data["manufacturer"],
+            "model": printer_data["model"],
+            "driver_data": printer_data["driver_data"]
+        }
+        
+        try:
+            await websocket.send_json(command)
+            self.logger.info(f"Install printer command sent to agent {agent_token}")
+        except Exception as e:
+            self.logger.error(f"Error sending install command to agent {agent_token}: {e}")
+            raise
+
 manager = ConnectionManager()
 
 @router.websocket("/register")
@@ -212,24 +233,3 @@ async def status_websocket(websocket: WebSocket):
     except Exception as e:
         websocket_logger.error(f"Critical error in status_websocket: {e}")
         await websocket.close(code=4002)
-
-async def send_install_printer_command(self, agent_token: str, printer_data: dict):
-        """Envía comando de instalación de impresora a un agente específico."""
-        if agent_token not in self.agent_connections:
-            raise ValueError(f"Agent {agent_token} not connected")
-        
-        websocket = self.agent_connections[agent_token]
-        command = {
-            "type": "install_printer",
-            "printer_ip": printer_data["printer_ip"],
-            "manufacturer": printer_data["manufacturer"],
-            "model": printer_data["model"],
-            "driver_data": printer_data["driver_data"]
-        }
-        
-        try:
-            await websocket.send_json(command)
-            self.logger.info(f"Install printer command sent to agent {agent_token}")
-        except Exception as e:
-            self.logger.error(f"Error sending install command to agent {agent_token}: {e}")
-            raise
