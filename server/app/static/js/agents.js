@@ -130,17 +130,20 @@ async function initializeDriverSelect() {
         });
 
         if (!response.ok) {
+            const text = await response.text();
+            console.error('Contenido de respuesta:', text);
             throw new Error(`Error al obtener drivers. Status: ${response.status}`);
         }
 
-        // Verificar el tipo de contenido
         const contentType = response.headers.get('content-type');
         if (!contentType || !contentType.includes('application/json')) {
+            const text = await response.text();
+            console.error('Contenido de respuesta no-JSON:', text);
             throw new Error(`Tipo de contenido inválido: ${contentType}`);
         }
 
         const drivers = await response.json();
-
+        
         // Validar que la respuesta sea un array
         if (!Array.isArray(drivers)) {
             throw new Error('El formato de datos devuelto no es válido');

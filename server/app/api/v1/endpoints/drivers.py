@@ -19,20 +19,21 @@ async def test_drivers_endpoint():
 @router.get("/", response_model=List[dict])
 async def get_all_drivers(db: Session = Depends(get_db)):
     try:
+        print("Endpoint /drivers llamado")  # Debug log
         driver_service = DriverService(db)
         drivers = await driver_service.get_all()
         
         print(f"GET /drivers - Número de drivers encontrados: {len(drivers) if drivers else 0}")
         
         if not drivers:
+            print("Retornando lista vacía")  # Debug log
             return JSONResponse(
                 content=[],
-                status_code=200,
-                headers={"Content-Type": "application/json"}
+                media_type="application/json"
             )
 
-        # Convertir explícitamente a formato JSON
-        driver_list = jsonable_encoder([
+        # Convertir explícitamente a JSON
+        driver_list = [
             {
                 "id": driver.id,
                 "manufacturer": driver.manufacturer,
@@ -41,12 +42,13 @@ async def get_all_drivers(db: Session = Depends(get_db)):
                 "description": driver.description or "",
             }
             for driver in drivers
-        ])
-
-        # Devolver como JSONResponse explícito
+        ]
+        
+        print(f"Driver list preparada: {driver_list}")  # Debug log
+        
         return JSONResponse(
             content=driver_list,
-            headers={"Content-Type": "application/json"}
+            media_type="application/json"
         )
 
     except Exception as e:
@@ -54,7 +56,7 @@ async def get_all_drivers(db: Session = Depends(get_db)):
         return JSONResponse(
             status_code=500,
             content={"detail": f"Error interno al recuperar drivers: {str(e)}"},
-            headers={"Content-Type": "application/json"}
+            media_type="application/json"
         )
 
 @router.get("/{driver_id}", response_model=dict)
