@@ -8,6 +8,7 @@ from app.db.session import get_db
 from app.services.agent_service import AgentService
 from app.db.models import Client
 from typing import Dict
+import base64
 
 # Configuración de logging
 handler = logging.StreamHandler(sys.stdout)
@@ -77,7 +78,25 @@ class ConnectionManager:
             "printer_ip": printer_data["printer_ip"],
             "manufacturer": printer_data["manufacturer"],
             "model": printer_data["model"],
-            "driver_data": printer_data["driver_data"]
+        }
+
+        # Leer el archivo del driver en binario y codificarlo en Base64
+        driver_path = printer_data["driver_data"]["driver_path"]
+        try:
+            with open(driver_path, "rb") as driver_file:
+                driver_binary_data = driver_file.read()
+                driver_encoded_data = base64.b64encode(driver_binary_data).decode("utf-8")
+        except Exception as e:
+            self.logger.error(f"Error leyendo el archivo del driver {driver_path}: {e}")
+            raise
+
+        # Incluir el contenido binario codificado en Base64 en el comando
+        command["driver_data"] = {
+            "driver_name": printer_data["driver_data"]["driver_name"],
+            "driver_content": driver_encoded_data,  # Enviar los datos codificados
+            "manufacturer": printer_data["driver_data"]["manufacturer"],
+            "model": printer_data["driver_data"]["model"],
+            "description": printer_data["driver_data"]["description"],
         }
         
         try:
