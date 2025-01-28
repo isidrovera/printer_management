@@ -1,83 +1,116 @@
 # app/services/driver_service.py
-from typing import List, Optional
+from typing import List, Optional, Dict
 from sqlalchemy.orm import Session
 from app.db.models.printer_driver import PrinterDriver
-import tempfile
-import zipfile
-import os
-from pathlib import Path
-import logging
+from app.services.driver_storage import DriverStorage
+from fastapi import HTTPException
 
 class DriverService:
-    STORAGE_PATH = "/var/www/printer_drivers"
-
     def __init__(self, db: Session):
         self.db = db
-        self.logger = logging.getLogger(__name__)
+        self.storage = DriverStorage()
 
     async def get_all(self) -> List[PrinterDriver]:
-        """
-        Obtener todos los drivers, con log de errores si ocurre algo.
-        """
-        try:
-            drivers = self.db.query(PrinterDriver).all()
-            self.logger.info(f"Recuperados {len(drivers)} drivers")
-            return drivers
-        except Exception as e:
-            self.logger.error(f"Error al recuperar drivers: {e}")
-            raise
+        """Obtiene todos los drivers disponibles."""
+        return self.db.query(PrinterDriver).all()
 
     async def get_by_id(self, driver_id: int) -> Optional[PrinterDriver]:
-        return self.db.query(PrinterDriver).filter(PrinterDriver.id == driver_id).first()
+        """Obtiene un driver específico por ID."""
+        driver = self.db.query(PrinterDriver).filter(PrinterDriver.id == driver_id).first()
+        if not driver:
+            raise HTTPException(status_code=404, detail="Driver no encontrado")
+        return driver
 
-    async def store_driver(self, manufacturer: str, model: str, driver_file: bytes, filename: str, description: str = None) -> PrinterDriver:
-        # Validar si el driver ya existe
-        existing_driver = self.db.query(PrinterDriver).filter_by(manufacturer=manufacturer, model=model).first()
+    async def create_driver(
+        self, 
+        manufacturer: str, 
+        model: str, 
+        driver_file: bytes, 
+        filename: str, 
+        description: Optional[str] = None
+    ) -> PrinterDriver:
+        """Crea un nuevo registro de driver y guarda el archivo asociado."""
+        # Validar que no exista un driver con el mismo fabricante y modelo
+        existing_driver = self.db.query(PrinterDriver).filter(
+            PrinterDriver.manufacturer == manufacturer,
+            PrinterDriver.model == model
+        ).first()
         if existing_driver:
-            raise ValueError(f"Ya existe un driver para el modelo {model} del fabricante {manufacturer}")
+            raise HTTPException(status_code=400, detail="Ya existe un driver para este fabricante y modelo")
 
+        # Guardar el archivo en el sistema de almacenamiento
         try:
-            os.makedirs(self.STORAGE_PATH, exist_ok=True)
-            file_path = Path(self.STORAGE_PATH) / filename
+            self.storage.save_driver_file(filename, driver_file)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
 
-            # Guardar el archivo
-            with open(file_path, "wb") as f:
-                f.write(driver_file)
-
-            # Crear registro en la base de datos
-            driver = PrinterDriver(
-                manufacturer=manufacturer,
-                model=model,
-                driver_filename=filename,
-                description=description
-            )
+        # Crear el registro en la base de datos
+        driver = PrinterDriver(
+            manufacturer=manufacturer,
+            model=model,
+            driver_filename=filename,
+            description=description
+        )
+        try:
             self.db.add(driver)
             self.db.commit()
             self.db.refresh(driver)
             return driver
         except Exception as e:
-            if os.path.exists(file_path):
-                os.remove(file_path)  # Limpieza del archivo en caso de error
             self.db.rollback()
-            raise RuntimeError(f"Error al guardar el driver: {e}")
+            self.storage.delete_driver_file(filename)  # Limpieza del archivo en caso de error
+            raise HTTPException(status_code=500, detail=f"Error al crear el driver: {str(e)}")
 
-    async def update(self, driver_id: int, manufacturer: str, model: str, description: str = None) -> PrinterDriver:
+    async def update_driver(
+        self,
+        driver_id: int,
+        manufacturer: str,
+        model: str,
+        description: Optional[str] = None,
+        driver_file: Optional[bytes] = None,
+        filename: Optional[str] = None
+    ) -> PrinterDriver:
+        """Actualiza un driver existente. Si se pasa un nuevo archivo, lo reemplaza."""
         driver = await self.get_by_id(driver_id)
         if not driver:
-            raise ValueError("Driver no encontrado")
+            raise HTTPException(status_code=404, detail="Driver no encontrado")
 
+        # Si se proporciona un nuevo archivo, reemplazar el existente
+        if driver_file and filename:
+            try:
+                self.storage.delete_driver_file(driver.driver_filename)  # Eliminar archivo anterior
+                self.storage.save_driver_file(filename, driver_file)  # Guardar nuevo archivo
+                driver.driver_filename = filename
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=f"Error al actualizar el archivo: {str(e)}")
+
+        # Actualizar los datos del driver
         driver.manufacturer = manufacturer
         driver.model = model
         driver.description = description
 
-        self.db.commit()
-        self.db.refresh(driver)
-        return driver
+        try:
+            self.db.commit()
+            self.db.refresh(driver)
+            return driver
+        except Exception as e:
+            self.db.rollback()
+            raise HTTPException(status_code=500, detail=f"Error al actualizar el driver: {str(e)}")
 
-    async def delete(self, driver_id: int) -> bool:
+    async def delete_driver(self, driver_id: int) -> bool:
+        """Elimina un driver de la base de datos y su archivo asociado."""
         driver = await self.get_by_id(driver_id)
-        if driver:
+        if not driver:
+            raise HTTPException(status_code=404, detail="Driver no encontrado")
+
+        # Eliminar el archivo físico
+        self.storage.delete_driver_file(driver.driver_filename)
+
+        # Eliminar el registro en la base de datos
+        try:
             self.db.delete(driver)
             self.db.commit()
             return True
-        return False
+        except Exception as e:
+            self.db.rollback()
+            raise HTTPException(status_code=500, detail=f"Error al eliminar el driver: {str(e)}")
