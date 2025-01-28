@@ -2,7 +2,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.db.session import get_db
-from app.services.driver_service import DriverService
+from app.services.driver_service import DriverService  # Actualizamos el import
 from app.api.v1.endpoints.websocket import manager
 from pydantic import BaseModel
 import logging
@@ -28,7 +28,8 @@ async def install_printer(
         logger.info(f"Iniciando instalación de impresora para agente {agent_token}")
         logger.debug(f"Datos recibidos: {install_data}")
         
-        driver_service = PrinterDriverService(db)
+        # Usamos DriverService en lugar de PrinterDriverService
+        driver_service = DriverService(db)
         
         try:
             # Obtener información del driver
