@@ -7,7 +7,7 @@ from typing import List
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder  # Añadido
 
-router = APIRouter()
+router = APIRouter(prefix="/api/v1/drivers")  # Añadimos prefix aquí
 
 @router.get("/test")
 async def test_drivers_endpoint():

@@ -119,7 +119,8 @@ async def list_agents(request: Request, db: Session = Depends(get_db)):
 
 
 
-@router.get("/drivers")
+# Cambiar la ruta de la vista de drivers
+@router.get("/drivers-view")  # Cambiado de /drivers a /drivers-view
 async def list_drivers(request: Request, db: Session = Depends(get_db)):
    driver_service = DriverService(db)
    drivers = await driver_service.get_all()
@@ -128,7 +129,7 @@ async def list_drivers(request: Request, db: Session = Depends(get_db)):
        "drivers": drivers
    })
 
-@router.get("/drivers/create")
+@router.get("/drivers-view/create")  # Actualizado
 async def create_driver_form(request: Request):
    return templates.TemplateResponse("drivers/form.html", {
        "request": request,

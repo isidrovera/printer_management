@@ -108,6 +108,7 @@ function initializeFormHandlers() {
 }
 
 // Función para inicializar el select de drivers
+// Función para inicializar el select de drivers
 async function initializeDriverSelect() {
     const driverSelect = document.getElementById('driver');
     if (!driverSelect) return;
@@ -116,6 +117,7 @@ async function initializeDriverSelect() {
         console.group('Carga de Drivers');
         console.log('Intentando cargar drivers...');
         
+        // Actualizamos la URL para usar la nueva ruta API
         const response = await fetch('/api/v1/drivers', {
             method: 'GET',
             headers: {
@@ -135,16 +137,8 @@ async function initializeDriverSelect() {
             throw new Error(`Error al obtener drivers. Status: ${response.status}`);
         }
 
-        const contentType = response.headers.get('content-type');
-        if (!contentType || !contentType.includes('application/json')) {
-            const text = await response.text();
-            console.error('Contenido de respuesta no-JSON:', text);
-            throw new Error(`Tipo de contenido inválido: ${contentType}`);
-        }
-
         const drivers = await response.json();
         
-        // Validar que la respuesta sea un array
         if (!Array.isArray(drivers)) {
             throw new Error('El formato de datos devuelto no es válido');
         }
@@ -169,7 +163,6 @@ async function initializeDriverSelect() {
         showNotification(`Error al cargar drivers: ${error.message}`, 'error');
     }
 }
-
 // Función para mostrar el modal de instalación de impresora
 function showInstallPrinter(agentToken) {
     currentAgentToken = agentToken;
