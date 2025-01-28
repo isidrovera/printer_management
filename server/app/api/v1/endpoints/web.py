@@ -150,7 +150,7 @@ async def create_driver(request: Request, db: Session = Depends(get_db)):
 
         # Guardar el archivo y registrar el driver en la base de datos
         driver_service = DriverService(db)
-        driver = await driver_service.store_driver(
+        driver = await driver_service.create_driver(
             manufacturer=form.get("manufacturer"),
             model=form.get("model"),
             driver_file=file_content,
@@ -166,6 +166,7 @@ async def create_driver(request: Request, db: Session = Depends(get_db)):
             "drivers/form.html",
             {"request": request, "driver": None, "error": str(e)}
         )
+
 
 
 @router.get("/drivers/{driver_id}/edit")
