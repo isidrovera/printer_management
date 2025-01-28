@@ -14,7 +14,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
-from app.api.v1.api import api_router
+from app.api.v1.api import api_router, web_router  # Importamos ambos routers
 from app.db.session import engine
 from app.db.base import Base
 
@@ -51,8 +51,10 @@ if css_dir.exists():
 app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
 
 logger.info("Including routers...")
-# Incluir el router API solo una vez con el prefijo correcto
-app.include_router(api_router, prefix="/api/v1")  # Solo esta línea, eliminamos la duplicada
+# Montar el router web en la raíz
+app.include_router(web_router)
+# Montar el router API con el prefijo
+app.include_router(api_router, prefix="/api/v1")
 
 logger.info("Creating database tables...")
 Base.metadata.create_all(bind=engine)
