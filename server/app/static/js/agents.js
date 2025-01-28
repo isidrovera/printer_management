@@ -6,7 +6,7 @@ let agentToDelete = null;
 
 // Configuración WebSocket
 const WS_CONFIG = {
-    url: `ws://${window.location.host}/ws/status`,
+    url: `ws://${window.location.host}/api/v1/ws/status`,
     reconnectInterval: 1000,
     maxReconnectAttempts: 5
 };
