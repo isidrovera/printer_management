@@ -6,7 +6,9 @@ import json
 from ..core.config import settings
 from .system_info_service import SystemInfoService
 from .printer_service import PrinterService
-
+import base64
+import tempfile
+import os
 # Configurar logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -150,22 +152,42 @@ class AgentService:
     async def _handle_printer_installation(self, data, websocket):
         """Maneja la instalación de impresoras."""
         try:
-            result = await self.printer_service.install(
-                data.get('driver_data'),
-                data.get('printer_ip'),
-                data.get('manufacturer'),
-                data.get('model')
-            )
-            
-            logger.info(f"Printer installation result: {result}")
-            await websocket.send(json.dumps({
-                'type': 'installation_result',
-                'success': result['success'],
-                'message': result['message']
-            }))
+            # Decodificar el archivo comprimido de Base64 a binario
+            driver_data_base64 = data.get('driver_data')
+            driver_binary_data = base64.b64decode(driver_data_base64)
+
+            # Crear un directorio temporal para almacenar el archivo
+            with tempfile.TemporaryDirectory() as temp_dir:
+                compressed_driver_path = os.path.join(temp_dir, "driver.zip")
+
+                # Guardar el archivo comprimido
+                with open(compressed_driver_path, "wb") as f:
+                    f.write(driver_binary_data)
+
+                # Descomprimir el archivo
+                extracted_driver_path = await self.printer_service._extract_driver(
+                    compressed_driver_path, temp_dir
+                )
+
+                # Instalar la impresora
+                result = await self.printer_service.install(
+                    extracted_driver_path,
+                    data.get('printer_ip'),
+                    data.get('manufacturer'),
+                    data.get('model')
+                )
+                
+                # Responder al servidor con el resultado
+                logger.info(f"Printer installation result: {result}")
+                await websocket.send(json.dumps({
+                    'type': 'installation_result',
+                    'success': result['success'],
+                    'message': result['message']
+                }))
+
         except Exception as e:
             logger.error(f"Error during printer installation: {e}")
-            await self._send_error_response(websocket, str(e))
+            await self._send_error_response(websocket, f"Error en instalación: {e}")
 
     async def _send_error_response(self, websocket, error_message: str):
         """Envía una respuesta de error al servidor."""
