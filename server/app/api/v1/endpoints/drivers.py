@@ -1,39 +1,33 @@
 # app/api/v1/endpoints/drivers.py
+# app/api/v1/endpoints/drivers.py
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.services.driver_service import DriverService
 from typing import List
 from fastapi.responses import JSONResponse
-from fastapi.encoders import jsonable_encoder  # Añadido
+from fastapi.encoders import jsonable_encoder
 
-router = APIRouter(prefix="/api/v1/drivers")  # Añadimos prefix aquí
+# Quitar el prefijo aquí
+router = APIRouter()
 
-@router.get("/test")
+@router.get("/api/v1/drivers/test")
 async def test_drivers_endpoint():
     return JSONResponse(
         content={"message": "Drivers endpoint está funcionando"},
         headers={"Content-Type": "application/json"}
     )
 
-@router.get("/", response_model=List[dict])
+@router.get("/api/v1/drivers", response_class=JSONResponse)
 async def get_all_drivers(db: Session = Depends(get_db)):
     try:
-        print("Endpoint /drivers llamado")  # Debug log
+        print("Endpoint /api/v1/drivers llamado")
         driver_service = DriverService(db)
         drivers = await driver_service.get_all()
         
-        print(f"GET /drivers - Número de drivers encontrados: {len(drivers) if drivers else 0}")
+        print(f"Drivers encontrados: {len(drivers) if drivers else 0}")
         
-        if not drivers:
-            print("Retornando lista vacía")  # Debug log
-            return JSONResponse(
-                content=[],
-                media_type="application/json"
-            )
-
-        # Convertir explícitamente a JSON
-        driver_list = [
+        driver_list = jsonable_encoder([
             {
                 "id": driver.id,
                 "manufacturer": driver.manufacturer,
@@ -42,24 +36,22 @@ async def get_all_drivers(db: Session = Depends(get_db)):
                 "description": driver.description or "",
             }
             for driver in drivers
-        ]
-        
-        print(f"Driver list preparada: {driver_list}")  # Debug log
+        ])
         
         return JSONResponse(
             content=driver_list,
-            media_type="application/json"
+            headers={"Content-Type": "application/json"}
         )
 
     except Exception as e:
         print(f"Error en get_all_drivers: {str(e)}")
         return JSONResponse(
             status_code=500,
-            content={"detail": f"Error interno al recuperar drivers: {str(e)}"},
-            media_type="application/json"
+            content={"detail": str(e)},
+            headers={"Content-Type": "application/json"}
         )
 
-@router.get("/{driver_id}", response_model=dict)
+@router.get("/api/v1/drivers/{driver_id}")
 async def get_driver_by_id(driver_id: int, db: Session = Depends(get_db)):
     try:
         driver_service = DriverService(db)
@@ -72,7 +64,6 @@ async def get_driver_by_id(driver_id: int, db: Session = Depends(get_db)):
                 headers={"Content-Type": "application/json"}
             )
 
-        # Convertir a formato JSON
         driver_data = jsonable_encoder({
             "id": driver.id,
             "manufacturer": driver.manufacturer,
@@ -89,6 +80,6 @@ async def get_driver_by_id(driver_id: int, db: Session = Depends(get_db)):
     except Exception as e:
         return JSONResponse(
             status_code=500,
-            content={"detail": f"Error interno al recuperar el driver: {str(e)}"},
+            content={"detail": str(e)},
             headers={"Content-Type": "application/json"}
         )
