@@ -1,6 +1,7 @@
 # app/services/driver_service.py
 from typing import List, Optional, Dict
 from sqlalchemy.orm import Session
+from app.core.config import settings
 from app.db.models.printer_driver import PrinterDriver
 from app.services.driver_storage import DriverStorage
 from pathlib import Path
