@@ -89,7 +89,7 @@ async def create_client(request: Request, db: Session = Depends(get_db)):
             {"request": request, "client": None, "error": str(e)}
         )
 
-@router.delete("/api/v1/clients/{client_id}")
+@router.delete("/clients/{client_id}")
 async def delete_client(client_id: int, db: Session = Depends(get_db)):
     try:
         client_service = ClientService(db)
