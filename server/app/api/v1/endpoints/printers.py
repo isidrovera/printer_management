@@ -2,7 +2,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.db.session import get_db
-from app.services.driver_service import PrinterDriverService
+from app.services.driver_service import DriverService
 from app.api.v1.endpoints.websocket import manager
 from pydantic import BaseModel
 import logging
