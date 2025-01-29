@@ -168,40 +168,53 @@ class AgentService:
             with tempfile.TemporaryDirectory() as temp_dir:
                 # Descargar el archivo del driver
                 driver_path = os.path.join(temp_dir, driver_filename)
+                logger.debug(f"Driver se guardará en: {driver_path}")
                 
-                # Usar la URL completa que viene del servidor
-                download_url = driver_url
-                logger.debug(f"Downloading driver from: {download_url}")
-                    
                 # Realizar la descarga usando el endpoint proporcionado
                 async with aiohttp.ClientSession() as session:
-                    async with session.get(download_url) as response:
+                    logger.debug(f"Iniciando descarga desde: {driver_url}")
+                    async with session.get(driver_url) as response:
                         if response.status != 200:
                             raise Exception(f"Error downloading driver: {response.status}")
                         
                         # Guardar el archivo descargado
+                        content = await response.read()
+                        logger.debug(f"Descargados {len(content)} bytes")
+                        
                         with open(driver_path, 'wb') as f:
-                            while True:
-                                chunk = await response.content.read(8192)
-                                if not chunk:
-                                    break
-                                f.write(chunk)
+                            f.write(content)
+                        
+                        logger.debug(f"Archivo guardado en {driver_path}")
+                        if os.path.exists(driver_path):
+                            logger.debug(f"Verificación: archivo existe y tiene {os.path.getsize(driver_path)} bytes")
+                        else:
+                            logger.error("El archivo no se guardó correctamente")
 
-                # Instalar la impresora utilizando el servicio de impresoras
-                result = await self.printer_service.install(
-                    driver_path,
-                    printer_ip,
-                    manufacturer,
-                    model
-                )
-                
-                # Enviar el resultado al servidor
-                logger.info(f"Printer installation result: {result}")
-                await websocket.send_json({
-                    'type': 'installation_result',
-                    'success': result['success'],
-                    'message': result['message']
-                })
+                        # Verificar que sea un archivo ZIP válido
+                        try:
+                            with zipfile.ZipFile(driver_path, 'r') as zip_ref:
+                                logger.debug("Contenido del ZIP:")
+                                for name in zip_ref.namelist():
+                                    logger.debug(f"- {name}")
+                        except Exception as e:
+                            logger.error(f"Error verificando ZIP: {e}")
+
+                    # Instalar la impresora utilizando el servicio de impresoras
+                    logger.debug("Iniciando instalación con printer_service")
+                    result = await self.printer_service.install(
+                        driver_path,
+                        printer_ip,
+                        manufacturer,
+                        model
+                    )
+                    
+                    # Enviar el resultado al servidor
+                    logger.info(f"Printer installation result: {result}")
+                    await websocket.send(json.dumps({
+                        'type': 'installation_result',
+                        'success': result['success'],
+                        'message': result['message']
+                    }))
 
         except Exception as e:
             logger.error(f"Error during printer installation: {e}")
