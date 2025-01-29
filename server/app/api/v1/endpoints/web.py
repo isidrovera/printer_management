@@ -222,15 +222,20 @@ async def delete_driver(driver_id: int, db: Session = Depends(get_db)):
 async def download_driver(driver_id: int, db: Session = Depends(get_db)):
     driver_service = DriverService(db)
     driver = await driver_service.get_by_id(driver_id)
+    
     if not driver:
-        return {"error": "Driver no encontrado"}, 404
+        return JSONResponse(
+            status_code=404,
+            content={"error": "Driver no encontrado"}
+        )
 
-    # Ruta completa del archivo
-    file_path = Path(DriverService.STORAGE_PATH) / driver.driver_filename
+    # Usar configuración correcta del almacenamiento
+    file_path = Path(settings.DRIVERS_STORAGE_PATH) / driver.driver_filename
 
-    # Verificar si el archivo existe
-    if not file_path.is_file():
-        return {"error": "Archivo no encontrado"}, 404
+    if not file_path.exists():
+        return JSONResponse(
+            status_code=404,
+            content={"error": "Archivo no encontrado"}
+        )
 
-    # Responder el archivo para descarga
     return FileResponse(path=file_path, filename=driver.driver_filename, media_type="application/octet-stream")
