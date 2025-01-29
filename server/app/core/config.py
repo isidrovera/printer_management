@@ -6,7 +6,8 @@ from typing import Optional
 
 # Obtener la ruta base del proyecto
 BASE_DIR = Path(__file__).resolve().parent.parent.parent  # server/app/
-
+# Agregamos la configuración del SERVER_URL
+SERVER_URL: str = "http://161.132.39.159:8000"  # Ajusta esta URL según tu servidor
 class Settings(BaseSettings):
     PROJECT_NAME: str = "Printer Management System"
     DATABASE_URL: str
