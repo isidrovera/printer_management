@@ -169,9 +169,13 @@ class AgentService:
                 # Descargar el archivo del driver
                 driver_path = os.path.join(temp_dir, driver_filename)
                 
+                # Usar la URL completa que viene del servidor
+                download_url = driver_url
+                logger.debug(f"Downloading driver from: {download_url}")
+                    
                 # Realizar la descarga usando el endpoint proporcionado
                 async with aiohttp.ClientSession() as session:
-                    async with session.get(f"{settings.SERVER_URL}{driver_url}") as response:
+                    async with session.get(download_url) as response:
                         if response.status != 200:
                             raise Exception(f"Error downloading driver: {response.status}")
                         
@@ -193,11 +197,11 @@ class AgentService:
                 
                 # Enviar el resultado al servidor
                 logger.info(f"Printer installation result: {result}")
-                await websocket.send(json.dumps({
+                await websocket.send_json({
                     'type': 'installation_result',
                     'success': result['success'],
                     'message': result['message']
-                }))
+                })
 
         except Exception as e:
             logger.error(f"Error during printer installation: {e}")
