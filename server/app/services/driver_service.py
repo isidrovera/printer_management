@@ -138,13 +138,21 @@ class DriverService:
                 detail=f"Archivo del driver {driver.driver_filename} no encontrado en {settings.DRIVERS_STORAGE_PATH}"
             )
 
-        # Construir la URL completa usando la configuración del servidor
-        download_url = f"{settings.SERVER_URL}/api/v1/drivers/{driver_id}/download"
+        # Asegurarnos de usar solo la parte HTTP de la URL
+        server_url = settings.SERVER_URL
+        if server_url.startswith('ws://'):
+            # Convertir ws:// a http://
+            server_url = 'http://' + server_url[5:]
+        elif server_url.startswith('wss://'):
+            # Convertir wss:// a https://
+            server_url = 'https://' + server_url[6:]
 
-        # Retornar la información del driver
+        # Construir la URL completa
+        download_url = f"{server_url}/api/v1/drivers/{driver_id}/download"
+
         return {
             "driver_name": f"{driver.manufacturer} {driver.model}",
-            "download_url": download_url,  # URL completa para descarga
+            "download_url": download_url,
             "manufacturer": driver.manufacturer,
             "model": driver.model,
             "driver_filename": driver.driver_filename,

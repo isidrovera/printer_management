@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     
     # Configuración del servidor
     SERVER_URL: str = "http://161.132.39.159:8000"  # Movido dentro de la clase
+    SERVER_WS_URL: str = "ws://161.132.39.159:8000" 
     
     class Config:
         env_file = ".env"
