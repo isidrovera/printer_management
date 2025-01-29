@@ -74,23 +74,14 @@ class ConnectionManager:
         
         websocket = self.agent_connections[agent_token]
 
-        # Leer y codificar el archivo del driver en Base64
-        driver_path = printer_data["driver_data"]["driver_path"]
-        try:
-            with open(driver_path, "rb") as driver_file:
-                driver_binary_data = driver_file.read()
-                driver_encoded_data = base64.b64encode(driver_binary_data).decode("utf-8")
-        except Exception as e:
-            self.logger.error(f"Error leyendo el archivo del driver {driver_path}: {e}")
-            raise RuntimeError(f"Error leyendo el archivo del driver: {e}")
-
-        # Crear el comando para enviar al agente
+        # Crear el comando para enviar al agente usando la URL de descarga
         command = {
             "type": "install_printer",
             "printer_ip": printer_data["printer_ip"],
             "manufacturer": printer_data["manufacturer"],
             "model": printer_data["model"],
-            "driver_data": driver_encoded_data,  # Archivo comprimido codificado en Base64
+            "driver_url": printer_data["driver_url"],  # URL para descargar el driver
+            "driver_filename": printer_data["driver_filename"]
         }
         
         try:
