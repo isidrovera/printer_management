@@ -2,6 +2,8 @@
 import logging
 import asyncio
 import websockets
+import zipfile
+import tempfile
 import json
 import base64
 import tempfile
@@ -149,7 +151,7 @@ class AgentService:
         except Exception as e:
             logger.error(f"Error sending heartbeat response: {e}")
     
-    # agent/app/services/agent_service.py
+    
 
     async def _handle_printer_installation(self, data, websocket):
         """Maneja la instalación de impresoras."""
@@ -166,18 +168,16 @@ class AgentService:
 
             # Crear un directorio temporal para la descarga
             with tempfile.TemporaryDirectory() as temp_dir:
-                # Descargar el archivo del driver
                 driver_path = os.path.join(temp_dir, driver_filename)
                 logger.debug(f"Driver se guardará en: {driver_path}")
                 
-                # Realizar la descarga usando el endpoint proporcionado
+                # Realizar la descarga
                 async with aiohttp.ClientSession() as session:
                     logger.debug(f"Iniciando descarga desde: {driver_url}")
                     async with session.get(driver_url) as response:
                         if response.status != 200:
                             raise Exception(f"Error downloading driver: {response.status}")
                         
-                        # Guardar el archivo descargado
                         content = await response.read()
                         logger.debug(f"Descargados {len(content)} bytes")
                         
@@ -185,47 +185,46 @@ class AgentService:
                             f.write(content)
                         
                         logger.debug(f"Archivo guardado en {driver_path}")
-                        if os.path.exists(driver_path):
-                            logger.debug(f"Verificación: archivo existe y tiene {os.path.getsize(driver_path)} bytes")
-                        else:
-                            logger.error("El archivo no se guardó correctamente")
-
-                        # Verificar que sea un archivo ZIP válido
+                        
+                        # Verificar el archivo ZIP
                         try:
                             with zipfile.ZipFile(driver_path, 'r') as zip_ref:
                                 logger.debug("Contenido del ZIP:")
-                                for name in zip_ref.namelist():
+                                files = zip_ref.namelist()
+                                for name in files:
                                     logger.debug(f"- {name}")
+                                
+                                # Extraer en un subdirectorio
+                                extract_dir = os.path.join(temp_dir, "extracted")
+                                os.makedirs(extract_dir, exist_ok=True)
+                                zip_ref.extractall(extract_dir)
+                                logger.debug(f"ZIP extraído en: {extract_dir}")
+                                
+                                # Listar archivos extraídos
+                                for root, dirs, files in os.walk(extract_dir):
+                                    logger.debug(f"Contenido de {root}:")
+                                    for file in files:
+                                        logger.debug(f"- {file}")
                         except Exception as e:
-                            logger.error(f"Error verificando ZIP: {e}")
+                            logger.error(f"Error con el archivo ZIP: {e}")
+                            raise
 
-                    # Instalar la impresora utilizando el servicio de impresoras
-                    logger.debug("Iniciando instalación con printer_service")
-                    result = await self.printer_service.install(
-                        driver_path,
-                        printer_ip,
-                        manufacturer,
-                        model
-                    )
-                    
-                    # Enviar el resultado al servidor
-                    logger.info(f"Printer installation result: {result}")
-                    await websocket.send(json.dumps({
-                        'type': 'installation_result',
-                        'success': result['success'],
-                        'message': result['message']
-                    }))
+                        # Instalar la impresora
+                        logger.debug("Iniciando instalación con printer_service")
+                        result = await self.printer_service.install(
+                            driver_path,
+                            printer_ip,
+                            manufacturer,
+                            model
+                        )
+                        
+                        logger.info(f"Printer installation result: {result}")
+                        await websocket.send(json.dumps({
+                            'type': 'installation_result',
+                            'success': result['success'],
+                            'message': result['message']
+                        }))
 
         except Exception as e:
             logger.error(f"Error during printer installation: {e}")
             await self._send_error_response(websocket, f"Error en instalación: {e}")
-
-    async def _send_error_response(self, websocket, error_message: str):
-        """Envía una respuesta de error al servidor."""
-        try:
-            await websocket.send(json.dumps({
-                'type': 'error',
-                'message': error_message
-            }))
-        except Exception as e:
-            logger.error(f"Error sending error response: {e}")
