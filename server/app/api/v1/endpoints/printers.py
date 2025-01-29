@@ -34,11 +34,11 @@ async def install_printer(
             
             # Preparar comando de instalación
             installation_command = {
-                "command": "install_printer",
+                "type": "install_printer",  # Asegurarse de incluir el tipo
                 "printer_ip": install_data.printer_ip,
                 "manufacturer": driver_info["manufacturer"],
                 "model": driver_info["model"],
-                "driver_url": driver_info["download_url"],  # URL en lugar del archivo
+                "driver_url": driver_info["download_url"],
                 "driver_filename": driver_info["driver_filename"]
             }
             

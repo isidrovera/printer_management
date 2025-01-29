@@ -70,20 +70,25 @@ function initializeSearchFilter() {
 // Función para inicializar manejadores de formularios
 function initializeFormHandlers() {
     const installForm = document.getElementById('installPrinterForm');
+    // Actualizar la función de envío del formulario en initializeFormHandlers
     if (installForm) {
         installForm.addEventListener('submit', async function (e) {
             e.preventDefault();
 
-            const driverId = document.getElementById('driver').value;
-            const printerIp = document.getElementById('printerIp').value;
-
-            if (!driverId || !printerIp) {
-                showNotification('Por favor complete todos los campos', 'error');
-                return;
-            }
-
-            // En la función initializeFormHandlers de agents.js
             try {
+                const driverId = document.getElementById('driver').value;
+                const printerIp = document.getElementById('printerIp').value;
+
+                if (!driverId || !printerIp) {
+                    showNotification('Por favor complete todos los campos', 'error');
+                    return;
+                }
+
+                console.log('Enviando solicitud de instalación:', {
+                    printer_ip: printerIp,
+                    driver_id: parseInt(driverId)
+                });
+
                 const response = await fetch(`/api/v1/printers/install/${currentAgentToken}`, {
                     method: 'POST',
                     headers: { 
@@ -92,21 +97,25 @@ function initializeFormHandlers() {
                     },
                     body: JSON.stringify({
                         printer_ip: printerIp,
-                        driver_id: parseInt(driverId)  // Asegurarnos que es un número
-                    }),
+                        driver_id: parseInt(driverId)
+                    })
                 });
 
+                // Mejorar el manejo de errores
                 if (!response.ok) {
                     const errorData = await response.json();
-                    throw new Error(errorData.detail || 'Error al enviar el comando de instalación');
+                    console.error('Error response:', errorData);
+                    throw new Error(errorData.detail || `Error en la instalación: ${response.status}`);
                 }
 
                 const data = await response.json();
+                console.log('Respuesta exitosa:', data);
                 showNotification('Comando de instalación enviado correctamente', 'success');
                 closeModal('installPrinterModal');
+
             } catch (error) {
-                console.error('Error al enviar formulario:', error);
-                showNotification(error.message, 'error');
+                console.error('Error detallado:', error);
+                showNotification(`Error al instalar impresora: ${error.message}`, 'error');
             }
         });
     }
