@@ -6,8 +6,7 @@ from typing import Optional
 
 # Obtener la ruta base del proyecto
 BASE_DIR = Path(__file__).resolve().parent.parent.parent  # server/app/
-# Agregamos la configuración del SERVER_URL
-SERVER_URL: str = "http://161.132.39.159:8000"  # Ajusta esta URL según tu servidor
+
 class Settings(BaseSettings):
     PROJECT_NAME: str = "Printer Management System"
     DATABASE_URL: str
@@ -16,6 +15,9 @@ class Settings(BaseSettings):
     
     # Configuración de almacenamiento de drivers
     DRIVERS_STORAGE_PATH: str = str(BASE_DIR / "storage" / "drivers")
+    
+    # Configuración del servidor
+    SERVER_URL: str = "http://161.132.39.159:8000"  # Movido dentro de la clase
     
     class Config:
         env_file = ".env"
