@@ -21,27 +21,25 @@ async def install_printer(
     install_data: PrinterInstallRequest,
     db: Session = Depends(get_db)
 ):
-    """
-    Envía comando para instalar una impresora a un agente específico.
-    """
     try:
         logger.info(f"Iniciando instalación de impresora para agente {agent_token}")
         logger.debug(f"Datos recibidos: {install_data}")
         
-        # Usamos DriverService en lugar de PrinterDriverService
         driver_service = DriverService(db)
         
         try:
-            # Obtener información del driver
+            # Obtener información del driver con URL de descarga
             driver_info = await driver_service.get_driver_for_installation(install_data.driver_id)
             logger.debug(f"Información del driver obtenida: {driver_info}")
             
             # Preparar comando de instalación
             installation_command = {
+                "command": "install_printer",
                 "printer_ip": install_data.printer_ip,
                 "manufacturer": driver_info["manufacturer"],
                 "model": driver_info["model"],
-                "driver_data": driver_info
+                "driver_url": driver_info["download_url"],  # URL en lugar del archivo
+                "driver_filename": driver_info["driver_filename"]
             }
             
             # Enviar comando al agente

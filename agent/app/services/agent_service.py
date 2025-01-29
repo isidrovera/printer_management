@@ -5,6 +5,7 @@ import websockets
 import json
 import base64
 import tempfile
+import aiohttp
 import os
 from ..core.config import settings
 from .system_info_service import SystemInfoService
@@ -148,30 +149,46 @@ class AgentService:
         except Exception as e:
             logger.error(f"Error sending heartbeat response: {e}")
     
+    # agent/app/services/agent_service.py
+
     async def _handle_printer_installation(self, data, websocket):
         """Maneja la instalación de impresoras."""
         try:
-            # Decodificar el archivo comprimido de Base64 a binario
-            driver_data_base64 = data.get('driver_data')
-            if not driver_data_base64:
-                raise ValueError("Driver data not provided in the command.")
-            
-            driver_binary_data = base64.b64decode(driver_data_base64)
+            # Obtener la URL de descarga y otros datos
+            driver_url = data.get('driver_url')
+            if not driver_url:
+                raise ValueError("Driver URL not provided in the command.")
 
-            # Crear un directorio temporal para guardar el archivo comprimido
+            printer_ip = data.get('printer_ip')
+            manufacturer = data.get('manufacturer')
+            model = data.get('model')
+            driver_filename = data.get('driver_filename')
+
+            # Crear un directorio temporal para la descarga
             with tempfile.TemporaryDirectory() as temp_dir:
-                compressed_driver_path = os.path.join(temp_dir, "driver.zip")
-
-                # Guardar el archivo comprimido
-                with open(compressed_driver_path, "wb") as f:
-                    f.write(driver_binary_data)
+                # Descargar el archivo del driver
+                driver_path = os.path.join(temp_dir, driver_filename)
+                
+                # Realizar la descarga usando el endpoint proporcionado
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(f"{settings.SERVER_URL}{driver_url}") as response:
+                        if response.status != 200:
+                            raise Exception(f"Error downloading driver: {response.status}")
+                        
+                        # Guardar el archivo descargado
+                        with open(driver_path, 'wb') as f:
+                            while True:
+                                chunk = await response.content.read(8192)
+                                if not chunk:
+                                    break
+                                f.write(chunk)
 
                 # Instalar la impresora utilizando el servicio de impresoras
                 result = await self.printer_service.install(
-                    compressed_driver_path,
-                    data.get('printer_ip'),
-                    data.get('manufacturer'),
-                    data.get('model')
+                    driver_path,
+                    printer_ip,
+                    manufacturer,
+                    model
                 )
                 
                 # Enviar el resultado al servidor
