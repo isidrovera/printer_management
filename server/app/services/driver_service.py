@@ -118,7 +118,6 @@ class DriverService:
             self.db.rollback()
             raise HTTPException(status_code=500, detail=f"Error al eliminar el driver: {str(e)}")
 
-
     async def get_driver_for_installation(self, driver_id: int) -> Dict:
         """
         Obtiene toda la información necesaria para instalar un driver.
@@ -139,34 +138,13 @@ class DriverService:
                 detail=f"Archivo del driver {driver.driver_filename} no encontrado en {settings.DRIVERS_STORAGE_PATH}"
             )
 
+        # Construir la URL completa usando la configuración del servidor
+        download_url = f"{settings.SERVER_URL}/api/v1/drivers/{driver_id}/download"
+
         # Retornar la información del driver
         return {
             "driver_name": f"{driver.manufacturer} {driver.model}",
-            "driver_path": str(driver_path),
-            "manufacturer": driver.manufacturer,
-            "model": driver.model,
-            "driver_filename": driver.driver_filename,
-            "description": driver.description,
-        }
-
-    # app/services/driver_service.py
-    async def get_driver_for_installation(self, driver_id: int) -> Dict:
-        """
-        Obtiene toda la información necesaria para instalar un driver.
-        """
-        driver = await self.get_by_id(driver_id)
-        if not driver:
-            raise HTTPException(
-                status_code=404,
-                detail=f"Driver con ID {driver_id} no encontrado"
-            )
-
-        # Generar URL de descarga
-        download_url = f"/api/v1/drivers/{driver_id}/download"
-
-        return {
-            "driver_name": f"{driver.manufacturer} {driver.model}",
-            "download_url": download_url,  # Nueva URL de descarga
+            "download_url": download_url,  # URL completa para descarga
             "manufacturer": driver.manufacturer,
             "model": driver.model,
             "driver_filename": driver.driver_filename,
