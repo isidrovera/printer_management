@@ -43,3 +43,24 @@ async def delete_agent(agent_id: int, db: Session = Depends(get_db)):
     agent_service = AgentService(db)
     if not await agent_service.delete_agent(agent_id):
         raise HTTPException(status_code=404, detail="Agent not found")
+
+        
+@router.put("/update", response_model=Agent)
+async def update_agent_info(data: AgentUpdate, db: Session = Depends(get_db)):
+    """
+    Actualiza la información de un agente existente.
+    """
+    agent_service = AgentService(db)
+
+    # Buscar el agente en la base de datos por su token
+    existing_agent = await agent_service.get_agent_by_token(data.agent_token)
+    if not existing_agent:
+        raise HTTPException(status_code=404, detail="Agent not found")
+
+    # Actualizar la información del agente
+    updated_agent = await agent_service.update_agent(existing_agent.id, data.dict(exclude_unset=True))
+    
+    if not updated_agent:
+        raise HTTPException(status_code=400, detail="Error updating agent")
+    
+    return updated_agent

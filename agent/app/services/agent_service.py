@@ -229,8 +229,26 @@ class AgentService:
     async def _update_agent_info(self):
         """Obtiene la información actualizada del sistema y la envía al servidor si hay cambios."""
         try:
+            import socket  # Asegurar que esté importado
+
             new_system_info = await self.system_info.get_system_info()
-            new_ip = os.popen("hostname -I").read().strip().split()[0]  # Obtener IP actual de manera confiable
+
+            # 🔍 Obtener la IP correctamente en cualquier sistema operativo
+            try:
+                new_ip = socket.gethostbyname(socket.gethostname())  # ✅ Método confiable multiplataforma
+                if new_ip == "127.0.0.1":  # Si la IP es localhost, buscar una IP real
+                    import netifaces
+                    interfaces = netifaces.interfaces()
+                    for interface in interfaces:
+                        addresses = netifaces.ifaddresses(interface)
+                        if netifaces.AF_INET in addresses:
+                            for addr in addresses[netifaces.AF_INET]:
+                                if addr['addr'] != "127.0.0.1":
+                                    new_ip = addr['addr']
+                                    break
+            except Exception as e:
+                new_ip = "0.0.0.0"
+                logger.error(f"🚨 Error al obtener la IP en el agente: {e}")
 
             update_data = {
                 "agent_token": settings.AGENT_TOKEN,
@@ -238,15 +256,15 @@ class AgentService:
                 "ip_address": new_ip
             }
 
-            logger.debug(f"🆕 Enviando actualización del agente al servidor: {json.dumps(update_data, indent=4)}")
+            logger.debug(f"🆕 [AGENTE] Enviando actualización al servidor: {json.dumps(update_data, indent=4)}")
 
             async with aiohttp.ClientSession() as session:
                 async with session.put(f"{settings.SERVER_URL}/api/v1/agents/update", json=update_data) as response:
                     data = await response.json()
                     if response.status == 200:
-                        logger.info(f"✅ Agente actualizado con éxito en el servidor.")
+                        logger.info(f"✅ [AGENTE] Actualización exitosa en el servidor.")
                     else:
-                        logger.error(f"❌ Error al actualizar agente: {data}")
+                        logger.error(f"❌ [AGENTE] Error en la actualización: {data}")
 
         except Exception as e:
-            logger.error(f"🚨 Error en la actualización del agente: {e}")
+            logger.error(f"🚨 [AGENTE] Error en la actualización del agente: {e}")
