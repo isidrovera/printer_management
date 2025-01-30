@@ -19,6 +19,45 @@ document.addEventListener('DOMContentLoaded', function () {
     initializeDriverSelect(); // Añadido para cargar drivers al inicio
 });
 
+// Función para añadir un mensaje de log
+function addLogMessage(message, type = 'info') {
+    const logContainer = document.getElementById('logMessages');
+    if (logContainer) {
+        const logEntry = document.createElement('div');
+        const timestamp = new Date().toLocaleTimeString();
+        
+        let classes = 'py-1 px-2 rounded';
+        let symbol = '';
+        switch (type) {
+            case 'success':
+                classes += ' text-green-700 bg-green-50';
+                symbol = '✓';
+                break;
+            case 'error':
+                classes += ' text-red-700 bg-red-50';
+                symbol = '✗';
+                break;
+            case 'warning':
+                classes += ' text-yellow-700 bg-yellow-50';
+                symbol = '⚠';
+                break;
+            default:
+                classes += ' text-gray-700';
+                symbol = '→';
+        }
+
+        logEntry.className = classes;
+        logEntry.innerHTML = `<span class="text-xs text-gray-500">${timestamp}</span> ${symbol} ${message}`;
+        
+        logContainer.appendChild(logEntry);
+        logContainer.scrollTop = logContainer.scrollHeight;
+
+        // Mantener solo los últimos N mensajes
+        while (logContainer.children.length > 50) {
+            logContainer.removeChild(logContainer.firstChild);
+        }
+    }
+}
 // Inicializar WebSocket
 function initializeWebSocket() {
     try {
@@ -31,6 +70,7 @@ function initializeWebSocket() {
             console.log('✅ WebSocket conectado exitosamente');
             reconnectAttempts = 0;
             showNotification('Conexión establecida con el servidor', 'success');
+            addLogMessage('Conexión establecida con el servidor', 'success');
         };
 
         wsConnection.onmessage = (event) => {
@@ -56,6 +96,7 @@ function initializeWebSocket() {
                         error: parseError,
                         rawData: event.data.slice(0, 100) + (event.data.length > 100 ? '...' : '')
                     });
+                    handleAgentLogMessage(event.data);
                     console.groupEnd();
                     return;
                 }
@@ -69,11 +110,8 @@ function initializeWebSocket() {
                 }
 
             } catch (error) {
-                console.error('❌ Error procesando mensaje:', {
-                    errorType: error.name,
-                    errorMessage: error.message,
-                    stack: error.stack
-                });
+                console.error('❌ Error procesando mensaje:', error);
+                addLogMessage('Error al procesar mensaje: ' + error.message, 'error');
             }
             console.groupEnd();
         };
@@ -86,18 +124,15 @@ function initializeWebSocket() {
         wsConnection.onerror = (error) => {
             console.error('❌ Error en WebSocket:', error);
             showNotification('Error en la conexión con el servidor', 'error');
+            addLogMessage('Error en la conexión con el servidor', 'error');
         };
-
-        console.groupEnd();
-        return wsConnection;
 
     } catch (error) {
         console.error('❌ Error al crear conexión WebSocket:', error);
         showNotification('Error al crear la conexión con el servidor', 'error');
-        console.groupEnd();
+        addLogMessage('Error al crear la conexión con el servidor', 'error');
     }
 }
-
 
 // Procesar diferentes tipos de mensajes JSON
 function processJsonMessage(data) {
@@ -118,20 +153,19 @@ function processJsonMessage(data) {
 
 // Manejar mensajes de log del agente
 function handleAgentLogMessage(message) {
-    // Aquí puedes implementar la lógica para mostrar los logs del agente
-    // Por ejemplo, añadirlos a un elemento en la UI
-    const logContainer = document.getElementById('agent-logs');
-    if (logContainer) {
-        const logEntry = document.createElement('div');
-        logEntry.textContent = message;
-        logEntry.className = 'log-entry';
-        logContainer.appendChild(logEntry);
-        // Mantener solo los últimos N logs
-        while (logContainer.children.length > 100) {
-            logContainer.removeChild(logContainer.firstChild);
-        }
+    let type = 'info';
+    if (message.toLowerCase().includes('error')) {
+        type = 'error';
+    } else if (message.toLowerCase().includes('warning')) {
+        type = 'warning';
+    } else if (message.toLowerCase().includes('success') || message.toLowerCase().includes('completed')) {
+        type = 'success';
     }
+
+    const cleanMessage = message.replace(/^Agent agt_[^\s]+\s*/, '');
+    addLogMessage(cleanMessage, type);
 }
+
 
 
 // Funciones auxiliares para manejar diferentes tipos de mensajes
@@ -207,7 +241,7 @@ function handleErrorMessage(data) {
 function initializeSearchFilter() {
     const searchInput = document.getElementById('searchInput');
     if (searchInput) {
-        searchInput.addEventListener('input', function (e) {
+        searchInput.addEventListener('input', function(e) {
             const searchTerm = e.target.value.toLowerCase();
             const rows = document.querySelectorAll('tbody tr');
 
@@ -219,31 +253,35 @@ function initializeSearchFilter() {
     }
 }
 
+
 // Función para inicializar manejadores de formularios
 function initializeFormHandlers() {
     const installForm = document.getElementById('installPrinterForm');
-    // Actualizar la función de envío del formulario en initializeFormHandlers
     if (installForm) {
-        installForm.addEventListener('submit', async function (e) {
+        installForm.addEventListener('submit', async function(e) {
             e.preventDefault();
 
             try {
+                const submitButton = installForm.querySelector('button[type="submit"]');
                 const driverId = document.getElementById('driver').value;
                 const printerIp = document.getElementById('printerIp').value;
 
                 if (!driverId || !printerIp) {
                     showNotification('Por favor complete todos los campos', 'error');
+                    addLogMessage('Error: Faltan campos requeridos', 'error');
                     return;
                 }
 
-                console.log('Enviando solicitud de instalación:', {
-                    printer_ip: printerIp,
-                    driver_id: parseInt(driverId)
-                });
+                // Deshabilitar el botón de envío y cambiar el texto
+                submitButton.disabled = true;
+                submitButton.innerHTML = 'Instalando...';
+                
+                addLogMessage('Iniciando instalación de impresora...', 'info');
+                addLogMessage(`IP de impresora: ${printerIp}`, 'info');
 
                 const response = await fetch(`/api/v1/printers/install/${currentAgentToken}`, {
                     method: 'POST',
-                    headers: { 
+                    headers: {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json'
                     },
@@ -253,26 +291,38 @@ function initializeFormHandlers() {
                     })
                 });
 
-                // Mejorar el manejo de errores
                 if (!response.ok) {
                     const errorData = await response.json();
-                    console.error('Error response:', errorData);
                     throw new Error(errorData.detail || `Error en la instalación: ${response.status}`);
                 }
 
                 const data = await response.json();
-                console.log('Respuesta exitosa:', data);
+                addLogMessage('Comando de instalación enviado correctamente', 'success');
+                addLogMessage('Esperando respuesta del agente...', 'info');
                 showNotification('Comando de instalación enviado correctamente', 'success');
-                closeModal('installPrinterModal');
+
+                // Cambiar el texto del botón de cerrar
+                const closeButton = document.querySelector('button[onclick="closeModal(\'installPrinterModal\')"]');
+                if (closeButton) {
+                    closeButton.textContent = 'Cerrar ventana';
+                }
+
+                // Deshabilitar los campos del formulario
+                document.getElementById('driver').disabled = true;
+                document.getElementById('printerIp').disabled = true;
 
             } catch (error) {
                 console.error('Error detallado:', error);
+                addLogMessage(`Error: ${error.message}`, 'error');
                 showNotification(`Error al instalar impresora: ${error.message}`, 'error');
+                
+                // Reactivar el botón de envío en caso de error
+                submitButton.disabled = false;
+                submitButton.innerHTML = 'Instalar';
             }
         });
     }
 }
-
 
 // Función para inicializar el select de drivers
 async function initializeDriverSelect() {
@@ -280,10 +330,8 @@ async function initializeDriverSelect() {
     if (!driverSelect) return;
 
     try {
-        console.group('Carga de Drivers');
-        console.log('Intentando cargar drivers...');
+        addLogMessage('Cargando lista de drivers...', 'info');
         
-        // Actualizamos la URL para usar la nueva ruta API
         const response = await fetch('/api/v1/drivers', {
             method: 'GET',
             headers: {
@@ -292,14 +340,8 @@ async function initializeDriverSelect() {
             }
         });
 
-        console.log('Respuesta de drivers:', {
-            status: response.status,
-            headers: Object.fromEntries(response.headers.entries())
-        });
-
         if (!response.ok) {
             const text = await response.text();
-            console.error('Contenido de respuesta:', text);
             throw new Error(`Error al obtener drivers. Status: ${response.status}`);
         }
 
@@ -309,9 +351,6 @@ async function initializeDriverSelect() {
             throw new Error('El formato de datos devuelto no es válido');
         }
 
-        console.log('Drivers recuperados:', drivers);
-
-        // Poblar el select con los drivers
         driverSelect.innerHTML = '<option value="">Seleccione un driver</option>';
         drivers.forEach((driver) => {
             const option = document.createElement('option');
@@ -320,40 +359,70 @@ async function initializeDriverSelect() {
             driverSelect.appendChild(option);
         });
 
-        console.log('Select de drivers poblado exitosamente');
-        console.groupEnd();
+        addLogMessage('Drivers cargados correctamente', 'success');
 
     } catch (error) {
-        console.groupEnd();
         console.error('Error completo inicializando drivers:', error);
+        addLogMessage(`Error al cargar drivers: ${error.message}`, 'error');
         showNotification(`Error al cargar drivers: ${error.message}`, 'error');
     }
 }
 // Función para mostrar el modal de instalación de impresora
 function showInstallPrinter(agentToken) {
     currentAgentToken = agentToken;
-
+    
     const modal = document.getElementById('installPrinterModal');
     if (modal) {
         modal.classList.remove('hidden');
-        document.getElementById('installPrinterForm').reset(); // Resetear el formulario
-        initializeDriverSelect(); // Llenar el select de drivers
-    } else {
-        console.warn("El modal no existe en el DOM.");
+        
+        // Resetear el formulario y habilitar campos
+        const form = document.getElementById('installPrinterForm');
+        form.reset();
+        
+        // Habilitar campos y botones
+        document.getElementById('driver').disabled = false;
+        document.getElementById('printerIp').disabled = false;
+        const submitButton = form.querySelector('button[type="submit"]');
+        if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.innerHTML = 'Instalar';
+        }
+        
+        // Limpiar logs anteriores
+        const logMessages = document.getElementById('logMessages');
+        if (logMessages) {
+            logMessages.innerHTML = '';
+            addLogMessage('Iniciando proceso de instalación...', 'info');
+        }
+        
+        initializeDriverSelect();
     }
 }
+
 
 // Función para cerrar un modal por ID
 function closeModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
+        // Verificar si hay una instalación en progreso
+        const submitButton = document.querySelector('#installPrinterForm button[type="submit"]');
+        if (submitButton && submitButton.disabled) {
+            if (!confirm('¿Está seguro que desea cerrar la ventana? Hay una instalación en progreso.')) {
+                return;
+            }
+        }
+        
         modal.classList.add('hidden');
         if (modalId === 'installPrinterModal') {
             document.getElementById('installPrinterForm').reset();
+            // Limpiar logs
+            const logMessages = document.getElementById('logMessages');
+            if (logMessages) {
+                logMessages.innerHTML = '';
+            }
         }
     }
 }
-
 // Función para mostrar notificaciones
 function showNotification(message, type = 'info') {
     console.log(`[${type.toUpperCase()}] ${message}`);
