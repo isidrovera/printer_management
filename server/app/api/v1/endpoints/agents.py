@@ -64,3 +64,15 @@ async def update_agent_info(data: AgentUpdate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Error updating agent")
     
     return updated_agent
+@router.get("/{agent_id}", response_model=Agent)
+async def get_agent(agent_id: int, db: Session = Depends(get_db)):
+    """
+    Obtiene la información detallada de un agente por su ID.
+    """
+    agent_service = AgentService(db)
+    agent = await agent_service.get_agent(agent_id)
+    
+    if not agent:
+        raise HTTPException(status_code=404, detail="Agent not found")
+    
+    return agent
