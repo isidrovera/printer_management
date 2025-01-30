@@ -509,7 +509,8 @@ async function showAgentInfo(agentId) {
     const modal = document.getElementById("agentInfoModal");
     const content = document.getElementById("agentInfoContent");
 
-    // Hacer que el modal cubra todo el ancho de la pantalla
+    // Hacer que el modal cubra toda la pantalla
+    modal.classList.remove("hidden");
     modal.style.display = "flex";
     modal.style.justifyContent = "center";
     modal.style.alignItems = "center";
@@ -518,7 +519,7 @@ async function showAgentInfo(agentId) {
     modal.style.left = "0";
     modal.style.width = "100vw";
     modal.style.height = "100vh";
-    modal.style.background = "rgba(0, 0, 0, 0.5)";
+    modal.style.background = "rgba(0, 0, 0, 0.7)";
     modal.style.zIndex = "9999";
 
     // 🏷️ Mostrar mensaje de carga
@@ -532,7 +533,7 @@ async function showAgentInfo(agentId) {
         }
         const agent = await response.json();
 
-        // Verificaciones para evitar errores de propiedades undefined
+        // Verificar datos para evitar errores
         const cpuInfo = agent.cpu_info || {};
         const memoryInfo = agent.memory_info || {};
         const diskInfo = agent.disk_info || [];
@@ -541,15 +542,15 @@ async function showAgentInfo(agentId) {
         const batteryInfo = agent.battery_info || { Porcentaje: "No disponible", Enchufado: false };
         const diskUsage = agent.disk_usage || {};
 
-        // 🌟 Diseño con 8 columnas bien organizadas y ocupando la pantalla
+        // 🌟 Estilos mejorados en una cuadrícula de 8 columnas
         content.innerHTML = `
-            <div class="bg-white rounded-lg shadow-lg p-6 w-11/12 max-w-full h-[90vh] overflow-auto">
+            <div class="bg-white rounded-lg shadow-lg p-6 w-[90vw] h-[90vh] overflow-auto">
                 
                 <!-- Botón de Cerrar -->
                 <div class="flex justify-between items-center border-b pb-3">
-                    <h3 class="text-xl font-semibold text-gray-800">Información Completa del Agente</h3>
+                    <h3 class="text-2xl font-semibold text-gray-800">Información Completa del Agente</h3>
                     <button onclick="closeModal('agentInfoModal')" class="text-gray-500 hover:text-gray-800">
-                        <i data-lucide="x-circle" class="h-6 w-6"></i>
+                        <i data-lucide="x-circle" class="h-8 w-8"></i>
                     </button>
                 </div>
 
@@ -562,7 +563,7 @@ async function showAgentInfo(agentId) {
 
                     <!-- CPU -->
                     <div class="col-span-8 border-b pt-4 text-red-500 font-bold">
-                        <i data-lucide="cpu" class="h-5 w-5 mr-2"></i> Procesador
+                        <i data-lucide="cpu" class="h-6 w-6 mr-2"></i> Procesador
                     </div>
                     <div class="col-span-3"><strong>⚙ Modelo:</strong> ${cpuInfo.Modelo || "N/A"}</div>
                     <div class="col-span-3"><strong>🔄 Frecuencia:</strong> ${cpuInfo["Frecuencia (MHz)"] || "N/A"} MHz</div>
@@ -570,7 +571,7 @@ async function showAgentInfo(agentId) {
 
                     <!-- Memoria RAM -->
                     <div class="col-span-8 border-b pt-4 text-purple-500 font-bold">
-                        <i data-lucide="database" class="h-5 w-5 mr-2"></i> Memoria RAM
+                        <i data-lucide="database" class="h-6 w-6 mr-2"></i> Memoria RAM
                     </div>
                     <div class="col-span-3"><strong>💾 Total:</strong> ${memoryInfo["Total RAM (GB)"] || "N/A"} GB</div>
                     <div class="col-span-3"><strong>📉 Disponible:</strong> ${memoryInfo["Disponible RAM (GB)"] || "N/A"} GB</div>
@@ -578,7 +579,7 @@ async function showAgentInfo(agentId) {
 
                     <!-- Discos -->
                     <div class="col-span-8 border-b pt-4 text-orange-500 font-bold">
-                        <i data-lucide="hard-drive" class="h-5 w-5 mr-2"></i> Discos
+                        <i data-lucide="hard-drive" class="h-6 w-6 mr-2"></i> Discos
                     </div>
                     ${
                         diskInfo.length > 0
@@ -592,7 +593,7 @@ async function showAgentInfo(agentId) {
 
                     <!-- Red -->
                     <div class="col-span-8 border-b pt-4 text-blue-500 font-bold">
-                        <i data-lucide="wifi" class="h-5 w-5 mr-2"></i> Conexión de Red
+                        <i data-lucide="wifi" class="h-6 w-6 mr-2"></i> Conexión de Red
                     </div>
                     ${
                         Object.keys(networkInfo).length > 0
@@ -605,13 +606,13 @@ async function showAgentInfo(agentId) {
 
                     <!-- GPU -->
                     <div class="col-span-8 border-b pt-4 text-green-500 font-bold">
-                        <i data-lucide="monitor" class="h-5 w-5 mr-2"></i> Tarjeta Gráfica
+                        <i data-lucide="monitor" class="h-6 w-6 mr-2"></i> Tarjeta Gráfica
                     </div>
                     <div class="col-span-8"><strong>🖥️ GPU:</strong> ${gpuInfo.Nombre || "N/A"}</div>
 
                     <!-- Batería -->
                     <div class="col-span-8 border-b pt-4 text-yellow-500 font-bold">
-                        <i data-lucide="battery-charging" class="h-5 w-5 mr-2"></i> Estado de la Batería
+                        <i data-lucide="battery-charging" class="h-6 w-6 mr-2"></i> Estado de la Batería
                     </div>
                     <div class="col-span-4"><strong>🔋 Carga:</strong> ${batteryInfo.Porcentaje || "N/A"}%</div>
                     <div class="col-span-4"><strong>🔌 Enchufado:</strong> ${batteryInfo.Enchufado ? "Sí" : "No"}</div>
@@ -627,5 +628,5 @@ async function showAgentInfo(agentId) {
 
 // Función para cerrar el modal
 function closeModal(modalId) {
-    document.getElementById(modalId).style.display = "none";
+    document.getElementById(modalId).classList.add("hidden");
 }
