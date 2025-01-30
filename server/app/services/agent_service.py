@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import List, Optional, Dict
 from sqlalchemy.orm import Session
 import json
-
+import socket
 class AgentService:
     def __init__(self, db_session: Session):
         self.db = db_session
@@ -119,54 +119,33 @@ class AgentService:
         return self.db.query(Agent)\
                       .filter(Agent.token == token, Agent.is_active == True)\
                       .first()
-    async def update_agent_info(self, agent: Agent, new_system_info: dict, new_ip: str) -> Agent:
-        """Actualiza la información del agente si hay cambios en cualquier campo."""
-        updated = False
+    async def _update_agent_info(self):
+        """Obtiene la información actualizada del sistema y la envía al servidor si hay cambios."""
+        try:
+            new_system_info = await self.system_info.get_system_info()
 
-        # 🔍 Convertimos valores almacenados en la BD de JSON string a diccionario si es necesario
-        def parse_json(value):
-            if isinstance(value, str):  # Si el valor es string JSON, lo convertimos a diccionario
-                try:
-                    return json.loads(value)
-                except json.JSONDecodeError:
-                    return value  # Si falla, devolvemos el valor original
-            return value
+            # 🔍 Obtener la IP correctamente en cualquier sistema operativo
+            try:
+                new_ip = socket.gethostbyname(socket.gethostname())  # ✅ Método confiable multiplataforma
+            except Exception as e:
+                new_ip = "0.0.0.0"  # En caso de error, se usa una IP por defecto
+                logger.error(f"🚨 Error al obtener la IP: {e}")
 
-        # Campos a verificar individualmente
-        fields_to_check = {
-            "ip_address": new_ip,
-            "cpu_info": parse_json(new_system_info.get("CPU")),
-            "memory_info": parse_json(new_system_info.get("Memoria")),
-            "disk_info": parse_json(new_system_info.get("Discos")),
-            "network_info": parse_json(new_system_info.get("Red")),
-            "gpu_info": parse_json(new_system_info.get("Tarjetas Gráficas")),
-            "battery_info": parse_json(new_system_info.get("Batería")),
-            "disk_usage": parse_json(new_system_info.get("Espacio en Disco")),
-        }
+            update_data = {
+                "agent_token": settings.AGENT_TOKEN,
+                "system_info": new_system_info,
+                "ip_address": new_ip
+            }
 
-        # Comparar cada campo y actualizar si hay diferencias
-        for field, new_value in fields_to_check.items():
-            existing_value = parse_json(getattr(agent, field))  # Convertimos si es necesario
+            logger.debug(f"🆕 Enviando actualización del agente al servidor: {json.dumps(update_data, indent=4)}")
 
-            if existing_value != new_value:  # Si hay diferencia, actualizamos el campo
-                print(f"🔄 Cambio detectado en {field}: {existing_value} → {new_value}")
-                setattr(agent, field, new_value)
-                updated = True
+            async with aiohttp.ClientSession() as session:
+                async with session.put(f"{settings.SERVER_URL}/api/v1/agents/update", json=update_data) as response:
+                    data = await response.json()
+                    if response.status == 200:
+                        logger.info(f"✅ Agente actualizado con éxito en el servidor.")
+                    else:
+                        logger.error(f"❌ Error al actualizar agente: {data}")
 
-        # Verificar si `system_info` cambió completamente
-        existing_system_info = parse_json(agent.system_info)
-        if existing_system_info != new_system_info:
-            print(f"🔄 Cambio detectado en 'system_info', actualizando toda la información.")
-            agent.system_info = new_system_info
-            updated = True
-
-        # 🚀 Si hubo algún cambio, actualizar la base de datos
-        if updated:
-            agent.updated_at = datetime.utcnow()
-            self.db.commit()  # Guardamos cambios en la base de datos
-            self.db.refresh(agent)
-            print(f"✅ Información de {agent.hostname} actualizada correctamente en la base de datos.")
-        else:
-            print(f"⚡ No se detectaron cambios en {agent.hostname}, no se actualiza.")
-
-        return agent
+        except Exception as e:
+            logger.error(f"🚨 Error en la actualización del agente: {e}")
