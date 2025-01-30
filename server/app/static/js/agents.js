@@ -529,94 +529,100 @@ async function showAgentInfo(agentId) {
         const batteryInfo = agent.battery_info || { Porcentaje: "No disponible", Enchufado: false };
         const diskUsage = agent.disk_usage || {};
 
-        // 🖼️ Generar la vista con los datos del agente
+        // 🌟 Diseño con 4 columnas
         content.innerHTML = `
-            <div class="grid grid-cols-2 gap-4">
-                <div class="col-span-2">
+            <div class="grid grid-cols-4 gap-4 p-4 text-sm">
+                
+                <!-- Información General -->
+                <div class="col-span-4 border-b pb-2">
                     <h4 class="text-lg font-bold flex items-center text-blue-600">
                         <i data-lucide="server" class="h-6 w-6 mr-2"></i> Información del Servidor
                     </h4>
                 </div>
-                <div>
-                    <p class="text-gray-600"><strong>🖥️ Hostname:</strong> ${agent.hostname || "N/A"}</p>
-                    <p class="text-gray-600"><strong>📡 IP:</strong> ${agent.ip_address || "N/A"}</p>
-                    <p class="text-gray-600"><strong>💻 Tipo de Dispositivo:</strong> ${agent.device_type || "N/A"}</p>
-                    <p class="text-gray-600"><strong>🔌 Estado:</strong> ${agent.status || "N/A"}</p>
-                </div>
-                <div>
-                    <p class="text-gray-600"><strong>👤 Usuario:</strong> ${agent.username || "N/A"}</p>
-                    <p class="text-gray-600"><strong>🆔 Token:</strong> ${agent.token || "N/A"}</p>
-                </div>
+                <div><p><strong>🖥️ Hostname:</strong> ${agent.hostname || "N/A"}</p></div>
+                <div><p><strong>📡 IP:</strong> ${agent.ip_address || "N/A"}</p></div>
+                <div><p><strong>💻 Tipo:</strong> ${agent.device_type || "N/A"}</p></div>
+                <div><p><strong>🔌 Estado:</strong> ${agent.status || "N/A"}</p></div>
 
                 <!-- CPU -->
-                <div class="col-span-2 border-t pt-2">
+                <div class="col-span-4 border-b pt-4">
                     <h4 class="text-md font-semibold flex items-center text-red-500">
                         <i data-lucide="cpu" class="h-5 w-5 mr-2"></i> Procesador
                     </h4>
-                    <p class="text-gray-600"><strong>⚙ Modelo:</strong> ${cpuInfo.Modelo || "N/A"}</p>
-                    <p class="text-gray-600"><strong>🔄 Frecuencia:</strong> ${cpuInfo["Frecuencia (MHz)"] || "N/A"} MHz</p>
-                    <p class="text-gray-600"><strong>📊 Uso:</strong> ${cpuInfo["Uso actual (%)"] || "N/A"}%</p>
                 </div>
+                <div><p><strong>⚙ Modelo:</strong> ${cpuInfo.Modelo || "N/A"}</p></div>
+                <div><p><strong>🔄 Frecuencia:</strong> ${cpuInfo["Frecuencia (MHz)"] || "N/A"} MHz</p></div>
+                <div><p><strong>📊 Uso:</strong> ${cpuInfo["Uso actual (%)"] || "N/A"}%</p></div>
+                <div></div>
 
                 <!-- Memoria RAM -->
-                <div class="col-span-2 border-t pt-2">
+                <div class="col-span-4 border-b pt-4">
                     <h4 class="text-md font-semibold flex items-center text-purple-500">
                         <i data-lucide="database" class="h-5 w-5 mr-2"></i> Memoria RAM
                     </h4>
-                    <p class="text-gray-600"><strong>💾 Total:</strong> ${memoryInfo["Total RAM (GB)"] || "N/A"} GB</p>
-                    <p class="text-gray-600"><strong>📉 Disponible:</strong> ${memoryInfo["Disponible RAM (GB)"] || "N/A"} GB</p>
-                    <p class="text-gray-600"><strong>📊 Uso:</strong> ${memoryInfo["Uso de RAM (%)"] || "N/A"}%</p>
                 </div>
+                <div><p><strong>💾 Total:</strong> ${memoryInfo["Total RAM (GB)"] || "N/A"} GB</p></div>
+                <div><p><strong>📉 Disponible:</strong> ${memoryInfo["Disponible RAM (GB)"] || "N/A"} GB</p></div>
+                <div><p><strong>📊 Uso:</strong> ${memoryInfo["Uso de RAM (%)"] || "N/A"}%</p></div>
+                <div></div>
 
                 <!-- Discos -->
-                <div class="col-span-2 border-t pt-2">
+                <div class="col-span-4 border-b pt-4">
                     <h4 class="text-md font-semibold flex items-center text-orange-500">
                         <i data-lucide="hard-drive" class="h-5 w-5 mr-2"></i> Discos
                     </h4>
-                    ${diskInfo.length > 0 ? diskInfo.map(disk => `
-                        <p class="text-gray-600"><strong>🖴 ${disk.Dispositivo || "N/A"}:</strong> 
-                        ${disk["Total (GB)"] || "N/A"} GB, Usado: ${disk["Usado (GB)"] || "N/A"} GB</p>
-                    `).join("") : `<p class="text-gray-500">🔹 No se encontraron discos.</p>`}
                 </div>
+                ${
+                    diskInfo.length > 0
+                        ? diskInfo.map(disk => `
+                            <div class="col-span-2"><p><strong>🖴 ${disk.Dispositivo || "N/A"}:</strong></p></div>
+                            <div><p><strong>Total:</strong> ${disk["Total (GB)"] || "N/A"} GB</p></div>
+                            <div><p><strong>Usado:</strong> ${disk["Usado (GB)"] || "N/A"} GB</p></div>
+                        `).join("")
+                        : `<div class="col-span-4 text-gray-500">🔹 No se encontraron discos.</div>`
+                }
 
                 <!-- Red -->
-                <div class="col-span-2 border-t pt-2">
+                <div class="col-span-4 border-b pt-4">
                     <h4 class="text-md font-semibold flex items-center text-blue-500">
                         <i data-lucide="wifi" class="h-5 w-5 mr-2"></i> Conexión de Red
                     </h4>
-                    ${Object.keys(networkInfo).length > 0 ? 
-                        Object.entries(networkInfo).map(([interface, addresses]) => `
-                            <p class="text-gray-600"><strong>🌐 ${interface}:</strong></p>
-                            ${addresses.map(addr => `<p class="text-gray-600 pl-4">🔹 ${addr.Tipo || "N/A"}: ${addr.Dirección || "N/A"}</p>`).join("")}
-                        `).join("") : `<p class="text-gray-500">🔹 No se encontraron conexiones de red.</p>`}
                 </div>
+                ${
+                    Object.keys(networkInfo).length > 0
+                        ? Object.entries(networkInfo).map(([interface, addresses]) => `
+                            <div class="col-span-4"><p><strong>🌐 ${interface}:</strong></p></div>
+                            ${addresses.map(addr => `<div class="col-span-4 pl-4">🔹 ${addr.Tipo || "N/A"}: ${addr.Dirección || "N/A"}</div>`).join("")}
+                        `).join("")
+                        : `<div class="col-span-4 text-gray-500">🔹 No se encontraron conexiones de red.</div>`
+                }
 
                 <!-- GPU -->
-                <div class="col-span-2 border-t pt-2">
+                <div class="col-span-4 border-b pt-4">
                     <h4 class="text-md font-semibold flex items-center text-green-500">
                         <i data-lucide="monitor" class="h-5 w-5 mr-2"></i> Tarjeta Gráfica
                     </h4>
-                    <p class="text-gray-600"><strong>🖥️ GPU:</strong> ${gpuInfo.Nombre || "N/A"}</p>
                 </div>
+                <div class="col-span-4"><p><strong>🖥️ GPU:</strong> ${gpuInfo.Nombre || "N/A"}</p></div>
 
                 <!-- Batería -->
-                <div class="col-span-2 border-t pt-2">
+                <div class="col-span-4 border-b pt-4">
                     <h4 class="text-md font-semibold flex items-center text-yellow-500">
                         <i data-lucide="battery-charging" class="h-5 w-5 mr-2"></i> Estado de la Batería
                     </h4>
-                    <p class="text-gray-600"><strong>🔋 Carga:</strong> ${batteryInfo.Porcentaje || "N/A"}%</p>
-                    <p class="text-gray-600"><strong>🔌 Enchufado:</strong> ${batteryInfo.Enchufado ? "Sí" : "No"}</p>
                 </div>
+                <div><p><strong>🔋 Carga:</strong> ${batteryInfo.Porcentaje || "N/A"}%</p></div>
+                <div><p><strong>🔌 Enchufado:</strong> ${batteryInfo.Enchufado ? "Sí" : "No"}</p></div>
 
                 <!-- Espacio en Disco -->
-                <div class="col-span-2 border-t pt-2">
+                <div class="col-span-4 border-b pt-4">
                     <h4 class="text-md font-semibold flex items-center text-gray-600">
                         <i data-lucide="database" class="h-5 w-5 mr-2"></i> Espacio en Disco
                     </h4>
-                    <p class="text-gray-600"><strong>📁 Total:</strong> ${diskUsage["Total (GB)"] || "N/A"} GB</p>
-                    <p class="text-gray-600"><strong>📂 Usado:</strong> ${diskUsage["Usado (GB)"] || "N/A"} GB</p>
-                    <p class="text-gray-600"><strong>📦 Libre:</strong> ${diskUsage["Libre (GB)"] || "N/A"} GB</p>
                 </div>
+                <div><p><strong>📁 Total:</strong> ${diskUsage["Total (GB)"] || "N/A"} GB</p></div>
+                <div><p><strong>📂 Usado:</strong> ${diskUsage["Usado (GB)"] || "N/A"} GB</p></div>
+                <div><p><strong>📦 Libre:</strong> ${diskUsage["Libre (GB)"] || "N/A"} GB</p></div>
             </div>
         `;
 
@@ -625,6 +631,5 @@ async function showAgentInfo(agentId) {
         content.innerHTML = `<p class="text-red-500">⚠ Error al cargar la información del agente.</p>`;
     }
 
-    // 🔥 Mostrar el modal
     modal.classList.remove("hidden");
 }
