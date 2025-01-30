@@ -36,43 +36,30 @@ class AgentService:
                 await asyncio.sleep(self.reconnect_interval)
     
     async def _register(self):
-        """Registra el agente con el servidor."""
+        """Registra el agente con el servidor o lo actualiza si ya existe."""
         registration_data = {
-            'client_token': settings.CLIENT_TOKEN,
-            'system_info': await self.system_info.get_system_info()  # ✅ Obtener info completa
+            "client_token": settings.CLIENT_TOKEN,
+            "system_info": await self.system_info.get_system_info()
         }
 
-        logger.debug(f"Registration data to send: {json.dumps(registration_data, indent=4)}")
+        logger.debug(f"🔄 Enviando datos de registro: {json.dumps(registration_data, indent=4)}")
 
-        
         try:
-            ws_url = f"{settings.SERVER_URL}/api/v1/ws/register"
-            logger.debug(f"Connecting to registration endpoint: {ws_url}")
-            
-            async with websockets.connect(ws_url) as ws:
-                # Enviar los datos de registro
-                await ws.send(json.dumps(registration_data))
-                logger.info("Registration data sent successfully.")
-
-                # Esperar la respuesta
-                response = await ws.recv()
-                logger.debug(f"Response received: {response}")
-                data = json.loads(response)
-                
-                if data.get('status') == 'success':
-                    self._save_agent_token(data['agent_token'])
-                    logger.info("Registration successful, connecting as agent...")
-                    await self._connect()
-                else:
-                    logger.error(f"Registration failed: {data.get('message', 'Unknown error')}")
-                    raise Exception("Registration failed")
+            async with aiohttp.ClientSession() as session:
+                async with session.post(f"{settings.SERVER_URL}/api/v1/agents/register", json=registration_data) as response:
+                    data = await response.json()
                     
-        except websockets.exceptions.ConnectionClosed as e:
-            logger.error(f"WebSocket connection closed during registration: {e}")
-            raise
+                    if response.status == 200 and data.get("status") == "success":
+                        agent_token = data.get("agent_token")
+                        self._save_agent_token(agent_token)  # Guardamos el token
+                        logger.info("✅ Registro exitoso, conectando...")
+                        await self._connect()
+                    else:
+                        logger.error(f"❌ Registro fallido: {data.get('message', 'Unknown error')}")
+
         except Exception as e:
-            logger.error(f"Error during registration: {e}")
-            raise
+            logger.error(f"🚨 Error en el registro: {e}")
+
     
     def _save_agent_token(self, token: str):
         """Guarda el token del agente en el archivo .env y en la configuración."""
@@ -86,23 +73,27 @@ class AgentService:
             raise
     
     async def _connect(self):
-        """Conecta el agente al servidor usando el token existente."""
+        """Conecta el agente al servidor usando el token existente y mantiene la conexión."""
         while True:
             try:
                 ws_url = f"{settings.SERVER_URL}/api/v1/ws/agent/{settings.AGENT_TOKEN}"
-                logger.debug(f"Connecting to agent endpoint: {ws_url}")
-                
+                logger.debug(f"🔗 Conectando al servidor WebSocket: {ws_url}")
+
                 async with websockets.connect(ws_url) as ws:
-                    logger.info("Connected to server successfully")
-                    await self._handle_connection(ws)
-                    
+                    logger.info("✅ Conectado al servidor WebSocket correctamente.")
+
+                    # Actualizar la información cada cierto tiempo (ej. cada 5 minutos)
+                    while True:
+                        await self._update_agent_info()
+                        await asyncio.sleep(300)  # 5 minutos entre actualizaciones
+
             except websockets.exceptions.ConnectionClosed as e:
-                logger.error(f"WebSocket connection closed: {e}")
+                logger.error(f"🚨 Conexión WebSocket cerrada: {e}")
                 await asyncio.sleep(self.reconnect_interval)
             except Exception as e:
-                logger.error(f"Connection error: {e}")
+                logger.error(f"🚨 Error en la conexión WebSocket: {e}")
                 await asyncio.sleep(self.reconnect_interval)
-    
+
     async def _handle_connection(self, websocket):
         """Maneja la conexión WebSocket activa."""
         try:
@@ -234,3 +225,28 @@ class AgentService:
         except Exception as e:
             logger.error(f"Error during printer installation: {e}")
             await self._send_error_response(websocket, f"Error en instalación: {e}")
+
+    async def _update_agent_info(self):
+        """Obtiene la información actualizada del sistema y la envía al servidor si hay cambios."""
+        try:
+            new_system_info = await self.system_info.get_system_info()
+            new_ip = os.popen("hostname -I").read().strip().split()[0]  # Obtener IP actual de manera confiable
+
+            update_data = {
+                "agent_token": settings.AGENT_TOKEN,
+                "system_info": new_system_info,
+                "ip_address": new_ip
+            }
+
+            logger.debug(f"🆕 Enviando actualización del agente al servidor: {json.dumps(update_data, indent=4)}")
+
+            async with aiohttp.ClientSession() as session:
+                async with session.put(f"{settings.SERVER_URL}/api/v1/agents/update", json=update_data) as response:
+                    data = await response.json()
+                    if response.status == 200:
+                        logger.info(f"✅ Agente actualizado con éxito en el servidor.")
+                    else:
+                        logger.error(f"❌ Error al actualizar agente: {data}")
+
+        except Exception as e:
+            logger.error(f"🚨 Error en la actualización del agente: {e}")
