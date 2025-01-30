@@ -56,21 +56,22 @@
                                 <i data-lucide="printer" class="h-5 w-5 stroke-[2]"></i>
                             </button>
                             
-                            <!-- Botón Ver Info -->
+                            <!-- Botón Ver Info (Verde Oscuro) -->
                             <button onclick="showAgentInfo({{ agent.id }})"
-                            class="inline-flex items-center justify-center w-10 h-10 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition-all shadow-sm hover:shadow-md"
+                            class="inline-flex items-center justify-center w-10 h-10 bg-green-800 text-white rounded-lg hover:bg-green-900 transition-all shadow-sm hover:shadow-md"
                             title="Ver Info Completa">
-                            <i data-lucide="eye" class="h-5 w-5 stroke-[2]"></i>
+                            <i data-lucide="eye" class="h-6 w-6 stroke-[2]"></i>
                             </button>
 
-                            <!-- Botón SSH -->
+                            <!-- Botón SSH (Negro) -->
                             <button onclick="toggleSSH('{{ agent.token }}')" 
                             {% if agent.status != 'online' %}disabled{% endif %}
-                            class="inline-flex items-center justify-center w-10 h-10 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-md"
+                            class="inline-flex items-center justify-center w-10 h-10 bg-gray-900 text-white rounded-lg hover:bg-black transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-md"
                             title="{% if agent.ssh_status == 'open' %}Cerrar SSH{% else %}Abrir SSH{% endif %}">
                             <i data-lucide="{% if agent.ssh_status == 'open' %}unlock{% else %}lock{% endif %}" 
-                            class="h-5 w-5 stroke-[2]"></i>
+                            class="h-6 w-6 stroke-[2]"></i>
                             </button>
+
 
                     
                             <!-- Botón Eliminar -->
