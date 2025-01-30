@@ -726,3 +726,30 @@ async function showAgentInfo(agentId) {
 function closeModal(modalId) {
     document.getElementById(modalId).classList.add("hidden");
 }
+
+
+async function deleteAgent(agentId) {
+    if (!confirm("¿Estás seguro de que deseas eliminar este agente?")) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`/api/v1/agents/${agentId}`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (response.ok) {
+            alert("Agente eliminado correctamente.");
+            location.reload(); // Recargar la página para actualizar la lista
+        } else {
+            const errorData = await response.json();
+            alert(`Error: ${errorData.detail}`);
+        }
+    } catch (error) {
+        console.error("Error eliminando el agente:", error);
+        alert("Ocurrió un error al intentar eliminar el agente.");
+    }
+}
