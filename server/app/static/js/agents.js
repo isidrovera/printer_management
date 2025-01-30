@@ -22,86 +22,114 @@ document.addEventListener('DOMContentLoaded', function () {
 // Inicializar WebSocket
 function initializeWebSocket() {
     try {
+        console.group('Inicialización WebSocket');
         console.log('Intentando conectar WebSocket a:', WS_CONFIG.url);
-        const ws = new WebSocket(WS_CONFIG.url);
-        let reconnectAttempts = 0;
+        
+        wsConnection = new WebSocket(WS_CONFIG.url);
 
-        ws.onopen = () => {
-            console.log('WebSocket conectado exitosamente');
-            reconnectAttempts = 0; // Reiniciar contador de intentos al conectar exitosamente
+        wsConnection.onopen = () => {
+            console.log('✅ WebSocket conectado exitosamente');
+            reconnectAttempts = 0;
             showNotification('Conexión establecida con el servidor', 'success');
         };
 
-        ws.onmessage = (event) => {
+        wsConnection.onmessage = (event) => {
+            console.group('Mensaje WebSocket Recibido');
+            console.log('Mensaje raw:', event.data);
+
             try {
-                // Verificar si event.data es una cadena válida
-                if (typeof event.data !== 'string') {
-                    throw new Error('Datos recibidos en formato no válido');
+                // Verificar si es un mensaje de log del agente
+                if (typeof event.data === 'string' && event.data.startsWith('Agent')) {
+                    console.log('📝 Mensaje de log del agente:', event.data);
+                    handleAgentLogMessage(event.data);
+                    console.groupEnd();
+                    return;
                 }
 
-                // Intentar parsear el JSON con manejo de errores más detallado
+                // Intentar parsear como JSON
                 let data;
                 try {
                     data = JSON.parse(event.data);
+                    console.log('✅ JSON parseado correctamente:', data);
                 } catch (parseError) {
-                    console.error('Error al parsear JSON:', {
+                    console.warn('⚠️ No se pudo parsear como JSON:', {
                         error: parseError,
-                        rawData: event.data.slice(0, 100) + '...' // Mostrar los primeros 100 caracteres
+                        rawData: event.data.slice(0, 100) + (event.data.length > 100 ? '...' : '')
                     });
-                    throw parseError;
+                    console.groupEnd();
+                    return;
                 }
 
-                // Procesar los diferentes tipos de mensajes
-                switch (data.type) {
-                    case 'agent_status':
-                        updateAgentStatus(data);
-                        break;
-                    case 'printer_status':
-                        updatePrinterStatus(data);
-                        break;
-                    case 'error':
-                        handleErrorMessage(data);
-                        break;
-                    default:
-                        console.log('Mensaje recibido sin tipo específico:', data);
+                // Procesar mensaje JSON según su tipo
+                if (data && data.type) {
+                    console.log(`🔄 Procesando mensaje de tipo: ${data.type}`);
+                    processJsonMessage(data);
+                } else {
+                    console.log('ℹ️ Mensaje JSON sin tipo específico:', data);
                 }
 
             } catch (error) {
-                console.error('Error al procesar mensaje:', {
+                console.error('❌ Error procesando mensaje:', {
                     errorType: error.name,
                     errorMessage: error.message,
                     stack: error.stack
                 });
-                showNotification('Error al procesar mensaje del servidor', 'error');
             }
+            console.groupEnd();
         };
 
-        ws.onclose = (event) => {
-            console.warn('WebSocket cerrado. Código:', event.code);
-            showNotification('Conexión perdida con el servidor', 'warning');
-
-            // Intentar reconectar si no excedimos el límite de intentos
-            if (reconnectAttempts < WS_CONFIG.maxReconnectAttempts) {
-                reconnectAttempts++;
-                console.log(`Intento de reconexión ${reconnectAttempts} de ${WS_CONFIG.maxReconnectAttempts}`);
-                setTimeout(() => {
-                    initializeWebSocket();
-                }, WS_CONFIG.reconnectInterval);
-            } else {
-                showNotification('No se pudo restablecer la conexión con el servidor', 'error');
-            }
+        wsConnection.onclose = (event) => {
+            console.warn('⚠️ WebSocket cerrado. Código:', event.code);
+            handleWebSocketClose(event);
         };
 
-        ws.onerror = (error) => {
-            console.error('Error en WebSocket:', error);
+        wsConnection.onerror = (error) => {
+            console.error('❌ Error en WebSocket:', error);
             showNotification('Error en la conexión con el servidor', 'error');
         };
 
-        return ws;
+        console.groupEnd();
+        return wsConnection;
 
     } catch (error) {
-        console.error('Error al crear conexión WebSocket:', error);
+        console.error('❌ Error al crear conexión WebSocket:', error);
         showNotification('Error al crear la conexión con el servidor', 'error');
+        console.groupEnd();
+    }
+}
+
+
+// Procesar diferentes tipos de mensajes JSON
+function processJsonMessage(data) {
+    switch (data.type) {
+        case 'agent_status':
+            updateAgentStatus(data);
+            break;
+        case 'printer_status':
+            updatePrinterStatus(data);
+            break;
+        case 'error':
+            handleErrorMessage(data);
+            break;
+        default:
+            console.log('📌 Mensaje recibido sin tipo específico:', data);
+    }
+}
+
+// Manejar mensajes de log del agente
+function handleAgentLogMessage(message) {
+    // Aquí puedes implementar la lógica para mostrar los logs del agente
+    // Por ejemplo, añadirlos a un elemento en la UI
+    const logContainer = document.getElementById('agent-logs');
+    if (logContainer) {
+        const logEntry = document.createElement('div');
+        logEntry.textContent = message;
+        logEntry.className = 'log-entry';
+        logContainer.appendChild(logEntry);
+        // Mantener solo los últimos N logs
+        while (logContainer.children.length > 100) {
+            logContainer.removeChild(logContainer.firstChild);
+        }
     }
 }
 
@@ -109,42 +137,71 @@ function initializeWebSocket() {
 // Funciones auxiliares para manejar diferentes tipos de mensajes
 function updateAgentStatus(data) {
     try {
-        // Actualizar el estado del agente en la interfaz
+        console.group('Actualización Estado Agente');
+        console.log('Datos recibidos:', data);
+
         const agentElement = document.querySelector(`[data-agent-id="${data.agent_id}"]`);
         if (agentElement) {
-            // Actualizar el estado visual del agente
             const statusElement = agentElement.querySelector('.agent-status');
             if (statusElement) {
                 statusElement.className = `agent-status status-${data.status}`;
                 statusElement.textContent = data.status;
+                console.log('✅ Estado del agente actualizado');
             }
+        } else {
+            console.warn('⚠️ Elemento del agente no encontrado');
         }
+        console.groupEnd();
     } catch (error) {
-        console.error('Error al actualizar estado del agente:', error);
+        console.error('❌ Error al actualizar estado del agente:', error);
+        console.groupEnd();
+    }
+}
+
+// Manejar cierre de WebSocket
+function handleWebSocketClose(event) {
+    showNotification('Conexión perdida con el servidor', 'warning');
+
+    if (reconnectAttempts < WS_CONFIG.maxReconnectAttempts) {
+        reconnectAttempts++;
+        console.log(`🔄 Intento de reconexión ${reconnectAttempts} de ${WS_CONFIG.maxReconnectAttempts}`);
+        setTimeout(initializeWebSocket, WS_CONFIG.reconnectInterval);
+    } else {
+        console.error('❌ Máximo número de intentos de reconexión alcanzado');
+        showNotification('No se pudo restablecer la conexión con el servidor', 'error');
     }
 }
 
 function updatePrinterStatus(data) {
     try {
-        // Actualizar el estado de la impresora en la interfaz
+        console.group('Actualización Estado Impresora');
+        console.log('Datos recibidos:', data);
+
         const printerElement = document.querySelector(`[data-printer-id="${data.printer_id}"]`);
         if (printerElement) {
-            // Actualizar el estado visual de la impresora
             const statusElement = printerElement.querySelector('.printer-status');
             if (statusElement) {
                 statusElement.className = `printer-status status-${data.status}`;
                 statusElement.textContent = data.status;
+                console.log('✅ Estado de la impresora actualizado');
             }
+        } else {
+            console.warn('⚠️ Elemento de la impresora no encontrado');
         }
+        console.groupEnd();
     } catch (error) {
-        console.error('Error al actualizar estado de la impresora:', error);
+        console.error('❌ Error al actualizar estado de la impresora:', error);
+        console.groupEnd();
     }
 }
 
+// Manejar mensajes de error
 function handleErrorMessage(data) {
-    console.error('Error recibido del servidor:', data.error);
+    console.error('❌ Error recibido del servidor:', data.error);
     showNotification(data.error.message || 'Error del servidor', 'error');
 }
+
+
 
 // Función para inicializar el filtro de búsqueda
 function initializeSearchFilter() {
