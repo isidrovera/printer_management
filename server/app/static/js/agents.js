@@ -503,3 +503,78 @@ function showNotification(message, type = 'info') {
         }, 5000);
     }
 }
+
+
+async function showAgentInfo(agentId) {
+    const modal = document.getElementById("agentInfoModal");
+    const content = document.getElementById("agentInfoContent");
+
+    // 🏷️ Mostrar mensaje de carga
+    content.innerHTML = `<p class="text-center text-gray-500">Cargando información...</p>`;
+
+    try {
+        // 🔄 Obtener los datos del agente desde el servidor
+        const response = await fetch(`/api/v1/agents/${agentId}`);
+        const agent = await response.json();
+
+        // 🖼️ Generar la vista con los datos del agente
+        content.innerHTML = `
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <h4 class="text-md font-semibold flex items-center">
+                        <i data-lucide="server" class="h-5 w-5 mr-2 text-blue-500"></i> Servidor
+                    </h4>
+                    <p class="text-gray-600"><strong>Hostname:</strong> ${agent.hostname}</p>
+                    <p class="text-gray-600"><strong>IP:</strong> ${agent.ip_address}</p>
+                    <p class="text-gray-600"><strong>Tipo:</strong> ${agent.device_type}</p>
+                </div>
+                <div>
+                    <h4 class="text-md font-semibold flex items-center">
+                        <i data-lucide="user" class="h-5 w-5 mr-2 text-green-500"></i> Usuario
+                    </h4>
+                    <p class="text-gray-600"><strong>Nombre:</strong> ${agent.username}</p>
+                    <p class="text-gray-600"><strong>Status:</strong> ${agent.status}</p>
+                </div>
+                <div class="col-span-2 border-t pt-2">
+                    <h4 class="text-md font-semibold flex items-center">
+                        <i data-lucide="cpu" class="h-5 w-5 mr-2 text-red-500"></i> CPU
+                    </h4>
+                    <p class="text-gray-600"><strong>Modelo:</strong> ${agent.system_info.CPU.Modelo}</p>
+                    <p class="text-gray-600"><strong>Frecuencia:</strong> ${agent.system_info.CPU["Frecuencia (MHz)"]} MHz</p>
+                    <p class="text-gray-600"><strong>Uso:</strong> ${agent.system_info.CPU["Uso actual (%)"]}%</p>
+                </div>
+                <div class="col-span-2 border-t pt-2">
+                    <h4 class="text-md font-semibold flex items-center">
+                        <i data-lucide="database" class="h-5 w-5 mr-2 text-purple-500"></i> Memoria RAM
+                    </h4>
+                    <p class="text-gray-600"><strong>Total:</strong> ${agent.system_info.Memoria["Total RAM (GB)"]} GB</p>
+                    <p class="text-gray-600"><strong>Disponible:</strong> ${agent.system_info.Memoria["Disponible RAM (GB)"]} GB</p>
+                    <p class="text-gray-600"><strong>Uso:</strong> ${agent.system_info.Memoria["Uso de RAM (%)"]}%</p>
+                </div>
+                <div class="col-span-2 border-t pt-2">
+                    <h4 class="text-md font-semibold flex items-center">
+                        <i data-lucide="hard-drive" class="h-5 w-5 mr-2 text-orange-500"></i> Discos
+                    </h4>
+                    ${agent.system_info.Discos.map(disk => `
+                        <p class="text-gray-600"><strong>${disk.Dispositivo}:</strong> ${disk["Total (GB)"]} GB, Usado: ${disk["Usado (GB)"]} GB</p>
+                    `).join("")}
+                </div>
+                <div class="col-span-2 border-t pt-2">
+                    <h4 class="text-md font-semibold flex items-center">
+                        <i data-lucide="wifi" class="h-5 w-5 mr-2 text-blue-500"></i> Red
+                    </h4>
+                    ${Object.entries(agent.system_info.Red).map(([interface, addresses]) => `
+                        <p class="text-gray-600"><strong>${interface}:</strong></p>
+                        ${addresses.map(addr => `<p class="text-gray-600 pl-4">- ${addr.Tipo}: ${addr.Dirección}</p>`).join("")}
+                    `).join("")}
+                </div>
+            </div>
+        `;
+    } catch (error) {
+        console.error("Error obteniendo los datos del agente:", error);
+        content.innerHTML = `<p class="text-red-500">Error al cargar la información del agente.</p>`;
+    }
+
+    // 🔥 Mostrar el modal
+    modal.classList.remove("hidden");
+}

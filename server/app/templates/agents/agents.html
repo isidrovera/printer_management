@@ -75,6 +75,32 @@
 </div>
 
 <!-- Modal Instalar Impresora -->
+ <!-- Modal Ver Info Completa -->
+<div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden z-50" id="agentInfoModal">
+    <div class="bg-white rounded-lg shadow-lg max-w-2xl w-full mx-4 p-6">
+        <div class="flex justify-between items-center border-b pb-3">
+            <h3 class="text-lg font-semibold text-gray-800">Información Completa del Agente</h3>
+            <button onclick="closeModal('agentInfoModal')" class="text-gray-500 hover:text-gray-800">
+                <i data-lucide="x" class="h-6 w-6"></i>
+            </button>
+        </div>
+        
+        <!-- Contenido del Modal -->
+        <div class="mt-4 space-y-4" id="agentInfoContent">
+            <p class="text-center text-gray-500">Cargando información...</p>
+        </div>
+
+        <!-- Botón Cerrar -->
+        <div class="mt-6 flex justify-end">
+            <button type="button" 
+                    onclick="closeModal('agentInfoModal')"
+                    class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+                Cerrar
+            </button>
+        </div>
+    </div>
+</div>
+
 <!-- Modal Instalar Impresora -->
 <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden z-50" id="installPrinterModal">
     <div class="bg-white rounded-lg shadow-lg max-w-md w-full mx-4">
