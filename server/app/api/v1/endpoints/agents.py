@@ -77,24 +77,3 @@ async def get_agent(agent_id: int, db: Session = Depends(get_db)):
     
     return agent
 
-@router.post("/register", response_model=Agent)
-async def register_agent(data: AgentCreate, db: Session = Depends(get_db)):
-    """
-    Registra un nuevo agente en la base de datos.
-    """
-    agent_service = AgentService(db)
-    
-    try:
-        agent = await agent_service.register_agent(
-            client_token=data.client_token,
-            hostname=data.hostname,
-            username=data.username,
-            ip_address=data.ip_address,
-            device_type=data.device_type,
-            system_info=data.system_info
-        )
-        return agent
-    except HTTPException as e:
-        raise e
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))

@@ -7,6 +7,8 @@ import tempfile
 import json
 import base64
 import tempfile
+import platform
+import socket
 import aiohttp
 import os
 from ..core.config import settings
@@ -37,9 +39,34 @@ class AgentService:
     
     async def _register(self):
         """Registra el agente con el servidor o lo actualiza si ya existe."""
+        system_info = await self.system_info.get_system_info()
+        
+        # Obtener la IP de la interfaz Ethernet o WiFi que tenga una IP válida
+        ip_address = "0.0.0.0"
+        network_info = system_info.get("Red", {})
+        
+        # Primero intentar con Ethernet
+        ethernet = network_info.get("Ethernet", [])
+        for interface in ethernet:
+            if interface.get("Tipo") == "IPv4" and not interface.get("Dirección", "").startswith("169.254"):
+                ip_address = interface.get("Dirección")
+                break
+        
+        # Si no hay IP válida en Ethernet, intentar con WiFi
+        if ip_address == "0.0.0.0":
+            wifi = network_info.get("Wi-Fi", [])
+            for interface in wifi:
+                if interface.get("Tipo") == "IPv4" and not interface.get("Dirección", "").startswith("169.254"):
+                    ip_address = interface.get("Dirección")
+                    break
+
         registration_data = {
             "client_token": settings.CLIENT_TOKEN,
-            "system_info": await self.system_info.get_system_info()
+            "hostname": platform.node(),
+            "username": platform.uname().node,
+            "ip_address": ip_address,
+            "device_type": system_info["Sistema"]["Nombre del SO"],
+            "system_info": system_info
         }
 
         logger.debug(f"🔄 Enviando datos de registro: {json.dumps(registration_data, indent=4)}")
@@ -47,20 +74,33 @@ class AgentService:
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.post(f"{settings.SERVER_URL}/api/v1/agents/register", json=registration_data) as response:
-                    data = await response.json()
+                    response_text = await response.text()
+                    logger.debug(f"Respuesta del servidor: {response.status} - {response_text}")
                     
-                    if response.status == 200 and data.get("status") == "success":
-                        agent_token = data.get("agent_token")
-                        self._save_agent_token(agent_token)  # Guardamos el token
-                        logger.info("✅ Registro exitoso, conectando...")
-                        await self._connect()
+                    try:
+                        data = json.loads(response_text)
+                    except json.JSONDecodeError:
+                        logger.error(f"Respuesta no es JSON válido: {response_text}")
+                        return
+                    
+                    if response.status == 422:
+                        logger.error(f"Error de validación: {data}")
+                        return
+                    
+                    if response.status == 200:
+                        if data.get("token"):  # Asumiendo que el servidor devuelve el token en esta clave
+                            self._save_agent_token(data["token"])
+                            logger.info("✅ Registro exitoso, conectando...")
+                            await self._connect()
+                        else:
+                            logger.error(f"❌ Registro exitoso pero no se recibió token: {data}")
                     else:
-                        logger.error(f"❌ Registro fallido: {data.get('message', 'Unknown error')}")
+                        logger.error(f"❌ Registro fallido: {data}")
 
         except Exception as e:
-            logger.error(f"🚨 Error en el registro: {e}")
-
-    
+            logger.error(f"🚨 Error en el registro: {str(e)}")
+            if hasattr(e, '__cause__'):
+                logger.error(f"Causa: {str(e.__cause__)}")
     def _save_agent_token(self, token: str):
         """Guarda el token del agente en el archivo .env y en la configuración."""
         try:
@@ -79,13 +119,15 @@ class AgentService:
                 ws_url = f"{settings.SERVER_URL}/api/v1/ws/agent/{settings.AGENT_TOKEN}"
                 logger.debug(f"🔗 Conectando al servidor WebSocket: {ws_url}")
 
-                async with websockets.connect(ws_url) as ws:
+                async with websockets.connect(ws_url) as websocket:
                     logger.info("✅ Conectado al servidor WebSocket correctamente.")
-
-                    # Actualizar la información cada cierto tiempo (ej. cada 5 minutos)
-                    while True:
-                        await self._update_agent_info()
-                        await asyncio.sleep(300)  # 5 minutos entre actualizaciones
+                    
+                    # Manejar la conexión y las actualizaciones en tareas separadas
+                    connection_task = asyncio.create_task(self._handle_connection(websocket))
+                    update_task = asyncio.create_task(self._periodic_updates(websocket))
+                    
+                    # Esperar a que cualquiera de las tareas termine
+                    await asyncio.gather(connection_task, update_task, return_exceptions=True)
 
             except websockets.exceptions.ConnectionClosed as e:
                 logger.error(f"🚨 Conexión WebSocket cerrada: {e}")
@@ -94,43 +136,66 @@ class AgentService:
                 logger.error(f"🚨 Error en la conexión WebSocket: {e}")
                 await asyncio.sleep(self.reconnect_interval)
 
+    async def _periodic_updates(self, websocket):
+        """Maneja las actualizaciones periódicas mientras la conexión está activa."""
+        try:
+            while True:
+                await self._update_agent_info()
+                await asyncio.sleep(300)  # 5 minutos entre actualizaciones
+        except Exception as e:
+            logger.error(f"Error en actualizaciones periódicas: {e}")
+            raise
     async def _handle_connection(self, websocket):
         """Maneja la conexión WebSocket activa."""
         try:
             while True:
                 message = await websocket.recv()
-                logger.debug(f"Message received from server: {message}")
+                logger.debug(f"Mensaje recibido del servidor: {message}")
                 
                 try:
                     data = json.loads(message)
+                    logger.debug(f"Mensaje decodificado: {json.dumps(data, indent=2)}")
+                    await self._process_message(data, websocket)
                 except json.JSONDecodeError:
-                    logger.error(f"Invalid JSON received: {message}")
+                    logger.error(f"JSON inválido recibido: {message}")
+                    continue
+                except Exception as e:
+                    logger.error(f"Error procesando mensaje: {str(e)}")
                     continue
 
-                await self._process_message(data, websocket)
-                
         except websockets.exceptions.ConnectionClosed:
-            logger.info("Connection closed by server")
+            logger.info("Conexión cerrada por el servidor")
             raise
         except Exception as e:
-            logger.error(f"Error in connection handler: {e}")
+            logger.error(f"Error en el manejador de conexión: {str(e)}")
             raise
 
     async def _process_message(self, data, websocket):
         """Procesa los mensajes recibidos del servidor."""
         try:
             message_type = data.get('type')
+            logger.debug(f"Procesando mensaje tipo: {message_type}")
             
             if message_type == 'install_printer':
                 await self._handle_printer_installation(data, websocket)
             elif message_type == 'heartbeat':
                 await self._handle_heartbeat(websocket)
             else:
-                logger.warning(f"Unknown message type received: {message_type}")
+                logger.warning(f"Tipo de mensaje desconocido: {message_type}")
                 
         except Exception as e:
-            logger.error(f"Error processing message: {e}")
+            logger.error(f"Error procesando mensaje: {e}")
             await self._send_error_response(websocket, str(e))
+
+    async def _send_error_response(self, websocket, error_message: str):
+        """Envía una respuesta de error al servidor."""
+        try:
+            await websocket.send(json.dumps({
+                'type': 'error',
+                'message': error_message
+            }))
+        except Exception as e:
+            logger.error(f"Error enviando respuesta de error: {e}")
     
     async def _handle_heartbeat(self, websocket):
         """Maneja los mensajes de heartbeat."""
