@@ -474,10 +474,8 @@ function closeModal(modalId) {
 function showNotification(message, type = 'info') {
     console.log(`[${type.toUpperCase()}] ${message}`);
     
-    // Implementación de notificación visual
     const notificationContainer = document.getElementById('notification-container');
     if (notificationContainer) {
-        // Crear elemento de notificación
         const notification = document.createElement('div');
         notification.classList.add('notification', `notification-${type}`);
         notification.innerHTML = `
@@ -486,7 +484,6 @@ function showNotification(message, type = 'info') {
             <button class="close-notification">&times;</button>
         `;
 
-        // Añadir evento de cierre
         const closeButton = notification.querySelector('.close-notification');
         closeButton.addEventListener('click', () => {
             notification.remove();
@@ -494,7 +491,6 @@ function showNotification(message, type = 'info') {
 
         notificationContainer.appendChild(notification);
 
-        // Eliminar la notificación después de unos segundos
         setTimeout(() => {
             notification.classList.add('fade-out');
             setTimeout(() => {
@@ -504,225 +500,93 @@ function showNotification(message, type = 'info') {
     }
 }
 
-
-async function showAgentInfo(agentId) {
-    const modal = document.getElementById("agentInfoModal");
-    const content = document.getElementById("agentInfoContent");
-
-    // Mostrar el modal
-    modal.classList.remove("hidden");
-    
-    // Mostrar mensaje de carga
-    content.innerHTML = `
-        <div class="flex justify-center items-center py-8">
-            <p class="text-gray-500 text-lg">Cargando información...</p>
-        </div>
-    `;
-
-    try {
-        const response = await fetch(`/api/v1/agents/${agentId}`);
-        if (!response.ok) {
-            throw new Error(`Error en la solicitud: ${response.status}`);
-        }
-        const agent = await response.json();
-
-        // Verificar datos
-        const cpuInfo = agent.cpu_info || {};
-        const memoryInfo = agent.memory_info || {};
-        const diskInfo = agent.disk_info || [];
-        const networkInfo = agent.network_info || {};
-        const gpuInfo = agent.gpu_info || { Nombre: "No disponible" };
-        const batteryInfo = agent.battery_info || { Porcentaje: "No disponible", Enchufado: false };
-
-        // Renderizar el contenido
-        content.innerHTML = `
-            <div class="grid grid-cols-1 md:grid-cols-8 gap-6">
-                <!-- Información General -->
-                <div class="col-span-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 bg-gray-50 p-4 rounded-lg">
-                    <div class="flex items-center space-x-2">
-                        <i data-lucide="computer" class="h-5 w-5 text-blue-500"></i>
-                        <div>
-                            <div class="text-sm font-medium text-gray-500">Hostname</div>
-                            <div class="text-gray-900">${agent.hostname || "N/A"}</div>
-                        </div>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <i data-lucide="network" class="h-5 w-5 text-green-500"></i>
-                        <div>
-                            <div class="text-sm font-medium text-gray-500">IP</div>
-                            <div class="text-gray-900">${agent.ip_address || "N/A"}</div>
-                        </div>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <i data-lucide="monitor" class="h-5 w-5 text-purple-500"></i>
-                        <div>
-                            <div class="text-sm font-medium text-gray-500">Tipo</div>
-                            <div class="text-gray-900">${agent.device_type || "N/A"}</div>
-                        </div>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <i data-lucide="activity" class="h-5 w-5 text-red-500"></i>
-                        <div>
-                            <div class="text-sm font-medium text-gray-500">Estado</div>
-                            <div class="text-gray-900">${agent.status || "N/A"}</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- CPU -->
-                <div class="col-span-full md:col-span-4 bg-white p-4 rounded-lg border">
-                    <div class="flex items-center space-x-2 mb-4">
-                        <i data-lucide="cpu" class="h-6 w-6 text-red-500"></i>
-                        <h4 class="text-lg font-semibold text-gray-800">Procesador</h4>
-                    </div>
-                    <div class="space-y-3">
-                        <div class="flex justify-between">
-                            <span class="text-gray-600">Modelo:</span>
-                            <span class="text-gray-900">${cpuInfo.Modelo || "N/A"}</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-600">Frecuencia:</span>
-                            <span class="text-gray-900">${cpuInfo["Frecuencia (MHz)"] || "N/A"} MHz</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-600">Uso:</span>
-                            <span class="text-gray-900">${cpuInfo["Uso actual (%)"] || "N/A"}%</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- RAM -->
-                <div class="col-span-full md:col-span-4 bg-white p-4 rounded-lg border">
-                    <div class="flex items-center space-x-2 mb-4">
-                        <i data-lucide="database" class="h-6 w-6 text-purple-500"></i>
-                        <h4 class="text-lg font-semibold text-gray-800">Memoria RAM</h4>
-                    </div>
-                    <div class="space-y-3">
-                        <div class="flex justify-between">
-                            <span class="text-gray-600">Total:</span>
-                            <span class="text-gray-900">${memoryInfo["Total RAM (GB)"] || "N/A"} GB</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-600">Disponible:</span>
-                            <span class="text-gray-900">${memoryInfo["Disponible RAM (GB)"] || "N/A"} GB</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-600">Uso:</span>
-                            <span class="text-gray-900">${memoryInfo["Uso de RAM (%)"] || "N/A"}%</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Discos -->
-                <div class="col-span-full bg-white p-4 rounded-lg border">
-                    <div class="flex items-center space-x-2 mb-4">
-                        <i data-lucide="hard-drive" class="h-6 w-6 text-orange-500"></i>
-                        <h4 class="text-lg font-semibold text-gray-800">Discos</h4>
-                    </div>
-                    ${
-                        diskInfo.length > 0 
-                        ? `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            ${diskInfo.map(disk => `
-                                <div class="p-3 bg-gray-50 rounded-lg">
-                                    <div class="font-medium text-gray-900 mb-2">${disk.Dispositivo || "N/A"}</div>
-                                    <div class="space-y-1 text-sm">
-                                        <div class="flex justify-between">
-                                            <span class="text-gray-600">Total:</span>
-                                            <span>${disk["Total (GB)"] || "N/A"} GB</span>
-                                        </div>
-                                        <div class="flex justify-between">
-                                            <span class="text-gray-600">Usado:</span>
-                                            <span>${disk["Usado (GB)"] || "N/A"} GB</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            `).join('')}
-                           </div>`
-                        : '<p class="text-gray-500">No se encontraron discos.</p>'
-                    }
-                </div>
-
-                <!-- Red -->
-                <div class="col-span-full bg-white p-4 rounded-lg border">
-                    <div class="flex items-center space-x-2 mb-4">
-                        <i data-lucide="wifi" class="h-6 w-6 text-blue-500"></i>
-                        <h4 class="text-lg font-semibold text-gray-800">Conexión de Red</h4>
-                    </div>
-                    ${
-                        Object.keys(networkInfo).length > 0
-                        ? `<div class="space-y-4">
-                            ${Object.entries(networkInfo).map(([interface, addresses]) => `
-                                <div class="bg-gray-50 p-3 rounded-lg">
-                                    <div class="font-medium text-gray-900 mb-2">${interface}</div>
-                                    <div class="space-y-2">
-                                        ${addresses.map(addr => `
-                                            <div class="flex justify-between text-sm">
-                                                <span class="text-gray-600">${addr.Tipo || "N/A"}:</span>
-                                                <span class="text-gray-900">${addr.Dirección || "N/A"}</span>
-                                            </div>
-                                        `).join('')}
-                                    </div>
-                                </div>
-                            `).join('')}
-                           </div>`
-                        : '<p class="text-gray-500">No se encontraron conexiones de red.</p>'
-                    }
-                </div>
-
-                <!-- GPU y Batería -->
-                <div class="col-span-full md:col-span-4 bg-white p-4 rounded-lg border">
-                    <div class="flex items-center space-x-2 mb-4">
-                        <i data-lucide="monitor" class="h-6 w-6 text-green-500"></i>
-                        <h4 class="text-lg font-semibold text-gray-800">Tarjeta Gráfica</h4>
-                    </div>
-                    <div class="text-gray-900">${gpuInfo.Nombre || "No disponible"}</div>
-                </div>
-
-                <div class="col-span-full md:col-span-4 bg-white p-4 rounded-lg border">
-                    <div class="flex items-center space-x-2 mb-4">
-                        <i data-lucide="battery-charging" class="h-6 w-6 text-yellow-500"></i>
-                        <h4 class="text-lg font-semibold text-gray-800">Estado de la Batería</h4>
-                    </div>
-                    <div class="space-y-3">
-                        <div class="flex justify-between">
-                            <span class="text-gray-600">Carga:</span>
-                            <span class="text-gray-900">${batteryInfo.Porcentaje || "N/A"}%</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-600">Enchufado:</span>
-                            <span class="text-gray-900">${batteryInfo.Enchufado ? "Sí" : "No"}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        // Reinicializar los íconos de Lucide
-        if (window.lucide) {
-            window.lucide.createIcons();
-        }
-
-    } catch (error) {
-        console.error("Error obteniendo los datos del agente:", error);
-        content.innerHTML = `
-            <div class="flex flex-col items-center justify-center py-8">
-                <div class="text-red-500 text-center mb-4">
-                    <i data-lucide="alert-circle" class="h-12 w-12 mb-2 mx-auto"></i>
-                    <p>Error al cargar la información del agente.</p>
-                </div>
-                <button onclick="closeModal('agentInfoModal')" 
-                        class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
-                    Cerrar
-                </button>
-            </div>
-        `;
-        
-        if (window.lucide) {
-            window.lucide.createIcons();
-        }
-    }
-}
-
 function closeModal(modalId) {
     document.getElementById(modalId).classList.add("hidden");
+}
+
+try {
+    document.getElementById("content").innerHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="col-span-full md:col-span-4 bg-white p-4 rounded-lg border">
+                <div class="flex items-center space-x-2 mb-4">
+                    <i data-lucide="database" class="h-6 w-6 text-purple-500"></i>
+                    <h4 class="text-lg font-semibold text-gray-800">Memoria RAM</h4>
+                </div>
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <i data-lucide="database" class="h-4 w-4 text-gray-400"></i>
+                            <span class="text-gray-600">Total:</span>
+                        </div>
+                        <span class="text-gray-900">${memoryInfo["Total RAM (GB)"] || "N/A"} GB</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <i data-lucide="check-circle" class="h-4 w-4 text-gray-400"></i>
+                            <span class="text-gray-600">Disponible:</span>
+                        </div>
+                        <span class="text-gray-900">${memoryInfo["Disponible RAM (GB)"] || "N/A"} GB</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <i data-lucide="percent" class="h-4 w-4 text-gray-400"></i>
+                            <span class="text-gray-600">Uso:</span>
+                        </div>
+                        <span class="text-gray-900">${memoryInfo["Uso de RAM (%)"] || "N/A"}%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-span-full bg-white p-4 rounded-lg border">
+                <div class="flex items-center space-x-2 mb-4">
+                    <i data-lucide="hard-drive" class="h-6 w-6 text-orange-500"></i>
+                    <h4 class="text-lg font-semibold text-gray-800">Discos</h4>
+                </div>
+                ${diskInfo.length > 0 
+                    ? `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        ${diskInfo.map(disk => `
+                            <div class="p-4 bg-gray-50 rounded-lg">
+                                <div class="flex items-center space-x-2 mb-3">
+                                    <i data-lucide="disc" class="h-4 w-4 text-gray-400"></i>
+                                    <span class="font-medium text-gray-900">${disk.Dispositivo || "N/A"}</span>
+                                </div>
+                                <div class="space-y-2 text-sm">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-gray-600">Total:</span>
+                                        <span>${disk["Total (GB)"] || "N/A"} GB</span>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-gray-600">Usado:</span>
+                                        <span>${disk["Usado (GB)"] || "N/A"} GB</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>`
+                    : '<div class="text-gray-500">No se encontraron discos.</div>'
+                }
+            </div>
+        </div>`;
+
+    if (window.lucide) {
+        window.lucide.createIcons();
+    }
+
+} catch (error) {
+    console.error("Error obteniendo los datos del agente:", error);
+    document.getElementById("content").innerHTML = `
+        <div class="flex flex-col items-center justify-center py-8">
+            <div class="text-red-500 text-center mb-4">
+                <i data-lucide="alert-circle" class="h-12 w-12 mb-2 mx-auto"></i>
+                <p>Error al cargar la información del agente.</p>
+            </div>
+            <button onclick="closeModal('agentInfoModal')" 
+                    class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+                Cerrar
+            </button>
+        </div>`;
+    
+    if (window.lucide) {
+        window.lucide.createIcons();
+    }
 }

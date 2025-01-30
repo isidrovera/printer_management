@@ -82,7 +82,10 @@
             <div class="relative w-full max-w-6xl bg-white rounded-lg shadow-xl">
                 <!-- Cabecera fija -->
                 <div class="sticky top-0 flex justify-between items-center p-6 border-b bg-gray-50 rounded-t-lg">
-                    <h3 class="text-2xl font-semibold text-gray-800">Información Completa del Agente</h3>
+                    <div class="flex items-center space-x-2">
+                        <i data-lucide="info" class="h-6 w-6 text-blue-500"></i>
+                        <h3 class="text-2xl font-semibold text-gray-800">Información Completa del Agente</h3>
+                    </div>
                     <button onclick="closeModal('agentInfoModal')" 
                             class="text-gray-500 hover:text-gray-800 transition-colors">
                         <i data-lucide="x-circle" class="h-8 w-8"></i>
@@ -92,6 +95,15 @@
                 <!-- Contenido scrolleable -->
                 <div class="p-6 overflow-y-auto max-h-[calc(100vh-200px)]" id="agentInfoContent">
                     <p class="text-center text-gray-500">Cargando información...</p>
+                </div>
+
+                <!-- Footer fijo con botón de cerrar -->
+                <div class="sticky bottom-0 flex justify-end items-center p-6 border-t bg-gray-50 rounded-b-lg">
+                    <button onclick="closeModal('agentInfoModal')" 
+                            class="flex items-center space-x-2 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">
+                        <i data-lucide="x" class="h-5 w-5"></i>
+                        <span>Cerrar</span>
+                    </button>
                 </div>
             </div>
         </div>
