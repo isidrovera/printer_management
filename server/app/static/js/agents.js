@@ -515,7 +515,19 @@ async function showAgentInfo(agentId) {
     try {
         // 🔄 Obtener los datos del agente desde el servidor
         const response = await fetch(`/api/v1/agents/${agentId}`);
+        if (!response.ok) {
+            throw new Error(`Error en la solicitud: ${response.status}`);
+        }
         const agent = await response.json();
+
+        // 🔍 Verificaciones para evitar errores de propiedades undefined
+        const cpuInfo = agent.cpu_info || {};
+        const memoryInfo = agent.memory_info || {};
+        const diskInfo = agent.disk_info || [];
+        const networkInfo = agent.network_info || {};
+        const gpuInfo = agent.gpu_info || { Nombre: "No disponible" };
+        const batteryInfo = agent.battery_info || { Porcentaje: "No disponible", Enchufado: false };
+        const diskUsage = agent.disk_usage || {};
 
         // 🖼️ Generar la vista con los datos del agente
         content.innerHTML = `
@@ -526,14 +538,14 @@ async function showAgentInfo(agentId) {
                     </h4>
                 </div>
                 <div>
-                    <p class="text-gray-600"><strong>🖥️ Hostname:</strong> ${agent.hostname}</p>
-                    <p class="text-gray-600"><strong>📡 IP:</strong> ${agent.ip_address}</p>
-                    <p class="text-gray-600"><strong>💻 Tipo de Dispositivo:</strong> ${agent.device_type}</p>
-                    <p class="text-gray-600"><strong>🔌 Estado:</strong> ${agent.status}</p>
+                    <p class="text-gray-600"><strong>🖥️ Hostname:</strong> ${agent.hostname || "N/A"}</p>
+                    <p class="text-gray-600"><strong>📡 IP:</strong> ${agent.ip_address || "N/A"}</p>
+                    <p class="text-gray-600"><strong>💻 Tipo de Dispositivo:</strong> ${agent.device_type || "N/A"}</p>
+                    <p class="text-gray-600"><strong>🔌 Estado:</strong> ${agent.status || "N/A"}</p>
                 </div>
                 <div>
-                    <p class="text-gray-600"><strong>👤 Usuario:</strong> ${agent.username}</p>
-                    <p class="text-gray-600"><strong>🆔 Token:</strong> ${agent.token}</p>
+                    <p class="text-gray-600"><strong>👤 Usuario:</strong> ${agent.username || "N/A"}</p>
+                    <p class="text-gray-600"><strong>🆔 Token:</strong> ${agent.token || "N/A"}</p>
                 </div>
 
                 <!-- CPU -->
@@ -541,9 +553,9 @@ async function showAgentInfo(agentId) {
                     <h4 class="text-md font-semibold flex items-center text-red-500">
                         <i data-lucide="cpu" class="h-5 w-5 mr-2"></i> Procesador
                     </h4>
-                    <p class="text-gray-600"><strong>⚙ Modelo:</strong> ${agent.cpu_info.Modelo}</p>
-                    <p class="text-gray-600"><strong>🔄 Frecuencia:</strong> ${agent.cpu_info["Frecuencia (MHz)"]} MHz</p>
-                    <p class="text-gray-600"><strong>📊 Uso:</strong> ${agent.cpu_info["Uso actual (%)"]}%</p>
+                    <p class="text-gray-600"><strong>⚙ Modelo:</strong> ${cpuInfo.Modelo || "N/A"}</p>
+                    <p class="text-gray-600"><strong>🔄 Frecuencia:</strong> ${cpuInfo["Frecuencia (MHz)"] || "N/A"} MHz</p>
+                    <p class="text-gray-600"><strong>📊 Uso:</strong> ${cpuInfo["Uso actual (%)"] || "N/A"}%</p>
                 </div>
 
                 <!-- Memoria RAM -->
@@ -551,9 +563,9 @@ async function showAgentInfo(agentId) {
                     <h4 class="text-md font-semibold flex items-center text-purple-500">
                         <i data-lucide="database" class="h-5 w-5 mr-2"></i> Memoria RAM
                     </h4>
-                    <p class="text-gray-600"><strong>💾 Total:</strong> ${agent.memory_info["Total RAM (GB)"]} GB</p>
-                    <p class="text-gray-600"><strong>📉 Disponible:</strong> ${agent.memory_info["Disponible RAM (GB)"]} GB</p>
-                    <p class="text-gray-600"><strong>📊 Uso:</strong> ${agent.memory_info["Uso de RAM (%)"]}%</p>
+                    <p class="text-gray-600"><strong>💾 Total:</strong> ${memoryInfo["Total RAM (GB)"] || "N/A"} GB</p>
+                    <p class="text-gray-600"><strong>📉 Disponible:</strong> ${memoryInfo["Disponible RAM (GB)"] || "N/A"} GB</p>
+                    <p class="text-gray-600"><strong>📊 Uso:</strong> ${memoryInfo["Uso de RAM (%)"] || "N/A"}%</p>
                 </div>
 
                 <!-- Discos -->
@@ -561,9 +573,10 @@ async function showAgentInfo(agentId) {
                     <h4 class="text-md font-semibold flex items-center text-orange-500">
                         <i data-lucide="hard-drive" class="h-5 w-5 mr-2"></i> Discos
                     </h4>
-                    ${agent.disk_info.map(disk => `
-                        <p class="text-gray-600"><strong>🖴 ${disk.Dispositivo}:</strong> ${disk["Total (GB)"]} GB, Usado: ${disk["Usado (GB)"]} GB</p>
-                    `).join("")}
+                    ${diskInfo.length > 0 ? diskInfo.map(disk => `
+                        <p class="text-gray-600"><strong>🖴 ${disk.Dispositivo || "N/A"}:</strong> 
+                        ${disk["Total (GB)"] || "N/A"} GB, Usado: ${disk["Usado (GB)"] || "N/A"} GB</p>
+                    `).join("") : `<p class="text-gray-500">🔹 No se encontraron discos.</p>`}
                 </div>
 
                 <!-- Red -->
@@ -571,10 +584,11 @@ async function showAgentInfo(agentId) {
                     <h4 class="text-md font-semibold flex items-center text-blue-500">
                         <i data-lucide="wifi" class="h-5 w-5 mr-2"></i> Conexión de Red
                     </h4>
-                    ${Object.entries(agent.network_info).map(([interface, addresses]) => `
-                        <p class="text-gray-600"><strong>🌐 ${interface}:</strong></p>
-                        ${addresses.map(addr => `<p class="text-gray-600 pl-4">🔹 ${addr.Tipo}: ${addr.Dirección}</p>`).join("")}
-                    `).join("")}
+                    ${Object.keys(networkInfo).length > 0 ? 
+                        Object.entries(networkInfo).map(([interface, addresses]) => `
+                            <p class="text-gray-600"><strong>🌐 ${interface}:</strong></p>
+                            ${addresses.map(addr => `<p class="text-gray-600 pl-4">🔹 ${addr.Tipo || "N/A"}: ${addr.Dirección || "N/A"}</p>`).join("")}
+                        `).join("") : `<p class="text-gray-500">🔹 No se encontraron conexiones de red.</p>`}
                 </div>
 
                 <!-- GPU -->
@@ -582,7 +596,7 @@ async function showAgentInfo(agentId) {
                     <h4 class="text-md font-semibold flex items-center text-green-500">
                         <i data-lucide="monitor" class="h-5 w-5 mr-2"></i> Tarjeta Gráfica
                     </h4>
-                    ${agent.gpu_info ? `<p class="text-gray-600"><strong>🖥️ GPU:</strong> ${agent.gpu_info.Nombre}</p>` : `<p class="text-gray-500">🔹 No se detectó GPU.</p>`}
+                    <p class="text-gray-600"><strong>🖥️ GPU:</strong> ${gpuInfo.Nombre || "N/A"}</p>
                 </div>
 
                 <!-- Batería -->
@@ -590,8 +604,8 @@ async function showAgentInfo(agentId) {
                     <h4 class="text-md font-semibold flex items-center text-yellow-500">
                         <i data-lucide="battery-charging" class="h-5 w-5 mr-2"></i> Estado de la Batería
                     </h4>
-                    <p class="text-gray-600"><strong>🔋 Carga:</strong> ${agent.battery_info.Porcentaje}%</p>
-                    <p class="text-gray-600"><strong>🔌 Enchufado:</strong> ${agent.battery_info.Enchufado ? "Sí" : "No"}</p>
+                    <p class="text-gray-600"><strong>🔋 Carga:</strong> ${batteryInfo.Porcentaje || "N/A"}%</p>
+                    <p class="text-gray-600"><strong>🔌 Enchufado:</strong> ${batteryInfo.Enchufado ? "Sí" : "No"}</p>
                 </div>
 
                 <!-- Espacio en Disco -->
@@ -599,9 +613,9 @@ async function showAgentInfo(agentId) {
                     <h4 class="text-md font-semibold flex items-center text-gray-600">
                         <i data-lucide="database" class="h-5 w-5 mr-2"></i> Espacio en Disco
                     </h4>
-                    <p class="text-gray-600"><strong>📁 Total:</strong> ${agent.disk_usage["Total (GB)"]} GB</p>
-                    <p class="text-gray-600"><strong>📂 Usado:</strong> ${agent.disk_usage["Usado (GB)"]} GB</p>
-                    <p class="text-gray-600"><strong>📦 Libre:</strong> ${agent.disk_usage["Libre (GB)"]} GB</p>
+                    <p class="text-gray-600"><strong>📁 Total:</strong> ${diskUsage["Total (GB)"] || "N/A"} GB</p>
+                    <p class="text-gray-600"><strong>📂 Usado:</strong> ${diskUsage["Usado (GB)"] || "N/A"} GB</p>
+                    <p class="text-gray-600"><strong>📦 Libre:</strong> ${diskUsage["Libre (GB)"] || "N/A"} GB</p>
                 </div>
             </div>
         `;
