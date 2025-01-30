@@ -166,6 +166,10 @@ class AgentService:
             model = data.get('model')
             driver_filename = data.get('driver_filename')
 
+            # Obtener el nombre del driver sin la extensión
+            driver_name = os.path.splitext(driver_filename)[0]
+            logger.debug(f"Nombre del driver a usar: {driver_name}")
+
             # Crear un directorio temporal para la descarga
             with tempfile.TemporaryDirectory() as temp_dir:
                 driver_path = os.path.join(temp_dir, driver_filename)
@@ -209,13 +213,14 @@ class AgentService:
                             logger.error(f"Error con el archivo ZIP: {e}")
                             raise
 
-                        # Instalar la impresora
+                        # Instalar la impresora pasando el nombre del driver
                         logger.debug("Iniciando instalación con printer_service")
                         result = await self.printer_service.install(
                             driver_path,
                             printer_ip,
                             manufacturer,
-                            model
+                            model,
+                            driver_name  # Pasamos el nombre del driver sin extensión
                         )
                         
                         logger.info(f"Printer installation result: {result}")

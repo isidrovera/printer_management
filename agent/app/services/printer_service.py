@@ -8,9 +8,16 @@ import platform
 import logging
 
 class PrinterService:
-    async def install(self, compressed_driver_path: str, printer_ip: str, manufacturer: str, model: str):
+    async def install(self, compressed_driver_path: str, printer_ip: str, manufacturer: str, model: str, driver_name: str = None):
         """
         Descomprime el archivo del driver e instala la impresora.
+        
+        Args:
+            compressed_driver_path (str): Ruta al archivo ZIP del driver
+            printer_ip (str): IP de la impresora
+            manufacturer (str): Fabricante de la impresora
+            model (str): Modelo de la impresora
+            driver_name (str, optional): Nombre del driver sin extensión
         """
         try:
             with tempfile.TemporaryDirectory() as temp_dir:
@@ -65,7 +72,7 @@ class PrinterService:
 
                 # Instalar el driver según el sistema operativo
                 if platform.system() == 'Windows':
-                    return await self._install_windows(inf_path, printer_ip, manufacturer, model)
+                    return await self._install_windows(inf_path, printer_ip, manufacturer, model, driver_name)
                 else:
                     return await self._install_linux(inf_path, printer_ip, manufacturer, model)
 
@@ -97,16 +104,11 @@ class PrinterService:
         except Exception as e:
             raise Exception(f"Error al descomprimir el archivo: {str(e)}")
 
-    async def _install_windows(self, inf_path: str, printer_ip: str, manufacturer: str, model: str):
+    async def _install_windows(self, inf_path: str, printer_ip: str, manufacturer: str, model: str, driver_name: str):
         try:
             logging.info(f"Instalando driver desde {inf_path}")
-            
-            # Obtener el nombre del driver del directorio (que es el nombre del archivo comprimido)
-            dir_name = os.path.basename(os.path.dirname(inf_path))
-            driver_name = dir_name  # No necesitamos quitar nada porque el directorio ya es el nombre sin extensión
-            
-            logging.info(f"Nombre del driver a usar: {driver_name}")
-
+            logging.info(f"Usando nombre de driver: {driver_name}")
+                
             # 1. Expandir archivos DLL
             driver_dir = os.path.dirname(inf_path)
             for file in os.listdir(driver_dir):
@@ -137,7 +139,7 @@ class PrinterService:
             except subprocess.CalledProcessError:
                 logging.warning("Error en rundll32, continuando...")
 
-            # 4. Verificar la instalación
+            # 4. Verificar la instalación del driver
             time.sleep(5)
             logging.info("Verificando instalación del driver...")
             result = subprocess.run([
@@ -147,7 +149,7 @@ class PrinterService:
             ], capture_output=True, text=True)
             logging.info(f"Drivers instalados:\n{result.stdout}")
 
-            # 5. Verificar si el puerto existe
+            # 5. Verificar y manejar el puerto TCP/IP
             port_name = f"IP_{printer_ip}"
             logging.info(f"Verificando puerto TCP/IP: {port_name}")
             check_port = subprocess.run([
@@ -156,28 +158,84 @@ class PrinterService:
                 f'Get-PrinterPort -Name "{port_name}" 2>$null'
             ], capture_output=True, text=True)
 
-            if "Name" not in check_port.stdout:
+            if "Name" in check_port.stdout:
+                logging.info("El puerto ya existe, verificando configuración...")
+                # Verificar si el puerto existente tiene la IP correcta
+                port_info = subprocess.run([
+                    'powershell',
+                    '-Command',
+                    f'Get-PrinterPort -Name "{port_name}" | Select-Object PrinterHostAddress'
+                ], capture_output=True, text=True)
+                
+                current_ip = port_info.stdout.strip()
+                if printer_ip not in current_ip:
+                    logging.info("La IP del puerto no coincide, eliminando y recreando...")
+                    subprocess.run([
+                        'powershell',
+                        '-Command',
+                        f'Remove-PrinterPort -Name "{port_name}"'
+                    ], check=True)
+                    time.sleep(2)
+                    subprocess.run([
+                        'powershell',
+                        '-Command',
+                        f'Add-PrinterPort -Name "{port_name}" -PrinterHostAddress "{printer_ip}"'
+                    ], check=True)
+                else:
+                    logging.info("Puerto existente tiene la configuración correcta")
+            else:
                 logging.info("Creando nuevo puerto TCP/IP...")
                 subprocess.run([
                     'powershell',
                     '-Command',
                     f'Add-PrinterPort -Name "{port_name}" -PrinterHostAddress "{printer_ip}"'
                 ], check=True)
-            else:
-                logging.info("Puerto ya existe, usando puerto existente")
 
-            # 6. Instalar la impresora
+            # 6. Verificar y manejar la impresora
             printer_name = f"{manufacturer} {model}"
-            logging.info(f"Instalando impresora {printer_name}...")
-            subprocess.run([
+            logging.info(f"Verificando si la impresora {printer_name} ya existe...")
+            check_printer = subprocess.run([
                 'powershell',
                 '-Command',
-                f'Add-Printer -Name "{printer_name}" -DriverName "{driver_name}" -PortName "{port_name}"'
-            ], check=True)
+                f'Get-Printer -Name "{printer_name}" 2>$null'
+            ], capture_output=True, text=True)
+
+            if "Name" in check_printer.stdout:
+                logging.info("La impresora ya existe, verificando configuración...")
+                # Obtener información de la impresora existente
+                printer_info = subprocess.run([
+                    'powershell',
+                    '-Command',
+                    f'Get-Printer -Name "{printer_name}" | Select-Object DriverName, PortName'
+                ], capture_output=True, text=True)
+                
+                # Si el driver o puerto no coinciden, eliminar y recrear
+                if driver_name not in printer_info.stdout or port_name not in printer_info.stdout:
+                    logging.info("La configuración no coincide, eliminando y recreando la impresora...")
+                    subprocess.run([
+                        'powershell',
+                        '-Command',
+                        f'Remove-Printer -Name "{printer_name}"'
+                    ], check=True)
+                    time.sleep(2)
+                    subprocess.run([
+                        'powershell',
+                        '-Command',
+                        f'Add-Printer -Name "{printer_name}" -DriverName "{driver_name}" -PortName "{port_name}"'
+                    ], check=True)
+                else:
+                    logging.info("La impresora existente tiene la configuración correcta")
+            else:
+                logging.info("Instalando nueva impresora...")
+                subprocess.run([
+                    'powershell',
+                    '-Command',
+                    f'Add-Printer -Name "{printer_name}" -DriverName "{driver_name}" -PortName "{port_name}"'
+                ], check=True)
 
             return {
                 'success': True,
-                'message': f'Impresora {printer_name} instalada correctamente'
+                'message': f'Impresora {printer_name} instalada/actualizada correctamente'
             }
         except Exception as e:
             error_msg = str(e)

@@ -24,31 +24,126 @@ function initializeWebSocket() {
     try {
         console.log('Intentando conectar WebSocket a:', WS_CONFIG.url);
         const ws = new WebSocket(WS_CONFIG.url);
+        let reconnectAttempts = 0;
 
         ws.onopen = () => {
             console.log('WebSocket conectado exitosamente');
+            reconnectAttempts = 0; // Reiniciar contador de intentos al conectar exitosamente
+            showNotification('Conexión establecida con el servidor', 'success');
         };
 
         ws.onmessage = (event) => {
             try {
-                const data = JSON.parse(event.data);
-                console.log('Mensaje recibido:', data);
-                // Maneja los datos según el tipo
+                // Verificar si event.data es una cadena válida
+                if (typeof event.data !== 'string') {
+                    throw new Error('Datos recibidos en formato no válido');
+                }
+
+                // Intentar parsear el JSON con manejo de errores más detallado
+                let data;
+                try {
+                    data = JSON.parse(event.data);
+                } catch (parseError) {
+                    console.error('Error al parsear JSON:', {
+                        error: parseError,
+                        rawData: event.data.slice(0, 100) + '...' // Mostrar los primeros 100 caracteres
+                    });
+                    throw parseError;
+                }
+
+                // Procesar los diferentes tipos de mensajes
+                switch (data.type) {
+                    case 'agent_status':
+                        updateAgentStatus(data);
+                        break;
+                    case 'printer_status':
+                        updatePrinterStatus(data);
+                        break;
+                    case 'error':
+                        handleErrorMessage(data);
+                        break;
+                    default:
+                        console.log('Mensaje recibido sin tipo específico:', data);
+                }
+
             } catch (error) {
-                console.error('Error al procesar mensaje:', error);
+                console.error('Error al procesar mensaje:', {
+                    errorType: error.name,
+                    errorMessage: error.message,
+                    stack: error.stack
+                });
+                showNotification('Error al procesar mensaje del servidor', 'error');
             }
         };
 
         ws.onclose = (event) => {
             console.warn('WebSocket cerrado. Código:', event.code);
+            showNotification('Conexión perdida con el servidor', 'warning');
+
+            // Intentar reconectar si no excedimos el límite de intentos
+            if (reconnectAttempts < WS_CONFIG.maxReconnectAttempts) {
+                reconnectAttempts++;
+                console.log(`Intento de reconexión ${reconnectAttempts} de ${WS_CONFIG.maxReconnectAttempts}`);
+                setTimeout(() => {
+                    initializeWebSocket();
+                }, WS_CONFIG.reconnectInterval);
+            } else {
+                showNotification('No se pudo restablecer la conexión con el servidor', 'error');
+            }
         };
 
         ws.onerror = (error) => {
             console.error('Error en WebSocket:', error);
+            showNotification('Error en la conexión con el servidor', 'error');
         };
+
+        return ws;
+
     } catch (error) {
         console.error('Error al crear conexión WebSocket:', error);
+        showNotification('Error al crear la conexión con el servidor', 'error');
     }
+}
+
+
+// Funciones auxiliares para manejar diferentes tipos de mensajes
+function updateAgentStatus(data) {
+    try {
+        // Actualizar el estado del agente en la interfaz
+        const agentElement = document.querySelector(`[data-agent-id="${data.agent_id}"]`);
+        if (agentElement) {
+            // Actualizar el estado visual del agente
+            const statusElement = agentElement.querySelector('.agent-status');
+            if (statusElement) {
+                statusElement.className = `agent-status status-${data.status}`;
+                statusElement.textContent = data.status;
+            }
+        }
+    } catch (error) {
+        console.error('Error al actualizar estado del agente:', error);
+    }
+}
+
+function updatePrinterStatus(data) {
+    try {
+        // Actualizar el estado de la impresora en la interfaz
+        const printerElement = document.querySelector(`[data-printer-id="${data.printer_id}"]`);
+        if (printerElement) {
+            // Actualizar el estado visual de la impresora
+            const statusElement = printerElement.querySelector('.printer-status');
+            if (statusElement) {
+                statusElement.className = `printer-status status-${data.status}`;
+                statusElement.textContent = data.status;
+            }
+        }
+    } catch (error) {
+        console.error('Error al actualizar estado de la impresora:', error);
+    }
+}
+
+function handleErrorMessage(data) {
+    console.error('Error recibido del servidor:', data.error);
+    showNotification(data.error.message || 'Error del servidor', 'error');
 }
 
 // Función para inicializar el filtro de búsqueda
