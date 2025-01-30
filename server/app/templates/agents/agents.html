@@ -159,4 +159,44 @@
 
 {% block scripts %}
 <script src="/static/js/agents.js"></script>
+<script>
+    async function showAgentInfo(agentId) {
+        const modal = document.getElementById("agentInfoModal");
+        const content = document.getElementById("agentInfoContent");
+
+        content.innerHTML = `<p class="text-center text-gray-500">Cargando información...</p>`;
+
+        try {
+            // 🔄 Obtener los datos del agente desde el servidor
+            const response = await fetch(`/api/v1/agents/${agentId}`);
+            const agent = await response.json();
+
+            // 🖼️ Generar la vista con los datos del agente
+            content.innerHTML = `
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <h4 class="text-md font-semibold flex items-center">
+                            <i data-lucide="server" class="h-5 w-5 mr-2 text-blue-500"></i> Servidor
+                        </h4>
+                        <p class="text-gray-600"><strong>Hostname:</strong> ${agent.hostname}</p>
+                        <p class="text-gray-600"><strong>IP:</strong> ${agent.ip_address}</p>
+                        <p class="text-gray-600"><strong>Tipo:</strong> ${agent.device_type}</p>
+                    </div>
+                    <div>
+                        <h4 class="text-md font-semibold flex items-center">
+                            <i data-lucide="user" class="h-5 w-5 mr-2 text-green-500"></i> Usuario
+                        </h4>
+                        <p class="text-gray-600"><strong>Nombre:</strong> ${agent.username}</p>
+                        <p class="text-gray-600"><strong>Status:</strong> ${agent.status}</p>
+                    </div>
+                </div>
+            `;
+        } catch (error) {
+            console.error("Error obteniendo los datos del agente:", error);
+            content.innerHTML = `<p class="text-red-500">Error al cargar la información del agente.</p>`;
+        }
+
+        modal.classList.remove("hidden");
+    }
+</script>
 {% endblock %}
