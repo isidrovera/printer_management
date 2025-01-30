@@ -119,3 +119,51 @@ class AgentService:
         return self.db.query(Agent)\
                       .filter(Agent.token == token, Agent.is_active == True)\
                       .first()
+    async def update_agent_info(self, agent: Agent, new_system_info: dict, new_ip: str) -> Agent:
+        """Actualiza la información del agente si hay cambios en cualquier campo."""
+        updated = False
+
+        # Campos a verificar individualmente
+        fields_to_check = {
+            "ip_address": new_ip,
+            "cpu_info": new_system_info.get("CPU"),
+            "memory_info": new_system_info.get("Memoria"),
+            "disk_info": new_system_info.get("Discos"),
+            "network_info": new_system_info.get("Red"),
+            "gpu_info": new_system_info.get("Tarjetas Gráficas"),
+            "battery_info": new_system_info.get("Batería"),
+            "disk_usage": new_system_info.get("Espacio en Disco"),
+        }
+
+        # Comparar cada campo y actualizar si hay diferencias
+        for field, new_value in fields_to_check.items():
+            existing_value = getattr(agent, field)
+
+            if isinstance(existing_value, str):  # Si está almacenado como JSON string, lo convertimos
+                try:
+                    existing_value = json.loads(existing_value)
+                except json.JSONDecodeError:
+                    pass  # Si no es JSON válido, lo dejamos como está
+
+            if existing_value != new_value:  # Si hay diferencia, actualizamos el campo
+                print(f"🔄 Cambio detectado en {field}: {existing_value} → {new_value}")
+                setattr(agent, field, new_value)
+                updated = True
+
+        # Verificar si `system_info` cambió completamente
+        existing_system_info = json.loads(agent.system_info) if isinstance(agent.system_info, str) else agent.system_info
+        if existing_system_info != new_system_info:
+            print(f"🔄 Cambio detectado en 'system_info', actualizando toda la información.")
+            agent.system_info = new_system_info
+            updated = True
+
+        # Si hubo algún cambio, actualizar la base de datos
+        if updated:
+            agent.updated_at = datetime.utcnow()
+            self.db.commit()
+            self.db.refresh(agent)
+            print(f"✅ Información de {agent.hostname} actualizada correctamente en la base de datos.")
+        else:
+            print(f"⚡ No se detectaron cambios en {agent.hostname}, no se actualiza.")
+
+        return agent
