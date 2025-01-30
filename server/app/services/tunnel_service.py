@@ -1,7 +1,7 @@
 # server/app/services/tunnel_service.py
 from sqlalchemy.orm import Session
-from ..models.tunnel import Tunnel
-from ..models.agent import Agent
+from ..db.models.tunnel import Tunnel
+from ..db.models.agent import Agent
 from ..schemas.tunnel import TunnelCreate
 from fastapi import HTTPException
 import logging
