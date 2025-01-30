@@ -529,45 +529,43 @@ async function showAgentInfo(agentId) {
         const batteryInfo = agent.battery_info || { Porcentaje: "No disponible", Enchufado: false };
         const diskUsage = agent.disk_usage || {};
 
-        // 🌟 Diseño con 4 columnas
+        // 🌟 Diseño con 8 columnas
         content.innerHTML = `
-            <div class="grid grid-cols-4 gap-4 p-4 text-sm">
+            <div class="grid grid-cols-8 gap-4 p-6 text-sm">
                 
                 <!-- Información General -->
-                <div class="col-span-4 border-b pb-2">
+                <div class="col-span-8 border-b pb-2">
                     <h4 class="text-lg font-bold flex items-center text-blue-600">
                         <i data-lucide="server" class="h-6 w-6 mr-2"></i> Información del Servidor
                     </h4>
                 </div>
-                <div><p><strong>🖥️ Hostname:</strong> ${agent.hostname || "N/A"}</p></div>
-                <div><p><strong>📡 IP:</strong> ${agent.ip_address || "N/A"}</p></div>
-                <div><p><strong>💻 Tipo:</strong> ${agent.device_type || "N/A"}</p></div>
-                <div><p><strong>🔌 Estado:</strong> ${agent.status || "N/A"}</p></div>
+                <div class="col-span-2"><p><strong>🖥️ Hostname:</strong> ${agent.hostname || "N/A"}</p></div>
+                <div class="col-span-2"><p><strong>📡 IP:</strong> ${agent.ip_address || "N/A"}</p></div>
+                <div class="col-span-2"><p><strong>💻 Tipo:</strong> ${agent.device_type || "N/A"}</p></div>
+                <div class="col-span-2"><p><strong>🔌 Estado:</strong> ${agent.status || "N/A"}</p></div>
 
                 <!-- CPU -->
-                <div class="col-span-4 border-b pt-4">
+                <div class="col-span-8 border-b pt-4">
                     <h4 class="text-md font-semibold flex items-center text-red-500">
                         <i data-lucide="cpu" class="h-5 w-5 mr-2"></i> Procesador
                     </h4>
                 </div>
-                <div><p><strong>⚙ Modelo:</strong> ${cpuInfo.Modelo || "N/A"}</p></div>
-                <div><p><strong>🔄 Frecuencia:</strong> ${cpuInfo["Frecuencia (MHz)"] || "N/A"} MHz</p></div>
-                <div><p><strong>📊 Uso:</strong> ${cpuInfo["Uso actual (%)"] || "N/A"}%</p></div>
-                <div></div>
+                <div class="col-span-3"><p><strong>⚙ Modelo:</strong> ${cpuInfo.Modelo || "N/A"}</p></div>
+                <div class="col-span-3"><p><strong>🔄 Frecuencia:</strong> ${cpuInfo["Frecuencia (MHz)"] || "N/A"} MHz</p></div>
+                <div class="col-span-2"><p><strong>📊 Uso:</strong> ${cpuInfo["Uso actual (%)"] || "N/A"}%</p></div>
 
                 <!-- Memoria RAM -->
-                <div class="col-span-4 border-b pt-4">
+                <div class="col-span-8 border-b pt-4">
                     <h4 class="text-md font-semibold flex items-center text-purple-500">
                         <i data-lucide="database" class="h-5 w-5 mr-2"></i> Memoria RAM
                     </h4>
                 </div>
-                <div><p><strong>💾 Total:</strong> ${memoryInfo["Total RAM (GB)"] || "N/A"} GB</p></div>
-                <div><p><strong>📉 Disponible:</strong> ${memoryInfo["Disponible RAM (GB)"] || "N/A"} GB</p></div>
-                <div><p><strong>📊 Uso:</strong> ${memoryInfo["Uso de RAM (%)"] || "N/A"}%</p></div>
-                <div></div>
+                <div class="col-span-3"><p><strong>💾 Total:</strong> ${memoryInfo["Total RAM (GB)"] || "N/A"} GB</p></div>
+                <div class="col-span-3"><p><strong>📉 Disponible:</strong> ${memoryInfo["Disponible RAM (GB)"] || "N/A"} GB</p></div>
+                <div class="col-span-2"><p><strong>📊 Uso:</strong> ${memoryInfo["Uso de RAM (%)"] || "N/A"}%</p></div>
 
                 <!-- Discos -->
-                <div class="col-span-4 border-b pt-4">
+                <div class="col-span-8 border-b pt-4">
                     <h4 class="text-md font-semibold flex items-center text-orange-500">
                         <i data-lucide="hard-drive" class="h-5 w-5 mr-2"></i> Discos
                     </h4>
@@ -575,15 +573,15 @@ async function showAgentInfo(agentId) {
                 ${
                     diskInfo.length > 0
                         ? diskInfo.map(disk => `
-                            <div class="col-span-2"><p><strong>🖴 ${disk.Dispositivo || "N/A"}:</strong></p></div>
-                            <div><p><strong>Total:</strong> ${disk["Total (GB)"] || "N/A"} GB</p></div>
-                            <div><p><strong>Usado:</strong> ${disk["Usado (GB)"] || "N/A"} GB</p></div>
+                            <div class="col-span-4"><p><strong>🖴 ${disk.Dispositivo || "N/A"}:</strong></p></div>
+                            <div class="col-span-2"><p><strong>Total:</strong> ${disk["Total (GB)"] || "N/A"} GB</p></div>
+                            <div class="col-span-2"><p><strong>Usado:</strong> ${disk["Usado (GB)"] || "N/A"} GB</p></div>
                         `).join("")
-                        : `<div class="col-span-4 text-gray-500">🔹 No se encontraron discos.</div>`
+                        : `<div class="col-span-8 text-gray-500">🔹 No se encontraron discos.</div>`
                 }
 
                 <!-- Red -->
-                <div class="col-span-4 border-b pt-4">
+                <div class="col-span-8 border-b pt-4">
                     <h4 class="text-md font-semibold flex items-center text-blue-500">
                         <i data-lucide="wifi" class="h-5 w-5 mr-2"></i> Conexión de Red
                     </h4>
@@ -591,38 +589,38 @@ async function showAgentInfo(agentId) {
                 ${
                     Object.keys(networkInfo).length > 0
                         ? Object.entries(networkInfo).map(([interface, addresses]) => `
-                            <div class="col-span-4"><p><strong>🌐 ${interface}:</strong></p></div>
-                            ${addresses.map(addr => `<div class="col-span-4 pl-4">🔹 ${addr.Tipo || "N/A"}: ${addr.Dirección || "N/A"}</div>`).join("")}
+                            <div class="col-span-8"><p><strong>🌐 ${interface}:</strong></p></div>
+                            ${addresses.map(addr => `<div class="col-span-8 pl-4">🔹 ${addr.Tipo || "N/A"}: ${addr.Dirección || "N/A"}</div>`).join("")}
                         `).join("")
-                        : `<div class="col-span-4 text-gray-500">🔹 No se encontraron conexiones de red.</div>`
+                        : `<div class="col-span-8 text-gray-500">🔹 No se encontraron conexiones de red.</div>`
                 }
 
                 <!-- GPU -->
-                <div class="col-span-4 border-b pt-4">
+                <div class="col-span-8 border-b pt-4">
                     <h4 class="text-md font-semibold flex items-center text-green-500">
                         <i data-lucide="monitor" class="h-5 w-5 mr-2"></i> Tarjeta Gráfica
                     </h4>
                 </div>
-                <div class="col-span-4"><p><strong>🖥️ GPU:</strong> ${gpuInfo.Nombre || "N/A"}</p></div>
+                <div class="col-span-8"><p><strong>🖥️ GPU:</strong> ${gpuInfo.Nombre || "N/A"}</p></div>
 
                 <!-- Batería -->
-                <div class="col-span-4 border-b pt-4">
+                <div class="col-span-8 border-b pt-4">
                     <h4 class="text-md font-semibold flex items-center text-yellow-500">
                         <i data-lucide="battery-charging" class="h-5 w-5 mr-2"></i> Estado de la Batería
                     </h4>
                 </div>
-                <div><p><strong>🔋 Carga:</strong> ${batteryInfo.Porcentaje || "N/A"}%</p></div>
-                <div><p><strong>🔌 Enchufado:</strong> ${batteryInfo.Enchufado ? "Sí" : "No"}</p></div>
+                <div class="col-span-4"><p><strong>🔋 Carga:</strong> ${batteryInfo.Porcentaje || "N/A"}%</p></div>
+                <div class="col-span-4"><p><strong>🔌 Enchufado:</strong> ${batteryInfo.Enchufado ? "Sí" : "No"}</p></div>
 
                 <!-- Espacio en Disco -->
-                <div class="col-span-4 border-b pt-4">
+                <div class="col-span-8 border-b pt-4">
                     <h4 class="text-md font-semibold flex items-center text-gray-600">
                         <i data-lucide="database" class="h-5 w-5 mr-2"></i> Espacio en Disco
                     </h4>
                 </div>
-                <div><p><strong>📁 Total:</strong> ${diskUsage["Total (GB)"] || "N/A"} GB</p></div>
-                <div><p><strong>📂 Usado:</strong> ${diskUsage["Usado (GB)"] || "N/A"} GB</p></div>
-                <div><p><strong>📦 Libre:</strong> ${diskUsage["Libre (GB)"] || "N/A"} GB</p></div>
+                <div class="col-span-3"><p><strong>📁 Total:</strong> ${diskUsage["Total (GB)"] || "N/A"} GB</p></div>
+                <div class="col-span-3"><p><strong>📂 Usado:</strong> ${diskUsage["Usado (GB)"] || "N/A"} GB</p></div>
+                <div class="col-span-2"><p><strong>📦 Libre:</strong> ${diskUsage["Libre (GB)"] || "N/A"} GB</p></div>
             </div>
         `;
 
