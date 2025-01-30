@@ -1,6 +1,6 @@
 # server/app/db/models/agent.py
 from app.db.base import BaseModel
-from sqlalchemy import Column, String, Boolean, ForeignKey, JSON, Integer
+from sqlalchemy import Column, String, Boolean, ForeignKey, JSON, Integer, Float
 from sqlalchemy.orm import relationship
 import uuid
 
@@ -13,7 +13,14 @@ class Agent(BaseModel):
     username = Column(String)
     ip_address = Column(String)
     device_type = Column(String)
-    system_info = Column(JSON)
+    system_info = Column(JSON)  # Información completa del sistema
+    cpu_info = Column(JSON)  # Información del procesador
+    memory_info = Column(JSON)  # Información de la memoria RAM
+    disk_info = Column(JSON)  # Información de los discos
+    network_info = Column(JSON)  # Información de la red
+    gpu_info = Column(JSON)  # Información de la GPU
+    battery_info = Column(JSON)  # Información de la batería
+    disk_usage = Column(JSON)  # Espacio en disco usado/libre
     status = Column(String, default='offline')
     is_active = Column(Boolean, default=True)
     
