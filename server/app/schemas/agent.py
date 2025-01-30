@@ -21,6 +21,7 @@ class Agent(AgentBase):
         from_attributes = True
 
 class AgentUpdate(BaseModel):
+    agent_token: str  # ✅ Se agrega agent_token para identificar el agente
     hostname: Optional[str] = None
     username: Optional[str] = None
     ip_address: Optional[str] = None
