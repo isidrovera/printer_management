@@ -8,7 +8,8 @@ let agentToDelete = null;
 const WS_CONFIG = {
     url: `ws://${window.location.host}/api/v1/ws/status`,
     reconnectInterval: 1000,
-    maxReconnectAttempts: 5
+    maxReconnectAttempts: 10,  // Aumentamos el número de reintentos
+    currentInstallation: null  // Para trackear instalación en progreso
 };
 
 // Inicialización cuando el DOM está listo
@@ -18,6 +19,30 @@ document.addEventListener('DOMContentLoaded', function () {
     initializeFormHandlers();
     initializeDriverSelect(); // Añadido para cargar drivers al inicio
 });
+// Función para manejar la reconexión del WebSocket
+function handleWebSocketReconnection(event) {
+    console.log('WebSocket cerrado. Código:', event.code);
+    addLogMessage({
+        timestamp: new Date().toISOString().replace('T', ' ').split('.')[0],
+        type: 'warning',
+        message: 'Conexión interrumpida. Reintentando...'
+    });
+
+    // Si hay una instalación en progreso, intentar reconectar
+    if (WS_CONFIG.currentInstallation) {
+        if (reconnectAttempts < WS_CONFIG.maxReconnectAttempts) {
+            reconnectAttempts++;
+            console.log(`Intento de reconexión ${reconnectAttempts} de ${WS_CONFIG.maxReconnectAttempts}`);
+            setTimeout(initializeWebSocket, WS_CONFIG.reconnectInterval);
+        } else {
+            addLogMessage({
+                timestamp: new Date().toISOString().replace('T', ' ').split('.')[0],
+                type: 'warning',
+                message: 'No se pudo restablecer la conexión. La instalación continúa en segundo plano.'
+            });
+        }
+    }
+}
 
 // Función para añadir un mensaje de log
 function addLogMessage(message, type = 'info') {
@@ -268,16 +293,30 @@ function initializeFormHandlers() {
 
                 if (!driverId || !printerIp) {
                     showNotification('Por favor complete todos los campos', 'error');
-                    addLogMessage('Error: Faltan campos requeridos', 'error');
+                    addLogMessage({
+                        timestamp: new Date().toISOString().replace('T', ' ').split('.')[0],
+                        type: 'error',
+                        message: 'Error: Faltan campos requeridos'
+                    });
                     return;
                 }
+
+                // Guardar información de la instalación actual
+                WS_CONFIG.currentInstallation = {
+                    driverId,
+                    printerIp,
+                    startTime: new Date()
+                };
 
                 // Deshabilitar el botón de envío y cambiar el texto
                 submitButton.disabled = true;
                 submitButton.innerHTML = 'Instalando...';
                 
-                addLogMessage('Iniciando instalación de impresora...', 'info');
-                addLogMessage(`IP de impresora: ${printerIp}`, 'info');
+                addLogMessage({
+                    timestamp: new Date().toISOString().replace('T', ' ').split('.')[0],
+                    type: 'info',
+                    message: 'Iniciando instalación de impresora...'
+                });
 
                 const response = await fetch(`/api/v1/printers/install/${currentAgentToken}`, {
                     method: 'POST',
@@ -296,10 +335,11 @@ function initializeFormHandlers() {
                     throw new Error(errorData.detail || `Error en la instalación: ${response.status}`);
                 }
 
-                const data = await response.json();
-                addLogMessage('Comando de instalación enviado correctamente', 'success');
-                addLogMessage('Esperando respuesta del agente...', 'info');
-                showNotification('Comando de instalación enviado correctamente', 'success');
+                addLogMessage({
+                    timestamp: new Date().toISOString().replace('T', ' ').split('.')[0],
+                    type: 'info',
+                    message: 'Comando enviado. La instalación continúa en segundo plano...'
+                });
 
                 // Cambiar el texto del botón de cerrar
                 const closeButton = document.querySelector('button[onclick="closeModal(\'installPrinterModal\')"]');
@@ -313,17 +353,22 @@ function initializeFormHandlers() {
 
             } catch (error) {
                 console.error('Error detallado:', error);
-                addLogMessage(`Error: ${error.message}`, 'error');
-                showNotification(`Error al instalar impresora: ${error.message}`, 'error');
+                addLogMessage({
+                    timestamp: new Date().toISOString().replace('T', ' ').split('.')[0],
+                    type: 'error',
+                    message: `Error: ${error.message}`
+                });
                 
                 // Reactivar el botón de envío en caso de error
                 submitButton.disabled = false;
                 submitButton.innerHTML = 'Instalar';
+                
+                // Limpiar instalación actual
+                WS_CONFIG.currentInstallation = null;
             }
         });
     }
 }
-
 // Función para inicializar el select de drivers
 async function initializeDriverSelect() {
     const driverSelect = document.getElementById('driver');
@@ -405,17 +450,19 @@ function closeModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
         // Verificar si hay una instalación en progreso
-        const submitButton = document.querySelector('#installPrinterForm button[type="submit"]');
-        if (submitButton && submitButton.disabled) {
-            if (!confirm('¿Está seguro que desea cerrar la ventana? Hay una instalación en progreso.')) {
-                return;
+        if (WS_CONFIG.currentInstallation) {
+            const installationTime = (new Date() - WS_CONFIG.currentInstallation.startTime) / 1000;
+            if (installationTime < 60) { // Si han pasado menos de 60 segundos
+                if (!confirm('La instalación está en progreso. ¿Está seguro que desea cerrar la ventana?')) {
+                    return;
+                }
             }
         }
         
         modal.classList.add('hidden');
         if (modalId === 'installPrinterModal') {
             document.getElementById('installPrinterForm').reset();
-            // Limpiar logs
+            WS_CONFIG.currentInstallation = null; // Limpiar instalación actual
             const logMessages = document.getElementById('logMessages');
             if (logMessages) {
                 logMessages.innerHTML = '';
