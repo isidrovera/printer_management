@@ -74,8 +74,6 @@
     {% endif %}
 </div>
 
-<!-- Modal Instalar Impresora -->
- <!-- Modal Ver Info Completa -->
 <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden z-50" id="agentInfoModal">
     <div class="bg-white rounded-lg shadow-lg max-w-2xl w-full mx-4 p-6">
         <div class="flex justify-between items-center border-b pb-3">
@@ -84,22 +82,18 @@
                 <i data-lucide="x" class="h-6 w-6"></i>
             </button>
         </div>
-        
-        <!-- Contenido del Modal -->
         <div class="mt-4 space-y-4" id="agentInfoContent">
             <p class="text-center text-gray-500">Cargando información...</p>
         </div>
-
-        <!-- Botón Cerrar -->
         <div class="mt-6 flex justify-end">
-            <button type="button" 
-                    onclick="closeModal('agentInfoModal')"
+            <button type="button" onclick="closeModal('agentInfoModal')"
                     class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
                 Cerrar
             </button>
         </div>
     </div>
 </div>
+
 
 <!-- Modal Instalar Impresora -->
 <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden z-50" id="installPrinterModal">
@@ -159,44 +153,5 @@
 
 {% block scripts %}
 <script src="/static/js/agents.js"></script>
-<script>
-    async function showAgentInfo(agentId) {
-        const modal = document.getElementById("agentInfoModal");
-        const content = document.getElementById("agentInfoContent");
 
-        content.innerHTML = `<p class="text-center text-gray-500">Cargando información...</p>`;
-
-        try {
-            // 🔄 Obtener los datos del agente desde el servidor
-            const response = await fetch(`/api/v1/agents/${agentId}`);
-            const agent = await response.json();
-
-            // 🖼️ Generar la vista con los datos del agente
-            content.innerHTML = `
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <h4 class="text-md font-semibold flex items-center">
-                            <i data-lucide="server" class="h-5 w-5 mr-2 text-blue-500"></i> Servidor
-                        </h4>
-                        <p class="text-gray-600"><strong>Hostname:</strong> ${agent.hostname}</p>
-                        <p class="text-gray-600"><strong>IP:</strong> ${agent.ip_address}</p>
-                        <p class="text-gray-600"><strong>Tipo:</strong> ${agent.device_type}</p>
-                    </div>
-                    <div>
-                        <h4 class="text-md font-semibold flex items-center">
-                            <i data-lucide="user" class="h-5 w-5 mr-2 text-green-500"></i> Usuario
-                        </h4>
-                        <p class="text-gray-600"><strong>Nombre:</strong> ${agent.username}</p>
-                        <p class="text-gray-600"><strong>Status:</strong> ${agent.status}</p>
-                    </div>
-                </div>
-            `;
-        } catch (error) {
-            console.error("Error obteniendo los datos del agente:", error);
-            content.innerHTML = `<p class="text-red-500">Error al cargar la información del agente.</p>`;
-        }
-
-        modal.classList.remove("hidden");
-    }
-</script>
 {% endblock %}

@@ -520,59 +520,95 @@ async function showAgentInfo(agentId) {
         // 🖼️ Generar la vista con los datos del agente
         content.innerHTML = `
             <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <h4 class="text-md font-semibold flex items-center">
-                        <i data-lucide="server" class="h-5 w-5 mr-2 text-blue-500"></i> Servidor
+                <div class="col-span-2">
+                    <h4 class="text-lg font-bold flex items-center text-blue-600">
+                        <i data-lucide="server" class="h-6 w-6 mr-2"></i> Información del Servidor
                     </h4>
-                    <p class="text-gray-600"><strong>Hostname:</strong> ${agent.hostname}</p>
-                    <p class="text-gray-600"><strong>IP:</strong> ${agent.ip_address}</p>
-                    <p class="text-gray-600"><strong>Tipo:</strong> ${agent.device_type}</p>
                 </div>
                 <div>
-                    <h4 class="text-md font-semibold flex items-center">
-                        <i data-lucide="user" class="h-5 w-5 mr-2 text-green-500"></i> Usuario
-                    </h4>
-                    <p class="text-gray-600"><strong>Nombre:</strong> ${agent.username}</p>
-                    <p class="text-gray-600"><strong>Status:</strong> ${agent.status}</p>
+                    <p class="text-gray-600"><strong>🖥️ Hostname:</strong> ${agent.hostname}</p>
+                    <p class="text-gray-600"><strong>📡 IP:</strong> ${agent.ip_address}</p>
+                    <p class="text-gray-600"><strong>💻 Tipo de Dispositivo:</strong> ${agent.device_type}</p>
+                    <p class="text-gray-600"><strong>🔌 Estado:</strong> ${agent.status}</p>
                 </div>
-                <div class="col-span-2 border-t pt-2">
-                    <h4 class="text-md font-semibold flex items-center">
-                        <i data-lucide="cpu" class="h-5 w-5 mr-2 text-red-500"></i> CPU
-                    </h4>
-                    <p class="text-gray-600"><strong>Modelo:</strong> ${agent.system_info.CPU.Modelo}</p>
-                    <p class="text-gray-600"><strong>Frecuencia:</strong> ${agent.system_info.CPU["Frecuencia (MHz)"]} MHz</p>
-                    <p class="text-gray-600"><strong>Uso:</strong> ${agent.system_info.CPU["Uso actual (%)"]}%</p>
+                <div>
+                    <p class="text-gray-600"><strong>👤 Usuario:</strong> ${agent.username}</p>
+                    <p class="text-gray-600"><strong>🆔 Token:</strong> ${agent.token}</p>
                 </div>
+
+                <!-- CPU -->
                 <div class="col-span-2 border-t pt-2">
-                    <h4 class="text-md font-semibold flex items-center">
-                        <i data-lucide="database" class="h-5 w-5 mr-2 text-purple-500"></i> Memoria RAM
+                    <h4 class="text-md font-semibold flex items-center text-red-500">
+                        <i data-lucide="cpu" class="h-5 w-5 mr-2"></i> Procesador
                     </h4>
-                    <p class="text-gray-600"><strong>Total:</strong> ${agent.system_info.Memoria["Total RAM (GB)"]} GB</p>
-                    <p class="text-gray-600"><strong>Disponible:</strong> ${agent.system_info.Memoria["Disponible RAM (GB)"]} GB</p>
-                    <p class="text-gray-600"><strong>Uso:</strong> ${agent.system_info.Memoria["Uso de RAM (%)"]}%</p>
+                    <p class="text-gray-600"><strong>⚙ Modelo:</strong> ${agent.cpu_info.Modelo}</p>
+                    <p class="text-gray-600"><strong>🔄 Frecuencia:</strong> ${agent.cpu_info["Frecuencia (MHz)"]} MHz</p>
+                    <p class="text-gray-600"><strong>📊 Uso:</strong> ${agent.cpu_info["Uso actual (%)"]}%</p>
                 </div>
+
+                <!-- Memoria RAM -->
                 <div class="col-span-2 border-t pt-2">
-                    <h4 class="text-md font-semibold flex items-center">
-                        <i data-lucide="hard-drive" class="h-5 w-5 mr-2 text-orange-500"></i> Discos
+                    <h4 class="text-md font-semibold flex items-center text-purple-500">
+                        <i data-lucide="database" class="h-5 w-5 mr-2"></i> Memoria RAM
                     </h4>
-                    ${agent.system_info.Discos.map(disk => `
-                        <p class="text-gray-600"><strong>${disk.Dispositivo}:</strong> ${disk["Total (GB)"]} GB, Usado: ${disk["Usado (GB)"]} GB</p>
+                    <p class="text-gray-600"><strong>💾 Total:</strong> ${agent.memory_info["Total RAM (GB)"]} GB</p>
+                    <p class="text-gray-600"><strong>📉 Disponible:</strong> ${agent.memory_info["Disponible RAM (GB)"]} GB</p>
+                    <p class="text-gray-600"><strong>📊 Uso:</strong> ${agent.memory_info["Uso de RAM (%)"]}%</p>
+                </div>
+
+                <!-- Discos -->
+                <div class="col-span-2 border-t pt-2">
+                    <h4 class="text-md font-semibold flex items-center text-orange-500">
+                        <i data-lucide="hard-drive" class="h-5 w-5 mr-2"></i> Discos
+                    </h4>
+                    ${agent.disk_info.map(disk => `
+                        <p class="text-gray-600"><strong>🖴 ${disk.Dispositivo}:</strong> ${disk["Total (GB)"]} GB, Usado: ${disk["Usado (GB)"]} GB</p>
                     `).join("")}
                 </div>
+
+                <!-- Red -->
                 <div class="col-span-2 border-t pt-2">
-                    <h4 class="text-md font-semibold flex items-center">
-                        <i data-lucide="wifi" class="h-5 w-5 mr-2 text-blue-500"></i> Red
+                    <h4 class="text-md font-semibold flex items-center text-blue-500">
+                        <i data-lucide="wifi" class="h-5 w-5 mr-2"></i> Conexión de Red
                     </h4>
-                    ${Object.entries(agent.system_info.Red).map(([interface, addresses]) => `
-                        <p class="text-gray-600"><strong>${interface}:</strong></p>
-                        ${addresses.map(addr => `<p class="text-gray-600 pl-4">- ${addr.Tipo}: ${addr.Dirección}</p>`).join("")}
+                    ${Object.entries(agent.network_info).map(([interface, addresses]) => `
+                        <p class="text-gray-600"><strong>🌐 ${interface}:</strong></p>
+                        ${addresses.map(addr => `<p class="text-gray-600 pl-4">🔹 ${addr.Tipo}: ${addr.Dirección}</p>`).join("")}
                     `).join("")}
+                </div>
+
+                <!-- GPU -->
+                <div class="col-span-2 border-t pt-2">
+                    <h4 class="text-md font-semibold flex items-center text-green-500">
+                        <i data-lucide="monitor" class="h-5 w-5 mr-2"></i> Tarjeta Gráfica
+                    </h4>
+                    ${agent.gpu_info ? `<p class="text-gray-600"><strong>🖥️ GPU:</strong> ${agent.gpu_info.Nombre}</p>` : `<p class="text-gray-500">🔹 No se detectó GPU.</p>`}
+                </div>
+
+                <!-- Batería -->
+                <div class="col-span-2 border-t pt-2">
+                    <h4 class="text-md font-semibold flex items-center text-yellow-500">
+                        <i data-lucide="battery-charging" class="h-5 w-5 mr-2"></i> Estado de la Batería
+                    </h4>
+                    <p class="text-gray-600"><strong>🔋 Carga:</strong> ${agent.battery_info.Porcentaje}%</p>
+                    <p class="text-gray-600"><strong>🔌 Enchufado:</strong> ${agent.battery_info.Enchufado ? "Sí" : "No"}</p>
+                </div>
+
+                <!-- Espacio en Disco -->
+                <div class="col-span-2 border-t pt-2">
+                    <h4 class="text-md font-semibold flex items-center text-gray-600">
+                        <i data-lucide="database" class="h-5 w-5 mr-2"></i> Espacio en Disco
+                    </h4>
+                    <p class="text-gray-600"><strong>📁 Total:</strong> ${agent.disk_usage["Total (GB)"]} GB</p>
+                    <p class="text-gray-600"><strong>📂 Usado:</strong> ${agent.disk_usage["Usado (GB)"]} GB</p>
+                    <p class="text-gray-600"><strong>📦 Libre:</strong> ${agent.disk_usage["Libre (GB)"]} GB</p>
                 </div>
             </div>
         `;
+
     } catch (error) {
-        console.error("Error obteniendo los datos del agente:", error);
-        content.innerHTML = `<p class="text-red-500">Error al cargar la información del agente.</p>`;
+        console.error("❌ Error obteniendo los datos del agente:", error);
+        content.innerHTML = `<p class="text-red-500">⚠ Error al cargar la información del agente.</p>`;
     }
 
     // 🔥 Mostrar el modal
