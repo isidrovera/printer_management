@@ -24,6 +24,7 @@ class AgentService:
         self.system_info = SystemInfoService()
         self.printer_service = PrinterService()
         self.reconnect_interval = 10
+        self.active_tunnels = {}
     
     async def start(self):
         """Inicia el agente, registrándolo si es necesario."""
@@ -180,6 +181,10 @@ class AgentService:
                 await self._handle_printer_installation(data, websocket)
             elif message_type == 'heartbeat':
                 await self._handle_heartbeat(websocket)
+            elif message_type == 'create_tunnel':
+                await self._handle_tunnel_creation(data, websocket)
+            elif message_type == 'close_tunnel':
+                await self._handle_tunnel_closure(data, websocket)
             else:
                 logger.warning(f"Tipo de mensaje desconocido: {message_type}")
                 
@@ -333,3 +338,171 @@ class AgentService:
 
         except Exception as e:
             logger.error(f"🚨 [AGENTE] Error en la actualización del agente: {e}")
+
+
+
+    async def _handle_tunnel_creation(self, data, websocket):
+        """Maneja la creación de túneles SSH."""
+        try:
+            # Validar datos requeridos
+            required_fields = ['remote_host', 'remote_port', 'local_port', 'username', 'password']
+            missing_fields = [field for field in required_fields if not data.get(field)]
+            
+            if missing_fields:
+                raise ValueError(f"Faltan campos requeridos: {', '.join(missing_fields)}")
+
+            tunnel_id = f"{data['remote_host']}:{data['remote_port']}-{data['local_port']}"
+            
+            # Verificar si ya existe un túnel con ese ID
+            if tunnel_id in self.active_tunnels:
+                raise ValueError(f"Ya existe un túnel activo para {tunnel_id}")
+
+            # Crear el túnel en un thread separado
+            tunnel_thread = threading.Thread(
+                target=self._create_tunnel,
+                args=(
+                    data['remote_host'],
+                    int(data['remote_port']),
+                    int(data['local_port']),
+                    data['username'],
+                    data['password'],
+                    tunnel_id,
+                    websocket
+                )
+            )
+            tunnel_thread.daemon = True
+            tunnel_thread.start()
+
+            # Registrar el túnel activo
+            self.active_tunnels[tunnel_id] = {
+                'thread': tunnel_thread,
+                'config': data,
+                'status': 'starting'
+            }
+
+            await websocket.send(json.dumps({
+                'type': 'tunnel_status',
+                'tunnel_id': tunnel_id,
+                'status': 'starting',
+                'message': 'Iniciando túnel SSH...'
+            }))
+
+        except Exception as e:
+            error_msg = f"Error creando túnel SSH: {str(e)}"
+            logger.error(error_msg)
+            await websocket.send(json.dumps({
+                'type': 'tunnel_status',
+                'status': 'error',
+                'message': error_msg
+            }))
+
+    def _create_tunnel(self, remote_host, remote_port, local_port, username, password, tunnel_id, websocket):
+        """Crea el túnel SSH."""
+        try:
+            # Crear cliente SSH
+            ssh = paramiko.SSHClient()
+            ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            
+            # Conectar al servidor remoto
+            ssh.connect(
+                remote_host,
+                username=username,
+                password=password,
+                look_for_keys=False
+            )
+
+            # Configurar el túnel
+            def handler(channel, remote_addr, server_addr):
+                try:
+                    sock = socket.socket()
+                    sock.connect(('127.0.0.1', local_port))
+
+                    while True:
+                        r, w, x = select.select([channel, sock], [], [])
+                        if channel in r:
+                            data = channel.recv(1024)
+                            if len(data) == 0:
+                                break
+                            sock.send(data)
+                        if sock in r:
+                            data = sock.recv(1024)
+                            if len(data) == 0:
+                                break
+                            channel.send(data)
+                    
+                    channel.close()
+                    sock.close()
+
+                except Exception as e:
+                    logger.error(f"Error en el handler del túnel: {e}")
+                    
+            # Iniciar el reenvío
+            forward = ssh.get_transport().request_port_forward('', remote_port, handler=handler)
+            
+            asyncio.run_coroutine_threadsafe(
+                self._send_tunnel_status(websocket, tunnel_id, 'active', 'Túnel establecido'), 
+                asyncio.get_event_loop()
+            )
+
+            # Mantener el túnel activo
+            while tunnel_id in self.active_tunnels:
+                if not ssh.get_transport():
+                    break
+                time.sleep(1)
+
+            ssh.close()
+
+        except Exception as e:
+            error_msg = f"Error en el túnel: {str(e)}"
+            logger.error(error_msg)
+            asyncio.run_coroutine_threadsafe(
+                self._send_tunnel_status(websocket, tunnel_id, 'error', error_msg),
+                asyncio.get_event_loop()
+            )
+
+    async def _handle_tunnel_closure(self, data, websocket):
+        """Maneja el cierre de túneles SSH."""
+        try:
+            tunnel_id = data.get('tunnel_id')
+            if not tunnel_id:
+                raise ValueError("Se requiere tunnel_id")
+
+            if tunnel_id in self.active_tunnels:
+                # Marcar el túnel para cierre
+                tunnel_info = self.active_tunnels.pop(tunnel_id)
+                # El thread se cerrará en la siguiente iteración
+                
+                await websocket.send(json.dumps({
+                    'type': 'tunnel_status',
+                    'tunnel_id': tunnel_id,
+                    'status': 'closed',
+                    'message': 'Túnel cerrado correctamente'
+                }))
+            else:
+                await websocket.send(json.dumps({
+                    'type': 'tunnel_status',
+                    'tunnel_id': tunnel_id,
+                    'status': 'error',
+                    'message': 'Túnel no encontrado'
+                }))
+
+        except Exception as e:
+            error_msg = f"Error cerrando túnel: {str(e)}"
+            logger.error(error_msg)
+            await websocket.send(json.dumps({
+                'type': 'tunnel_status',
+                'status': 'error',
+                'message': error_msg
+            }))
+
+    async def _send_tunnel_status(self, websocket, tunnel_id, status, message):
+        """Envía actualizaciones de estado del túnel al servidor."""
+        try:
+            await websocket.send(json.dumps({
+                'type': 'tunnel_status',
+                'tunnel_id': tunnel_id,
+                'status': status,
+                'message': message
+            }))
+        except Exception as e:
+            logger.error(f"Error enviando estado del túnel: {e}")
