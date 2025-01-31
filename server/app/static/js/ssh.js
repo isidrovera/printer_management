@@ -23,44 +23,28 @@ function addLogMessage(message, type = 'info') {
 async function handleSSHForm(event) {
     event.preventDefault();
     
-    const data = {
-        agent_id: parseInt(document.getElementById('sshAgentId').value),
-        ssh_host: document.getElementById('sshHost').value,
-        ssh_port: parseInt(document.getElementById('sshPort').value) || 22,
-        username: document.getElementById('sshUsername').value,
-        password: document.getElementById('sshPassword').value,
-        local_port: parseInt(document.getElementById('sshLocalPort').value),
-        remote_host: document.getElementById('remoteHost').value,
-        remote_port: parseInt(document.getElementById('sshRemotePort').value)
-    };
-
     try {
-        addLogMessage('Iniciando creación del túnel...');
         const response = await fetch('/api/v1/tunnels/create', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         });
 
+        const result = await response.json();
+        
         if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.detail || 'Error creando el túnel');
+            console.error('Error details:', result);
+            throw new Error(result.detail ? JSON.stringify(result.detail) : 'Error desconocido');
         }
 
-        const result = await response.json();
-        addLogMessage('Túnel creado exitosamente', 'success');
+        addLogMessage('Túnel creado exitosamente');
         closeModal('sshModal');
         showNotification('Túnel SSH creado exitosamente', 'success');
     } catch (error) {
         console.error('[ERROR]', error);
-        addLogMessage(`Error: ${error.message}`, 'error');
-        showNotification('Error: ' + error.message, 'error');
+        addLogMessage(error.message);
+        showNotification(error.message, 'error');
     }
-}
-
-function closeModal(modalId) {
-    document.getElementById(modalId).classList.add('hidden');
-    clearInterval(tunnelLogInterval);
 }
 
 document.addEventListener('DOMContentLoaded', function() {
