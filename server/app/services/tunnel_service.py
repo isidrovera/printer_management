@@ -4,6 +4,7 @@ from ..db.models.tunnel import Tunnel
 from ..db.models.agent import Agent
 from ..schemas.tunnel import TunnelCreate
 from fastapi import HTTPException
+from ..api.v1.endpoints.websocket import manager
 import logging
 from typing import List, Dict
 import asyncio
@@ -16,22 +17,20 @@ class TunnelService:
         self.active_tunnels: Dict[str, dict] = {}
 
     async def create_tunnel(self, tunnel_data: TunnelCreate) -> dict:
-        """Crea un nuevo túnel SSH."""
         try:
-            # Verificar que el agente existe
             agent = self.db.query(Agent).filter(Agent.id == tunnel_data.agent_id).first()
             if not agent:
                 raise HTTPException(status_code=404, detail="Agente no encontrado")
 
+            # Obtener el websocket del manager de conexiones
+            websocket = manager.agent_connections.get(agent.token)
+            if not websocket:
+                raise HTTPException(status_code=503, detail="Agente no está conectado")
+
             # Crear el ID único del túnel
             tunnel_id = f"{tunnel_data.remote_host}:{tunnel_data.remote_port}-{tunnel_data.local_port}"
 
-            # Verificar si ya existe un túnel con ese ID
-            existing_tunnel = self.db.query(Tunnel).filter(Tunnel.tunnel_id == tunnel_id).first()
-            if existing_tunnel and existing_tunnel.status == 'active':
-                raise HTTPException(status_code=400, detail="Ya existe un túnel activo con esos parámetros")
-
-            # Crear el registro del túnel
+            # Crear registro del túnel
             tunnel = Tunnel(
                 agent_id=tunnel_data.agent_id,
                 tunnel_id=tunnel_id,
@@ -46,14 +45,17 @@ class TunnelService:
             self.db.commit()
             self.db.refresh(tunnel)
 
-            # Enviar comando al agente a través del WebSocket
-            await self._send_tunnel_command(agent, 'create_tunnel', {
+            # Enviar comando al agente
+            await websocket.send_json({
+                'type': 'create_tunnel',
                 'tunnel_id': tunnel_id,
+                'ssh_host': tunnel_data.ssh_host,
+                'ssh_port': tunnel_data.ssh_port,
+                'username': tunnel_data.username,
+                'password': tunnel_data.password,
                 'remote_host': tunnel_data.remote_host,
                 'remote_port': tunnel_data.remote_port,
-                'local_port': tunnel_data.local_port,
-                'username': tunnel_data.username,
-                'password': tunnel_data.password
+                'local_port': tunnel_data.local_port
             })
 
             return tunnel
