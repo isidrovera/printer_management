@@ -23,20 +23,31 @@ function addLogMessage(message, type = 'info') {
 async function handleSSHForm(event) {
     event.preventDefault();
     
+    const data = {
+        agent_id: parseInt(document.getElementById('sshAgentId').value),
+        ssh_host: document.getElementById('sshHost').value,
+        ssh_port: parseInt(document.getElementById('sshPort').value) || 22,
+        username: document.getElementById('sshUsername').value,
+        password: document.getElementById('sshPassword').value,
+        remote_host: document.getElementById('remoteHost').value,
+        remote_port: parseInt(document.getElementById('sshRemotePort').value),
+        local_port: parseInt(document.getElementById('sshLocalPort').value)
+    };
+ 
     try {
         const response = await fetch('/api/v1/tunnels/create', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         });
-
+ 
         const result = await response.json();
         
         if (!response.ok) {
             console.error('Error details:', result);
             throw new Error(result.detail ? JSON.stringify(result.detail) : 'Error desconocido');
         }
-
+ 
         addLogMessage('Túnel creado exitosamente');
         closeModal('sshModal');
         showNotification('Túnel SSH creado exitosamente', 'success');
@@ -45,15 +56,14 @@ async function handleSSHForm(event) {
         addLogMessage(error.message);
         showNotification(error.message, 'error');
     }
-}
-
-document.addEventListener('DOMContentLoaded', function() {
+ }
+ 
+ document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('sshForm');
     if (form) {
         form.addEventListener('submit', handleSSHForm);
     }
-});
-
+ });
 
 async function createTunnel(data) {
     try {
