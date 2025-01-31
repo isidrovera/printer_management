@@ -1,18 +1,18 @@
 // static/js/ssh.js
-async function toggleSSH(agentToken) {
+async function toggleSSH(agentToken, agentId) {
     const modal = document.getElementById('sshModal');
     document.getElementById('sshAgentToken').value = agentToken;
+    document.getElementById('sshAgentId').value = agentId;
     modal.classList.remove('hidden');
 }
 
-// static/js/ssh.js
 async function handleSSHForm(event) {
     event.preventDefault();
     
     const data = {
         agent_id: parseInt(document.getElementById('sshAgentId').value),
         ssh_host: document.getElementById('sshHost').value,
-        ssh_port: parseInt(document.getElementById('sshPort').value) || 22,
+        ssh_port: parseInt(document.getElementById('sshPort').value),
         username: document.getElementById('sshUsername').value,
         password: document.getElementById('sshPassword').value,
         local_port: parseInt(document.getElementById('sshLocalPort').value),
@@ -28,12 +28,14 @@ async function handleSSHForm(event) {
         });
 
         if (!response.ok) {
-            throw new Error(await response.text());
+            const errorData = await response.json();
+            throw new Error(JSON.stringify(errorData));
         }
 
         showNotification('Túnel SSH creado exitosamente', 'success');
         closeModal('sshModal');
     } catch (error) {
+        console.error('[ERROR]', error);
         showNotification('Error: ' + error.message, 'error');
     }
 }
