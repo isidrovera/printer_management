@@ -9,13 +9,13 @@ class TunnelCreate(BaseModel):
     ssh_port: int = 22
     username: str
     password: str
-    local_port: int
     remote_host: str
     remote_port: int
+    local_port: int
     description: Optional[str] = None
 
 class TunnelResponse(BaseModel):
-    id: int 
+    id: int
     tunnel_id: str
     remote_host: str
     remote_port: int

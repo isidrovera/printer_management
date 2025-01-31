@@ -69,3 +69,27 @@ document.addEventListener('DOMContentLoaded', function() {
         form.addEventListener('submit', handleSSHForm);
     }
 });
+
+
+async function createTunnel(data) {
+    try {
+        const response = await fetch('/api/v1/tunnels/create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+        if (!response.ok) {
+            throw new Error(JSON.stringify(result.detail));
+        }
+
+        addLogMessage('Túnel creado exitosamente');
+        closeModal('sshModal');
+        showNotification('Túnel SSH creado exitosamente', 'success');
+    } catch (error) {
+        console.error('[ERROR]', error);
+        addLogMessage(`Error: ${error.message}`, 'error');
+        showNotification(error.message, 'error');
+    }
+}
