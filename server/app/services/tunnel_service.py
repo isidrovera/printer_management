@@ -29,7 +29,17 @@ class TunnelService:
 
             # Crear el ID único del túnel
             tunnel_id = f"{tunnel_data.remote_host}:{tunnel_data.remote_port}-{tunnel_data.local_port}"
-
+            # Verificar túnel existente
+            existing_tunnel = self.db.query(Tunnel).filter(
+                Tunnel.tunnel_id == tunnel_id,
+                Tunnel.status != 'closed'
+            ).first()
+            
+            if existing_tunnel:
+                raise HTTPException(
+                    status_code=400, 
+                    detail=f"Ya existe un túnel activo con ID: {tunnel_id}"
+                )
             # Crear registro del túnel
             tunnel = Tunnel(
                 agent_id=tunnel_data.agent_id,
