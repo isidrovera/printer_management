@@ -1,14 +1,13 @@
 // static/js/ssh.js
 let tunnelLogInterval;
 
-async function toggleSSH(agentToken, agentId) {
+function toggleSSH(agentToken, agentId) {
     const modal = document.getElementById('sshModal');
     document.getElementById('sshAgentToken').value = agentToken;
-    document.getElementById('sshAgentId').value = agentId;
+    document.getElementById('sshAgentId').value = agentId;  // Asegurarse que este campo exista
     modal.classList.remove('hidden');
-
+    // Limpiar logs previos
     document.getElementById('sshLogMessages').innerHTML = '';
-    addLogMessage('Listo para crear túnel SSH...');
 }
 
 function addLogMessage(message, type = 'info') {
