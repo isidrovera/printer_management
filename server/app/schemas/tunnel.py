@@ -5,12 +5,13 @@ from datetime import datetime
 
 class TunnelCreate(BaseModel):
     agent_id: int
-    remote_host: str
+    ssh_host: str      # Servidor SSH al que nos conectaremos
+    ssh_port: int = 22 # Puerto SSH del servidor
+    username: str      # Usuario SSH
+    password: str      # Contraseña SSH
+    local_port: int    # Puerto local en Windows
+    remote_host: str   # Host al que queremos acceder a través del túnel
     remote_port: int
-    local_port: int
-    username: str
-    password: str
-    description: Optional[str] = None
 
 class TunnelResponse(BaseModel):
     id: int
