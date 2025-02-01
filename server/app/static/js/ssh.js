@@ -10,7 +10,7 @@ function toggleSSH(agentToken, agentId) {
     document.getElementById('sshLogMessages').innerHTML = '';
 }
 
-function addLogMessage(message, type = 'info') {
+function addSSHLogMessage(message, type = 'info') {
     const logsDiv = document.getElementById('sshLogMessages');
     const messageDiv = document.createElement('div');
     messageDiv.className = `text-sm ${type === 'error' ? 'text-red-600' : 'text-gray-600'}`;
@@ -47,12 +47,12 @@ async function handleSSHForm(event) {
             throw new Error(result.detail ? JSON.stringify(result.detail) : 'Error desconocido');
         }
  
-        addLogMessage('Túnel creado exitosamente');
+        addSSHLogMessage('Túnel creado exitosamente');
         closeModal('sshModal');
         showNotification('Túnel SSH creado exitosamente', 'success');
     } catch (error) {
         console.error('[ERROR]', error);
-        addLogMessage(error.message);
+        addSSHLogMessage(error.message);
         showNotification(error.message, 'error');
     }
  }
@@ -77,12 +77,12 @@ async function createTunnel(data) {
             throw new Error(JSON.stringify(result.detail));
         }
 
-        addLogMessage('Túnel creado exitosamente');
+        addSSHLogMessage('Túnel creado exitosamente');
         closeModal('sshModal');
         showNotification('Túnel SSH creado exitosamente', 'success');
     } catch (error) {
         console.error('[ERROR]', error);
-        addLogMessage(`Error: ${error.message}`, 'error');
+        addSSHLogMessage(`Error: ${error.message}`, 'error');
         showNotification(error.message, 'error');
     }
 }
