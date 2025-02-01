@@ -318,22 +318,24 @@ function initializeSearchFilter() {
 
 
 // Función para inicializar manejadores de formularios
-// En agents.js, corregir la función initializeFormHandlers
 function initializeFormHandlers() {
     const installForm = document.getElementById('installPrinterForm');
     if (installForm) {
         installForm.addEventListener('submit', async function(e) {
             e.preventDefault();
-            // Obtener el botón submit al inicio de la función
-            const submitButton = this.querySelector('button[type="submit"]');
 
             try {
+                const submitButton = installForm.querySelector('button[type="submit"]');
                 const driverId = document.getElementById('driver').value;
                 const printerIp = document.getElementById('printerIp').value;
 
                 if (!driverId || !printerIp) {
                     showNotification('Por favor complete todos los campos', 'error');
-                    addLogMessage('Error: Faltan campos requeridos', 'error');
+                    addLogMessage({
+                        timestamp: new Date().toISOString().replace('T', ' ').split('.')[0],
+                        type: 'error',
+                        message: 'Error: Faltan campos requeridos'
+                    });
                     return;
                 }
 
@@ -348,7 +350,11 @@ function initializeFormHandlers() {
                 submitButton.disabled = true;
                 submitButton.innerHTML = 'Instalando...';
                 
-                addLogMessage('Iniciando instalación de impresora...');
+                addLogMessage({
+                    timestamp: new Date().toISOString().replace('T', ' ').split('.')[0],
+                    type: 'info',
+                    message: 'Iniciando instalación de impresora...'
+                });
 
                 const response = await fetch(`/api/v1/printers/install/${currentAgentToken}`, {
                     method: 'POST',
@@ -362,13 +368,16 @@ function initializeFormHandlers() {
                     })
                 });
 
-                const data = await response.json();
-
                 if (!response.ok) {
-                    throw new Error(data.detail || `Error en la instalación: ${response.status}`);
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || `Error en la instalación: ${response.status}`);
                 }
 
-                addLogMessage('Comando enviado. La instalación continúa en segundo plano...');
+                addLogMessage({
+                    timestamp: new Date().toISOString().replace('T', ' ').split('.')[0],
+                    type: 'info',
+                    message: 'Comando enviado. La instalación continúa en segundo plano...'
+                });
 
                 // Cambiar el texto del botón de cerrar
                 const closeButton = document.querySelector('button[onclick="closeModal(\'installPrinterModal\')"]');
@@ -382,19 +391,18 @@ function initializeFormHandlers() {
 
             } catch (error) {
                 console.error('Error detallado:', error);
-                addLogMessage(`Error: ${error.message}`, 'error');
+                addLogMessage({
+                    timestamp: new Date().toISOString().replace('T', ' ').split('.')[0],
+                    type: 'error',
+                    message: `Error: ${error.message}`
+                });
                 
                 // Reactivar el botón de envío en caso de error
-                if (submitButton) {
-                    submitButton.disabled = false;
-                    submitButton.innerHTML = 'Instalar';
-                }
+                submitButton.disabled = false;
+                submitButton.innerHTML = 'Instalar';
                 
                 // Limpiar instalación actual
                 WS_CONFIG.currentInstallation = null;
-
-                // Mostrar notificación de error
-                showNotification(error.message, 'error');
             }
         });
     }
