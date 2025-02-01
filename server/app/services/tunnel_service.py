@@ -15,60 +15,51 @@ class TunnelService:
        self.db = db
 
    async def create_tunnel(self, tunnel_data: TunnelCreate) -> dict:
-       """Crea un nuevo túnel SSH."""
-       try:
-           logger.info(f"Iniciando creación de túnel con datos: {tunnel_data}")
-           
-           tunnel_id = f"{tunnel_data.remote_host}:{tunnel_data.remote_port}-{tunnel_data.local_port}"
-           logger.debug(f"ID del túnel generado: {tunnel_id}")
-           
-           # Verificar túnel existente
-           existing_tunnel = self.db.query(Tunnel).filter(
-               Tunnel.tunnel_id == tunnel_id,
-               Tunnel.status != 'closed'
-           ).first()
+        """Crea un nuevo túnel SSH."""
+        try:
+            logger.info(f"Iniciando creación de túnel con datos: {tunnel_data}")
+            
+            tunnel_id = f"{tunnel_data.remote_host}:{tunnel_data.remote_port}-{tunnel_data.local_port}"
+            logger.debug(f"ID del túnel generado: {tunnel_id}")
+            
+            # Modificar la verificación del túnel existente
+            existing_tunnel = self.db.query(Tunnel).filter(
+                Tunnel.tunnel_id == tunnel_id
+            ).first()
 
-           if existing_tunnel:
-               logger.warning(f"Túnel ya existe con ID: {tunnel_id}")
-               return JSONResponse(
-                   status_code=400,
-                   content={"detail": f"Ya existe un túnel activo con ID: {tunnel_id}"}
-               )
+            if existing_tunnel:
+                logger.info(f"Encontrado túnel existente: {tunnel_id} con estado: {existing_tunnel.status}")
+                if existing_tunnel.status != 'closed':
+                    logger.warning(f"Túnel activo encontrado con ID: {tunnel_id}")
+                    return JSONResponse(
+                        status_code=400,
+                        content={"detail": f"Ya existe un túnel activo con ID: {tunnel_id}"}
+                    )
+                else:
+                    # Si el túnel existe pero está cerrado, lo actualizamos
+                    logger.info(f"Actualizando túnel cerrado: {tunnel_id}")
+                    existing_tunnel.status = 'creating'
+                    existing_tunnel.agent_id = tunnel_data.agent_id
+                    self.db.commit()
+                    tunnel = existing_tunnel
 
-           # Verificar agente
-           agent = self.db.query(Agent).filter(Agent.id == tunnel_data.agent_id).first()
-           if not agent:
-               logger.error(f"Agente no encontrado con ID: {tunnel_data.agent_id}")
-               return JSONResponse(
-                   status_code=404,
-                   content={"detail": "Agente no encontrado"}
-               )
-
-           logger.debug(f"Verificando conexión WebSocket para agente: {agent.token}")
-           websocket = manager.agent_connections.get(agent.token)
-           if not websocket:
-               logger.error(f"Agente {agent.token} no está conectado")
-               return JSONResponse(
-                   status_code=503,
-                   content={"detail": "Agente no está conectado"}
-               )
-
-           # Crear registro del túnel
-           logger.debug("Creando registro del túnel en la base de datos")
-           tunnel = Tunnel(
-               agent_id=tunnel_data.agent_id,
-               tunnel_id=tunnel_id,
-               remote_host=tunnel_data.remote_host,
-               remote_port=tunnel_data.remote_port,
-               local_port=tunnel_data.local_port,
-               status='creating',
-               description=tunnel_data.description
-           )
-           
-           self.db.add(tunnel)
-           self.db.commit()
-           self.db.refresh(tunnel)
-           logger.info(f"Túnel creado en BD con ID: {tunnel.id}")
+            else:
+                # Crear nuevo túnel si no existe
+                logger.debug("Creando nuevo registro de túnel en la base de datos")
+                tunnel = Tunnel(
+                    agent_id=tunnel_data.agent_id,
+                    tunnel_id=tunnel_id,
+                    remote_host=tunnel_data.remote_host,
+                    remote_port=tunnel_data.remote_port,
+                    local_port=tunnel_data.local_port,
+                    status='creating',
+                    description=tunnel_data.description
+                )
+                
+                self.db.add(tunnel)
+                self.db.commit()
+                self.db.refresh(tunnel)
+                logger.info(f"Nuevo túnel creado en BD con ID: {tunnel.id}")
 
            # Preparar comando para el agente
            command = {
