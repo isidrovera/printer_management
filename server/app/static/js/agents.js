@@ -43,45 +43,7 @@ function handleWebSocketReconnection(event) {
         }
     }
 }
-// Función específica para logs de impresora
-function addPrinterLog(message, type = 'info') {
-    const logContainer = document.getElementById('logMessages');
-    if (!logContainer) return;
 
-    const logEntry = document.createElement('div');
-    const timestamp = new Date().toLocaleTimeString();
-    
-    let classes = 'py-1 px-2 rounded';
-    let symbol = '';
-    switch (type) {
-        case 'success':
-            classes += ' text-green-700 bg-green-50';
-            symbol = '✓';
-            break;
-        case 'error':
-            classes += ' text-red-700 bg-red-50';
-            symbol = '✗';
-            break;
-        case 'warning':
-            classes += ' text-yellow-700 bg-yellow-50';
-            symbol = '⚠';
-            break;
-        default:
-            classes += ' text-gray-700';
-            symbol = '→';
-    }
-
-    logEntry.className = classes;
-    logEntry.innerHTML = `<span class="text-xs text-gray-500">${timestamp}</span> ${symbol} ${message}`;
-    
-    logContainer.appendChild(logEntry);
-    logContainer.scrollTop = logContainer.scrollHeight;
-
-    // Mantener solo los últimos N mensajes
-    while (logContainer.children.length > 50) {
-        logContainer.removeChild(logContainer.firstChild);
-    }
-}
 // Función para añadir un mensaje de log
 function addLogMessage(message, type = 'info') {
     const logContainer = document.getElementById('logMessages');
