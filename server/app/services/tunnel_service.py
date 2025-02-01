@@ -5,6 +5,7 @@ from ..db.models.agent import Agent
 from ..schemas.tunnel import TunnelCreate
 from fastapi import HTTPException
 from ..api.v1.endpoints.websocket import manager
+from fastapi.responses import JSONResponse
 import logging
 from typing import List, Dict
 import asyncio
@@ -16,19 +17,13 @@ class TunnelService:
         self.db = db
         self.active_tunnels: Dict[str, dict] = {}
 
+    # server/app/services/tunnel_service.py
     async def create_tunnel(self, tunnel_data: TunnelCreate) -> dict:
         try:
-            agent = self.db.query(Agent).filter(Agent.id == tunnel_data.agent_id).first()
-            if not agent:
-                raise HTTPException(status_code=404, detail="Agente no encontrado")
-
-            # Obtener el websocket del manager de conexiones
-            websocket = manager.agent_connections.get(agent.token)
-            if not websocket:
-                raise HTTPException(status_code=503, detail="Agente no está conectado")
-
-            # Crear el ID único del túnel
+            logger.debug(f"Creando túnel con datos: {tunnel_data}")
+            
             tunnel_id = f"{tunnel_data.remote_host}:{tunnel_data.remote_port}-{tunnel_data.local_port}"
+            
             # Verificar túnel existente
             existing_tunnel = self.db.query(Tunnel).filter(
                 Tunnel.tunnel_id == tunnel_id,
@@ -36,11 +31,29 @@ class TunnelService:
             ).first()
             
             if existing_tunnel:
-                raise HTTPException(
-                    status_code=400, 
-                    detail=f"Ya existe un túnel activo con ID: {tunnel_id}"
+                logger.warning(f"Túnel ya existe: {tunnel_id}")
+                # Importante: Cambiar de raise HTTPException a return para manejar el error correctamente
+                return JSONResponse(
+                    status_code=400,
+                    content={"detail": f"Ya existe un túnel activo con ID: {tunnel_id}"}
                 )
-            # Crear registro del túnel
+
+            agent = self.db.query(Agent).filter(Agent.id == tunnel_data.agent_id).first()
+            if not agent:
+                return JSONResponse(
+                    status_code=404,
+                    content={"detail": "Agente no encontrado"}
+                )
+
+            # Verificar conexión WebSocket
+            websocket = manager.active_connections.get(agent.token)
+            if not websocket:
+                return JSONResponse(
+                    status_code=503,
+                    content={"detail": "Agente no está conectado"}
+                )
+
+            # Crear el túnel
             tunnel = Tunnel(
                 agent_id=tunnel_data.agent_id,
                 tunnel_id=tunnel_id,
@@ -73,7 +86,10 @@ class TunnelService:
         except Exception as e:
             self.db.rollback()
             logger.error(f"Error creando túnel: {str(e)}")
-            raise HTTPException(status_code=500, detail=str(e))
+            return JSONResponse(
+                status_code=500,
+                content={"detail": f"Error interno: {str(e)}"}
+            )
 
     async def close_tunnel(self, tunnel_id: str) -> dict:
         """Cierra un túnel SSH existente."""
