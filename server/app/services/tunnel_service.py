@@ -22,7 +22,7 @@ class TunnelService:
             tunnel_id = f"{tunnel_data.remote_host}:{tunnel_data.remote_port}-{tunnel_data.local_port}"
             logger.debug(f"ID del túnel generado: {tunnel_id}")
             
-            # Modificar la verificación del túnel existente
+            # Verificar túnel existente
             existing_tunnel = self.db.query(Tunnel).filter(
                 Tunnel.tunnel_id == tunnel_id
             ).first()
@@ -42,7 +42,6 @@ class TunnelService:
                     existing_tunnel.agent_id = tunnel_data.agent_id
                     self.db.commit()
                     tunnel = existing_tunnel
-
             else:
                 # Crear nuevo túnel si no existe
                 logger.debug("Creando nuevo registro de túnel en la base de datos")
@@ -61,42 +60,60 @@ class TunnelService:
                 self.db.refresh(tunnel)
                 logger.info(f"Nuevo túnel creado en BD con ID: {tunnel.id}")
 
-           # Preparar comando para el agente
-           command = {
-               'type': 'create_tunnel',
-               'tunnel_id': tunnel_id,
-               'ssh_host': tunnel_data.ssh_host,
-               'ssh_port': tunnel_data.ssh_port,
-               'username': tunnel_data.username,
-               'password': tunnel_data.password,
-               'remote_host': tunnel_data.remote_host,
-               'remote_port': tunnel_data.remote_port,
-               'local_port': tunnel_data.local_port
-           }
+            # Verificar agente
+            agent = self.db.query(Agent).filter(Agent.id == tunnel_data.agent_id).first()
+            if not agent:
+                logger.error(f"Agente no encontrado con ID: {tunnel_data.agent_id}")
+                return JSONResponse(
+                    status_code=404,
+                    content={"detail": "Agente no encontrado"}
+                )
 
-           # Enviar comando al agente
-           logger.debug(f"Enviando comando al agente: {command}")
-           try:
-               await websocket.send_json(command)
-               logger.info(f"Comando enviado exitosamente al agente {agent.token}")
-           except Exception as e:
-               logger.error(f"Error enviando comando al agente: {str(e)}")
-               tunnel.status = 'error'
-               self.db.commit()
-               raise HTTPException(
-                   status_code=500,
-                   detail=f"Error enviando comando al agente: {str(e)}"
-               )
+            logger.debug(f"Verificando conexión WebSocket para agente: {agent.token}")
+            websocket = manager.agent_connections.get(agent.token)
+            if not websocket:
+                logger.error(f"Agente {agent.token} no está conectado")
+                return JSONResponse(
+                    status_code=503,
+                    content={"detail": "Agente no está conectado"}
+                )
 
-           return tunnel
+            # Preparar comando para el agente
+            command = {
+                'type': 'create_tunnel',
+                'tunnel_id': tunnel_id,
+                'ssh_host': tunnel_data.ssh_host,
+                'ssh_port': tunnel_data.ssh_port,
+                'username': tunnel_data.username,
+                'password': tunnel_data.password,
+                'remote_host': tunnel_data.remote_host,
+                'remote_port': tunnel_data.remote_port,
+                'local_port': tunnel_data.local_port
+            }
 
-       except Exception as e:
-           logger.error(f"Error inesperado creando túnel: {str(e)}")
-           self.db.rollback()
-           return JSONResponse(
-               status_code=500,
-               content={"detail": f"Error interno del servidor: {str(e)}"}
-           )
+            # Enviar comando al agente
+            logger.debug(f"Enviando comando al agente: {command}")
+            try:
+                await websocket.send_json(command)
+                logger.info(f"Comando enviado exitosamente al agente {agent.token}")
+            except Exception as e:
+                logger.error(f"Error enviando comando al agente: {str(e)}")
+                tunnel.status = 'error'
+                self.db.commit()
+                raise HTTPException(
+                    status_code=500,
+                    detail=f"Error enviando comando al agente: {str(e)}"
+                )
+
+            return tunnel
+
+        except Exception as e:
+            logger.error(f"Error inesperado creando túnel: {str(e)}")
+            self.db.rollback()
+            return JSONResponse(
+                status_code=500,
+                content={"detail": f"Error interno del servidor: {str(e)}"}
+            )
 
    async def close_tunnel(self, tunnel_id: str) -> dict:
        """Cierra un túnel SSH existente."""
