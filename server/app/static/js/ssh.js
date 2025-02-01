@@ -22,7 +22,8 @@ function addSSHLogMessage(message, type = 'info') {
 async function handleSSHForm(event) {
     event.preventDefault();
     
-    const data = {
+    // Obtener datos del formulario
+    const formData = {
         agent_id: parseInt(document.getElementById('sshAgentId').value),
         ssh_host: document.getElementById('sshHost').value,
         ssh_port: parseInt(document.getElementById('sshPort').value) || 22,
@@ -34,28 +35,81 @@ async function handleSSHForm(event) {
     };
  
     try {
+        // Intentar crear el túnel
+        addSSHLogMessage('Iniciando creación del túnel...');
         const response = await fetch('/api/v1/tunnels/create', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
         });
  
         const result = await response.json();
-        
+ 
+        // Manejar respuesta
         if (!response.ok) {
-            console.error('Error details:', result);
-            throw new Error(result.detail ? JSON.stringify(result.detail) : 'Error desconocido');
+            // Si ya existe un túnel
+            if (response.status === 400 && result.detail.includes('Ya existe un túnel activo')) {
+                const tunnelId = `${formData.remote_host}:${formData.remote_port}-${formData.local_port}`;
+                
+                if (confirm(`Ya existe un túnel activo (${tunnelId}). ¿Desea cerrarlo y crear uno nuevo?`)) {
+                    addSSHLogMessage('Cerrando túnel existente...');
+                    
+                    // Cerrar túnel existente
+                    const deleteResponse = await fetch(`/api/v1/tunnels/${tunnelId}`, {
+                        method: 'DELETE'
+                    });
+ 
+                    if (!deleteResponse.ok) {
+                        throw new Error('Error al cerrar el túnel existente');
+                    }
+ 
+                    addSSHLogMessage('Túnel cerrado. Creando nuevo túnel...');
+ 
+                    // Intentar crear el túnel nuevamente
+                    const retryResponse = await fetch('/api/v1/tunnels/create', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(formData)
+                    });
+ 
+                    if (!retryResponse.ok) {
+                        const retryError = await retryResponse.json();
+                        throw new Error(retryError.detail || 'Error creando el nuevo túnel');
+                    }
+ 
+                    addSSHLogMessage('Túnel creado exitosamente');
+                    showNotification('Túnel SSH creado exitosamente', 'success');
+                    closeModal('sshModal');
+                }
+            } else {
+                // Otros errores
+                throw new Error(result.detail || 'Error desconocido');
+            }
+        } else {
+            // Éxito en la primera creación
+            addSSHLogMessage('Túnel creado exitosamente');
+            showNotification('Túnel SSH creado exitosamente', 'success');
+            closeModal('sshModal');
         }
  
-        addSSHLogMessage('Túnel creado exitosamente');
-        closeModal('sshModal');
-        showNotification('Túnel SSH creado exitosamente', 'success');
     } catch (error) {
         console.error('[ERROR]', error);
-        addSSHLogMessage(error.message);
+        addSSHLogMessage(`Error: ${error.message}`, 'error');
         showNotification(error.message, 'error');
     }
  }
+ 
+ // Asegurar que el formulario existe antes de agregar el event listener
+ document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('sshForm');
+    if (form) {
+        form.addEventListener('submit', handleSSHForm);
+    }
+ });
  
  document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('sshForm');
