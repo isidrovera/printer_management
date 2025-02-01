@@ -91,30 +91,58 @@ class TunnelService:
                 content={"detail": f"Error interno: {str(e)}"}
             )
 
+    # server/app/services/tunnel_service.py
     async def close_tunnel(self, tunnel_id: str) -> dict:
         """Cierra un túnel SSH existente."""
         try:
             tunnel = self.db.query(Tunnel).filter(Tunnel.tunnel_id == tunnel_id).first()
             if not tunnel:
-                raise HTTPException(status_code=404, detail="Túnel no encontrado")
+                return JSONResponse(
+                    status_code=404,
+                    content={"detail": "Túnel no encontrado"}
+                )
 
             agent = self.db.query(Agent).filter(Agent.id == tunnel.agent_id).first()
             if not agent:
-                raise HTTPException(status_code=404, detail="Agente no encontrado")
+                return JSONResponse(
+                    status_code=404,
+                    content={"detail": "Agente no encontrado"}
+                )
+
+            # Usar el manager para obtener el websocket
+            websocket = manager.active_connections.get(agent.token)
+            if not websocket:
+                # Si no hay conexión, solo actualizamos el estado
+                tunnel.status = 'closed'
+                self.db.commit()
+                return JSONResponse(
+                    status_code=200,
+                    content={"message": "Túnel marcado como cerrado"}
+                )
 
             # Enviar comando de cierre al agente
-            await self._send_tunnel_command(agent, 'close_tunnel', {
-                'tunnel_id': tunnel_id
-            })
+            try:
+                await websocket.send_json({
+                    'type': 'close_tunnel',
+                    'tunnel_id': tunnel_id
+                })
+            except Exception as e:
+                logger.error(f"Error enviando comando de cierre: {e}")
 
             tunnel.status = 'closed'
             self.db.commit()
 
-            return {"message": "Túnel cerrado correctamente"}
+            return JSONResponse(
+                status_code=200,
+                content={"message": "Túnel cerrado correctamente"}
+            )
 
         except Exception as e:
             logger.error(f"Error cerrando túnel: {str(e)}")
-            raise HTTPException(status_code=500, detail=str(e))
+            return JSONResponse(
+                status_code=500,
+                content={"detail": f"Error cerrando túnel: {str(e)}"}
+            )
 
     async def list_tunnels(self) -> List[Tunnel]:
         """Lista todos los túneles."""
