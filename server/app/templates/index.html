@@ -1,81 +1,229 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Gestión de Impresoras</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/dashboard.css">
-</head>
-<body>
-    <nav class="navbar">
-        <h1>Sistema de Gestión de Impresoras</h1>
-        <div class="nav-icons">
-            <i class="fas fa-bell animated-icon"></i>
-            <i class="fas fa-cog animated-icon"></i>
-        </div>
-    </nav>
-    <div class="dashboard-grid">
-        <!-- Clientes -->
-        <div class="card" data-aos="fade-up">
-            <div class="icon-circle">
-                <i class="fas fa-users animated-icon"></i>
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div class="bg-white shadow">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="flex justify-between items-center">
+            <div class="flex items-center">
+                <i class="fas fa-tachometer-alt text-blue-600 text-3xl mr-3"></i>
+                <h1 class="text-2xl font-bold text-gray-900">Panel de Control</h1>
             </div>
-            <h2>Clientes</h2>
-            <a href="/clients" class="card-link">
-                Gestionar
-                <i class="fas fa-arrow-right"></i>
-            </a>
+            <div class="flex items-center space-x-4">
+                <button class="relative p-2 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg">
+                    <span class="sr-only">Notificaciones</span>
+                    <i class="fas fa-bell text-xl"></i>
+                    <span class="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-400 ring-2 ring-white"></span>
+                </button>
+                <button class="p-2 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg">
+                    <span class="sr-only">Configuración</span>
+                    <i class="fas fa-cog text-xl"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Stats Overview -->
+    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+        <!-- Total Clientes -->
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 bg-blue-100 rounded-lg p-3">
+                        <i class="fas fa-users text-blue-600 text-2xl"></i>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Total Clientes</dt>
+                            <dd class="text-2xl font-semibold text-gray-900">128</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-blue-50 px-5 py-3">
+                <div class="text-sm">
+                    <a href="/clients" class="font-medium text-blue-700 hover:text-blue-900">Ver detalles</a>
+                </div>
+            </div>
         </div>
 
-        <!-- Agentes -->
-        <div class="card" data-aos="fade-up" data-aos-delay="100">
-            <div class="icon-circle">
-                <i class="fas fa-user-tie animated-icon"></i>
+        <!-- Agentes Online -->
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 bg-green-100 rounded-lg p-3">
+                        <i class="fas fa-desktop text-green-600 text-2xl"></i>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Agentes Online</dt>
+                            <dd class="text-2xl font-semibold text-gray-900">85</dd>
+                        </dl>
+                    </div>
+                </div>
             </div>
-            <h2>Agentes</h2>
-            <a href="/agents" class="card-link">
-                Gestionar
-                <i class="fas fa-arrow-right"></i>
-            </a>
-        </div>
-
-        <!-- Drivers -->
-        <div class="card" data-aos="fade-up" data-aos-delay="200">
-            <div class="icon-circle">
-                <i class="fas fa-print animated-icon"></i>
+            <div class="bg-green-50 px-5 py-3">
+                <div class="text-sm">
+                    <a href="/agents" class="font-medium text-green-700 hover:text-green-900">Ver detalles</a>
+                </div>
             </div>
-            <h2>Drivers</h2>
-            <a href="/drivers" class="card-link">
-                Gestionar
-                <i class="fas fa-arrow-right"></i>
-            </a>
         </div>
 
         <!-- Túneles SSH -->
-        <div class="card" data-aos="fade-up" data-aos-delay="250">
-            <div class="icon-circle">
-                <i class="fas fa-network-wired animated-icon"></i>
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 bg-purple-100 rounded-lg p-3">
+                        <i class="fas fa-network-wired text-purple-600 text-2xl"></i>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Túneles Activos</dt>
+                            <dd class="text-2xl font-semibold text-gray-900">24</dd>
+                        </dl>
+                    </div>
+                </div>
             </div>
-            <h2>Túneles SSH</h2>
-            <a href="/tunnels" class="card-link">
-                Gestionar
-                <i class="fas fa-arrow-right"></i>
-            </a>
+            <div class="bg-purple-50 px-5 py-3">
+                <div class="text-sm">
+                    <a href="/tunnels" class="font-medium text-purple-700 hover:text-purple-900">Ver detalles</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Impresoras -->
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 bg-red-100 rounded-lg p-3">
+                        <i class="fas fa-print text-red-600 text-2xl"></i>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Impresoras</dt>
+                            <dd class="text-2xl font-semibold text-gray-900">256</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-red-50 px-5 py-3">
+                <div class="text-sm">
+                    <a href="/printers" class="font-medium text-red-700 hover:text-red-900">Ver detalles</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menu Cards -->
+    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <!-- Clientes -->
+        <div class="bg-white overflow-hidden shadow-lg rounded-lg hover:shadow-xl transition-shadow duration-300">
+            <div class="px-6 py-8">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="bg-blue-100 rounded-lg p-3">
+                        <i class="fas fa-users text-blue-600 text-2xl"></i>
+                    </div>
+                    <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">Principal</span>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-2">Clientes</h3>
+                <p class="text-gray-600 mb-6">Gestiona los clientes y sus configuraciones</p>
+                <a href="/clients" class="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium">
+                    Gestionar
+                    <i class="fas fa-arrow-right ml-2"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Agentes -->
+        <div class="bg-white overflow-hidden shadow-lg rounded-lg hover:shadow-xl transition-shadow duration-300">
+            <div class="px-6 py-8">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="bg-green-100 rounded-lg p-3">
+                        <i class="fas fa-desktop text-green-600 text-2xl"></i>
+                    </div>
+                    <span class="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">Activo</span>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-2">Agentes</h3>
+                <p class="text-gray-600 mb-6">Administra los agentes y su estado</p>
+                <a href="/agents" class="inline-flex items-center text-green-600 hover:text-green-700 font-medium">
+                    Gestionar
+                    <i class="fas fa-arrow-right ml-2"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Drivers -->
+        <div class="bg-white overflow-hidden shadow-lg rounded-lg hover:shadow-xl transition-shadow duration-300">
+            <div class="px-6 py-8">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="bg-red-100 rounded-lg p-3">
+                        <i class="fas fa-print text-red-600 text-2xl"></i>
+                    </div>
+                    <span class="bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">Esencial</span>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-2">Drivers</h3>
+                <p class="text-gray-600 mb-6">Gestiona los drivers de impresoras</p>
+                <a href="/drivers" class="inline-flex items-center text-red-600 hover:text-red-700 font-medium">
+                    Gestionar
+                    <i class="fas fa-arrow-right ml-2"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Túneles SSH -->
+        <div class="bg-white overflow-hidden shadow-lg rounded-lg hover:shadow-xl transition-shadow duration-300">
+            <div class="px-6 py-8">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="bg-purple-100 rounded-lg p-3">
+                        <i class="fas fa-network-wired text-purple-600 text-2xl"></i>
+                    </div>
+                    <span class="bg-purple-100 text-purple-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">Seguro</span>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-2">Túneles SSH</h3>
+                <p class="text-gray-600 mb-6">Administra las conexiones seguras</p>
+                <a href="/tunnels" class="inline-flex items-center text-purple-600 hover:text-purple-700 font-medium">
+                    Gestionar
+                    <i class="fas fa-arrow-right ml-2"></i>
+                </a>
+            </div>
         </div>
 
         <!-- Estadísticas -->
-        <div class="card" data-aos="fade-up" data-aos-delay="300">
-            <div class="icon-circle">
-                <i class="fas fa-chart-bar animated-icon"></i>
+        <div class="bg-white overflow-hidden shadow-lg rounded-lg hover:shadow-xl transition-shadow duration-300">
+            <div class="px-6 py-8">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="bg-amber-100 rounded-lg p-3">
+                        <i class="fas fa-chart-line text-amber-600 text-2xl"></i>
+                    </div>
+                    <span class="bg-amber-100 text-amber-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">Análisis</span>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-2">Estadísticas</h3>
+                <p class="text-gray-600 mb-6">Visualiza métricas y reportes</p>
+                <a href="/stats" class="inline-flex items-center text-amber-600 hover:text-amber-700 font-medium">
+                    Gestionar
+                    <i class="fas fa-arrow-right ml-2"></i>
+                </a>
             </div>
-            <h2>Estadísticas</h2>
-            <a href="/stats" class="card-link">
-                Gestionar
-                <i class="fas fa-arrow-right"></i>
-            </a>
         </div>
     </div>
-    <script src="/static/js/dashboard.js"></script>
-</body>
-</html>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Animación para las tarjetas al cargar
+    const cards = document.querySelectorAll('.card');
+    cards.forEach((card, index) => {
+        setTimeout(() => {
+            card.classList.add('visible');
+        }, 100 * index);
+    });
+});
+</script>
+{% endblock %}
