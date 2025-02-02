@@ -28,6 +28,7 @@
 <!-- Main Content -->
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Stats Overview -->
+    <!-- Stats Overview -->
     <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
         <!-- Total Clientes -->
         <div class="bg-white overflow-hidden shadow rounded-lg">
@@ -39,14 +40,21 @@
                     <div class="ml-5 w-0 flex-1">
                         <dl>
                             <dt class="text-sm font-medium text-gray-500 truncate">Total Clientes</dt>
-                            <dd class="text-2xl font-semibold text-gray-900">128</dd>
+                            <dd class="text-2xl font-semibold text-gray-900">{{ stats.total_clients }}</dd>
                         </dl>
                     </div>
                 </div>
             </div>
             <div class="bg-blue-50 px-5 py-3">
                 <div class="text-sm">
-                    <a href="/clients" class="font-medium text-blue-700 hover:text-blue-900">Ver detalles</a>
+                    <a href="/clients" class="font-medium text-blue-700 hover:text-blue-900">
+                        Ver detalles
+                        {% if stats.total_clients > 0 %}
+                        <span class="ml-2 text-xs bg-blue-200 text-blue-800 px-2 py-0.5 rounded-full">
+                            Activo
+                        </span>
+                        {% endif %}
+                    </a>
                 </div>
             </div>
         </div>
@@ -61,14 +69,23 @@
                     <div class="ml-5 w-0 flex-1">
                         <dl>
                             <dt class="text-sm font-medium text-gray-500 truncate">Agentes Online</dt>
-                            <dd class="text-2xl font-semibold text-gray-900">85</dd>
+                            <dd class="text-2xl font-semibold text-gray-900">
+                                {{ stats.agents.online }} / {{ stats.agents.total }}
+                            </dd>
                         </dl>
                     </div>
                 </div>
             </div>
             <div class="bg-green-50 px-5 py-3">
                 <div class="text-sm">
-                    <a href="/agents" class="font-medium text-green-700 hover:text-green-900">Ver detalles</a>
+                    <a href="/agents" class="font-medium text-green-700 hover:text-green-900">
+                        Ver detalles
+                        {% if stats.agents.online > 0 %}
+                        <span class="ml-2 text-xs bg-green-200 text-green-800 px-2 py-0.5 rounded-full">
+                            {{ (stats.agents.online / stats.agents.total * 100)|round|int }}% Online
+                        </span>
+                        {% endif %}
+                    </a>
                 </div>
             </div>
         </div>
@@ -83,14 +100,23 @@
                     <div class="ml-5 w-0 flex-1">
                         <dl>
                             <dt class="text-sm font-medium text-gray-500 truncate">Túneles Activos</dt>
-                            <dd class="text-2xl font-semibold text-gray-900">24</dd>
+                            <dd class="text-2xl font-semibold text-gray-900">
+                                {{ stats.tunnels.active }} / {{ stats.tunnels.total }}
+                            </dd>
                         </dl>
                     </div>
                 </div>
             </div>
             <div class="bg-purple-50 px-5 py-3">
                 <div class="text-sm">
-                    <a href="/tunnels" class="font-medium text-purple-700 hover:text-purple-900">Ver detalles</a>
+                    <a href="/tunnels" class="font-medium text-purple-700 hover:text-purple-900">
+                        Ver detalles
+                        {% if stats.tunnels.active > 0 %}
+                        <span class="ml-2 text-xs bg-purple-200 text-purple-800 px-2 py-0.5 rounded-full">
+                            {{ (stats.tunnels.active / stats.tunnels.total * 100)|round|int }}% Activos
+                        </span>
+                        {% endif %}
+                    </a>
                 </div>
             </div>
         </div>
@@ -105,14 +131,23 @@
                     <div class="ml-5 w-0 flex-1">
                         <dl>
                             <dt class="text-sm font-medium text-gray-500 truncate">Impresoras</dt>
-                            <dd class="text-2xl font-semibold text-gray-900">256</dd>
+                            <dd class="text-2xl font-semibold text-gray-900">
+                                {{ stats.printers.online }} / {{ stats.printers.total }}
+                            </dd>
                         </dl>
                     </div>
                 </div>
             </div>
             <div class="bg-red-50 px-5 py-3">
                 <div class="text-sm">
-                    <a href="/printers" class="font-medium text-red-700 hover:text-red-900">Ver detalles</a>
+                    <a href="/printers" class="font-medium text-red-700 hover:text-red-900">
+                        Ver detalles
+                        {% if stats.printers.online > 0 %}
+                        <span class="ml-2 text-xs bg-red-200 text-red-800 px-2 py-0.5 rounded-full">
+                            {{ (stats.printers.online / stats.printers.total * 100)|round|int }}% Online
+                        </span>
+                        {% endif %}
+                    </a>
                 </div>
             </div>
         </div>
