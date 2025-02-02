@@ -36,3 +36,10 @@ class ClientService:
             self.db.commit()
             return True
         return False
+    async def get_count(self) -> int:
+        """Obtiene el número total de clientes."""
+        try:
+            return self.db.query(Client).count()
+        except Exception as e:
+            logger.error(f"Error obteniendo conteo de clientes: {str(e)}")
+            return 0
