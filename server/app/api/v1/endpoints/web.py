@@ -7,6 +7,7 @@ from app.db.session import get_db
 from app.services.client_service import ClientService
 from app.services.agent_service import AgentService
 from app.services.driver_service import DriverService
+from app.services.tunnel_service import TunnelService
 from fastapi import File, UploadFile
 from pathlib import Path
 from app.core.config import settings
