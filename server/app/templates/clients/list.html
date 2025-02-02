@@ -13,7 +13,7 @@
                        id="searchInput" 
                        placeholder="Buscar clientes..." 
                        class="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                <i data-lucide="search" class="absolute right-3 top-2.5 h-5 w-5 text-gray-400"></i>
+                <i class="fas fa-search absolute right-3 top-2.5 h-5 w-5 text-gray-400"></i>
             </div>
 
             <!-- Controles de vista -->
@@ -22,18 +22,18 @@
                     <button id="listViewBtn" 
                             class="flex items-center p-2 rounded-md transition-all"
                             aria-label="Vista Lista">
-                        <i data-lucide="layout-list" class="h-5 w-5"></i>
+                        <i class="fas fa-list h-5 w-5"></i>
                     </button>
                     <button id="kanbanViewBtn"
                             class="flex items-center p-2 rounded-md transition-all"
                             aria-label="Vista Kanban">
-                        <i data-lucide="grid" class="h-5 w-5"></i>
+                        <i class="fas fa-th h-5 w-5"></i>
                     </button>
                 </div>
                 
                 <a href="/clients/create" 
                    class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors">
-                    <i data-lucide="plus" class="h-5 w-5"></i>
+                    <i class="fas fa-plus h-5 w-5"></i>
                     <span>Nuevo Cliente</span>
                 </a>
             </div>
@@ -41,7 +41,7 @@
     </div>
 
     <!-- Vista Lista -->
-    <div id="listView" class="overflow-x-auto">
+    <div id="listView" class="overflow-x-auto shadow ring-1 ring-black ring-opacity-5 rounded-lg">
         <table class="w-full border-collapse">
             <thead class="bg-gray-50">
                 <tr>
@@ -52,9 +52,9 @@
                     <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-200 bg-white">
+            <tbody class="bg-white divide-y divide-gray-200">
                 {% for client in clients %}
-                <tr class="hover:bg-gray-50 transition-colors">
+                <tr class="hover:bg-gray-50 transition-colors" data-client-id="{{ client.id }}">
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ client.id }}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ client.name }}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-500">{{ client.token }}</td>
@@ -77,15 +77,13 @@
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div class="flex items-center justify-end space-x-2">
                             <a href="/clients/{{ client.id }}/edit" 
-                               class="inline-flex items-center px-3 py-2 bg-amber-100 text-amber-700 rounded-lg hover:bg-amber-200 transition-colors"
-                               title="Editar">
-                                <i data-lucide="pencil" class="h-4 w-4"></i>
+                               class="inline-flex items-center px-3 py-2 bg-amber-100 text-amber-700 rounded-lg hover:bg-amber-200 transition-colors">
+                                <i class="fas fa-pencil-alt h-4 w-4"></i>
                                 <span class="ml-1">Editar</span>
                             </a>
                             <button onclick="confirmDelete('{{ client.id }}')"
-                                    class="inline-flex items-center px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
-                                    title="Eliminar">
-                                <i data-lucide="trash" class="h-4 w-4"></i>
+                                    class="inline-flex items-center px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors">
+                                <i class="fas fa-trash h-4 w-4"></i>
                                 <span class="ml-1">Eliminar</span>
                             </button>
                         </div>
@@ -94,17 +92,24 @@
                 {% endfor %}
             </tbody>
         </table>
+
+        {% if not clients %}
+        <div class="text-center py-8">
+            <p class="text-gray-500">No hay clientes registrados</p>
+        </div>
+        {% endif %}
     </div>
 
     <!-- Vista Kanban -->
     <div id="kanbanView" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
         {% for client in clients %}
-        <div class="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+        <div class="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow" 
+             data-client-id="{{ client.id }}">
             <div class="p-5">
                 <div class="flex justify-between items-center mb-4">
                     <div class="flex items-center space-x-3">
                         <div class="flex-shrink-0">
-                            <i data-lucide="user" class="h-6 w-6 text-gray-400"></i>
+                            <i class="fas fa-user h-6 w-6 text-gray-400"></i>
                         </div>
                         <div>
                             <h3 class="text-lg font-medium text-gray-900">{{ client.name }}</h3>
@@ -132,85 +137,30 @@
                 </div>
                 <div class="mt-6 flex justify-end space-x-2">
                     <a href="/clients/{{ client.id }}/edit" 
-                       class="inline-flex items-center px-3 py-2 bg-amber-100 text-amber-700 rounded-lg hover:bg-amber-200 transition-colors"
-                       title="Editar">
-                        <i data-lucide="pencil" class="h-4 w-4"></i>
+                       class="inline-flex items-center px-3 py-2 bg-amber-100 text-amber-700 rounded-lg hover:bg-amber-200 transition-colors">
+                        <i class="fas fa-pencil-alt h-4 w-4"></i>
                         <span class="ml-1">Editar</span>
                     </a>
                     <button onclick="confirmDelete('{{ client.id }}')"
-                            class="inline-flex items-center px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
-                            title="Eliminar">
-                        <i data-lucide="trash" class="h-4 w-4"></i>
+                            class="inline-flex items-center px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors">
+                        <i class="fas fa-trash h-4 w-4"></i>
                         <span class="ml-1">Eliminar</span>
                     </button>
                 </div>
             </div>
         </div>
         {% endfor %}
+
+        {% if not clients %}
+        <div class="col-span-full text-center py-8">
+            <p class="text-gray-500">No hay clientes registrados</p>
+        </div>
+        {% endif %}
     </div>
 </div>
+{% endblock %}
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const listView = document.getElementById('listView');
-    const kanbanView = document.getElementById('kanbanView');
-    const listViewBtn = document.getElementById('listViewBtn');
-    const kanbanViewBtn = document.getElementById('kanbanViewBtn');
-    const searchInput = document.getElementById('searchInput');
-
-    function updateViewButtons(activeView) {
-        if (activeView === 'list') {
-            listViewBtn.classList.add('bg-white', 'shadow', 'text-blue-600');
-            listViewBtn.classList.remove('text-gray-600');
-            kanbanViewBtn.classList.remove('bg-white', 'shadow', 'text-blue-600');
-            kanbanViewBtn.classList.add('text-gray-600');
-        } else {
-            kanbanViewBtn.classList.add('bg-white', 'shadow', 'text-blue-600');
-            kanbanViewBtn.classList.remove('text-gray-600');
-            listViewBtn.classList.remove('bg-white', 'shadow', 'text-blue-600');
-            listViewBtn.classList.add('text-gray-600');
-        }
-    }
-
-    function switchView(view) {
-        if (view === 'list') {
-            listView.classList.remove('hidden');
-            kanbanView.classList.add('hidden');
-        } else {
-            kanbanView.classList.remove('hidden');
-            listView.classList.add('hidden');
-        }
-        updateViewButtons(view);
-        localStorage.setItem('preferredView', view);
-    }
-
-    listViewBtn.addEventListener('click', () => switchView('list'));
-    kanbanViewBtn.addEventListener('click', () => switchView('kanban'));
-
-    searchInput.addEventListener('input', function(e) {
-        const searchTerm = e.target.value.toLowerCase();
-        const rows = document.querySelectorAll('tbody tr');
-        const cards = document.querySelectorAll('#kanbanView > div');
-
-        rows.forEach(row => {
-            const text = row.textContent.toLowerCase();
-            row.style.display = text.includes(searchTerm) ? '' : 'none';
-        });
-
-        cards.forEach(card => {
-            const text = card.textContent.toLowerCase();
-            card.style.display = text.includes(searchTerm) ? '' : 'none';
-        });
-    });
-
-    const preferredView = localStorage.getItem('preferredView') || 'list';
-    switchView(preferredView);
-});
-
-function confirmDelete(id) {
-    if (confirm('¿Estás seguro de que deseas eliminar este cliente?')) {
-        console.log('Eliminando cliente:', id);
-    }
-}
-</script>
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+<script src="/static/js/clients.js"></script>
 {% endblock %}
