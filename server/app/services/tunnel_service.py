@@ -201,4 +201,43 @@ class TunnelService:
                detail=f"Error obteniendo lista de túneles: {str(e)}"
            )
 
-    
+    # Agregar este método a tu clase TunnelService en tunnel_service.py
+
+    async def get_tunnel_info(self, tunnel_id: str) -> dict:
+        """Obtiene información detallada de un túnel específico."""
+        try:
+            logger.debug(f"Buscando túnel con ID: {tunnel_id}")
+            tunnel = self.db.query(Tunnel).filter(Tunnel.tunnel_id == tunnel_id).first()
+            
+            if not tunnel:
+                logger.warning(f"Túnel no encontrado: {tunnel_id}")
+                return None
+                
+            # Obtener información del agente asociado
+            agent = self.db.query(Agent).filter(Agent.id == tunnel.agent_id).first()
+            
+            # Construir respuesta con información detallada
+            tunnel_info = {
+                "tunnel_id": tunnel.tunnel_id,
+                "status": tunnel.status,
+                "remote_host": tunnel.remote_host,
+                "remote_port": tunnel.remote_port,
+                "local_port": tunnel.local_port,
+                "description": tunnel.description,
+                "created_at": tunnel.created_at.isoformat() if tunnel.created_at else None,
+                "agent": {
+                    "hostname": agent.hostname if agent else None,
+                    "username": agent.username if agent else None,
+                    "ip_address": agent.ip_address if agent else None
+                }
+            }
+            
+            logger.info(f"Información del túnel {tunnel_id} recuperada exitosamente")
+            return tunnel_info
+            
+        except Exception as e:
+            logger.error(f"Error recuperando información del túnel: {str(e)}")
+            raise HTTPException(
+                status_code=500,
+                detail=f"Error obteniendo información del túnel: {str(e)}"
+            )
