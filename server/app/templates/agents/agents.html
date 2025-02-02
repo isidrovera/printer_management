@@ -3,8 +3,12 @@
 
 {% block content %}
 <div class="bg-white shadow-lg rounded-lg p-6 mx-auto max-w-7xl">
+    <!-- Header con búsqueda -->
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-        <h2 class="text-2xl font-bold text-gray-800">Gestión de Agentes</h2>
+        <div class="flex items-center space-x-2">
+            <i class="fas fa-microchip text-blue-600 text-2xl"></i>
+            <h2 class="text-2xl font-bold text-gray-800">Gestión de Agentes</h2>
+        </div>
         <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto">
             <!-- Barra de búsqueda -->
             <div class="relative flex-grow sm:flex-grow-0">
@@ -12,7 +16,62 @@
                        id="searchInput" 
                        placeholder="Buscar agentes..." 
                        class="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                <i data-lucide="search" class="absolute right-3 top-2.5 h-5 w-5 text-gray-400"></i>
+                <i class="fas fa-search absolute right-3 top-2.5 h-5 w-5 text-gray-400"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resumen de estados -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <!-- Total Agentes -->
+        <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500">Total Agentes</p>
+                    <h3 class="text-2xl font-bold text-gray-900">{{ agents|length }}</h3>
+                </div>
+                <div class="bg-blue-100 p-3 rounded-lg">
+                    <i class="fas fa-microchip text-blue-600 text-xl"></i>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Agentes Online -->
+        <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500">Online</p>
+                    <h3 class="text-2xl font-bold text-green-600">{{ agents|selectattr('status', 'equalto', 'online')|list|length }}</h3>
+                </div>
+                <div class="bg-green-100 p-3 rounded-lg">
+                    <i class="fas fa-check-circle text-green-600 text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Agentes Offline -->
+        <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500">Offline</p>
+                    <h3 class="text-2xl font-bold text-red-600">{{ agents|selectattr('status', 'equalto', 'offline')|list|length }}</h3>
+                </div>
+                <div class="bg-red-100 p-3 rounded-lg">
+                    <i class="fas fa-times-circle text-red-600 text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Túneles SSH Activos -->
+        <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500">Túneles SSH</p>
+                    <h3 class="text-2xl font-bold text-purple-600">{{ agents|selectattr('ssh_status', 'equalto', 'open')|list|length }}</h3>
+                </div>
+                <div class="bg-purple-100 p-3 rounded-lg">
+                    <i class="fas fa-network-wired text-purple-600 text-xl"></i>
+                </div>
             </div>
         </div>
     </div>
@@ -34,51 +93,77 @@
             <tbody class="bg-white divide-y divide-gray-200">
                 {% for agent in agents %}
                 <tr class="hover:bg-gray-50 transition-colors" data-agent-id="{{ agent.id }}" data-agent-token="{{ agent.token }}">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ agent.client.name }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ agent.hostname }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ agent.username }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ agent.ip_address }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ agent.device_type }}</td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                        <div class="flex items-center">
+                            <i class="fas fa-building text-gray-400 mr-2"></i>
+                            <span class="text-sm text-gray-900">{{ agent.client.name }}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <i class="fas fa-desktop text-blue-400 mr-2"></i>
+                            <span class="text-sm text-gray-900">{{ agent.hostname }}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <i class="fas fa-user text-green-400 mr-2"></i>
+                            <span class="text-sm text-gray-900">{{ agent.username }}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <i class="fas fa-network-wired text-purple-400 mr-2"></i>
+                            <span class="text-sm text-gray-900">{{ agent.ip_address }}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <i class="fas fa-{% if agent.device_type == 'desktop' %}desktop{% else %}laptop{% endif %} text-amber-400 mr-2"></i>
+                            <span class="text-sm text-gray-900">{{ agent.device_type }}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
                                    {% if agent.status == 'online' %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
-                            <span class="w-2 h-2 mr-2 rounded-full {% if agent.status == 'online' %}bg-green-400{% else %}bg-red-400{% endif %}"></span>
+                            <i class="fas fa-{% if agent.status == 'online' %}circle{% else %}circle-xmark{% endif %} mr-2"></i>
                             {{ agent.status|capitalize }}
                         </span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <div class="flex items-center justify-end space-x-3">
+                        <div class="flex items-center justify-end space-x-2">
                             <!-- Botón Instalar Impresora -->
                             <button onclick="showInstallPrinter('{{ agent.token }}')" 
                                     {% if agent.status != 'online' %}disabled{% endif %}
-                                    class="inline-flex items-center justify-center w-10 h-10 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-md"
+                                    class="inline-flex items-center px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                     title="Instalar Impresora">
-                                <i data-lucide="printer" class="h-5 w-5 stroke-[2]"></i>
+                                <i class="fas fa-print mr-2"></i>
+                                <span>Instalar</span>
                             </button>
                             
-                            <!-- Botón Ver Info (Verde Oscuro) -->
+                            <!-- Botón Ver Info -->
                             <button onclick="showAgentInfo({{ agent.id }})"
-                            class="inline-flex items-center justify-center w-10 h-10 bg-green-800 text-white rounded-lg hover:bg-green-900 transition-all shadow-sm hover:shadow-md"
-                            title="Ver Info Completa">
-                            <i data-lucide="eye" class="h-6 w-6 stroke-[2]"></i>
+                                    class="inline-flex items-center px-3 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors"
+                                    title="Ver Info Completa">
+                                <i class="fas fa-info-circle mr-2"></i>
+                                <span>Info</span>
                             </button>
 
-                            <!-- Botón SSH (Negro) -->
+                            <!-- Botón SSH -->
                             <button onclick="toggleSSH('{{ agent.token }}', {{ agent.id }})" 
-                                {% if agent.status != 'online' %}disabled{% endif %}
-                                class="inline-flex items-center justify-center w-10 h-10 bg-gray-900 text-white rounded-lg hover:bg-black transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-md"
-                                title="{% if agent.ssh_status == 'open' %}Cerrar SSH{% else %}Abrir SSH{% endif %}">
-                                <i data-lucide="{% if agent.ssh_status == 'open' %}unlock{% else %}lock{% endif %}" 
-                                class="h-6 w-6 stroke-[2]"></i>
+                                    {% if agent.status != 'online' %}disabled{% endif %}
+                                    class="inline-flex items-center px-3 py-2 {% if agent.ssh_status == 'open' %}bg-purple-100 text-purple-700{% else %}bg-gray-100 text-gray-700{% endif %} rounded-lg hover:bg-{% if agent.ssh_status == 'open' %}purple{% else %}gray{% endif %}-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    title="{% if agent.ssh_status == 'open' %}Cerrar SSH{% else %}Abrir SSH{% endif %}">
+                                <i class="fas fa-{% if agent.ssh_status == 'open' %}lock-open{% else %}lock{% endif %} mr-2"></i>
+                                <span>SSH</span>
                             </button>
 
-
-                    
                             <!-- Botón Eliminar -->
                             <button onclick="deleteAgent({{ agent.id }})"
-                                    class="inline-flex items-center justify-center w-10 h-10 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all shadow-sm hover:shadow-md"
+                                    class="inline-flex items-center px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
                                     title="Eliminar">
-                                <i data-lucide="trash-2" class="h-5 w-5 stroke-[2]"></i>
+                                <i class="fas fa-trash-alt mr-2"></i>
+                                <span>Eliminar</span>
                             </button>
                         </div>
                     </td>
@@ -86,15 +171,18 @@
                 {% endfor %}
             </tbody>
         </table>
-    </div>
 
-    {% if not agents %}
-    <div class="text-center py-8">
-        <p class="text-gray-500">No hay agentes registrados</p>
+        {% if not agents %}
+        <div class="text-center py-12">
+            <div class="flex flex-col items-center">
+                <i class="fas fa-microchip text-gray-400 text-5xl mb-4"></i>
+                <h3 class="text-lg font-medium text-gray-900">No hay agentes registrados</h3>
+                <p class="text-gray-500 mt-2">No se encontraron agentes en el sistema.</p>
+            </div>
+        </div>
+        {% endif %}
     </div>
-    {% endif %}
 </div>
-
 <!-- Modal de Información del Agente -->
 <div class="fixed inset-0 hidden z-50" id="agentInfoModal">
     <div class="absolute inset-0 bg-black bg-opacity-50"></div>
@@ -104,25 +192,28 @@
                 <!-- Cabecera fija -->
                 <div class="sticky top-0 flex justify-between items-center p-6 border-b bg-gray-50 rounded-t-lg">
                     <div class="flex items-center space-x-2">
-                        <i data-lucide="info" class="h-6 w-6 text-blue-500"></i>
-                        <h3 class="text-2xl font-semibold text-gray-800">Información Completa del Agente</h3>
+                        <i class="fas fa-info-circle text-blue-500 text-xl"></i>
+                        <h3 class="text-2xl font-semibold text-gray-800">Información del Agente</h3>
                     </div>
                     <button onclick="closeModal('agentInfoModal')" 
                             class="text-gray-500 hover:text-gray-800 transition-colors">
-                        <i data-lucide="x-circle" class="h-8 w-8"></i>
+                        <i class="fas fa-times-circle text-2xl"></i>
                     </button>
                 </div>
                 
                 <!-- Contenido scrolleable -->
                 <div class="p-6 overflow-y-auto max-h-[calc(100vh-200px)]" id="agentInfoContent">
-                    <p class="text-center text-gray-500">Cargando información...</p>
+                    <div class="flex justify-center items-center">
+                        <i class="fas fa-circle-notch fa-spin text-blue-500 text-2xl mr-3"></i>
+                        <p class="text-gray-500 text-lg">Cargando información...</p>
+                    </div>
                 </div>
 
-                <!-- Footer fijo con botón de cerrar -->
+                <!-- Footer fijo -->
                 <div class="sticky bottom-0 flex justify-end items-center p-6 border-t bg-gray-50 rounded-b-lg">
                     <button onclick="closeModal('agentInfoModal')" 
                             class="flex items-center space-x-2 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">
-                        <i data-lucide="x" class="h-5 w-5"></i>
+                        <i class="fas fa-times"></i>
                         <span>Cerrar</span>
                     </button>
                 </div>
@@ -133,19 +224,22 @@
 
 <!-- Modal SSH -->
 <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden z-50 overflow-y-auto" id="sshModal">
-    <div class="bg-white rounded-lg shadow-lg w-full max-w-4xl mx-4 my-6">  <!-- Ajustado max-w-4xl y agregado my-6 -->
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-4xl mx-4 my-6">
         <div class="flex justify-between items-center p-4 border-b">
-            <h3 class="text-lg font-semibold text-gray-800">Configuración SSH</h3>
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-terminal text-gray-800 text-xl"></i>
+                <h3 class="text-lg font-semibold text-gray-800">Configuración SSH</h3>
+            </div>
             <button onclick="closeModal('sshModal')" class="text-gray-500 hover:text-gray-700">
-                <i data-lucide="x" class="h-5 w-5"></i>
+                <i class="fas fa-times text-xl"></i>
             </button>
         </div>
         
-        <form id="sshForm" class="p-6">  <!-- Aumentado padding -->
+        <form id="sshForm" class="p-6">
             <input type="hidden" id="sshAgentToken">
             <input type="hidden" id="sshAgentId">
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">  <!-- Grid de 2 columnas -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Servidor SSH</label>
                     <input type="text" id="sshHost" required placeholder="ejemplo.com o IP"
@@ -168,8 +262,14 @@
  
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Contraseña SSH</label>
-                    <input type="password" id="sshPassword" required placeholder="contraseña"
-                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    <div class="relative">
+                        <input type="password" id="sshPassword" required placeholder="contraseña"
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 pr-10">
+                        <button type="button" onclick="togglePasswordVisibility('sshPassword')"
+                                class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-500">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
                 </div>
  
                 <div>
@@ -197,29 +297,38 @@
             <!-- Log Area -->
             <div class="mt-6">
                 <label class="block text-sm font-medium text-gray-700 mb-2">Estado del Túnel</label>
-                <div id="sshLogs" class="bg-gray-50 rounded p-3 h-32 overflow-y-auto font-mono text-sm">
+                <div id="sshLogs" class="bg-gray-50 rounded-lg p-3 h-32 overflow-y-auto font-mono text-sm">
                     <div class="space-y-1" id="sshLogMessages"></div>
                 </div>
             </div>
  
             <div class="mt-6 flex justify-end space-x-3">
                 <button type="button" onclick="closeModal('sshModal')"
-                        class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
-                    Cancelar
+                        class="flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+                    <i class="fas fa-times mr-2"></i>
+                    <span>Cancelar</span>
                 </button>
                 <button type="submit"
-                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                    Crear Túnel
+                        class="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                    <i class="fas fa-play mr-2"></i>
+                    <span>Crear Túnel</span>
                 </button>
             </div>
         </form>
     </div>
- </div>
+</div>
+
 <!-- Modal Instalar Impresora -->
 <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden z-50" id="installPrinterModal">
     <div class="bg-white rounded-lg shadow-lg max-w-md w-full mx-4">
-        <div class="p-4 border-b">
-            <h3 class="text-lg font-semibold text-gray-800">Instalar Impresora</h3>
+        <div class="flex justify-between items-center p-4 border-b">
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-print text-gray-800 text-xl"></i>
+                <h3 class="text-lg font-semibold text-gray-800">Instalar Impresora</h3>
+            </div>
+            <button onclick="closeModal('installPrinterModal')" class="text-gray-500 hover:text-gray-700">
+                <i class="fas fa-times text-xl"></i>
+            </button>
         </div>
         <form id="installPrinterForm" class="p-4">
             <input type="hidden" id="agentToken" name="agentToken">
@@ -240,10 +349,10 @@
                        placeholder="192.168.1.100"
                        pattern="^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
                        class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                <p class="mt-1 text-sm text-gray-500">Formato: xxx.xxx.xxx.xxx</p>
+                <p class="mt-1 text-xs text-gray-500">Formato: xxx.xxx.xxx.xxx</p>
             </div>
 
-            <!-- Área de Logs - NUEVO -->
+            <!-- Área de Logs -->
             <div class="mt-4 border-t pt-4">
                 <h4 class="text-sm font-medium text-gray-700 mb-2">Logs de Instalación</h4>
                 <div id="installationLogs" 
@@ -258,26 +367,27 @@
             <div class="mt-6 flex justify-end space-x-3">
                 <button type="button" 
                         onclick="closeModal('installPrinterModal')"
-                        class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
-                    Cancelar
+                        class="flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+                    <i class="fas fa-times mr-2"></i>
+                    <span>Cancelar</span>
                 </button>
                 <button type="submit"
-                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                    Instalar
+                        class="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                    <i class="fas fa-plus mr-2"></i>
+                    <span>Instalar</span>
                 </button>
             </div>
         </form>
     </div>
 </div>
+
+<!-- Contenedor de notificaciones -->
+<div id="notification-container" class="fixed bottom-4 right-4 z-50 space-y-2"></div>
+
 {% endblock %}
 
 {% block scripts %}
-<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
 <script src="/static/js/agents.js"></script>
 <script src="/static/js/ssh.js"></script>
-<script>
-    // Inicializar todos los iconos de Lucide
-    lucide.createIcons();
-</script>
-
 {% endblock %}
