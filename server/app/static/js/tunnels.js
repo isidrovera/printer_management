@@ -1,36 +1,63 @@
-// Función para mostrar información del túnel
+// Actualizar la función showTunnelInfo en tunnels.js
+
 async function showTunnelInfo(tunnelId) {
     try {
-        const response = await fetch(`/api/v1/tunnels/${tunnelId}`);
+        const response = await fetch(`/api/v1/tunnels/${encodeURIComponent(tunnelId)}`);
         if (!response.ok) {
-            throw new Error('Error obteniendo información del túnel');
+            throw new Error(`Error: ${response.statusText}`);
         }
+        
         const tunnelInfo = await response.json();
         
         // Construir el contenido HTML con la información del túnel
         const content = `
             <div class="space-y-4">
-                <div>
-                    <h4 class="text-sm font-medium text-gray-500">ID del Túnel</h4>
-                    <p class="mt-1">${tunnelInfo.tunnel_id}</p>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <h4 class="text-sm font-medium text-gray-500">ID del Túnel</h4>
+                        <p class="mt-1">${tunnelInfo.tunnel_id}</p>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-medium text-gray-500">Estado</h4>
+                        <p class="mt-1">${tunnelInfo.status}</p>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-medium text-gray-500">Host Remoto</h4>
+                        <p class="mt-1">${tunnelInfo.remote_host}</p>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-medium text-gray-500">Puerto Remoto</h4>
+                        <p class="mt-1">${tunnelInfo.remote_port}</p>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-medium text-gray-500">Puerto Local</h4>
+                        <p class="mt-1">${tunnelInfo.local_port}</p>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-medium text-gray-500">Creado</h4>
+                        <p class="mt-1">${new Date(tunnelInfo.created_at).toLocaleString()}</p>
+                    </div>
                 </div>
-                <div>
-                    <h4 class="text-sm font-medium text-gray-500">Host Remoto</h4>
-                    <p class="mt-1">${tunnelInfo.remote_host}</p>
+                
+                <div class="mt-6">
+                    <h4 class="text-sm font-medium text-gray-500">Información del Agente</h4>
+                    <div class="mt-2 grid grid-cols-2 gap-4">
+                        <div>
+                            <h5 class="text-xs font-medium text-gray-500">Hostname</h5>
+                            <p class="mt-1">${tunnelInfo.agent.hostname}</p>
+                        </div>
+                        <div>
+                            <h5 class="text-xs font-medium text-gray-500">Usuario</h5>
+                            <p class="mt-1">${tunnelInfo.agent.username}</p>
+                        </div>
+                        <div>
+                            <h5 class="text-xs font-medium text-gray-500">IP</h5>
+                            <p class="mt-1">${tunnelInfo.agent.ip_address}</p>
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <h4 class="text-sm font-medium text-gray-500">Puerto Local</h4>
-                    <p class="mt-1">${tunnelInfo.local_port}</p>
-                </div>
-                <div>
-                    <h4 class="text-sm font-medium text-gray-500">Puerto Remoto</h4>
-                    <p class="mt-1">${tunnelInfo.remote_port}</p>
-                </div>
-                <div>
-                    <h4 class="text-sm font-medium text-gray-500">Estado</h4>
-                    <p class="mt-1">${tunnelInfo.status}</p>
-                </div>
-                <div>
+
+                <div class="mt-4">
                     <h4 class="text-sm font-medium text-gray-500">Descripción</h4>
                     <p class="mt-1">${tunnelInfo.description || 'Sin descripción'}</p>
                 </div>
@@ -44,6 +71,7 @@ async function showTunnelInfo(tunnelId) {
         alert('Error al obtener la información del túnel');
     }
 }
+
 
 // Función para cerrar un túnel
 async function closeTunnel(tunnelId) {
