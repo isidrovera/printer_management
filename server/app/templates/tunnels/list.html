@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block title %}Túneles SSH{% endblock %}
+
+{% block content %}
+<div class="bg-white shadow-lg rounded-lg p-6 mx-auto max-w-7xl">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">Gestión de Túneles SSH</h2>
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto">
+            <!-- Barra de búsqueda -->
+            <div class="relative flex-grow sm:flex-grow-0">
+                <input type="text" 
+                       id="searchInput" 
+                       placeholder="Buscar túneles..." 
+                       class="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <i data-lucide="search" class="absolute right-3 top-2.5 h-5 w-5 text-gray-400"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de Túneles -->
+    <div class="overflow-x-auto shadow ring-1 ring-black ring-opacity-5 rounded-lg">
+        <table class="w-full border-collapse">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID Túnel</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Agente</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Host Remoto</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Puerto Local</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Puerto Remoto</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for tunnel in tunnels %}
+                <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ tunnel.tunnel_id }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ tunnel.agent.hostname }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ tunnel.remote_host }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ tunnel.local_port }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ tunnel.remote_port }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                   {% if tunnel.status == 'active' %}bg-green-100 text-green-800
+                                   {% elif tunnel.status == 'creating' %}bg-yellow-100 text-yellow-800
+                                   {% elif tunnel.status == 'error' %}bg-red-100 text-red-800
+                                   {% else %}bg-gray-100 text-gray-800{% endif %}">
+                            <span class="w-2 h-2 mr-2 rounded-full 
+                                       {% if tunnel.status == 'active' %}bg-green-400
+                                       {% elif tunnel.status == 'creating' %}bg-yellow-400
+                                       {% elif tunnel.status == 'error' %}bg-red-400
+                                       {% else %}bg-gray-400{% endif %}"></span>
+                            {{ tunnel.status|capitalize }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <div class="flex items-center justify-end space-x-3">
+                            <!-- Botón Info -->
+                            <button onclick="showTunnelInfo('{{ tunnel.tunnel_id }}')"
+                                    class="inline-flex items-center justify-center w-10 h-10 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all shadow-sm hover:shadow-md"
+                                    title="Ver Info">
+                                <i data-lucide="info" class="h-5 w-5"></i>
+                            </button>
+
+                            <!-- Botón Cerrar Túnel -->
+                            {% if tunnel.status != 'closed' %}
+                            <button onclick="closeTunnel('{{ tunnel.tunnel_id }}')"
+                                    class="inline-flex items-center justify-center w-10 h-10 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all shadow-sm hover:shadow-md"
+                                    title="Cerrar Túnel">
+                                <i data-lucide="x-circle" class="h-5 w-5"></i>
+                            </button>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if not tunnels %}
+    <div class="text-center py-8">
+        <p class="text-gray-500">No hay túneles activos</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Modal de Información del Túnel -->
+<div class="fixed inset-0 hidden z-50" id="tunnelInfoModal">
+    <div class="absolute inset-0 bg-black bg-opacity-50"></div>
+    <div class="absolute inset-0 overflow-y-auto">
+        <div class="flex min-h-full items-center justify-center p-4">
+            <div class="relative w-full max-w-2xl bg-white rounded-lg shadow-xl">
+                <!-- Cabecera -->
+                <div class="flex justify-between items-center p-6 border-b">
+                    <div class="flex items-center space-x-2">
+                        <i data-lucide="info" class="h-6 w-6 text-blue-500"></i>
+                        <h3 class="text-xl font-semibold text-gray-800">Información del Túnel</h3>
+                    </div>
+                    <button onclick="closeModal('tunnelInfoModal')" 
+                            class="text-gray-500 hover:text-gray-700">
+                        <i data-lucide="x" class="h-6 w-6"></i>
+                    </button>
+                </div>
+                
+                <!-- Contenido -->
+                <div class="p-6">
+                    <div id="tunnelInfoContent">
+                        <!-- El contenido se insertará dinámicamente -->
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="flex justify-end items-center p-6 border-t">
+                    <button onclick="closeModal('tunnelInfoModal')" 
+                            class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="/static/js/tunnels.js"></script>
+<script>
+    // Inicializar iconos de Lucide
+    lucide.createIcons();
+</script>
+{% endblock %}
