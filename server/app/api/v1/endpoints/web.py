@@ -36,7 +36,15 @@ async def index(request: Request, db: Session = Depends(get_db)):
         client_service = ClientService(db)
         agent_service = AgentService(db)
         tunnel_service = TunnelService(db)
-        printer_service = PrinterService(db)
+        
+        # Si no existe PrinterService, podemos omitir esas estadísticas
+        try:
+            printer_service = PrinterService(db)
+            has_printer_service = True
+            logger.debug("Servicio de impresoras inicializado correctamente")
+        except NameError:
+            has_printer_service = False
+            logger.warning("PrinterService no está disponible, omitiendo estadísticas de impresoras")
 
         # Obtener estadísticas de clientes
         logger.debug("Obteniendo estadísticas de clientes")
@@ -56,13 +64,7 @@ async def index(request: Request, db: Session = Depends(get_db)):
         tunnels_active = await tunnel_service.get_count_by_status("active")
         logger.info(f"Estadísticas de túneles - Total: {tunnels_total}, Activos: {tunnels_active}")
 
-        # Obtener estadísticas de impresoras
-        logger.debug("Obteniendo estadísticas de impresoras")
-        printers_total = await printer_service.get_count()
-        printers_online = await printer_service.get_count_by_status("online")
-        logger.info(f"Estadísticas de impresoras - Total: {printers_total}, Online: {printers_online}")
-
-        # Construir diccionario de estadísticas
+        # Construir diccionario base de estadísticas
         stats = {
             "total_clients": total_clients,
             "agents": {
@@ -74,22 +76,26 @@ async def index(request: Request, db: Session = Depends(get_db)):
                 "total": tunnels_total,
                 "active": tunnels_active
             },
-            "printers": {
-                "total": printers_total,
-                "online": printers_online
-            },
             "last_updated": datetime.now().isoformat()
         }
 
-        # Calcular porcentajes para logging
-        agents_online_pct = (agents_online / agents_total * 100) if agents_total > 0 else 0
-        tunnels_active_pct = (tunnels_active / tunnels_total * 100) if tunnels_total > 0 else 0
-        printers_online_pct = (printers_online / printers_total * 100) if printers_total > 0 else 0
-
-        logger.info("Resumen de estadísticas:")
-        logger.info(f"- Agentes online: {agents_online_pct:.1f}%")
-        logger.info(f"- Túneles activos: {tunnels_active_pct:.1f}%")
-        logger.info(f"- Impresoras online: {printers_online_pct:.1f}%")
+        # Agregar estadísticas de impresoras solo si el servicio está disponible
+        if has_printer_service:
+            logger.debug("Obteniendo estadísticas de impresoras")
+            printers_total = await printer_service.get_count()
+            printers_online = await printer_service.get_count_by_status("online")
+            logger.info(f"Estadísticas de impresoras - Total: {printers_total}, Online: {printers_online}")
+            
+            stats["printers"] = {
+                "total": printers_total,
+                "online": printers_online
+            }
+        else:
+            stats["printers"] = {
+                "total": 0,
+                "online": 0,
+                "service_unavailable": True
+            }
 
         # Calcular tiempo de ejecución
         execution_time = (datetime.now() - start_time).total_seconds()
@@ -104,24 +110,20 @@ async def index(request: Request, db: Session = Depends(get_db)):
         )
 
     except SQLAlchemyError as e:
-        logger.error(f"Error de base de datos al cargar el dashboard: {str(e)}")
-        logger.exception("Detalles del error de base de datos:")
-        return handle_dashboard_error(request)
-
-    except HTTPException as e:
-        logger.error(f"Error HTTP al cargar el dashboard: {str(e)}")
-        raise e
+        logger.error("Error de base de datos al cargar el dashboard")
+        logger.exception(e)
+        return handle_dashboard_error(request, "Error de base de datos al cargar estadísticas")
 
     except Exception as e:
-        logger.error(f"Error inesperado al cargar el dashboard: {str(e)}")
-        logger.exception("Traza completa del error:")
-        return handle_dashboard_error(request)
+        logger.error("Error inesperado al cargar el dashboard")
+        logger.exception(e)
+        return handle_dashboard_error(request, "Error inesperado al cargar estadísticas")
 
-def handle_dashboard_error(request: Request):
+def handle_dashboard_error(request: Request, error_message: str = "Error al cargar estadísticas"):
     """
     Maneja los errores del dashboard retornando una respuesta con estadísticas en 0.
     """
-    logger.info("Retornando respuesta de error con estadísticas en 0")
+    logger.info(f"Retornando respuesta de error: {error_message}")
     stats = {
         "total_clients": 0,
         "agents": {"total": 0, "online": 0, "offline": 0},
@@ -136,10 +138,9 @@ def handle_dashboard_error(request: Request):
         {
             "request": request,
             "stats": stats,
-            "error": "Error al cargar estadísticas. Por favor, intente nuevamente."
+            "error": error_message
         }
     )
-
 @router.get("/clients")
 async def list_clients(request: Request, db: Session = Depends(get_db)):
     client_service = ClientService(db)
