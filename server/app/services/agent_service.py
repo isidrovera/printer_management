@@ -149,3 +149,19 @@ class AgentService:
 
         except Exception as e:
             logger.error(f"🚨 Error en la actualización del agente: {e}")
+            
+    async def get_count(self) -> int:
+        """Obtiene el número total de agentes."""
+        try:
+            return self.db.query(Agent).count()
+        except Exception as e:
+            logger.error(f"Error obteniendo conteo de agentes: {str(e)}")
+            return 0
+
+    async def get_count_by_status(self, status: str) -> int:
+        """Obtiene el número de agentes por estado."""
+        try:
+            return self.db.query(Agent).filter(Agent.status == status).count()
+        except Exception as e:
+            logger.error(f"Error obteniendo conteo de agentes por estado: {str(e)}")
+            return 0
