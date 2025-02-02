@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="/static/css/dashboard.css">
 </head>
 <body>
-    <!-- Same content as before, just renamed file -->
     <nav class="navbar">
         <h1>Sistema de Gestión de Impresoras</h1>
         <div class="nav-icons">
@@ -16,9 +15,8 @@
             <i class="fas fa-cog animated-icon"></i>
         </div>
     </nav>
-
     <div class="dashboard-grid">
-        <!-- Cards content same as before -->
+        <!-- Clientes -->
         <div class="card" data-aos="fade-up">
             <div class="icon-circle">
                 <i class="fas fa-users animated-icon"></i>
@@ -30,6 +28,7 @@
             </a>
         </div>
 
+        <!-- Agentes -->
         <div class="card" data-aos="fade-up" data-aos-delay="100">
             <div class="icon-circle">
                 <i class="fas fa-user-tie animated-icon"></i>
@@ -41,6 +40,7 @@
             </a>
         </div>
 
+        <!-- Drivers -->
         <div class="card" data-aos="fade-up" data-aos-delay="200">
             <div class="icon-circle">
                 <i class="fas fa-print animated-icon"></i>
@@ -52,6 +52,19 @@
             </a>
         </div>
 
+        <!-- Túneles SSH -->
+        <div class="card" data-aos="fade-up" data-aos-delay="250">
+            <div class="icon-circle">
+                <i class="fas fa-network-wired animated-icon"></i>
+            </div>
+            <h2>Túneles SSH</h2>
+            <a href="/tunnels" class="card-link">
+                Gestionar
+                <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+
+        <!-- Estadísticas -->
         <div class="card" data-aos="fade-up" data-aos-delay="300">
             <div class="icon-circle">
                 <i class="fas fa-chart-bar animated-icon"></i>
@@ -63,7 +76,6 @@
             </a>
         </div>
     </div>
-
     <script src="/static/js/dashboard.js"></script>
 </body>
 </html>
