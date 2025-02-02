@@ -240,3 +240,18 @@ async def download_driver(driver_id: int, db: Session = Depends(get_db)):
         )
 
     return FileResponse(path=file_path, filename=driver.driver_filename, media_type="application/octet-stream")
+
+
+
+
+@router.get("/tunnels")
+async def list_tunnels_view(request: Request, db: Session = Depends(get_db)):
+    tunnel_service = TunnelService(db)
+    tunnels = await tunnel_service.list_tunnels()
+    return templates.TemplateResponse(
+        "tunnels/list.html",  # This will use the template we created
+        {
+            "request": request,
+            "tunnels": tunnels
+        }
+    )
