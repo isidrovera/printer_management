@@ -203,7 +203,7 @@ class TunnelService:
 
     # Agregar este método a tu clase TunnelService en tunnel_service.py
 
-    async def get_tunnel_info(self, tunnel_id: str) -> dict:
+   async def get_tunnel_info(self, tunnel_id: str) -> dict:
         """Obtiene información detallada de un túnel específico."""
         try:
             logger.debug(f"Buscando túnel con ID: {tunnel_id}")
