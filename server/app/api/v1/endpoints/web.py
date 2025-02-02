@@ -12,40 +12,88 @@ from fastapi import File, UploadFile
 from pathlib import Path
 from app.core.config import settings
 from fastapi.responses import FileResponse
+from fastapi import HTTPException
+from datetime import datetime
+
 import logging
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
 
-# En web.py
 
 @router.get("/")
 async def index(request: Request, db: Session = Depends(get_db)):
+    """
+    Endpoint principal que muestra el dashboard con estadísticas.
+    """
+    start_time = datetime.now()
+    logger.info("Iniciando carga del dashboard")
+    
     try:
-        # Obtener servicios necesarios
+        # Inicializar servicios
+        logger.debug("Inicializando servicios necesarios")
         client_service = ClientService(db)
         agent_service = AgentService(db)
         tunnel_service = TunnelService(db)
         printer_service = PrinterService(db)
 
-        # Obtener estadísticas
+        # Obtener estadísticas de clientes
+        logger.debug("Obteniendo estadísticas de clientes")
+        total_clients = await client_service.get_count()
+        logger.info(f"Total de clientes obtenidos: {total_clients}")
+
+        # Obtener estadísticas de agentes
+        logger.debug("Obteniendo estadísticas de agentes")
+        agents_total = await agent_service.get_count()
+        agents_online = await agent_service.get_count_by_status("online")
+        agents_offline = await agent_service.get_count_by_status("offline")
+        logger.info(f"Estadísticas de agentes - Total: {agents_total}, Online: {agents_online}, Offline: {agents_offline}")
+
+        # Obtener estadísticas de túneles
+        logger.debug("Obteniendo estadísticas de túneles")
+        tunnels_total = await tunnel_service.get_count()
+        tunnels_active = await tunnel_service.get_count_by_status("active")
+        logger.info(f"Estadísticas de túneles - Total: {tunnels_total}, Activos: {tunnels_active}")
+
+        # Obtener estadísticas de impresoras
+        logger.debug("Obteniendo estadísticas de impresoras")
+        printers_total = await printer_service.get_count()
+        printers_online = await printer_service.get_count_by_status("online")
+        logger.info(f"Estadísticas de impresoras - Total: {printers_total}, Online: {printers_online}")
+
+        # Construir diccionario de estadísticas
         stats = {
-            "total_clients": await client_service.get_count(),
+            "total_clients": total_clients,
             "agents": {
-                "total": await agent_service.get_count(),
-                "online": await agent_service.get_count_by_status("online"),
-                "offline": await agent_service.get_count_by_status("offline")
+                "total": agents_total,
+                "online": agents_online,
+                "offline": agents_offline
             },
             "tunnels": {
-                "total": await tunnel_service.get_count(),
-                "active": await tunnel_service.get_count_by_status("active")
+                "total": tunnels_total,
+                "active": tunnels_active
             },
             "printers": {
-                "total": await printer_service.get_count(),
-                "online": await printer_service.get_count_by_status("online")
-            }
+                "total": printers_total,
+                "online": printers_online
+            },
+            "last_updated": datetime.now().isoformat()
         }
+
+        # Calcular porcentajes para logging
+        agents_online_pct = (agents_online / agents_total * 100) if agents_total > 0 else 0
+        tunnels_active_pct = (tunnels_active / tunnels_total * 100) if tunnels_total > 0 else 0
+        printers_online_pct = (printers_online / printers_total * 100) if printers_total > 0 else 0
+
+        logger.info("Resumen de estadísticas:")
+        logger.info(f"- Agentes online: {agents_online_pct:.1f}%")
+        logger.info(f"- Túneles activos: {tunnels_active_pct:.1f}%")
+        logger.info(f"- Impresoras online: {printers_online_pct:.1f}%")
+
+        # Calcular tiempo de ejecución
+        execution_time = (datetime.now() - start_time).total_seconds()
+        logger.info(f"Dashboard cargado exitosamente en {execution_time:.2f} segundos")
 
         return templates.TemplateResponse(
             "index.html",
@@ -54,23 +102,43 @@ async def index(request: Request, db: Session = Depends(get_db)):
                 "stats": stats
             }
         )
+
+    except SQLAlchemyError as e:
+        logger.error(f"Error de base de datos al cargar el dashboard: {str(e)}")
+        logger.exception("Detalles del error de base de datos:")
+        return handle_dashboard_error(request)
+
+    except HTTPException as e:
+        logger.error(f"Error HTTP al cargar el dashboard: {str(e)}")
+        raise e
+
     except Exception as e:
-        logger.error(f"Error obteniendo estadísticas del dashboard: {str(e)}")
-        # En caso de error, enviar estadísticas en 0
-        stats = {
-            "total_clients": 0,
-            "agents": {"total": 0, "online": 0, "offline": 0},
-            "tunnels": {"total": 0, "active": 0},
-            "printers": {"total": 0, "online": 0}
+        logger.error(f"Error inesperado al cargar el dashboard: {str(e)}")
+        logger.exception("Traza completa del error:")
+        return handle_dashboard_error(request)
+
+def handle_dashboard_error(request: Request):
+    """
+    Maneja los errores del dashboard retornando una respuesta con estadísticas en 0.
+    """
+    logger.info("Retornando respuesta de error con estadísticas en 0")
+    stats = {
+        "total_clients": 0,
+        "agents": {"total": 0, "online": 0, "offline": 0},
+        "tunnels": {"total": 0, "active": 0},
+        "printers": {"total": 0, "online": 0},
+        "last_updated": datetime.now().isoformat(),
+        "error": True
+    }
+    
+    return templates.TemplateResponse(
+        "index.html",
+        {
+            "request": request,
+            "stats": stats,
+            "error": "Error al cargar estadísticas. Por favor, intente nuevamente."
         }
-        return templates.TemplateResponse(
-            "index.html",
-            {
-                "request": request,
-                "stats": stats,
-                "error": "Error al cargar estadísticas"
-            }
-        )
+    )
 
 @router.get("/clients")
 async def list_clients(request: Request, db: Session = Depends(get_db)):
