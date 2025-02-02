@@ -18,9 +18,59 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
 
+# En web.py
+
 @router.get("/")
-async def index(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+async def index(request: Request, db: Session = Depends(get_db)):
+    try:
+        # Obtener servicios necesarios
+        client_service = ClientService(db)
+        agent_service = AgentService(db)
+        tunnel_service = TunnelService(db)
+        printer_service = PrinterService(db)
+
+        # Obtener estadísticas
+        stats = {
+            "total_clients": await client_service.get_count(),
+            "agents": {
+                "total": await agent_service.get_count(),
+                "online": await agent_service.get_count_by_status("online"),
+                "offline": await agent_service.get_count_by_status("offline")
+            },
+            "tunnels": {
+                "total": await tunnel_service.get_count(),
+                "active": await tunnel_service.get_count_by_status("active")
+            },
+            "printers": {
+                "total": await printer_service.get_count(),
+                "online": await printer_service.get_count_by_status("online")
+            }
+        }
+
+        return templates.TemplateResponse(
+            "index.html",
+            {
+                "request": request,
+                "stats": stats
+            }
+        )
+    except Exception as e:
+        logger.error(f"Error obteniendo estadísticas del dashboard: {str(e)}")
+        # En caso de error, enviar estadísticas en 0
+        stats = {
+            "total_clients": 0,
+            "agents": {"total": 0, "online": 0, "offline": 0},
+            "tunnels": {"total": 0, "active": 0},
+            "printers": {"total": 0, "online": 0}
+        }
+        return templates.TemplateResponse(
+            "index.html",
+            {
+                "request": request,
+                "stats": stats,
+                "error": "Error al cargar estadísticas"
+            }
+        )
 
 @router.get("/clients")
 async def list_clients(request: Request, db: Session = Depends(get_db)):
