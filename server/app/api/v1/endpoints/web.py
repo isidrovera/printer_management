@@ -4,6 +4,8 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 from app.db.session import get_db
+from sqlalchemy.exc import SQLAlchemyError
+
 from app.services.client_service import ClientService
 from app.services.agent_service import AgentService
 from app.services.driver_service import DriverService
