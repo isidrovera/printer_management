@@ -382,26 +382,17 @@ async def list_tunnels_view(request: Request, db: Session = Depends(get_db)):
         }
     )
 
-@templates.add_template_filter
-def numberformat(value):
-    return "{:,}".format(value)
+templates.env.filters['numberformat'] = lambda value: "{:,}".format(value)
 
 
 @router.get("/monitor/printers")
 async def list_printers(request: Request, db: Session = Depends(get_db)):
-    """
-    Vista para listar todas las impresoras monitoreadas
-    """
     try:
-        printer_service = PrinterMonitorService(db)
-        
-        # Obtener todas las impresoras con consumibles críticos
-        critical_printers = printer_service.get_printers_with_critical_supplies()
-        
+        # Resto del código...
         return templates.TemplateResponse(
-            "monitor/monitor_printers.html",  # El nombre de su template
+            "monitor/monitor_printers.html",
             {
-                "request": request, 
+                "request": request,
                 "printers": critical_printers,
                 "stats": {
                     "total": len(critical_printers),
@@ -415,7 +406,7 @@ async def list_printers(request: Request, db: Session = Depends(get_db)):
         return templates.TemplateResponse(
             "monitor_printers.html",
             {
-                "request": request, 
+                "request": request,
                 "printers": [],
                 "error": str(e)
             }
