@@ -5,7 +5,7 @@ from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 from app.db.session import get_db
 from sqlalchemy.exc import SQLAlchemyError
-from jinja2 import Jinja2Templates
+
 from app.services.client_service import ClientService
 from app.services.agent_service import AgentService
 from app.services.driver_service import DriverService
@@ -23,7 +23,6 @@ import logging
 logger = logging.getLogger(__name__)
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
-
 
 
 @router.get("/")
@@ -386,7 +385,6 @@ async def list_tunnels_view(request: Request, db: Session = Depends(get_db)):
 
 
 
-
 @router.get("/monitor/printers")
 async def list_printers(request: Request, db: Session = Depends(get_db)):
     """
@@ -420,7 +418,6 @@ async def list_printers(request: Request, db: Session = Depends(get_db)):
                 "error": str(e)
             }
         )
-
 @router.get("/printers/{printer_id}")
 async def printer_details(request: Request, printer_id: int, db: Session = Depends(get_db)):
     """
