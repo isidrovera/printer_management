@@ -2,7 +2,7 @@
 import logging
 from typing import Any, Dict
 import asyncio
-
+from pysnmp.hlapi.asyncio import *
 import pysnmp
 
 logger = logging.getLogger(__name__)
