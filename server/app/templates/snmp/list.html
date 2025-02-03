@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+{% block title %}Configuración de OIDs{% endblock %}
+
+{% block content %}
+<div class="bg-white shadow-lg rounded-lg p-6 mx-auto max-w-7xl">
+    <!-- Header con búsqueda y botón de crear -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <div class="flex items-center space-x-2">
+            <i class="fas fa-sitemap text-blue-600 text-2xl"></i>
+            <h2 class="text-2xl font-bold text-gray-800">Configuración de OIDs</h2>
+        </div>
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto">
+            <!-- Barra de búsqueda -->
+            <div class="relative flex-grow sm:flex-grow-0">
+                <input type="text" 
+                       id="searchInput" 
+                       placeholder="Buscar configuraciones..." 
+                       class="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <i class="fas fa-search absolute right-3 top-2.5 h-5 w-5 text-gray-400"></i>
+            </div>
+
+            <!-- Botón Crear -->
+            <a href="/printer-oids/create" 
+               class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors">
+                <i class="fas fa-plus h-5 w-5"></i>
+                <span>Nueva Configuración</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Resumen de configuraciones -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <!-- Total Configuraciones -->
+        <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500">Total Configuraciones</p>
+                    <h3 class="text-2xl font-bold text-gray-900">{{ oids_configs|length }}</h3>
+                </div>
+                <div class="bg-blue-100 p-3 rounded-lg">
+                    <i class="fas fa-sitemap text-blue-600 text-xl"></i>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Por Marca -->
+        <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500">Marcas</p>
+                    <h3 class="text-2xl font-bold text-purple-600">{{ oids_configs|map(attribute='brand')|unique|list|length }}</h3>
+                </div>
+                <div class="bg-purple-100 p-3 rounded-lg">
+                    <i class="fas fa-tag text-purple-600 text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Activas -->
+        <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500">Activas</p>
+                    <h3 class="text-2xl font-bold text-green-600">{{ oids_configs|selectattr('is_active', 'true')|list|length }}</h3>
+                </div>
+                <div class="bg-green-100 p-3 rounded-lg">
+                    <i class="fas fa-check-circle text-green-600 text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- En Pruebas -->
+        <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500">En Pruebas</p>
+                    <h3 class="text-2xl font-bold text-amber-600">{{ oids_configs|selectattr('is_testing', 'true')|list|length }}</h3>
+                </div>
+                <div class="bg-amber-100 p-3 rounded-lg">
+                    <i class="fas fa-flask text-amber-600 text-xl"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de Configuraciones -->
+    <div class="overflow-x-auto shadow ring-1 ring-black ring-opacity-5 rounded-lg">
+        <table class="w-full border-collapse">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Marca</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Modelo</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SNMP</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">OIDs</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for config in oids_configs %}
+                <tr class="hover:bg-gray-50 transition-colors" data-config-id="{{ config.id }}">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <i class="fas fa-tag text-purple-400 mr-2"></i>
+                            <span class="text-sm text-gray-900">{{ config.brand }}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <i class="fas fa-print text-blue-400 mr-2"></i>
+                            <span class="text-sm text-gray-900">{{ config.model or 'Todos los modelos' }}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <i class="fas fa-network-wired text-green-400 mr-2"></i>
+                            <span class="text-sm text-gray-900">v{{ config.snmp_config.version }}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex space-x-2">
+                            {% set categories = config.oids.keys()|list %}
+                            {% for category in categories[:4] %}
+                            <span class="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded">
+                                {{ category }}
+                            </span>
+                            {% endfor %}
+                            {% if categories|length > 4 %}
+                            <span class="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded">
+                                +{{ categories|length - 4 }}
+                            </span>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+                                   {% if config.is_active %}bg-green-100 text-green-800
+                                   {% elif config.is_testing %}bg-amber-100 text-amber-800
+                                   {% else %}bg-gray-100 text-gray-800{% endif %}">
+                            <i class="fas fa-{% if config.is_active %}check-circle{% elif config.is_testing %}flask{% else %}circle{% endif %} mr-2"></i>
+                            {{ 'Activo' if config.is_active else 'En Pruebas' if config.is_testing else 'Inactivo' }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <div class="flex items-center justify-end space-x-2">
+                            <!-- Botón Editar -->
+                            <a href="/printer-oids/{{ config.id }}/edit"
+                               class="inline-flex items-center px-3 py-2 bg-amber-100 text-amber-700 rounded-lg hover:bg-amber-200 transition-colors">
+                                <i class="fas fa-pencil-alt mr-2"></i>
+                                <span>Editar</span>
+                            </a>
+
+                            <!-- Botón Probar -->
+                            <button onclick="testConfig('{{ config.id }}')"
+                                    class="inline-flex items-center px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors">
+                                <i class="fas fa-vial mr-2"></i>
+                                <span>Probar</span>
+                            </button>
+
+                            <!-- Botón Eliminar -->
+                            <button onclick="deleteConfig('{{ config.id }}')"
+                                    class="inline-flex items-center px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors">
+                                <i class="fas fa-trash-alt mr-2"></i>
+                                <span>Eliminar</span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% if not oids_configs %}
+        <div class="text-center py-12">
+            <div class="flex flex-col items-center">
+                <i class="fas fa-sitemap text-gray-400 text-5xl mb-4"></i>
+                <h3 class="text-lg font-medium text-gray-900">No hay configuraciones</h3>
+                <p class="text-gray-500 mt-2">No se encontraron configuraciones de OIDs.</p>
+                <a href="/printer-oids/create" 
+                   class="mt-4 inline-flex items-center px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors">
+                    <i class="fas fa-plus mr-2"></i>
+                    Crear Nueva Configuración
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal de Prueba de Configuración -->
+<div class="fixed inset-0 hidden z-50" id="testConfigModal">
+    <div class="absolute inset-0 bg-black bg-opacity-50"></div>
+    <div class="absolute inset-0 overflow-y-auto">
+        <div class="flex min-h-full items-center justify-center p-4">
+            <div class="relative w-full max-w-2xl bg-white rounded-lg shadow-xl">
+                <div class="flex justify-between items-center p-6 border-b">
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-vial text-blue-500 text-xl"></i>
+                        <h3 class="text-xl font-semibold text-gray-800">Probar Configuración</h3>
+                    </div>
+                    <button onclick="closeModal('testConfigModal')" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                
+                <form id="testConfigForm" class="p-6">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">IP de la Impresora</label>
+                            <input type="text" id="testPrinterIp" required placeholder="192.168.1.100"
+                                   class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <h4 class="text-sm font-medium text-gray-700 mb-2">Resultados de la Prueba</h4>
+                            <div id="testResults" class="space-y-2">
+                                <!-- Los resultados se insertarán aquí -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 flex justify-end space-x-3">
+                        <button type="button" onclick="closeModal('testConfigModal')"
+                                class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+                            Cerrar
+                        </button>
+                        <button type="submit"
+                                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                            Iniciar Prueba
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Contenedor de notificaciones -->
+<div id="notification-container" class="fixed bottom-4 right-4 z-50 space-y-2"></div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+<script src="/static/js/printer-oids.js"></script>
+{% endblock %}

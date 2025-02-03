@@ -10,6 +10,8 @@ from app.services.client_service import ClientService
 from app.services.agent_service import AgentService
 from app.services.driver_service import DriverService
 from app.services.tunnel_service import TunnelService
+from app.services.printer_oids_service import PrinterOIDsService
+from app.services.monitor_service import MonitorService
 from fastapi import File, UploadFile
 from pathlib import Path
 from app.core.config import settings
@@ -380,3 +382,104 @@ async def list_tunnels_view(request: Request, db: Session = Depends(get_db)):
             "tunnels": tunnels
         }
     )
+
+
+@router.get("/printer-oids")
+async def list_printer_oids_view(request: Request, db: Session = Depends(get_db)):
+    """Vista de configuraciones de OIDs."""
+    try:
+        logger.info("Cargando vista de configuraciones OID")
+        oids_service = PrinterOIDsService(db)
+        oids_configs = await oids_service.get_all_oids()
+        return templates.TemplateResponse(
+            "printer_oids/list.html",
+            {
+                "request": request,
+                "oids_configs": oids_configs
+            }
+        )
+    except Exception as e:
+        logger.error(f"Error cargando configuraciones OID: {str(e)}")
+        return templates.TemplateResponse(
+            "printer_oids/list.html",
+            {
+                "request": request,
+                "oids_configs": [],
+                "error": "Error cargando configuraciones"
+            }
+        )
+
+@router.get("/printer-oids/create")
+async def create_printer_oids_form(request: Request):
+    """Formulario para crear configuración OID."""
+    return templates.TemplateResponse(
+        "printer_oids/form.html",
+        {
+            "request": request,
+            "oids_config": None
+        }
+    )
+
+@router.get("/printer-oids/{config_id}/edit")
+async def edit_printer_oids_form(request: Request, config_id: int, db: Session = Depends(get_db)):
+    """Formulario para editar configuración OID."""
+    try:
+        oids_service = PrinterOIDsService(db)
+        config = await oids_service.get_oids_config(config_id)
+        if not config:
+            return RedirectResponse("/printer-oids", status_code=303)
+        return templates.TemplateResponse(
+            "printer_oids/form.html",
+            {
+                "request": request,
+                "oids_config": config
+            }
+        )
+    except Exception as e:
+        logger.error(f"Error cargando configuración OID: {str(e)}")
+        return RedirectResponse("/printer-oids", status_code=303)
+
+@router.get("/monitor")
+async def monitor_view(request: Request, db: Session = Depends(get_db)):
+    """Vista del monitor de impresoras."""
+    try:
+        logger.info("Cargando vista de monitoreo")
+        monitor_service = MonitorService(db)
+        printers = await monitor_service.get_monitored_printers()
+        return templates.TemplateResponse(
+            "monitor/dashboard.html",
+            {
+                "request": request,
+                "printers": printers
+            }
+        )
+    except Exception as e:
+        logger.error(f"Error cargando monitor: {str(e)}")
+        return templates.TemplateResponse(
+            "monitor/dashboard.html",
+            {
+                "request": request,
+                "printers": [],
+                "error": "Error cargando datos de monitoreo"
+            }
+        )
+
+@router.get("/monitor/{printer_id}")
+async def monitor_printer_view(request: Request, printer_id: int, db: Session = Depends(get_db)):
+    """Vista detallada de monitoreo de una impresora."""
+    try:
+        logger.info(f"Cargando monitoreo detallado de impresora {printer_id}")
+        monitor_service = MonitorService(db)
+        printer_data = await monitor_service.get_monitor_data(printer_id)
+        history = await monitor_service.get_monitor_history(printer_id)
+        return templates.TemplateResponse(
+            "monitor/printer_detail.html",
+            {
+                "request": request,
+                "printer": printer_data,
+                "history": history
+            }
+        )
+    except Exception as e:
+        logger.error(f"Error cargando detalles de impresora: {str(e)}")
+        return RedirectResponse("/monitor", status_code=303)

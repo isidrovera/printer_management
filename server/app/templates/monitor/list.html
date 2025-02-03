@@ -1,0 +1,353 @@
+{% extends "base.html" %}
+{% block title %}Monitor de Impresoras{% endblock %}
+
+{% block content %}
+<div class="bg-white shadow-lg rounded-lg p-6 mx-auto max-w-7xl">
+    <!-- Header con búsqueda -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <div class="flex items-center space-x-2">
+            <i class="fas fa-print text-blue-600 text-2xl"></i>
+            <h2 class="text-2xl font-bold text-gray-800">Monitor de Impresoras</h2>
+        </div>
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto">
+            <!-- Barra de búsqueda -->
+            <div class="relative flex-grow sm:flex-grow-0">
+                <input type="text" 
+                       id="searchInput" 
+                       placeholder="Buscar impresoras..." 
+                       class="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <i class="fas fa-search absolute right-3 top-2.5 h-5 w-5 text-gray-400"></i>
+            </div>
+            
+            <!-- Selector de intervalo de actualización -->
+            <select id="refreshInterval" 
+                    class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <option value="30">Actualizar cada 30s</option>
+                <option value="60">Actualizar cada 1m</option>
+                <option value="300">Actualizar cada 5m</option>
+                <option value="600">Actualizar cada 10m</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Resumen de estados -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <!-- Total Impresoras -->
+        <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500">Total Impresoras</p>
+                    <h3 class="text-2xl font-bold text-gray-900">{{ printers|length }}</h3>
+                </div>
+                <div class="bg-blue-100 p-3 rounded-lg">
+                    <i class="fas fa-print text-blue-600 text-xl"></i>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Online -->
+        <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500">Online</p>
+                    <h3 class="text-2xl font-bold text-green-600">{{ printers|selectattr('status', 'equalto', 'online')|list|length }}</h3>
+                </div>
+                <div class="bg-green-100 p-3 rounded-lg">
+                    <i class="fas fa-check-circle text-green-600 text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Con alertas -->
+        <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500">Con Alertas</p>
+                    <h3 class="text-2xl font-bold text-yellow-600">{{ printers|selectattr('has_alerts', 'equalto', true)|list|length }}</h3>
+                </div>
+                <div class="bg-yellow-100 p-3 rounded-lg">
+                    <i class="fas fa-exclamation-triangle text-yellow-600 text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Con Error -->
+        <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500">Con Error</p>
+                    <h3 class="text-2xl font-bold text-red-600">{{ printers|selectattr('status', 'equalto', 'error')|list|length }}</h3>
+                </div>
+                <div class="bg-red-100 p-3 rounded-lg">
+                    <i class="fas fa-times-circle text-red-600 text-xl"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de Impresoras -->
+    <div class="overflow-x-auto shadow ring-1 ring-black ring-opacity-5 rounded-lg">
+        <table class="w-full border-collapse">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Modelo</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">IP</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Toners</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contadores</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for printer in printers %}
+                <tr class="hover:bg-gray-50 transition-colors" data-printer-id="{{ printer.id }}">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <i class="fas fa-print text-gray-400 mr-2"></i>
+                            <span class="text-sm text-gray-900">{{ printer.name }}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <i class="fas fa-tag text-blue-400 mr-2"></i>
+                            <span class="text-sm text-gray-900">{{ printer.model }}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <i class="fas fa-network-wired text-purple-400 mr-2"></i>
+                            <span class="text-sm text-gray-900">{{ printer.ip_address }}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex space-x-2">
+                            <!-- Negro -->
+                            <div class="relative w-6 h-6" title="Negro: {{ printer.supplies.black.level }}%">
+                                <div class="absolute inset-0 bg-gray-200 rounded"></div>
+                                <div class="absolute inset-0 bg-gray-800 rounded" 
+                                     style="clip-path: inset({{ 100 - printer.supplies.black.level }}% 0 0 0);">
+                                </div>
+                            </div>
+                            <!-- Cyan -->
+                            <div class="relative w-6 h-6" title="Cyan: {{ printer.supplies.cyan.level }}%">
+                                <div class="absolute inset-0 bg-gray-200 rounded"></div>
+                                <div class="absolute inset-0 bg-cyan-500 rounded" 
+                                     style="clip-path: inset({{ 100 - printer.supplies.cyan.level }}% 0 0 0);">
+                                </div>
+                            </div>
+                            <!-- Magenta -->
+                            <div class="relative w-6 h-6" title="Magenta: {{ printer.supplies.magenta.level }}%">
+                                <div class="absolute inset-0 bg-gray-200 rounded"></div>
+                                <div class="absolute inset-0 bg-pink-500 rounded" 
+                                     style="clip-path: inset({{ 100 - printer.supplies.magenta.level }}% 0 0 0);">
+                                </div>
+                            </div>
+                            <!-- Amarillo -->
+                            <div class="relative w-6 h-6" title="Amarillo: {{ printer.supplies.yellow.level }}%">
+                                <div class="absolute inset-0 bg-gray-200 rounded"></div>
+                                <div class="absolute inset-0 bg-yellow-500 rounded" 
+                                     style="clip-path: inset({{ 100 - printer.supplies.yellow.level }}% 0 0 0);">
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-sm text-gray-500">Total:</span>
+                            <span class="text-sm font-medium">{{ printer.counters.total|numberformat }}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+                                   {% if printer.status == 'online' %}bg-green-100 text-green-800
+                                   {% elif printer.status == 'error' %}bg-red-100 text-red-800
+                                   {% else %}bg-gray-100 text-gray-800{% endif %}">
+                            <i class="fas fa-{% if printer.status == 'online' %}check-circle{% elif printer.status == 'error' %}times-circle{% else %}circle{% endif %} mr-2"></i>
+                            {{ printer.status|capitalize }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <div class="flex items-center justify-end space-x-2">
+
+
+                            <!-- Botón Info -->
+                            <button onclick="showPrinterInfo('{{ printer.id }}')"
+                                    class="inline-flex items-center px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
+                                    title="Ver información detallada">
+                                <i class="fas fa-info-circle mr-2"></i>
+                                <span>Info</span>
+                            </button>
+
+                            <!-- Botón Suministros -->
+                            <button onclick="showSupplies('{{ printer.id }}')"
+                                    class="inline-flex items-center px-3 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors"
+                                    title="Ver detalles de suministros">
+                                <i class="fas fa-tint mr-2"></i>
+                                <span>Suministros</span>
+                            </button>
+
+                            <!-- Botón Contadores -->
+                            <button onclick="showCounters('{{ printer.id }}')"
+                                    class="inline-flex items-center px-3 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors"
+                                    title="Ver contadores detallados">
+                                <i class="fas fa-calculator mr-2"></i>
+                                <span>Contadores</span>
+                            </button>
+
+                            <!-- Botón Historial -->
+                            <button onclick="showHistory('{{ printer.id }}')"
+                                    class="inline-flex items-center px-3 py-2 bg-amber-100 text-amber-700 rounded-lg hover:bg-amber-200 transition-colors"
+                                    title="Ver historial">
+                                <i class="fas fa-history mr-2"></i>
+                                <span>Historial</span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% if not printers %}
+        <div class="text-center py-12">
+            <div class="flex flex-col items-center">
+                <i class="fas fa-print text-gray-400 text-5xl mb-4"></i>
+                <h3 class="text-lg font-medium text-gray-900">No hay impresoras monitoreadas</h3>
+                <p class="text-gray-500 mt-2">No se encontraron impresoras en el sistema de monitoreo.</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal de Información de Impresora -->
+<div class="fixed inset-0 hidden z-50" id="printerInfoModal">
+    <div class="absolute inset-0 bg-black bg-opacity-50"></div>
+    <div class="absolute inset-0 overflow-y-auto">
+        <div class="flex min-h-full items-center justify-center p-4">
+            <div class="relative w-full max-w-6xl bg-white rounded-lg shadow-xl">
+                <!-- Cabecera -->
+                <div class="sticky top-0 flex justify-between items-center p-6 border-b bg-gray-50 rounded-t-lg">
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-info-circle text-blue-500 text-xl"></i>
+                        <h3 class="text-2xl font-semibold text-gray-800">Información de Impresora</h3>
+                    </div>
+                    <button onclick="closeModal('printerInfoModal')" 
+                            class="text-gray-500 hover:text-gray-800 transition-colors">
+                        <i class="fas fa-times-circle text-2xl"></i>
+                    </button>
+                </div>
+                
+                <!-- Contenido -->
+                <div class="p-6 overflow-y-auto max-h-[calc(100vh-200px)]" id="printerInfoContent">
+                    <div class="flex justify-center items-center">
+                        <i class="fas fa-circle-notch fa-spin text-blue-500 text-2xl mr-3"></i>
+                        <p class="text-gray-500 text-lg">Cargando información...</p>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="sticky bottom-0 flex justify-end items-center p-6 border-t bg-gray-50 rounded-b-lg">
+                    <button onclick="closeModal('printerInfoModal')" 
+                            class="flex items-center space-x-2 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">
+                        <i class="fas fa-times"></i>
+                        <span>Cerrar</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Suministros -->
+<div class="fixed inset-0 hidden z-50" id="suppliesModal">
+    <div class="absolute inset-0 bg-black bg-opacity-50"></div>
+    <div class="absolute inset-0 overflow-y-auto">
+        <div class="flex min-h-full items-center justify-center p-4">
+            <div class="relative w-full max-w-4xl bg-white rounded-lg shadow-xl">
+                <div class="flex justify-between items-center p-6 border-b">
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-tint text-purple-500 text-xl"></i>
+                        <h3 class="text-xl font-semibold text-gray-800">Estado de Suministros</h3>
+                    </div>
+                    <button onclick="closeModal('suppliesModal')" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                
+                <div class="p-6" id="suppliesContent">
+                    <div class="flex justify-center items-center">
+                        <i class="fas fa-circle-notch fa-spin text-purple-500 text-2xl mr-3"></i>
+                        <p class="text-gray-500 text-lg">Cargando información...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Contadores -->
+<div class="fixed inset-0 hidden z-50" id="countersModal">
+    <div class="absolute inset-0 bg-black bg-opacity-50"></div>
+    <div class="absolute inset-0 overflow-y-auto">
+        <div class="flex min-h-full items-center justify-center p-4">
+            <div class="relative w-full max-w-4xl bg-white rounded-lg shadow-xl">
+                <div class="flex justify-between items-center p-6 border-b">
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-calculator text-green-500 text-xl"></i>
+                        <h3 class="text-xl font-semibold text-gray-800">Contadores Detallados</h3>
+                    </div>
+                    <button onclick="closeModal('countersModal')" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                
+                <div class="p-6" id="countersContent">
+                    <div class="flex justify-center items-center">
+                        <i class="fas fa-circle-notch fa-spin text-green-500 text-2xl mr-3"></i>
+                        <p class="text-gray-500 text-lg">Cargando información...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Historial -->
+<div class="fixed inset-0 hidden z-50" id="historyModal">
+    <div class="absolute inset-0 bg-black bg-opacity-50"></div>
+    <div class="absolute inset-0 overflow-y-auto">
+        <div class="flex min-h-full items-center justify-center p-4">
+            <div class="relative w-full max-w-6xl bg-white rounded-lg shadow-xl">
+                <div class="flex justify-between items-center p-6 border-b">
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-history text-amber-500 text-xl"></i>
+                        <h3 class="text-xl font-semibold text-gray-800">Historial de Eventos</h3>
+                    </div>
+                    <button onclick="closeModal('historyModal')" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                
+                <div class="p-6 overflow-y-auto max-h-[calc(100vh-200px)]" id="historyContent">
+                    <div class="flex justify-center items-center">
+                        <i class="fas fa-circle-notch fa-spin text-amber-500 text-2xl mr-3"></i>
+                        <p class="text-gray-500 text-lg">Cargando información...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Contenedor de notificaciones -->
+<div id="notification-container" class="fixed bottom-4 right-4 z-50 space-y-2"></div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+<script src="/static/js/monitor.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
