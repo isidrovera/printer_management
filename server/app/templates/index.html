@@ -227,20 +227,41 @@
             </div>
         </div>
 
-        <!-- Monitor -->
+        <!-- Monitor de Impresoras -->
         <div class="bg-white overflow-hidden shadow-lg rounded-lg hover:shadow-xl transition-shadow duration-300">
             <div class="px-6 py-8">
                 <div class="flex items-center justify-between mb-4">
-                    <div class="bg-purple-100 rounded-lg p-3">
-                        <i class="fas fa-network-wired text-purple-600 text-2xl"></i>
+                    <!-- Icono principal con diseño más relevante -->
+                    <div class="bg-blue-100 rounded-lg p-3 relative">
+                        <i class="fas fa-print text-blue-600 text-2xl"></i>
+                        <!-- Pequeño indicador de monitoreo -->
+                        <div class="absolute -top-1 -right-1">
+                            <i class="fas fa-chart-line text-green-500 text-sm"></i>
+                        </div>
                     </div>
-                    <span class="bg-purple-100 text-purple-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">Seguro</span>
+                    <!-- Badge de estado -->
+                    <div class="flex items-center space-x-2">
+                        <span class="flex items-center bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">
+                            <i class="fas fa-shield-alt mr-1"></i>
+                            Monitorizado
+                        </span>
+                    </div>
                 </div>
-                <h3 class="text-xl font-bold text-gray-900 mb-2">SNPM</h3>
-                <p class="text-gray-600 mb-6">Administra las conexiones seguras</p>
-                <a href="/monitor/printers" class="inline-flex items-center text-purple-600 hover:text-purple-700 font-medium">
-                    Gestionar
-                    <i class="fas fa-arrow-right ml-2"></i>
+                
+                <!-- Título y descripción -->
+                <h3 class="text-xl font-bold text-gray-900 mb-2">
+                    Monitor de Impresoras
+                </h3>
+                <p class="text-gray-600 mb-6">
+                    Control y seguimiento de estado en tiempo real
+                </p>
+                
+                <!-- Enlace con ícono más descriptivo -->
+                <a href="/monitor/printers" class="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium group">
+                    <span>Supervisar</span>
+                    <div class="ml-2 transform transition-transform group-hover:translate-x-1">
+                        <i class="fas fa-desktop"></i>
+                    </div>
                 </a>
             </div>
         </div>
