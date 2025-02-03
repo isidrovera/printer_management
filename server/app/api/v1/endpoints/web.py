@@ -393,9 +393,6 @@ async def list_printers(request: Request, db: Session = Depends(get_db)):
     try:
         printer_service = PrinterMonitorService(db)
         
-        # Generar un informe de impresoras
-        report = printer_service.generate_printer_report()
-        
         # Obtener todas las impresoras con consumibles críticos
         critical_printers = printer_service.get_printers_with_critical_supplies()
         
