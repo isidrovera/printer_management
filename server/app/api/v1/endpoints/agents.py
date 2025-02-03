@@ -79,20 +79,15 @@ async def get_agent(agent_id: int, db: Session = Depends(get_db)):
 
 @router.post("/register")
 async def register_agent(
-    client_token: str,
-    hostname: str,
-    username: str,
-    ip_address: str,
-    device_type: str,
-    system_info: dict,
+    data: AgentCreate,
     db: Session = Depends(get_db)
 ):
     agent_service = AgentService(db)
     return await agent_service.register_agent(
-        client_token=client_token,
-        hostname=hostname,
-        username=username,
-        ip_address=ip_address,
-        device_type=device_type,
-        system_info=system_info
+        client_token=data.client_token,
+        hostname=data.hostname,
+        username=data.username,
+        ip_address=data.ip_address,
+        device_type=data.device_type,
+        system_info=data.system_info
     )
