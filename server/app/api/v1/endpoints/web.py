@@ -10,7 +10,7 @@ from app.services.client_service import ClientService
 from app.services.agent_service import AgentService
 from app.services.driver_service import DriverService
 from app.services.tunnel_service import TunnelService
-from app.services.monitor_service import MonitorService
+from app.services.monitor_service import PrinterMonitorService
 from fastapi import File, UploadFile
 from pathlib import Path
 from app.core.config import settings
@@ -385,48 +385,100 @@ async def list_tunnels_view(request: Request, db: Session = Depends(get_db)):
 
 
 
-
-@router.get("/monitor")
-async def monitor_view(request: Request, db: Session = Depends(get_db)):
-    """Vista del monitor de impresoras."""
+@router.get("/printers")
+async def list_printers(request: Request, db: Session = Depends(get_db)):
+    """
+    Vista para listar todas las impresoras
+    """
     try:
-        logger.info("Cargando vista de monitoreo")
-        monitor_service = MonitorService(db)
-        printers = await monitor_service.get_monitored_printers()
+        printer_service = PrinterMonitorService(db)
+        printers = printer_service.get_printers_with_critical_supplies()
+        
         return templates.TemplateResponse(
-            "monitor/dashboard.html",
+            "printers/list.html",
             {
-                "request": request,
-                "printers": printers
+                "request": request, 
+                "printers": printers,
+                "critical_printers": [p for p in printers if p.check_critical_supplies()]
             }
         )
     except Exception as e:
-        logger.error(f"Error cargando monitor: {str(e)}")
+        logger.error(f"Error listando impresoras: {str(e)}")
         return templates.TemplateResponse(
-            "monitor/dashboard.html",
+            "printers/list.html",
             {
-                "request": request,
+                "request": request, 
                 "printers": [],
-                "error": "Error cargando datos de monitoreo"
+                "error": str(e)
             }
         )
 
-@router.get("/monitor/{printer_id}")
-async def monitor_printer_view(request: Request, printer_id: int, db: Session = Depends(get_db)):
-    """Vista detallada de monitoreo de una impresora."""
+@router.get("/printers/{printer_id}")
+async def printer_details(request: Request, printer_id: int, db: Session = Depends(get_db)):
+    """
+    Vista de detalles de una impresora específica
+    """
     try:
-        logger.info(f"Cargando monitoreo detallado de impresora {printer_id}")
-        monitor_service = MonitorService(db)
-        printer_data = await monitor_service.get_monitor_data(printer_id)
-        history = await monitor_service.get_monitor_history(printer_id)
+        printer_service = PrinterMonitorService(db)
+        
+        # Obtener detalles de la impresora
+        printer = db.query(Printer).filter(Printer.id == printer_id).first()
+        
+        if not printer:
+            return templates.TemplateResponse(
+                "printers/not_found.html",
+                {"request": request, "printer_id": printer_id}
+            )
+        
+        # Obtener historial de los últimos 7 días
+        history = printer_service.get_printer_history(printer_id)
+        
+        # Obtener consumibles críticos
+        critical_supplies = printer.check_critical_supplies()
+        
         return templates.TemplateResponse(
-            "monitor/printer_detail.html",
+            "printers/details.html",
             {
-                "request": request,
-                "printer": printer_data,
-                "history": history
+                "request": request, 
+                "printer": printer,
+                "history": history,
+                "critical_supplies": critical_supplies
             }
         )
     except Exception as e:
-        logger.error(f"Error cargando detalles de impresora: {str(e)}")
-        return RedirectResponse("/monitor", status_code=303)
+        logger.error(f"Error obteniendo detalles de impresora {printer_id}: {str(e)}")
+        return templates.TemplateResponse(
+            "printers/details.html",
+            {
+                "request": request, 
+                "printer": None,
+                "error": str(e)
+            }
+        )
+
+@router.get("/printers/report")
+async def printer_report(request: Request, db: Session = Depends(get_db)):
+    """
+    Vista de informe general de impresoras
+    """
+    try:
+        printer_service = PrinterMonitorService(db)
+        report = printer_service.generate_printer_report()
+        
+        return templates.TemplateResponse(
+            "printers/report.html",
+            {
+                "request": request, 
+                "report": report
+            }
+        )
+    except Exception as e:
+        logger.error(f"Error generando informe de impresoras: {str(e)}")
+        return templates.TemplateResponse(
+            "printers/report.html",
+            {
+                "request": request, 
+                "report": {},
+                "error": str(e)
+            }
+        )

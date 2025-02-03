@@ -1,170 +1,218 @@
 # server/app/db/models/printer.py
 from app.db.base import BaseModel
-from sqlalchemy import Column, String, Boolean, ForeignKey, JSON, Integer, Float
+from sqlalchemy import Column, String, Boolean, ForeignKey, JSON, Integer, DateTime
 from sqlalchemy.orm import relationship
 from datetime import datetime
 
 class Printer(BaseModel):
     __tablename__ = 'printers'
     
-    # Relaciones con Client y Agent
+    # Relaciones básicas
     client_id = Column(Integer, ForeignKey('clients.id'))
     agent_id = Column(Integer, ForeignKey('agents.id'))
-    oid_config_id = Column(Integer, ForeignKey('printer_oids.id'))
     
-    # Información básica
+    # Información básica de identificación
     name = Column(String, nullable=False)
     model = Column(String)
     brand = Column(String)
     serial_number = Column(String, unique=True)
     ip_address = Column(String, unique=True, nullable=False)
     location = Column(String)
+    
+    # Estado actual de la impresora
     status = Column(String, default='offline')
+    is_active = Column(Boolean, default=True)
+    last_check = Column(DateTime, nullable=True)
     
-    # Configuración SNMP
-    snmp_version = Column(String, default='2c')
-    snmp_community = Column(String, default='public')
-    snmp_port = Column(Integer, default=161)
-    snmp_timeout = Column(Integer, default=2)
-    snmp_retries = Column(Integer, default=3)
-    
-    # Últimos valores leídos vía SNMP
-    last_values = Column(JSON, default={
-        'system': {},
-        'status': {},
-        'supplies': {},
-        'counters': {},
-        'paper': {}
-    })
-    
-    # Contadores actuales
-    counters = Column(JSON, default={
-        'total': 0,
-        'color': 0,
-        'black': 0,
-        'duplex': 0,
-        'scan': 0,
-        'copy': 0,
-        'fax': 0
-    })
-    
-    # Estado de consumibles
-    supplies = Column(JSON, default={
-        'black': {'level': 100, 'max': None, 'type': None},
-        'cyan': {'level': 100, 'max': None, 'type': None},
-        'magenta': {'level': 100, 'max': None, 'type': None},
-        'yellow': {'level': 100, 'max': None, 'type': None},
-        'waste': {'level': 0, 'max': None},
-        'drum': {'level': 100, 'max': None},
-        'fuser': {'level': 100, 'max': None},
-        'maintenance_kit': {'level': 100, 'max': None}
-    })
-    
-    # Estado de las bandejas
-    paper_trays = Column(JSON, default={
-        'tray1': {'status': 'unknown', 'size': None, 'level': None},
-        'tray2': {'status': 'unknown', 'size': None, 'level': None},
-        'tray3': {'status': 'unknown', 'size': None, 'level': None}
-    })
-    
-    # Configuración y alertas
-    settings = Column(JSON, default={
-        'alert_levels': {
-            'toner': 15,
-            'drum': 20,
-            'maintenance_kit': 20,
-            'paper': 10
+    # Datos detallados reportados por el agente
+    printer_data = Column(JSON, default={
+        # Contadores detallados de impresión
+        'counters': {
+            'total': 0,
+            'color': {
+                'total': 0,
+                'cyan': 0,
+                'magenta': 0,
+                'yellow': 0,
+                'black': 0
+            },
+            'black_white': 0,
+            'duplex': 0,
+            'simplex': 0,
+            'a4': 0,
+            'a3': 0,
+            'letter': 0,
+            'legal': 0
         },
-        'polling_interval': 300,  # segundos
-        'retry_attempts': 3,
-        'notifications': {
-            'email': True,
-            'webhook': False,
-            'dashboard': True
-        }
+        
+        # Estado de consumibles
+        'supplies': {
+            'toners': {
+                'black': {
+                    'current_level': 0,
+                    'max_level': 0,
+                    'percentage': 0,
+                    'status': 'ok'
+                },
+                'cyan': {
+                    'current_level': 0,
+                    'max_level': 0,
+                    'percentage': 0,
+                    'status': 'ok'
+                },
+                'magenta': {
+                    'current_level': 0,
+                    'max_level': 0,
+                    'percentage': 0,
+                    'status': 'ok'
+                },
+                'yellow': {
+                    'current_level': 0,
+                    'max_level': 0,
+                    'percentage': 0,
+                    'status': 'ok'
+                }
+            },
+            'drums': {
+                'black': {
+                    'current_level': 0,
+                    'max_level': 0,
+                    'percentage': 0,
+                    'status': 'ok'
+                },
+                'color': {
+                    'current_level': 0,
+                    'max_level': 0,
+                    'percentage': 0,
+                    'status': 'ok'
+                }
+            },
+            'maintenance_kit': {
+                'current_level': 0,
+                'max_level': 0,
+                'percentage': 0,
+                'status': 'ok'
+            },
+            'waste_toner_box': {
+                'current_level': 0,
+                'max_level': 0,
+                'percentage': 0,
+                'status': 'ok'
+            }
+        },
+        
+        # Estado de bandejas de papel
+        'paper_trays': {
+            'tray1': {
+                'size': None,
+                'type': None,
+                'current_level': 0,
+                'max_level': 0,
+                'percentage': 0,
+                'status': 'unknown'
+            },
+            'tray2': {
+                'size': None,
+                'type': None,
+                'current_level': 0,
+                'max_level': 0,
+                'percentage': 0,
+                'status': 'unknown'
+            },
+            'tray3': {
+                'size': None,
+                'type': None,
+                'current_level': 0,
+                'max_level': 0,
+                'percentage': 0,
+                'status': 'unknown'
+            }
+        },
+        
+        # Información del sistema
+        'system': {
+            'temperature': 0,
+            'power_on_time': 0,
+            'firmware_version': None,
+            'serial_number': None
+        },
+        
+        # Alertas y errores
+        'alerts': [],
+        'errors': []
     })
     
-    # Historial de eventos
-    history = Column(JSON, default={
+    # Historial de datos (últimos 100 registros)
+    data_history = Column(JSON, default={
+        'counters': [],
+        'supplies': [],
         'errors': [],
-        'warnings': [],
-        'maintenance': [],
-        'supply_changes': [],
         'status_changes': []
     })
-    
-    # Estado y monitoreo
-    is_active = Column(Boolean, default=True)
-    last_check = Column(String)
-    next_check = Column(String)
-    error_count = Column(Integer, default=0)
-    consecutive_failures = Column(Integer, default=0)
     
     # Relaciones
     client = relationship("Client", back_populates="printers")
     agent = relationship("Agent", back_populates="printers")
-    oid_config = relationship("PrinterOIDs", back_populates="printers")
     printer_jobs = relationship("PrinterJob", back_populates="printer")
-
-    def update_history(self, event_type, event_data):
-        """Actualiza el historial con nuevo evento."""
-        if event_type in self.history:
-            self.history[event_type].append({
-                'timestamp': datetime.utcnow().isoformat(),
-                'data': event_data
-            })
-            # Mantener solo últimos 100 eventos por tipo
-            if len(self.history[event_type]) > 100:
-                self.history[event_type] = self.history[event_type][-100:]
-
-    def update_counter(self, counter_type, value):
-        """Actualiza un contador específico."""
-        if counter_type in self.counters:
-            old_value = self.counters[counter_type]
-            self.counters[counter_type] = value
-            if value < old_value:
-                self.update_history('counters', {
-                    'type': counter_type,
-                    'reset': True,
-                    'old_value': old_value,
-                    'new_value': value
+    
+    def update_printer_data(self, data):
+        """
+        Actualiza todos los datos de la impresora de una sola vez.
+        
+        :param data: Diccionario completo con los datos de la impresora
+        """
+        # Actualizar datos actuales
+        self.printer_data = data
+        
+        # Registrar en histórico
+        for key in ['counters', 'supplies', 'errors']:
+            if key in data:
+                log_entry = {
+                    'timestamp': datetime.utcnow(),
+                    'data': data[key]
+                }
+                
+                # Añadir nueva entrada y mantener solo los últimos 100 registros
+                self.data_history[key].append(log_entry)
+                if len(self.data_history[key]) > 100:
+                    self.data_history[key] = self.data_history[key][-100:]
+        
+        # Actualizar última verificación y estado
+        self.last_check = datetime.utcnow()
+        if 'status' in data:
+            self.status = data['status']
+    
+    def check_critical_supplies(self):
+        """
+        Verifica el estado crítico de los consumibles.
+        
+        :return: Lista de consumibles en estado crítico
+        """
+        critical_supplies = []
+        
+        # Verificar toners
+        for color, toner in self.printer_data['supplies']['toners'].items():
+            if toner['percentage'] < 10:
+                critical_supplies.append({
+                    'type': f'{color} toner',
+                    'current_level': toner['current_level'],
+                    'percentage': toner['percentage']
                 })
-
-    def update_supply(self, supply_type, value, max_value=None, supply_identifier=None):
-        """Actualiza nivel de consumible."""
-        if supply_type in self.supplies:
-            old_value = self.supplies[supply_type]['level']
-            self.supplies[supply_type]['level'] = value
-            if max_value:
-                self.supplies[supply_type]['max'] = max_value
-            if supply_identifier:
-                self.supplies[supply_type]['type'] = supply_identifier
-            
-            # Registrar cambio significativo
-            if abs(old_value - value) > 5:
-                self.update_history('supply_changes', {
+        
+        # Verificar otros consumibles
+        for supply_type in ['drums', 'maintenance_kit', 'waste_toner_box']:
+            supply = self.printer_data['supplies'].get(supply_type)
+            if supply and supply['percentage'] < 15:
+                critical_supplies.append({
                     'type': supply_type,
-                    'old_value': old_value,
-                    'new_value': value,
-                    'max': max_value,
-                    'identifier': supply_identifier
+                    'current_level': supply['current_level'],
+                    'percentage': supply['percentage']
                 })
-
-    def check_alerts(self):
-        """Verifica si hay alertas basadas en niveles configurados."""
-        alerts = []
-        for supply, data in self.supplies.items():
-            if data['level'] <= self.settings['alert_levels'].get(supply, 15):
-                alerts.append({
-                    'type': 'supply',
-                    'item': supply,
-                    'level': data['level'],
-                    'threshold': self.settings['alert_levels'].get(supply, 15)
-                })
-        return alerts
-
+        
+        return critical_supplies
+    
     def to_dict(self):
-        """Convierte el objeto a diccionario."""
+        """Convierte el objeto a diccionario para serialización."""
         return {
             "id": self.id,
             "name": self.name,
@@ -176,11 +224,8 @@ class Printer(BaseModel):
             "status": self.status,
             "is_active": self.is_active,
             "last_check": self.last_check,
-            "counters": self.counters,
-            "supplies": self.supplies,
-            "paper_trays": self.paper_trays,
-            "settings": self.settings,
-            "agent": self.agent.to_dict() if self.agent else None,
+            "printer_data": self.printer_data,
+            "critical_supplies": self.check_critical_supplies(),
             "client": self.client.to_dict() if self.client else None,
-            "alerts": self.check_alerts()
+            "agent": self.agent.to_dict() if self.agent else None
         }
