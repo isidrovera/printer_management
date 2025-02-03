@@ -45,3 +45,8 @@ class PrinterOIDsCreate(PrinterBase):
     snmp_version: Optional[str] = "2c"
     snmp_community: Optional[str] = "public"
     snmp_port: Optional[int] = 161
+class PrinterOIDsUpdate(BaseModel):
+    brand: Optional[str] = None
+    model: Optional[str] = None
+    oids: Optional[Dict[str, Dict[str, str]]] = None
+    snmp_config: Optional[Dict[str, str]] = None
