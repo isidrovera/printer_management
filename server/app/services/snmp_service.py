@@ -2,13 +2,19 @@
 import logging
 from typing import Any, Dict
 import asyncio
-from pysnmp.hlapi.asyncio import *
-import pysnmp
+from puresnmp.api.raw import walk, get
+from puresnmp.exc import SnmpTimeoutError
 
 logger = logging.getLogger(__name__)
 
 class SNMPService:
-    async def get_oid_value(self, ip: str, oid: str, community: str = 'public', version: int = 2) -> Any:
+    async def get_oid_value(
+        self, 
+        ip: str, 
+        oid: str, 
+        community: str = 'public', 
+        version: int = 2
+    ) -> Any:
         """
         Obtiene el valor de un OID específico de una impresora mediante SNMP.
         
@@ -24,38 +30,83 @@ class SNMPService:
         try:
             logger.debug(f"Consultando OID {oid} en {ip}")
             
-            # Configurar versión SNMP
-            if version == 1:
-                snmp_version = 0  # v1
-            else:
-                snmp_version = 1  # v2c
-
-            # Crear generador para la consulta SNMP
-            snmp_engine = SnmpEngine()
-            auth_data = CommunityData(community, mpModel=snmp_version)
-            transport_target = UdpTransportTarget((ip, 161))
-            context_data = ContextData()
-
-            # Realizar consulta
-            error_indication, error_status, error_index, var_binds = await getNextRequestObject(
-                snmp_engine,
-                auth_data,
-                transport_target,
-                context_data,
-                ObjectType(ObjectIdentity(oid))
+            # puresnmp es síncrono, así que lo ejecutamos en un thread separado
+            loop = asyncio.get_event_loop()
+            result = await loop.run_in_executor(
+                None,
+                lambda: get(
+                    ip,
+                    community,
+                    oid,
+                    port=161,
+                    timeout=2  # Timeout en segundos
+                )
             )
-
-            if error_indication:
-                raise Exception(f"Error SNMP: {error_indication}")
-            elif error_status:
-                raise Exception(f"Error en OID #{error_index}: {error_status}")
             
-            # Procesar respuesta
-            for var_bind in var_binds:
-                return var_bind[1].prettyPrint()
+            # Procesar el resultado según su tipo
+            if isinstance(result, bytes):
+                return result.decode('utf-8', errors='replace')
+            elif isinstance(result, (int, float)):
+                return str(result)
+            else:
+                return str(result)
 
+        except SnmpTimeoutError:
+            logger.error(f"Timeout consultando OID {oid} en {ip}")
+            raise TimeoutError(f"No se pudo conectar con la impresora en {ip}")
         except Exception as e:
             logger.error(f"Error consultando OID {oid} en {ip}: {str(e)}")
+            raise
+
+    async def walk_oid(
+        self,
+        ip: str,
+        oid: str,
+        community: str = 'public',
+        version: int = 2
+    ) -> Dict[str, Any]:
+        """
+        Realiza un SNMP walk desde un OID base.
+        
+        Args:
+            ip: Dirección IP de la impresora
+            oid: OID base para el walk
+            community: Comunidad SNMP
+            version: Versión SNMP
+        
+        Returns:
+            Diccionario con los resultados del walk
+        """
+        try:
+            logger.debug(f"Realizando SNMP walk desde OID {oid} en {ip}")
+            
+            loop = asyncio.get_event_loop()
+            results = await loop.run_in_executor(
+                None,
+                lambda: walk(
+                    ip,
+                    community,
+                    oid,
+                    port=161,
+                    timeout=2
+                )
+            )
+            
+            # Procesar resultados del walk
+            processed_results = {}
+            for oid_suffix, value in results:
+                if isinstance(value, bytes):
+                    processed_results[str(oid_suffix)] = value.decode('utf-8', errors='replace')
+                else:
+                    processed_results[str(oid_suffix)] = str(value)
+                    
+            return processed_results
+
+        except SnmpTimeoutError:
+            logger.error(f"Timeout en SNMP walk para {ip}")
+            raise TimeoutError(f"No se pudo conectar con la impresora en {ip}")
+        except Exception as e:
+            logger.error(f"Error en SNMP walk: {str(e)}")
             raise
 
     async def get_multiple_oids(
@@ -84,6 +135,9 @@ class SNMPService:
                     try:
                         value = await self.get_oid_value(ip, oid, community, version)
                         results[name] = value
+                    except TimeoutError:
+                        logger.error(f"Timeout en OID {name} para {ip}")
+                        results[name] = None
                     except Exception as e:
                         logger.error(f"Error consultando OID {name}: {str(e)}")
                         results[name] = None
