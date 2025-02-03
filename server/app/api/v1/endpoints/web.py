@@ -10,7 +10,6 @@ from app.services.client_service import ClientService
 from app.services.agent_service import AgentService
 from app.services.driver_service import DriverService
 from app.services.tunnel_service import TunnelService
-from app.services.printer_oids_service import PrinterOIDsService
 from app.services.monitor_service import MonitorService
 from fastapi import File, UploadFile
 from pathlib import Path

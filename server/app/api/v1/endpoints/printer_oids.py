@@ -5,7 +5,6 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from app.db.session import get_db
-from app.services.printer_oids_service import PrinterOIDsService
 from app.schemas.printer_oids import PrinterOIDsCreate, PrinterOIDs, PrinterOIDsUpdate
 import logging
 
