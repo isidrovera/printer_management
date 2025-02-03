@@ -2,8 +2,7 @@
 import logging
 from typing import Any, Dict
 import asyncio
-from puresnmp.api.raw import walk, get
-from puresnmp.exc import SnmpTimeoutError
+import puresnmp  # Cambiamos la importación aquí
 
 logger = logging.getLogger(__name__)
 
