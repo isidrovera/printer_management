@@ -3,8 +3,12 @@
 
 {% block content %}
 <div class="bg-white shadow-lg rounded-lg p-6 mx-auto max-w-7xl">
+    <!-- Header con búsqueda -->
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-        <h2 class="text-2xl font-bold text-gray-800">Gestión de Túneles SSH</h2>
+        <div class="flex items-center space-x-2">
+            <i class="fas fa-network-wired text-blue-600 text-2xl"></i>
+            <h2 class="text-2xl font-bold text-gray-800">Gestión de Túneles SSH</h2>
+        </div>
         <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto">
             <!-- Barra de búsqueda -->
             <div class="relative flex-grow sm:flex-grow-0">
@@ -12,7 +16,62 @@
                        id="searchInput" 
                        placeholder="Buscar túneles..." 
                        class="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                <i data-lucide="search" class="absolute right-3 top-2.5 h-5 w-5 text-gray-400"></i>
+                <i class="fas fa-search absolute right-3 top-2.5 h-5 w-5 text-gray-400"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resumen de estados -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <!-- Total Túneles -->
+        <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500">Total Túneles</p>
+                    <h3 class="text-2xl font-bold text-gray-900">{{ tunnels|length }}</h3>
+                </div>
+                <div class="bg-blue-100 p-3 rounded-lg">
+                    <i class="fas fa-network-wired text-blue-600 text-xl"></i>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Túneles Activos -->
+        <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500">Activos</p>
+                    <h3 class="text-2xl font-bold text-green-600">{{ tunnels|selectattr('status', 'equalto', 'active')|list|length }}</h3>
+                </div>
+                <div class="bg-green-100 p-3 rounded-lg">
+                    <i class="fas fa-check-circle text-green-600 text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- En Creación -->
+        <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500">En Creación</p>
+                    <h3 class="text-2xl font-bold text-yellow-600">{{ tunnels|selectattr('status', 'equalto', 'creating')|list|length }}</h3>
+                </div>
+                <div class="bg-yellow-100 p-3 rounded-lg">
+                    <i class="fas fa-sync fa-spin text-yellow-600 text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Con Error -->
+        <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500">Con Error</p>
+                    <h3 class="text-2xl font-bold text-red-600">{{ tunnels|selectattr('status', 'equalto', 'error')|list|length }}</h3>
+                </div>
+                <div class="bg-red-100 p-3 rounded-lg">
+                    <i class="fas fa-exclamation-circle text-red-600 text-xl"></i>
+                </div>
             </div>
         </div>
     </div>
@@ -33,41 +92,64 @@
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
                 {% for tunnel in tunnels %}
-                <tr class="hover:bg-gray-50 transition-colors">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ tunnel.tunnel_id }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ tunnel.agent.hostname }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ tunnel.remote_host }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ tunnel.local_port }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ tunnel.remote_port }}</td>
+                <tr class="hover:bg-gray-50 transition-colors" data-tunnel-id="{{ tunnel.tunnel_id }}">
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                   {% if tunnel.status == 'active' %}bg-green-100 text-green-800
-                                   {% elif tunnel.status == 'creating' %}bg-yellow-100 text-yellow-800
-                                   {% elif tunnel.status == 'error' %}bg-red-100 text-red-800
-                                   {% else %}bg-gray-100 text-gray-800{% endif %}">
-                            <span class="w-2 h-2 mr-2 rounded-full 
-                                       {% if tunnel.status == 'active' %}bg-green-400
-                                       {% elif tunnel.status == 'creating' %}bg-yellow-400
-                                       {% elif tunnel.status == 'error' %}bg-red-400
-                                       {% else %}bg-gray-400{% endif %}"></span>
+                        <div class="flex items-center">
+                            <i class="fas fa-link text-gray-400 mr-2"></i>
+                            <span class="text-sm font-mono text-gray-900">{{ tunnel.tunnel_id }}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <i class="fas fa-desktop text-blue-400 mr-2"></i>
+                            <span class="text-sm text-gray-900">{{ tunnel.agent.hostname }}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <i class="fas fa-server text-purple-400 mr-2"></i>
+                            <span class="text-sm text-gray-900">{{ tunnel.remote_host }}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <i class="fas fa-random text-green-400 mr-2"></i>
+                            <span class="text-sm text-gray-900">{{ tunnel.local_port }}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <i class="fas fa-random text-amber-400 mr-2"></i>
+                            <span class="text-sm text-gray-900">{{ tunnel.remote_port }}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+                            {% if tunnel.status == 'active' %}bg-green-100 text-green-800
+                            {% elif tunnel.status == 'creating' %}bg-yellow-100 text-yellow-800
+                            {% elif tunnel.status == 'error' %}bg-red-100 text-red-800
+                            {% else %}bg-gray-100 text-gray-800{% endif %}">
+                            <i class="fas fa-{% if tunnel.status == 'active' %}check-circle{% elif tunnel.status == 'creating' %}sync fa-spin{% elif tunnel.status == 'error' %}exclamation-circle{% else %}circle{% endif %} mr-2"></i>
                             {{ tunnel.status|capitalize }}
                         </span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <div class="flex items-center justify-end space-x-3">
+                        <div class="flex items-center justify-end space-x-2">
                             <!-- Botón Info -->
                             <button onclick="showTunnelInfo('{{ tunnel.tunnel_id }}')"
-                                    class="inline-flex items-center justify-center w-10 h-10 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all shadow-sm hover:shadow-md"
-                                    title="Ver Info">
-                                <i data-lucide="info" class="h-5 w-5"></i>
+                                    class="inline-flex items-center px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
+                                    title="Ver información detallada">
+                                <i class="fas fa-info-circle mr-2"></i>
+                                <span>Info</span>
                             </button>
 
                             <!-- Botón Cerrar Túnel -->
                             {% if tunnel.status != 'closed' %}
                             <button onclick="closeTunnel('{{ tunnel.tunnel_id }}')"
-                                    class="inline-flex items-center justify-center w-10 h-10 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all shadow-sm hover:shadow-md"
-                                    title="Cerrar Túnel">
-                                <i data-lucide="x-circle" class="h-5 w-5"></i>
+                                    class="inline-flex items-center px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
+                                    title="Cerrar túnel">
+                                <i class="fas fa-stop-circle mr-2"></i>
+                                <span>Cerrar</span>
                             </button>
                             {% endif %}
                         </div>
@@ -76,13 +158,17 @@
                 {% endfor %}
             </tbody>
         </table>
-    </div>
 
-    {% if not tunnels %}
-    <div class="text-center py-8">
-        <p class="text-gray-500">No hay túneles activos</p>
+        {% if not tunnels %}
+        <div class="text-center py-12">
+            <div class="flex flex-col items-center">
+                <i class="fas fa-network-wired text-gray-400 text-5xl mb-4"></i>
+                <h3 class="text-lg font-medium text-gray-900">No hay túneles configurados</h3>
+                <p class="text-gray-500 mt-2">No se encontraron túneles SSH en el sistema.</p>
+            </div>
+        </div>
+        {% endif %}
     </div>
-    {% endif %}
 </div>
 
 <!-- Modal de Información del Túnel -->
@@ -94,40 +180,44 @@
                 <!-- Cabecera -->
                 <div class="flex justify-between items-center p-6 border-b">
                     <div class="flex items-center space-x-2">
-                        <i data-lucide="info" class="h-6 w-6 text-blue-500"></i>
+                        <i class="fas fa-info-circle text-blue-500 text-xl"></i>
                         <h3 class="text-xl font-semibold text-gray-800">Información del Túnel</h3>
                     </div>
                     <button onclick="closeModal('tunnelInfoModal')" 
                             class="text-gray-500 hover:text-gray-700">
-                        <i data-lucide="x" class="h-6 w-6"></i>
+                        <i class="fas fa-times text-xl"></i>
                     </button>
                 </div>
                 
                 <!-- Contenido -->
                 <div class="p-6">
-                    <div id="tunnelInfoContent">
-                        <!-- El contenido se insertará dinámicamente -->
+                    <div id="tunnelInfoContent" class="space-y-6">
+                        <div class="flex justify-center items-center">
+                            <i class="fas fa-circle-notch fa-spin text-blue-500 text-2xl mr-3"></i>
+                            <p class="text-gray-500 text-lg">Cargando información...</p>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Footer -->
-                <div class="flex justify-end items-center p-6 border-t">
+                <div class="flex justify-end items-center p-6 border-t bg-gray-50">
                     <button onclick="closeModal('tunnelInfoModal')" 
-                            class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">
-                        Cerrar
+                            class="flex items-center px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">
+                        <i class="fas fa-times mr-2"></i>
+                        <span>Cerrar</span>
                     </button>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Contenedor de notificaciones -->
+<div id="notification-container" class="fixed bottom-4 right-4 z-50 space-y-2"></div>
+
 {% endblock %}
 
 {% block scripts %}
-<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
 <script src="/static/js/tunnels.js"></script>
-<script>
-    // Inicializar iconos de Lucide
-    lucide.createIcons();
-</script>
 {% endblock %}

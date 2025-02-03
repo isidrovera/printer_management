@@ -397,15 +397,13 @@ class AgentService:
             }))
 
     def _create_tunnel(self, ssh_host, ssh_port, username, password, remote_host, remote_port, local_port, tunnel_id, loop):
-        """Crea el túnel SSH."""
         try:
-            # Crear cliente SSH
             ssh = paramiko.SSHClient()
             ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
             
             logger.info(f"Conectando a {ssh_host}:{ssh_port}")
             ssh.connect(
-                ssh_host,
+                ssh_host, 
                 port=ssh_port,
                 username=username,
                 password=password,
@@ -413,32 +411,36 @@ class AgentService:
             )
             logger.info("Conexión SSH establecida")
 
-            def handler(channel, remote_addr, server_addr):
-                try:
-                    sock = socket.socket()
-                    sock.connect((remote_host, local_port))
+            transport = ssh.get_transport()
+            # Establecer el reenvío de puerto remoto
+            transport.request_port_forward('', local_port)
 
-                    while tunnel_id in self.active_tunnels:
-                        r, w, x = select.select([channel, sock], [], [])
-                        if channel in r:
-                            data = channel.recv(1024)
-                            if len(data) == 0:
-                                break
-                            sock.send(data)
-                        if sock in r:
-                            data = sock.recv(1024)
-                            if len(data) == 0:
-                                break
-                            channel.send(data)
-                    
-                    channel.close()
-                    sock.close()
-                except Exception as e:
-                    logger.error(f"Error en el handler del túnel: {e}")
+            # Manejar el reenvío de tráfico
+            def handle_channel():
+                while tunnel_id in self.active_tunnels:
+                    try:
+                        chan = transport.accept()
+                        if chan is None:
+                            continue
+                        sock = socket.socket()
+                        try:
+                            sock.connect((remote_host, remote_port))
+                        except Exception as e:
+                            logger.error(f"Error conectando a {remote_host}:{remote_port} - {e}")
+                            chan.close()
+                            continue
 
-            # Iniciar el reenvío
-            ssh.get_transport().request_port_forward('', remote_port, handler=handler)
-            logger.info(f"Túnel establecido: {remote_host}:{remote_port} -> localhost:{local_port}")
+                        self._handle_tunnel(chan, sock)
+                    except Exception as e:
+                        logger.error(f"Error en el canal: {e}")
+                        break
+
+            # Iniciar thread para manejar canales
+            handler_thread = threading.Thread(target=handle_channel)
+            handler_thread.daemon = True
+            handler_thread.start()
+
+            logger.info(f"Túnel remoto establecido: {remote_host}:{remote_port} <- localhost:{local_port}")
 
             future = asyncio.run_coroutine_threadsafe(
                 self._send_tunnel_status(tunnel_id, 'active', 'Túnel establecido'),
@@ -451,6 +453,7 @@ class AgentService:
                     break
                 time.sleep(1)
 
+            transport.cancel_port_forward('', local_port)
             ssh.close()
 
         except Exception as e:
@@ -461,6 +464,22 @@ class AgentService:
                 loop
             )
             future.result()
+
+    def _handle_tunnel(self, chan, sock):
+        while True:
+            r, w, x = select.select([sock, chan], [], [])
+            if sock in r:
+                data = sock.recv(1024)
+                if len(data) == 0:
+                    break
+                chan.send(data)
+            if chan in r:
+                data = chan.recv(1024)
+                if len(data) == 0:
+                    break
+                sock.send(data)
+        chan.close()
+        sock.close()
 
     async def _handle_tunnel_closure(self, data, websocket):
         """Maneja el cierre de túneles SSH."""
