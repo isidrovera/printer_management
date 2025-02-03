@@ -381,7 +381,9 @@ async def list_tunnels_view(request: Request, db: Session = Depends(get_db)):
             "tunnels": tunnels
         }
     )
-
+@templates.add_template_filter
+def numberformat(value):
+    return "{:,}".format(value)
 
 
 
