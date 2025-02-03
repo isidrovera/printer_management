@@ -18,7 +18,7 @@ class Printer(BaseModel):
     serial_number = Column(String, unique=True)
     ip_address = Column(String, unique=True, nullable=False)
     location = Column(String)
-    
+    printer_jobs = relationship("PrinterJob", back_populates="printer")
     # Estado actual de la impresora
     status = Column(String, default='offline')
     is_active = Column(Boolean, default=True)

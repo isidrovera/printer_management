@@ -15,3 +15,4 @@ class PrinterJob(BaseModel):
     
     agent = relationship("Agent", back_populates="printer_jobs")
     printer_driver = relationship("PrinterDriver")
+    printer = relationship("Printer", back_populates="printer_jobs")
