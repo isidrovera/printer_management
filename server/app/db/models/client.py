@@ -12,6 +12,7 @@ class Client(BaseModel):
     is_active = Column(Boolean, default=True)
     
     agents = relationship("Agent", back_populates="client")
+    printers = relationship("Printer", back_populates="client")
     
     @staticmethod
     def generate_token():
