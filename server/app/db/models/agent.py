@@ -26,6 +26,7 @@ class Agent(BaseModel):
     
     client = relationship("Client", back_populates="agents")
     printer_jobs = relationship("PrinterJob", back_populates="agent")
+    printers = relationship("Printer", back_populates="agent")
     tunnels = relationship("Tunnel", back_populates="agent", cascade="all, delete-orphan")
     
     @staticmethod
