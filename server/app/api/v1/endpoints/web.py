@@ -443,7 +443,7 @@ async def printer_details(request: Request, printer_id: int, db: Session = Depen
         critical_supplies = printer.check_critical_supplies()
         
         return templates.TemplateResponse(
-            "printers/details.html",
+            "monitor/printers/details.html",
             {
                 "request": request, 
                 "printer": printer,
