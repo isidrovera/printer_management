@@ -138,3 +138,25 @@ class PrinterMonitorService:
                 })
 
         return report
+
+    def get_critical_printers(self) -> List[Printer]:
+        """
+        Obtiene todas las impresoras que requieren atención.
+        Incluye impresoras con errores o con consumibles críticos.
+        
+        :return: Lista de impresoras críticas
+        """
+        printers = self.db.query(Printer).all()
+        critical_printers = []
+        
+        for printer in printers:
+            # Incluir impresoras con error
+            if printer.status == 'error':
+                critical_printers.append(printer)
+                continue
+                
+            # Incluir impresoras con consumibles críticos
+            if printer.check_critical_supplies():
+                critical_printers.append(printer)
+                
+        return critical_printers

@@ -388,7 +388,9 @@ templates.env.filters['numberformat'] = lambda value: "{:,}".format(value)
 @router.get("/monitor/printers")
 async def list_printers(request: Request, db: Session = Depends(get_db)):
     try:
-        # Resto del código...
+        printer_service = PrinterMonitorService(db)
+        critical_printers = printer_service.get_critical_printers()
+        
         return templates.TemplateResponse(
             "monitor/monitor_printers.html",
             {
@@ -404,7 +406,7 @@ async def list_printers(request: Request, db: Session = Depends(get_db)):
     except Exception as e:
         logger.error(f"Error en monitor de impresoras: {str(e)}")
         return templates.TemplateResponse(
-            "monitor_printers.html",
+            "monitor/monitor_printers.html",
             {
                 "request": request,
                 "printers": [],
