@@ -33,7 +33,7 @@ class PrinterMonitorService:
                     brand=printer_data.get('brand'),
                     serial_number=printer_data.get('serial_number'),
                     ip_address=printer_data.get('ip_address'),
-                    agent_id=agent_id
+                    agent_id=agent_id  # Usar el agent_id pasado como parámetro
                 )
                 self.db.add(printer)
 

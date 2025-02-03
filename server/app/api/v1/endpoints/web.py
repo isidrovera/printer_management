@@ -385,34 +385,42 @@ async def list_tunnels_view(request: Request, db: Session = Depends(get_db)):
 
 
 
-@router.get("/printers")
+@router.get("/monitor/printers")
 async def list_printers(request: Request, db: Session = Depends(get_db)):
     """
-    Vista para listar todas las impresoras
+    Vista para listar todas las impresoras monitoreadas
     """
     try:
         printer_service = PrinterMonitorService(db)
-        printers = printer_service.get_printers_with_critical_supplies()
+        
+        # Generar un informe de impresoras
+        report = printer_service.generate_printer_report()
+        
+        # Obtener todas las impresoras con consumibles críticos
+        critical_printers = printer_service.get_printers_with_critical_supplies()
         
         return templates.TemplateResponse(
-            "printers/list.html",
+            "monitor_printers.html",  # El nombre de su template
             {
                 "request": request, 
-                "printers": printers,
-                "critical_printers": [p for p in printers if p.check_critical_supplies()]
+                "printers": critical_printers,
+                "stats": {
+                    "total": len(critical_printers),
+                    "online": len([p for p in critical_printers if p.status == 'online']),
+                    "error": len([p for p in critical_printers if p.status == 'error'])
+                }
             }
         )
     except Exception as e:
-        logger.error(f"Error listando impresoras: {str(e)}")
+        logger.error(f"Error en monitor de impresoras: {str(e)}")
         return templates.TemplateResponse(
-            "printers/list.html",
+            "monitor_printers.html",
             {
                 "request": request, 
                 "printers": [],
                 "error": str(e)
             }
         )
-
 @router.get("/printers/{printer_id}")
 async def printer_details(request: Request, printer_id: int, db: Session = Depends(get_db)):
     """

@@ -11,6 +11,7 @@ router = APIRouter()
 
 @router.post("/update", response_model=Dict[str, Any])
 def update_printer_data(
+    agent_id: int,  # Añadir como parámetro de consulta
     printer_data: Dict[str, Any], 
     db: Session = Depends(get_db)
 ):
@@ -21,7 +22,7 @@ def update_printer_data(
     """
     try:
         monitor_service = PrinterMonitorService(db)
-        updated_printer = monitor_service.update_printer_data(printer_data)
+        updated_printer = monitor_service.update_printer_data(agent_id, printer_data)
         return {
             "status": "success",
             "printer_id": updated_printer.id,
@@ -30,7 +31,6 @@ def update_printer_data(
     except Exception as e:
         logger.error(f"Error updating printer data: {str(e)}")
         raise HTTPException(status_code=400, detail=str(e))
-
 @router.get("/critical-supplies", response_model=List[Dict[str, Any]])
 def get_critical_supplies(
     db: Session = Depends(get_db)
