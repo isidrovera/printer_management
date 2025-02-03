@@ -384,60 +384,8 @@ async def list_tunnels_view(request: Request, db: Session = Depends(get_db)):
     )
 
 
-@router.get("/printer-oids")
-async def list_printer_oids_view(request: Request, db: Session = Depends(get_db)):
-    """Vista de configuraciones de OIDs."""
-    try:
-        logger.info("Cargando vista de configuraciones OID")
-        oids_service = PrinterOIDsService(db)
-        oids_configs = await oids_service.get_all_oids()
-        return templates.TemplateResponse(
-            "printer_oids/list.html",
-            {
-                "request": request,
-                "oids_configs": oids_configs
-            }
-        )
-    except Exception as e:
-        logger.error(f"Error cargando configuraciones OID: {str(e)}")
-        return templates.TemplateResponse(
-            "printer_oids/list.html",
-            {
-                "request": request,
-                "oids_configs": [],
-                "error": "Error cargando configuraciones"
-            }
-        )
 
-@router.get("/printer-oids/create")
-async def create_printer_oids_form(request: Request):
-    """Formulario para crear configuración OID."""
-    return templates.TemplateResponse(
-        "printer_oids/form.html",
-        {
-            "request": request,
-            "oids_config": None
-        }
-    )
 
-@router.get("/printer-oids/{config_id}/edit")
-async def edit_printer_oids_form(request: Request, config_id: int, db: Session = Depends(get_db)):
-    """Formulario para editar configuración OID."""
-    try:
-        oids_service = PrinterOIDsService(db)
-        config = await oids_service.get_oids_config(config_id)
-        if not config:
-            return RedirectResponse("/printer-oids", status_code=303)
-        return templates.TemplateResponse(
-            "printer_oids/form.html",
-            {
-                "request": request,
-                "oids_config": config
-            }
-        )
-    except Exception as e:
-        logger.error(f"Error cargando configuración OID: {str(e)}")
-        return RedirectResponse("/printer-oids", status_code=303)
 
 @router.get("/monitor")
 async def monitor_view(request: Request, db: Session = Depends(get_db)):
