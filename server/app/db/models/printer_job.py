@@ -7,6 +7,7 @@ class PrinterJob(BaseModel):
     __tablename__ = 'printer_jobs'
     
     agent_id = Column(Integer, ForeignKey('agents.id'))
+    printer_id = Column(Integer, ForeignKey('printers.id'))  # Agregar esta línea
     printer_driver_id = Column(Integer, ForeignKey('printer_drivers.id'))
     status = Column(String, nullable=False)  # pending, installing, completed, failed
     ip_address = Column(String, nullable=False)
