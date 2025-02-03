@@ -397,7 +397,7 @@ async def list_printers(request: Request, db: Session = Depends(get_db)):
         critical_printers = printer_service.get_printers_with_critical_supplies()
         
         return templates.TemplateResponse(
-            "monitor_printers.html",  # El nombre de su template
+            "monitor/monitor_printers.html",  # El nombre de su template
             {
                 "request": request, 
                 "printers": critical_printers,
@@ -443,7 +443,7 @@ async def printer_details(request: Request, printer_id: int, db: Session = Depen
         critical_supplies = printer.check_critical_supplies()
         
         return templates.TemplateResponse(
-            "monitor/printers/details.html",
+            "printers/details.html",
             {
                 "request": request, 
                 "printer": printer,
