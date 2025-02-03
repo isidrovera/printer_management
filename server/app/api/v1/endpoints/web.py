@@ -418,6 +418,7 @@ async def list_printers(request: Request, db: Session = Depends(get_db)):
                 "error": str(e)
             }
         )
+
 @router.get("/printers/{printer_id}")
 async def printer_details(request: Request, printer_id: int, db: Session = Depends(get_db)):
     """
