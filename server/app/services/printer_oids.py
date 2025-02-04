@@ -22,9 +22,9 @@ class PrinterOIDsService:
             PrinterOIDs.model_family == model_family
         ).first()
 
-    def create(self, oid_data: PrinterOIDsCreate) -> PrinterOIDs:
+    def create(self, oid_data: dict) -> PrinterOIDs:
         """Crea un nuevo registro de OIDs."""
-        db_oids = PrinterOIDs(**oid_data.dict())
+        db_oids = PrinterOIDs(**oid_data)
         self.db.add(db_oids)
         self.db.commit()
         self.db.refresh(db_oids)
