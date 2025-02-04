@@ -73,3 +73,34 @@ async def install_printer(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error al procesar la instalación: {str(e)}"
         )
+
+@router.get("/monitored", response_model=List[Dict[str, Any]])
+async def get_monitored_printers(
+    db: Session = Depends(get_db)
+):
+    """
+    Obtiene la lista de impresoras configuradas para monitoreo.
+    """
+    try:
+        query = db.query(Printer).filter(
+            Printer.is_active == True
+        ).with_entities(
+            Printer.ip_address,
+            Printer.brand,
+            Printer.oid_config_id
+        ).all()
+        
+        printers = []
+        for printer in query:
+            printer_data = {
+                "ip_address": printer.ip_address,
+                "brand": printer.brand,
+                "oid_config_id": printer.oid_config_id
+            }
+            printers.append(printer_data)
+            
+        return printers
+        
+    except Exception as e:
+        logger.error(f"Error getting monitored printers: {str(e)}")
+        raise HTTPException(status_code=400, detail=str(e))
