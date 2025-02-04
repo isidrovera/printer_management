@@ -9,19 +9,12 @@ from pysnmp.hlapi import *
 logger = logging.getLogger(__name__)
 
 class PrinterMonitorService:
-    def __init__(self, server_url: str):
+    def __init__(self, server_url: str, agent_id: str = None):
         self.server_url = server_url
+        self.agent_id = agent_id
         self.oids_cache = {}
-        self.last_cache_update = {}
-        # Lista de impresoras conocidas (fallback)
-        self.known_printers = [
-            {
-                "ip_address": "192.168.18.79",
-                "brand": "Ricoh"
-            }
-            # Puedes agregar más impresoras aquí
-        ]
-
+        self.printers_cache = []
+        self.last_cache_update = datetime.now()
     async def scan_and_monitor(self) -> Dict[str, Any]:
         """Método de compatibilidad para agent_service"""
         try:

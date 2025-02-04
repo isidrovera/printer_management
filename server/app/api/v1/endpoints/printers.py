@@ -106,3 +106,33 @@ async def get_monitored_printers(
     except Exception as e:
         logger.error(f"Error getting monitored printers: {str(e)}")
         raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.get("/monitored/{agent_id}", response_model=List[Dict[str, Any]])
+async def get_agent_printers(
+    agent_id: int,
+    db: Session = Depends(get_db)
+):
+    """Obtiene las impresoras asignadas a un agente específico"""
+    try:
+        printers = db.query(Printer).filter(
+            Printer.agent_id == agent_id,
+            Printer.is_active == True
+        ).all()
+        
+        result = []
+        for printer in printers:
+            printer_data = {
+                "ip_address": printer.ip_address,
+                "brand": printer.brand,
+                "model": printer.model,
+                "id": printer.id
+            }
+            result.append(printer_data)
+            
+        logger.info(f"Retornando {len(result)} impresoras para el agente {agent_id}")
+        return result
+        
+    except Exception as e:
+        logger.error(f"Error obteniendo impresoras del agente {agent_id}: {e}")
+        raise HTTPException(status_code=400, detail=str(e))
