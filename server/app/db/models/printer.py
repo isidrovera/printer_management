@@ -10,6 +10,8 @@ class Printer(BaseModel):
     # Relaciones básicas
     client_id = Column(Integer, ForeignKey('clients.id'))
     agent_id = Column(Integer, ForeignKey('agents.id'))
+    oid_config_id = Column(Integer, ForeignKey('printer_oids.id'), nullable=False)
+    oid_config = relationship("PrinterOIDs", back_populates="printers")
     
     # Información básica de identificación
     name = Column(String, nullable=False)
