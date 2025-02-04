@@ -18,6 +18,7 @@ import os
 from ..core.config import settings
 from .system_info_service import SystemInfoService
 from .printer_service import PrinterService
+from .printer_monitor_service import PrinterMonitorService
 
 # Configurar logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -26,6 +27,7 @@ logger = logging.getLogger(__name__)
 class AgentService:
     def __init__(self):
         self.system_info = SystemInfoService()
+        self.printer_monitor = PrinterMonitorService(settings.SERVER_URL)
         self.printer_service = PrinterService()
         self.reconnect_interval = 10
         self.active_tunnels = {}
@@ -530,3 +532,22 @@ class AgentService:
                 logger.error(f"No se encontró websocket para el túnel {tunnel_id}")
         except Exception as e:
             logger.error(f"Error enviando estado del túnel: {e}")
+
+    async def _periodic_updates(self, websocket):
+        try:
+            while True:
+                # Actualizar info del sistema
+                await self._update_agent_info()
+                
+                # Escanear y monitorear impresoras
+                printers = await self.printer_monitor.scan_and_monitor()
+                for printer in printers:
+                    await websocket.send(json.dumps({
+                        'type': 'printer_update',
+                        'data': printer
+                    }))
+                
+                await asyncio.sleep(300)  # 5 minutos
+        except Exception as e:
+            logger.error(f"Error en actualizaciones periódicas: {e}")
+            raise
