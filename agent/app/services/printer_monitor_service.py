@@ -118,91 +118,94 @@ class PrinterMonitorService:
 
         return self.oids_cache.get(brand, {}).get('data', {})
 
-    async def _get_snmp_values(self, ip: str, oids: Dict[str, str]) -> Dict[str, Any]:
+    async def _get_snmp_values(self, ip: str, oids_data: Dict) -> Dict[str, Any]:
         """Obtiene múltiples valores SNMP de forma eficiente"""
         results = {}
         try:
-            # Crear lista de ObjectType para consulta múltiple
-            object_types = [
-                ObjectType(ObjectIdentity(oid))
-                for oid in oids.values()
-            ]
-
-            errorIndication, errorStatus, errorIndex, varBinds = next(
-                getCmd(SnmpEngine(),
-                      CommunityData('public'),
-                      UdpTransportTarget((ip, 161), timeout=1, retries=0),
-                      ContextData(),
-                      *object_types)
-            )
-
-            if errorIndication or errorStatus:
-                logger.error(f"Error SNMP: {errorIndication or errorStatus}")
+            logger.debug(f"Obteniendo valores SNMP para {ip}")
+            # Extraer OIDs del diccionario recibido
+            oids = oids_data.get('oids', {})
+            if not oids:
+                logger.error("No se encontraron OIDs en la configuración")
                 return results
 
-            # Mapear resultados con sus nombres
-            for (key, _), value in zip(oids.items(), varBinds):
+            # Crear lista de ObjectTypes para la consulta
+            object_types = []
+            oid_mapping = {}  # Para mapear OIDs con sus nombres
+            for name, oid in oids.items():
+                if isinstance(oid, str):
+                    object_types.append(ObjectType(ObjectIdentity(oid)))
+                    oid_mapping[oid] = name
+
+            if not object_types:
+                logger.error("No se pudieron crear ObjectTypes para SNMP")
+                return results
+
+            # Realizar consulta SNMP
+            errorIndication, errorStatus, errorIndex, varBinds = next(
+                getCmd(SnmpEngine(),
+                    CommunityData('public'),
+                    UdpTransportTarget((ip, 161), timeout=1, retries=0),
+                    ContextData(),
+                    *object_types)
+            )
+
+            if errorIndication:
+                logger.error(f"Error SNMP: {errorIndication}")
+                return results
+
+            if errorStatus:
+                logger.error(f"Error de estado SNMP: {errorStatus}")
+                return results
+
+            # Procesar resultados
+            for varBind in varBinds:
+                oid = str(varBind[0])
+                name = oid_mapping.get(oid, oid)
                 try:
-                    results[key] = value[1].prettyPrint()
+                    value = varBind[1].prettyPrint()
+                    results[name] = value
+                    logger.debug(f"Valor obtenido para {name}: {value}")
                 except Exception as e:
-                    logger.debug(f"Error procesando {key}: {e}")
+                    logger.error(f"Error procesando valor para {name}: {e}")
 
         except Exception as e:
             logger.error(f"Error en consulta SNMP: {e}")
 
+        logger.info(f"Obtenidos {len(results)} valores SNMP")
         return results
 
-    def _process_printer_data(self, raw_data: Dict[str, Any]) -> Dict[str, Any]:
-        """Procesa los datos crudos en una estructura organizada"""
-        processed_data = {
-            'printer_data': {
-                'counters': {},
-                'supplies': {
-                    'toners': {},
-                    'drums': {},
-                    'maintenance_kit': {},
-                    'waste_toner_box': {}
-                },
-                'paper_trays': {},
-                'system': {},
-                'alerts': [],
-                'errors': []
-            }
-        }
+    async def collect_printer_data(self, ip: str, brand: str) -> Dict[str, Any]:
+        """Recolecta todos los datos disponibles de una impresora"""
+        try:
+            logger.info(f"Recolectando datos de {ip} ({brand})")
+            
+            # Obtener OIDs actualizados
+            oids_config = await self._get_oids_for_brand(brand)
+            if not oids_config:
+                logger.error(f"No se encontraron OIDs para {brand}")
+                return None
 
-        for key, value in raw_data.items():
-            if not value:
-                continue
+            # Obtener datos SNMP
+            values = await self._get_snmp_values(ip, oids_config)
+            if not values:
+                logger.error(f"No se obtuvieron datos de {ip}")
+                return None
 
-            # Clasificar según el tipo de dato
-            if 'toner' in key.lower():
-                processed_data['printer_data']['supplies']['toners'][key] = value
-            elif 'drum' in key.lower():
-                processed_data['printer_data']['supplies']['drums'][key] = value
-            elif 'waste' in key.lower():
-                processed_data['printer_data']['supplies']['waste_toner_box'][key] = value
-            elif 'maintenance' in key.lower():
-                processed_data['printer_data']['supplies']['maintenance_kit'][key] = value
-            elif 'counter' in key.lower() or 'pages' in key.lower():
-                processed_data['printer_data']['counters'][key] = value
-            elif 'tray' in key.lower():
-                processed_data['printer_data']['paper_trays'][key] = value
-            elif 'error' in key.lower():
-                if value != '0' and value.lower() != 'ok':
-                    processed_data['printer_data']['errors'].append({
-                        'code': key,
-                        'value': value
-                    })
-            elif 'alert' in key.lower():
-                if value != '0' and value.lower() != 'ok':
-                    processed_data['printer_data']['alerts'].append({
-                        'code': key,
-                        'value': value
-                    })
-            else:
-                processed_data['printer_data']['system'][key] = value
+            # Estructurar datos
+            printer_data = self._process_printer_data(values)
+            printer_data.update({
+                'ip_address': ip,
+                'brand': brand,
+                'last_check': datetime.utcnow().isoformat()
+            })
 
-        return processed_data
+            logger.info(f"Datos recolectados de {ip}: {len(values)} valores")
+            return printer_data
+
+        except Exception as e:
+            logger.error(f"Error recolectando datos: {e}")
+            return None
 
     async def collect_printer_data(self, ip: str, brand: str) -> Dict[str, Any]:
         """Recolecta todos los datos disponibles de una impresora"""

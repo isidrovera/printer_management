@@ -5,6 +5,7 @@ from app.db.session import get_db
 from app.services.driver_service import DriverService  # Actualizamos el import
 from app.api.v1.endpoints.websocket import manager
 from typing import List, Dict, Any
+from app.db.models.printer import Printer
 from pydantic import BaseModel
 import logging
 
