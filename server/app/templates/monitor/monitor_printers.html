@@ -19,6 +19,7 @@
                 <i class="fas fa-search absolute right-3 top-2.5 h-5 w-5 text-gray-400"></i>
             </div>
             
+            
             <!-- Selector de intervalo de actualización -->
             <select id="refreshInterval" 
                     class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
@@ -27,6 +28,13 @@
                 <option value="300">Actualizar cada 5m</option>
                 <option value="600">Actualizar cada 10m</option>
             </select>
+            <!-- Botón para Crear Registro -->
+        <button onclick="openCreateModal()"
+            class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+            title="Crear nueva impresora">
+        <i class="fas fa-plus-circle mr-2"></i>
+        Crear Impresora
+        </button>
         </div>
     </div>
 
@@ -259,6 +267,52 @@
         </div>
     </div>
 </div>
+<!-- Modal de Crear Impresora -->
+<div class="fixed inset-0 hidden z-50" id="createPrinterModal">
+    <div class="absolute inset-0 bg-black bg-opacity-50"></div>
+    <div class="absolute inset-0 overflow-y-auto">
+        <div class="flex min-h-full items-center justify-center p-4">
+            <div class="relative w-full max-w-3xl bg-white rounded-lg shadow-xl">
+                <!-- Cabecera -->
+                <div class="sticky top-0 flex justify-between items-center p-6 border-b bg-gray-50 rounded-t-lg">
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-plus-circle text-green-500 text-xl"></i>
+                        <h3 class="text-2xl font-semibold text-gray-800">Crear Impresora</h3>
+                    </div>
+                    <button onclick="closeModal('createPrinterModal')" 
+                            class="text-gray-500 hover:text-gray-800 transition-colors">
+                        <i class="fas fa-times-circle text-2xl"></i>
+                    </button>
+                </div>
+                
+                <!-- Contenido -->
+                <div class="p-6">
+                    <form id="createPrinterForm">
+                        <div class="mb-4">
+                            <label for="printerName" class="block text-sm font-medium text-gray-700">Nombre</label>
+                            <input type="text" id="printerName" name="name" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="printerModel" class="block text-sm font-medium text-gray-700">Modelo</label>
+                            <input type="text" id="printerModel" name="model" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="printerIp" class="block text-sm font-medium text-gray-700">IP</label>
+                            <input type="text" id="printerIp" name="ip_address" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" required>
+                        </div>
+                        <!-- Aquí puedes agregar más campos según lo que necesites -->
+                        <div class="flex justify-end mt-4">
+                            <button type="submit" class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                                Crear Impresora
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <!-- Modal de Suministros -->
 <div class="fixed inset-0 hidden z-50" id="suppliesModal">

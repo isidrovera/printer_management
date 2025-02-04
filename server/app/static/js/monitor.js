@@ -378,3 +378,7 @@ document.addEventListener('click', function(event) {
         }
     });
 });
+
+function openCreateModal() {
+    document.getElementById('createPrinterModal').classList.remove('hidden');
+}
