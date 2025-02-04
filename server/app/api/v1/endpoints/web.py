@@ -514,24 +514,49 @@ async def create_printer_oids_form(request: Request):
 async def create_printer_oids(request: Request, db: Session = Depends(get_db)):
     try:
         form = await request.form()
-        printer_oids_service = PrinterOIDsService(db)
         
+        # Crear diccionario con los datos del formulario
         oid_data = {
             "brand": form.get("brand"),
             "model_family": form.get("model_family"),
             "description": form.get("description"),
             "oid_total_pages": form.get("oid_total_pages"),
+            "oid_total_color_pages": form.get("oid_total_color_pages"),
             "oid_black_toner_level": form.get("oid_black_toner_level"),
-            # Agregar todos los campos OID necesarios
+            "oid_cyan_toner_level": form.get("oid_cyan_toner_level"),
+            "oid_magenta_toner_level": form.get("oid_magenta_toner_level"),
+            "oid_yellow_toner_level": form.get("oid_yellow_toner_level")
         }
+        
+        printer_oids_service = PrinterOIDsService(db)
+        # Verificar si ya existe una configuración para esta marca y familia
+        existing = printer_oids_service.get_by_brand_and_family(
+            oid_data["brand"],
+            oid_data["model_family"]
+        )
+        
+        if existing:
+            return templates.TemplateResponse(
+                "printer_oids/form.html",
+                {
+                    "request": request,
+                    "printer_oids": None,
+                    "error": "Ya existe una configuración para esta marca y familia de modelos"
+                }
+            )
         
         await printer_oids_service.create(oid_data)
         return RedirectResponse("/printer-oids", status_code=303)
+    
     except Exception as e:
         logger.error(f"Error creating printer OIDs: {str(e)}")
         return templates.TemplateResponse(
             "printer_oids/form.html",
-            {"request": request, "printer_oids": None, "error": str(e)}
+            {
+                "request": request,
+                "printer_oids": None,
+                "error": str(e)
+            }
         )
 
 @router.get("/printer-oids/{oid_id}/edit")
