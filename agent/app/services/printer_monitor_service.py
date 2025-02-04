@@ -1,8 +1,5 @@
-#agent\app\services\printer_monitor_service.py
-import asyncio
+# agent\app\services\printer_monitor_service.py
 import logging
-import aiohttp
-import aiosnmp
 from typing import Dict, List
 from .network_scanner_service import NetworkScannerService
 
@@ -16,8 +13,8 @@ class PrinterMonitorService:
     async def scan_and_monitor(self) -> List[Dict]:
         try:
             logger.info("Starting printer scan")
-            printer_info = await self.scanner.scan_printer()
-            return [printer_info] if printer_info['is_printer'] else []
+            result = await self.scanner.scan_printer()
+            return [result] if result['is_printer'] else []
         except Exception as e:
             logger.error(f"Scan error: {e}")
             return []

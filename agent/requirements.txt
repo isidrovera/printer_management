@@ -1,0 +1,8 @@
+python-dotenv
+pydantic-settings
+websockets
+paramiko
+aiohttp
+psutil
+aiosnmp
+pysnmp
