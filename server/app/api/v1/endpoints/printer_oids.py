@@ -1,7 +1,7 @@
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from app.api import deps
+from app.db.session import get_db
 from app.services.printer_oids import PrinterOIDsService
 from app.schemas.printer_oids import (
     PrinterOIDsCreate,
@@ -16,7 +16,7 @@ router = APIRouter()
 def get_printer_oids(
     skip: int = 0,
     limit: int = 100,
-    db: Session = Depends(deps.get_db)
+    db: Session = Depends(get_db)
 ):
     """
     Obtiene la lista de configuraciones de OIDs de impresoras.
@@ -27,7 +27,7 @@ def get_printer_oids(
 @router.get("/{oid_id}", response_model=PrinterOIDsResponse)
 def get_printer_oids_by_id(
     oid_id: int,
-    db: Session = Depends(deps.get_db)
+    db: Session = Depends(get_db)
 ):
     """
     Obtiene una configuración específica de OIDs por ID.
@@ -44,7 +44,7 @@ def get_printer_oids_by_id(
 @router.post("/", response_model=PrinterOIDsResponse, status_code=status.HTTP_201_CREATED)
 def create_printer_oids(
     oid_data: PrinterOIDsCreate,
-    db: Session = Depends(deps.get_db)
+    db: Session = Depends(get_db)
 ):
     """
     Crea una nueva configuración de OIDs.
@@ -68,7 +68,7 @@ def create_printer_oids(
 def update_printer_oids(
     oid_id: int,
     oid_data: PrinterOIDsUpdate,
-    db: Session = Depends(deps.get_db)
+    db: Session = Depends(get_db)
 ):
     """
     Actualiza una configuración de OIDs existente.
@@ -85,7 +85,7 @@ def update_printer_oids(
 @router.delete("/{oid_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_printer_oids(
     oid_id: int,
-    db: Session = Depends(deps.get_db)
+    db: Session = Depends(get_db)
 ):
     """
     Elimina una configuración de OIDs.
@@ -106,7 +106,7 @@ def delete_printer_oids(
 
 @router.get("/brands/", response_model=List[BrandResponse])
 def get_brands_and_families(
-    db: Session = Depends(deps.get_db)
+    db: Session = Depends(get_db)
 ):
     """
     Obtiene la lista de marcas y sus familias de modelos disponibles.
