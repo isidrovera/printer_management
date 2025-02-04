@@ -5,7 +5,8 @@ from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 from app.db.session import get_db
 from sqlalchemy.exc import SQLAlchemyError
-
+from app.services.printer_oids import PrinterOIDsService
+from fastapi.responses import JSONResponse
 from app.services.client_service import ClientService
 from app.services.agent_service import AgentService
 from app.services.driver_service import DriverService
@@ -481,4 +482,107 @@ async def printer_report(request: Request, db: Session = Depends(get_db)):
                 "report": {},
                 "error": str(e)
             }
+        )
+        
+        
+        
+        
+@router.get("/printer-oids")
+async def list_printer_oids(request: Request, db: Session = Depends(get_db)):
+    try:
+        printer_oids_service = PrinterOIDsService(db)
+        oids = printer_oids_service.get_all()
+        return templates.TemplateResponse(
+            "printer_oids/list.html",
+            {"request": request, "printer_oids": oids}
+        )
+    except Exception as e:
+        logger.error(f"Error listing printer OIDs: {str(e)}")
+        return templates.TemplateResponse(
+            "printer_oids/list.html",
+            {"request": request, "printer_oids": [], "error": str(e)}
+        )
+
+@router.get("/printer-oids/create")
+async def create_printer_oids_form(request: Request):
+    return templates.TemplateResponse(
+        "printer_oids/form.html",
+        {"request": request, "printer_oids": None}
+    )
+
+@router.post("/printer-oids/create")
+async def create_printer_oids(request: Request, db: Session = Depends(get_db)):
+    try:
+        form = await request.form()
+        printer_oids_service = PrinterOIDsService(db)
+        
+        oid_data = {
+            "brand": form.get("brand"),
+            "model_family": form.get("model_family"),
+            "description": form.get("description"),
+            "oid_total_pages": form.get("oid_total_pages"),
+            "oid_black_toner_level": form.get("oid_black_toner_level"),
+            # Agregar todos los campos OID necesarios
+        }
+        
+        await printer_oids_service.create(oid_data)
+        return RedirectResponse("/printer-oids", status_code=303)
+    except Exception as e:
+        logger.error(f"Error creating printer OIDs: {str(e)}")
+        return templates.TemplateResponse(
+            "printer_oids/form.html",
+            {"request": request, "printer_oids": None, "error": str(e)}
+        )
+
+@router.get("/printer-oids/{oid_id}/edit")
+async def edit_printer_oids_form(request: Request, oid_id: int, db: Session = Depends(get_db)):
+    printer_oids_service = PrinterOIDsService(db)
+    oids = printer_oids_service.get_by_id(oid_id)
+    if not oids:
+        return RedirectResponse("/printer-oids", status_code=303)
+    return templates.TemplateResponse(
+        "printer_oids/form.html",
+        {"request": request, "printer_oids": oids}
+    )
+
+@router.post("/printer-oids/{oid_id}/edit")
+async def edit_printer_oids(request: Request, oid_id: int, db: Session = Depends(get_db)):
+    try:
+        form = await request.form()
+        printer_oids_service = PrinterOIDsService(db)
+        
+        oid_data = {
+            "brand": form.get("brand"),
+            "model_family": form.get("model_family"),
+            "description": form.get("description"),
+            "oid_total_pages": form.get("oid_total_pages"),
+            "oid_black_toner_level": form.get("oid_black_toner_level"),
+            # Agregar todos los campos OID necesarios
+        }
+        
+        await printer_oids_service.update(oid_id, oid_data)
+        return RedirectResponse("/printer-oids", status_code=303)
+    except Exception as e:
+        logger.error(f"Error updating printer OIDs: {str(e)}")
+        return templates.TemplateResponse(
+            "printer_oids/form.html",
+            {"request": request, "printer_oids": {"id": oid_id, **oid_data}, "error": str(e)}
+        )
+
+@router.delete("/printer-oids/{oid_id}")
+async def delete_printer_oids(oid_id: int, db: Session = Depends(get_db)):
+    try:
+        printer_oids_service = PrinterOIDsService(db)
+        success = await printer_oids_service.delete(oid_id)
+        if success:
+            return {"success": True}
+        return JSONResponse(
+            status_code=404,
+            content={"success": False, "error": "OIDs configuration not found"}
+        )
+    except Exception as e:
+        logger.error(f"Error deleting printer OIDs: {str(e)}")
+        return JSONResponse(
+            status_code=500,
+            content={"success": False, "error": str(e)}
         )
