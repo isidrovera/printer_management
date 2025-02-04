@@ -1,96 +1,147 @@
 # server/app/db/models/printer_oids.py
 from app.db.base import BaseModel
-from sqlalchemy import Column, String, JSON, Integer, ForeignKey
+from sqlalchemy import Column, String, Integer, ForeignKey
 from sqlalchemy.orm import relationship
 
 class PrinterOIDs(BaseModel):
     __tablename__ = 'printer_oids'
     
-    brand = Column(String, nullable=False)
-    model = Column(String)  # Null si aplica a toda la marca
+    # Información básica
+    brand = Column(String, nullable=False)  # Konica Minolta, HP, Epson, etc.
+    model_family = Column(String, nullable=False)  # Familia de modelos específica
+    description = Column(String)
     
-    # OIDs específicos por marca/modelo
-    oids = Column(JSON, default={
-        'system': {
-            'description': None,
-            'name': None,
-            'uptime': None,
-            'serial': None,
-            'model': None
-        },
-        'status': {
-            'general': None,
-            'display': None,
-            'error': None
-        },
-        'supplies': {
-            'black': None,
-            'cyan': None,
-            'magenta': None,
-            'yellow': None,
-            'waste': None,
-            'drum': None,
-            'fuser': None,
-            'maintenance_kit': None,
-            'max_capacity': None
-        },
-        'counters': {
-            'total': None,
-            'black': None,
-            'color': None,
-            'duplex': None,
-            'scan': None,
-            'copy': None,
-            'fax': None
-        },
-        'paper': {
-            'tray1_status': None,
-            'tray2_status': None,
-            'tray3_status': None,
-            'tray1_size': None,
-            'tray2_size': None,
-            'tray3_size': None
-        }
-    })
+    # OIDs para contadores de páginas
+    oid_total_pages = Column(String)
+    oid_total_color_pages = Column(String)
+    oid_total_bw_pages = Column(String)
+    oid_total_copies = Column(String)
+    oid_total_prints = Column(String)
+    oid_total_scans = Column(String)
+    oid_duplex_pages = Column(String)
+    oid_total_faxes = Column(String)
     
-    # Configuración SNMP específica
-    snmp_config = Column(JSON, default={
-        'version': '2c',
-        'community': 'public',
-        'port': 161,
-        'timeout': 2,
-        'retries': 3
-    })
+    # OIDs para tamaños de papel
+    oid_a4_pages = Column(String)
+    oid_a3_pages = Column(String)
+    oid_letter_pages = Column(String)
+    oid_legal_pages = Column(String)
     
-    # Mapeos de valores específicos de la marca
-    value_mappings = Column(JSON, default={
-        'status': {},
-        'errors': {},
-        'paper_sizes': {},
-        'supply_types': {}
-    })
+    # OIDs para niveles de tóner
+    oid_black_toner_level = Column(String)
+    oid_cyan_toner_level = Column(String)
+    oid_magenta_toner_level = Column(String)
+    oid_yellow_toner_level = Column(String)
     
-    # Relaciones
+    # OIDs para capacidad máxima de tóner
+    oid_black_toner_max = Column(String)
+    oid_cyan_toner_max = Column(String)
+    oid_magenta_toner_max = Column(String)
+    oid_yellow_toner_max = Column(String)
+    
+    # OIDs para estado de tóner
+    oid_black_toner_status = Column(String)
+    oid_cyan_toner_status = Column(String)
+    oid_magenta_toner_status = Column(String)
+    oid_yellow_toner_status = Column(String)
+    
+    # OIDs para unidades de imagen/drums
+    oid_black_drum_level = Column(String)
+    oid_cyan_drum_level = Column(String)
+    oid_magenta_drum_level = Column(String)
+    oid_yellow_drum_level = Column(String)
+    
+    # OIDs para otros consumibles
+    oid_fuser_unit_level = Column(String)
+    oid_transfer_belt_level = Column(String)
+    oid_waste_toner_level = Column(String)
+    oid_waste_toner_max = Column(String)
+    
+    # OIDs para bandejas de papel
+    oid_tray1_level = Column(String)
+    oid_tray1_max_capacity = Column(String)
+    oid_tray1_status = Column(String)
+    oid_tray1_paper_size = Column(String)
+    oid_tray1_paper_type = Column(String)
+    
+    oid_tray2_level = Column(String)
+    oid_tray2_max_capacity = Column(String)
+    oid_tray2_status = Column(String)
+    oid_tray2_paper_size = Column(String)
+    oid_tray2_paper_type = Column(String)
+    
+    oid_tray3_level = Column(String)
+    oid_tray3_max_capacity = Column(String)
+    oid_tray3_status = Column(String)
+    oid_tray3_paper_size = Column(String)
+    oid_tray3_paper_type = Column(String)
+    
+    oid_bypass_tray_level = Column(String)
+    oid_bypass_tray_status = Column(String)
+    
+    # OIDs para información del sistema
+    oid_printer_status = Column(String)
+    oid_printer_model = Column(String)
+    oid_serial_number = Column(String)
+    oid_firmware_version = Column(String)
+    oid_system_contact = Column(String)
+    oid_system_name = Column(String)
+    oid_system_location = Column(String)
+    oid_printer_memory = Column(String)
+    oid_temperature = Column(String)
+    oid_display_message = Column(String)
+    
+    # OIDs para errores y alertas
+    oid_error_messages = Column(String)
+    oid_warning_messages = Column(String)
+    oid_service_messages = Column(String)
+    
+    # OIDs para información de red
+    oid_ip_address = Column(String)
+    oid_mac_address = Column(String)
+    oid_subnet_mask = Column(String)
+    oid_gateway = Column(String)
+    
+    # Relación con las impresoras
     printers = relationship("Printer", back_populates="oid_config")
     
-    def get_oid(self, category, subcategory):
-        """Obtiene un OID específico."""
-        try:
-            return self.oids[category][subcategory]
-        except KeyError:
-            return None
+    class Meta:
+        unique_together = (('brand', 'model_family'),)
     
-    def get_status_mapping(self, code):
-        """Obtiene el significado de un código de estado."""
-        return self.value_mappings['status'].get(str(code), 'Unknown')
-    
-    def get_error_mapping(self, code):
-        """Obtiene el significado de un código de error."""
-        return self.value_mappings['errors'].get(str(code), 'Unknown Error')
-
-    def get_supported_oids(self):
-        """Obtiene lista de OIDs soportados (no nulos)."""
-        supported = {}
-        for category, items in self.oids.items():
-            supported[category] = {k: v for k, v in items.items() if v is not None}
-        return supported
+    def to_dict(self):
+        """Convierte el objeto a diccionario para serialización."""
+        return {
+            "id": self.id,
+            "brand": self.brand,
+            "model_family": self.model_family,
+            "description": self.description,
+            # Incluir todos los OIDs en el diccionario
+            "oids": {
+                "counters": {
+                    "total_pages": self.oid_total_pages,
+                    "total_color_pages": self.oid_total_color_pages,
+                    "total_bw_pages": self.oid_total_bw_pages,
+                    "total_copies": self.oid_total_copies,
+                    "total_prints": self.oid_total_prints,
+                    "total_scans": self.oid_total_scans,
+                    "duplex_pages": self.oid_duplex_pages,
+                    "total_faxes": self.oid_total_faxes
+                },
+                "toner_levels": {
+                    "black": self.oid_black_toner_level,
+                    "cyan": self.oid_cyan_toner_level,
+                    "magenta": self.oid_magenta_toner_level,
+                    "yellow": self.oid_yellow_toner_level
+                },
+                # ... más categorías organizadas ...
+            }
+        }
+        
+    def get_oid_by_name(self, oid_name):
+        """
+        Obtiene el valor de un OID específico por el nombre del atributo.
+        
+        :param oid_name: Nombre del atributo OID (ej: 'oid_black_toner_level')
+        :return: Valor del OID o None si no existe
+        """
+        return getattr(self, oid_name, None)
