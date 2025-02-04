@@ -1,43 +1,67 @@
 # agent\app\services\network_scanner_service.py
-import socket
+from pysnmp.hlapi import *
 import logging
 
 logger = logging.getLogger(__name__)
 
 class NetworkScannerService:
     TARGET_IP = "192.168.18.79"
+    
+    COMMUNITIES = ['public', 'internal', '@ricoh@', 'ricoh', 'monitor']
+    PRINTER_OIDS = {
+        'model': '.1.3.6.1.2.1.1.5.0',
+        'marca': '.1.3.6.1.2.1.43.8.2.1.14.1.2'
+    }
 
     async def scan_printer(self):
         try:
-            with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
-                sock.settimeout(1)
+            for community in self.COMMUNITIES:
+                logger.info(f"Probando comunidad: {community}")
+                try:
+                    # Verificar modelo
+                    error_indication, error_status, error_index, var_binds = next(
+                        getCmd(SnmpEngine(),
+                              CommunityData(community, mpModel=0),  # SNMPv1
+                              UdpTransportTarget((self.TARGET_IP, 161), timeout=2, retries=1),
+                              ContextData(),
+                              ObjectType(ObjectIdentity(self.PRINTER_OIDS['model'])))
+                    )
 
-                # SNMP GET request (v1)
-                request = bytes([
-                    0x30, 0x26,                         # SEQUENCE
-                    0x02, 0x01, 0x00,                   # Version: 1
-                    0x04, 0x06] + list("public".encode()) +  # Community: public
-                    [0xa0, 0x19,                        # PDU type: GET
-                    0x02, 0x01, 0x00,                   # Request ID: 0
-                    0x02, 0x01, 0x00,                   # Error status: 0
-                    0x02, 0x01, 0x00,                   # Error index: 0
-                    0x30, 0x0e,                         # Variable bindings
-                    0x30, 0x0c,                         # Variable
-                    0x06, 0x08] +                       # Object ID
-                    [0x2b, 0x06, 0x01, 0x02, 0x01, 0x01, 0x05, 0x00])  # sysName OID
+                    if error_indication or error_status:
+                        continue
 
-                sock.sendto(request, (self.TARGET_IP, 161))
-                response, _ = sock.recvfrom(1024)
+                    model = var_binds[0][1].prettyPrint() if var_binds else "Desconocido"
+                    
+                    # Verificar marca
+                    error_indication, error_status, error_index, var_binds = next(
+                        getCmd(SnmpEngine(),
+                              CommunityData(community, mpModel=0),
+                              UdpTransportTarget((self.TARGET_IP, 161), timeout=2, retries=1),
+                              ContextData(),
+                              ObjectType(ObjectIdentity(self.PRINTER_OIDS['marca'])))
+                    )
 
-                if response:
+                    if error_indication or error_status:
+                        continue
+
+                    marca = var_binds[0][1].prettyPrint() if var_binds else "Desconocida"
+
+                    logger.info(f"¡Impresora encontrada! Modelo: {model}, Marca: {marca}")
                     return {
                         'is_printer': True,
                         'ip': self.TARGET_IP,
-                        'model': 'MP C307',  # Basado en el iReasoning MIB Browser
-                        'snmp_response': response.hex()
+                        'modelo': model,
+                        'marca': marca,
+                        'comunidad': community
                     }
 
-        except Exception as e:
-            logger.error(f"Error escaneando impresora: {e}")
+                except Exception as e:
+                    logger.debug(f"Error con comunidad {community}: {e}")
+                    continue
 
-        return {'is_printer': False}
+            logger.info("No se detectó ninguna impresora")
+            return {'is_printer': False}
+
+        except Exception as e:
+            logger.error(f"Error general: {e}")
+            return {'is_printer': False}
