@@ -380,5 +380,9 @@ document.addEventListener('click', function(event) {
 });
 
 function openCreateModal() {
-    document.getElementById('createPrinterModal').classList.remove('hidden');
+    document.getElementById("createPrinterModal").classList.remove("hidden");
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).classList.add("hidden");
 }
