@@ -109,7 +109,7 @@ class PrinterMonitorService:
 
             logger.info(f"Obteniendo OIDs para marca {brand}")
             async with aiohttp.ClientSession() as session:
-                url = f"{self.server_url}/api/v1/printer-oids/brand/{brand}"
+                url = f"{self.server_url}/api/v1/printer-oids/brands/{brand}"  # Solo cambia esta línea
                 headers = {
                     "Authorization": f"Bearer {settings.AGENT_TOKEN}",
                     "Content-Type": "application/json"
@@ -126,7 +126,6 @@ class PrinterMonitorService:
         except Exception as e:
             logger.error(f"Error en _get_printer_oids: {e}")
             return None
-
     async def _get_counter_data(self, ip: str, oids: Dict) -> Dict[str, int]:
         """Obtiene datos de contadores usando SNMP"""
         try:

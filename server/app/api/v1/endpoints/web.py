@@ -541,8 +541,30 @@ async def printer_report(request: Request, db: Session = Depends(get_db)):
         )
         
         
-        
-        
+@router.get("/brands/{brand}")
+def get_oids_by_brand(
+    brand: str,
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(get_db)
+):
+    """
+    Obtiene las configuraciones de OIDs para una marca específica.
+    """
+    service = PrinterOIDsService(db)
+    oids = (service.db.query(PrinterOIDs)
+            .filter(PrinterOIDs.brand == brand)
+            .offset(skip)
+            .limit(limit)
+            .all())
+    
+    if not oids:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"No se encontraron configuraciones para la marca {brand}"
+        )
+    
+    return oids
 @router.get("/printer-oids")
 async def list_printer_oids(request: Request, db: Session = Depends(get_db)):
     try:
