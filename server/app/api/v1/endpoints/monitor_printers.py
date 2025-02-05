@@ -11,6 +11,7 @@ from app.core.logging import logger
 
 router = APIRouter()
 
+@router.post("/update", response_model=Dict[str, Any])
 def update_printer_data(self, agent_id: int, printer_data: Dict[str, Any]) -> Printer:
    """
    Actualiza los datos de una impresora para un agente específico.
