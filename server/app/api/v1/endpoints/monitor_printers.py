@@ -2,6 +2,8 @@
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 from typing import Dict, Any, List
+from app.db.models.printer import Printer
+from datetime import datetime
 
 from app.db.session import get_db
 from app.services.monitor_service import PrinterMonitorService
