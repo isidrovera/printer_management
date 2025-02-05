@@ -157,7 +157,7 @@ def get_printer_history(
         logger.error(f"Error retrieving printer history for printer {printer_id}: {str(e)}")
         raise HTTPException(status_code=400, detail=str(e))
         
-@router.post("/create", response_model=Dict[str, Any])
+@router.post("/create")
 async def create_printer(
     request: Request,
     db: Session = Depends(get_db)
@@ -193,12 +193,15 @@ async def create_printer(
             printer_data=printer_data
         )
         
-        return JSONResponse(content={
+        return {
             "status": "success",
             "printer_id": new_printer.id,
             "message": "Impresora creada exitosamente"
-        })
+        }
         
     except Exception as e:
         logger.error(f"Error creating printer: {str(e)}")
-        raise HTTPException(status_code=400, detail=str(e))
+        return JSONResponse(
+            status_code=400,
+            content={"status": "error", "detail": str(e)}
+        )
