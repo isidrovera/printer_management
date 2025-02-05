@@ -395,15 +395,13 @@ async def list_printers(request: Request, db: Session = Depends(get_db)):
     try:
         logger.info("Iniciando listado de impresoras")
         printers = db.query(Printer).all()
-        logger.info(f"Encontradas {len(printers)} impresoras")
+        client_service = ClientService(db)
+        clients = await client_service.get_all()  # Obtener lista de clientes
         
         processed_printers = []
         for printer in printers:
             try:
                 logger.debug(f"Procesando impresora ID: {printer.id}")
-                logger.debug(f"Datos de impresora: {printer.printer_data}")
-                
-                # Acceder a los datos de manera segura
                 printer_data = printer.printer_data or {}
                 supplies = printer_data.get('supplies', {})
                 toners = supplies.get('toners', {})
@@ -414,46 +412,35 @@ async def list_printers(request: Request, db: Session = Depends(get_db)):
                     'model': printer.model,
                     'ip_address': printer.ip_address,
                     'status': printer.status,
-                    'has_alerts': False,  # Por defecto
+                    'has_alerts': False,
                     'supplies': {
-                        'black': {
-                            'level': toners.get('black', {}).get('percentage', 0)
-                        },
-                        'cyan': {
-                            'level': toners.get('cyan', {}).get('percentage', 0)
-                        },
-                        'magenta': {
-                            'level': toners.get('magenta', {}).get('percentage', 0)
-                        },
-                        'yellow': {
-                            'level': toners.get('yellow', {}).get('percentage', 0)
-                        }
+                        'black': {'level': toners.get('black', {}).get('percentage', 0)},
+                        'cyan': {'level': toners.get('cyan', {}).get('percentage', 0)},
+                        'magenta': {'level': toners.get('magenta', {}).get('percentage', 0)},
+                        'yellow': {'level': toners.get('yellow', {}).get('percentage', 0)}
                     },
                     'counters': {
                         'total': printer_data.get('counters', {}).get('total', 0)
                     }
                 }
                 
-                # Intentar obtener alertas si el método existe
                 try:
                     printer_info['has_alerts'] = bool(printer.check_critical_supplies())
                 except Exception as e:
                     logger.warning(f"Error checking critical supplies for printer {printer.id}: {e}")
 
                 processed_printers.append(printer_info)
-                logger.debug(f"Impresora {printer.id} procesada exitosamente")
                 
             except Exception as e:
                 logger.error(f"Error procesando impresora {printer.id}: {str(e)}")
                 continue
-
-        logger.info(f"Procesadas exitosamente {len(processed_printers)} impresoras")
 
         return templates.TemplateResponse(
             "monitor/monitor_printers.html",
             {
                 "request": request,
                 "printers": processed_printers,
+                "clients": clients,  # Agregamos los clientes al contexto
                 "stats": {
                     "total": len(processed_printers),
                     "online": len([p for p in processed_printers if p['status'] == 'online']),
@@ -468,6 +455,7 @@ async def list_printers(request: Request, db: Session = Depends(get_db)):
             {
                 "request": request,
                 "printers": [],
+                "clients": [],  # También lo incluimos en caso de error
                 "error": str(e)
             }
         )
