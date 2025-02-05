@@ -1,7 +1,7 @@
 # server/app/api/v1/endpoints/monitor_printers.py
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 from app.db.models.printer import Printer
 from datetime import datetime
 
