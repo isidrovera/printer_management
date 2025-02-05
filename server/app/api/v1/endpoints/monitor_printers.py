@@ -18,13 +18,13 @@ def update_printer_data(self, agent_id: int, printer_data: Dict[str, Any]) -> Pr
             if not printer_data:
                 raise ValueError("No se proporcionaron datos de la impresora")
 
-            # Valores requeridos
+            # Validar campos requeridos
             required_fields = ["name", "model", "ip_address"]
             for field in required_fields:
                 if not printer_data.get(field):
                     raise ValueError(f"El campo {field} es requerido")
 
-            # Buscar la impresora por IP
+            # Buscar la impresora existente por IP
             printer = self.db.query(Printer).filter(
                 Printer.ip_address == printer_data["ip_address"]
             ).first()
@@ -36,24 +36,57 @@ def update_printer_data(self, agent_id: int, printer_data: Dict[str, Any]) -> Pr
                     model=printer_data["model"],
                     ip_address=printer_data["ip_address"],
                     agent_id=agent_id,
-                    status=printer_data.get("status", "offline"),
-                    last_update=datetime.utcnow()
+                    status="offline",
+                    last_check=datetime.utcnow(),
+                    printer_data={
+                        "counters": {
+                            "total": 0,
+                            "color": {
+                                "total": 0,
+                                "cyan": 0,
+                                "magenta": 0,
+                                "yellow": 0,
+                                "black": 0
+                            },
+                            "black_white": 0
+                        },
+                        "supplies": {
+                            "toners": {
+                                "black": {
+                                    "current_level": 100,
+                                    "max_level": 100,
+                                    "percentage": 100,
+                                    "status": "ok"
+                                },
+                                "cyan": {
+                                    "current_level": 100,
+                                    "max_level": 100,
+                                    "percentage": 100,
+                                    "status": "ok"
+                                },
+                                "magenta": {
+                                    "current_level": 100,
+                                    "max_level": 100,
+                                    "percentage": 100,
+                                    "status": "ok"
+                                },
+                                "yellow": {
+                                    "current_level": 100,
+                                    "max_level": 100,
+                                    "percentage": 100,
+                                    "status": "ok"
+                                }
+                            }
+                        }
+                    }
                 )
                 self.db.add(printer)
             
-            # Actualizar datos de la impresora
+            # Actualizar datos básicos
             printer.name = printer_data["name"]
             printer.model = printer_data["model"]
-            printer.status = printer_data.get("status", printer.status)
-            printer.last_update = datetime.utcnow()
-
-            # Actualizar suministros si se proporcionan
-            if "supplies" in printer_data:
-                printer.supplies = printer_data["supplies"]
-
-            # Actualizar contadores si se proporcionan
-            if "counters" in printer_data:
-                printer.counters = printer_data["counters"]
+            printer.status = printer_data.get("status", "offline")
+            printer.last_check = datetime.utcnow()
 
             # Confirmar cambios
             self.db.commit()
