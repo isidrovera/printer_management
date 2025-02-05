@@ -200,47 +200,38 @@ async def create_printer(
     request: Request,
     db: Session = Depends(get_db)
 ):
-    """
-    Endpoint para crear una nueva impresora.
-    """
     try:
         form_data = await request.json()
+        logger.info(f"Recibiendo solicitud de creación de impresora con datos: {form_data}")
+        
         monitor_service = PrinterMonitorService(db)
         
+        # Simplificar los datos enviados
         printer_data = {
             "name": form_data.get("name"),
             "brand": form_data.get("brand"),
             "model": form_data.get("model"),
             "ip_address": form_data.get("ip_address"),
-            "status": "offline",  # Estado inicial
-            "supplies": {
-                "black": {"level": 100},
-                "cyan": {"level": 100},
-                "magenta": {"level": 100},
-                "yellow": {"level": 100}
-            },
-            "counters": {
-                "total": 0,
-                "color": 0,
-                "bw": 0
-            }
+            "client_id": form_data.get("client_id"),
+            "status": "offline"
         }
         
-        # Usar el método existente para crear/actualizar
+        logger.debug(f"Datos de impresora a crear: {printer_data}")
+        
         new_printer = monitor_service.update_printer_data(
-            agent_id=form_data.get("agent_id", 1),  # ID del agente por defecto
+            agent_id=form_data.get("agent_id", 1),
             printer_data=printer_data
         )
         
-        return JSONResponse(content={
+        return {
             "status": "success",
             "printer_id": new_printer.id,
             "message": "Impresora creada exitosamente"
-        })
+        }
         
     except Exception as e:
-        logger.error(f"Error creating printer: {str(e)}")
-        raise HTTPException(status_code=400, detail=str(e))
+        logger.error(f"Error inesperado al crear impresora: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.delete("/monitor/printers/{printer_id}")
 async def delete_printer(printer_id: int, db: Session = Depends(get_db)):
