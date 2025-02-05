@@ -14,6 +14,7 @@ from app.services.driver_service import DriverService
 from app.services.tunnel_service import TunnelService
 from app.services.monitor_service import PrinterMonitorService
 from app.db.models.printer import Printer
+from app.db.models.client import Client
 from fastapi import File, UploadFile
 from pathlib import Path
 from app.core.config import settings
@@ -671,61 +672,69 @@ async def delete_printer_oids(oid_id: int, db: Session = Depends(get_db)):
 
 @router.post("/monitor/printers/create")
 async def create_printer(request: Request, db: Session = Depends(get_db)):
-    """
-    Endpoint para crear una nueva impresora desde la interfaz web.
-    """
-    try:
-        form_data = await request.json()
-        logger.info(f"Received printer creation request with data: {form_data}")
-        
-        # Validar datos requeridos
-        required_fields = ["name", "model", "ip_address"]
-        for field in required_fields:
-            if not form_data.get(field):
-                raise ValueError(f"El campo {field} es requerido")
+   """
+   Endpoint para crear una nueva impresora desde la interfaz web.
+   """
+   try:
+       form_data = await request.json()
+       logger.info(f"Recibiendo solicitud de creación de impresora con datos: {form_data}")
+       
+       # Validar datos requeridos
+       required_fields = ["name", "model", "ip_address", "client_id"]
+       for field in required_fields:
+           if not form_data.get(field):
+               logger.error(f"Campo requerido faltante: {field}")
+               raise ValueError(f"El campo {field} es requerido")
 
-        printer_service = PrinterMonitorService(db)
-        
-        printer_data = {
-            "name": form_data.get("name"),
-            "model": form_data.get("model"),
-            "ip_address": form_data.get("ip_address"),
-            "status": "offline"
-        }
-        
-        new_printer = printer_service.update_printer_data(
-            agent_id=1,  # ID del agente por defecto
-            printer_data=printer_data
-        )
-        
-        logger.info(f"Printer created successfully with ID: {new_printer.id}")
-        
-        return JSONResponse(content={
-            "status": "success",
-            "printer_id": new_printer.id,
-            "message": "Impresora creada exitosamente"
-        })
-        
-    except ValueError as e:
-        logger.error(f"Validation error creating printer: {str(e)}")
-        return JSONResponse(
-            status_code=400,
-            content={
-                "status": "error",
-                "detail": str(e)
-            }
-        )
-    except Exception as e:
-        logger.error(f"Error creating printer: {str(e)}")
-        return JSONResponse(
-            status_code=500,
-            content={
-                "status": "error",
-                "detail": "Error interno al crear la impresora"
-            }
-        )
+       # Verificar que el cliente exista
+       client = db.query(Client).filter(Client.id == form_data.get("client_id")).first()
+       if not client:
+           logger.error(f"Cliente no encontrado con ID: {form_data.get('client_id')}")
+           raise ValueError("Cliente no válido")
 
-
+       printer_service = PrinterMonitorService(db)
+       
+       printer_data = {
+           "name": form_data.get("name"),
+           "model": form_data.get("model"),
+           "ip_address": form_data.get("ip_address"),
+           "client_id": form_data.get("client_id"),
+           "status": "offline"
+       }
+       
+       logger.debug(f"Datos de impresora a crear: {printer_data}")
+       
+       new_printer = printer_service.update_printer_data(
+           agent_id=1,  # ID del agente por defecto
+           printer_data=printer_data
+       )
+       
+       logger.info(f"Impresora creada exitosamente con ID: {new_printer.id}")
+       
+       return JSONResponse(content={
+           "status": "success",
+           "printer_id": new_printer.id,
+           "message": "Impresora creada exitosamente"
+       })
+       
+   except ValueError as e:
+       logger.error(f"Error de validación al crear impresora: {str(e)}")
+       return JSONResponse(
+           status_code=400,
+           content={
+               "status": "error",
+               "detail": str(e)
+           }
+       )
+   except Exception as e:
+       logger.error(f"Error inesperado al crear impresora: {str(e)}")
+       return JSONResponse(
+           status_code=500,
+           content={
+               "status": "error",
+               "detail": "Error interno al crear la impresora"
+           }
+       )
 @router.delete("/monitor/printers/{printer_id}")
 async def delete_printer(printer_id: int, db: Session = Depends(get_db)):
     try:

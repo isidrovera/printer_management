@@ -416,7 +416,8 @@ async function handleCreatePrinter(event) {
         const formData = {
             name: document.getElementById("printerName").value,
             model: document.getElementById("printerModel").value,
-            ip_address: document.getElementById("printerIP").value
+            ip_address: document.getElementById("printerIP").value,
+            client_id: document.getElementById("clientId").value
         };
 
         const response = await fetch('/monitor/printers/create', {
