@@ -611,3 +611,55 @@ async def delete_printer_oids(oid_id: int, db: Session = Depends(get_db)):
             status_code=500,
             content={"success": False, "error": str(e)}
         )
+        
+        
+# Agregar este endpoint en web.py
+
+@router.post("/monitor/printers/create")
+async def create_printer(request: Request, db: Session = Depends(get_db)):
+    """
+    Endpoint para crear una nueva impresora desde la interfaz web.
+    """
+    try:
+        form_data = await request.json()
+        printer_service = PrinterMonitorService(db)
+        
+        printer_data = {
+            "name": form_data.get("name"),
+            "model": form_data.get("model"),
+            "ip_address": form_data.get("ip_address"),
+            "status": "offline",  # Estado inicial
+            "supplies": {
+                "black": {"level": 100},
+                "cyan": {"level": 100},
+                "magenta": {"level": 100},
+                "yellow": {"level": 100}
+            },
+            "counters": {
+                "total": 0,
+                "color": 0,
+                "bw": 0
+            }
+        }
+        
+        # Usar el método existente para crear/actualizar
+        new_printer = printer_service.update_printer_data(
+            agent_id=form_data.get("agent_id", 1),  # ID del agente por defecto
+            printer_data=printer_data
+        )
+        
+        return JSONResponse(content={
+            "status": "success",
+            "printer_id": new_printer.id,
+            "message": "Impresora creada exitosamente"
+        })
+        
+    except Exception as e:
+        logger.error(f"Error creating printer: {str(e)}")
+        return JSONResponse(
+            status_code=400,
+            content={
+                "status": "error",
+                "detail": str(e)
+            }
+        )
