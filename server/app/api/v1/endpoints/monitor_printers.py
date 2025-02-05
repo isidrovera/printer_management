@@ -10,27 +10,62 @@ from app.core.logging import logger
 router = APIRouter()
 
 @router.post("/update", response_model=Dict[str, Any])
-def update_printer_data(
-    agent_id: int,  # Añadir como parámetro de consulta
-    printer_data: Dict[str, Any], 
-    db: Session = Depends(get_db)
-):
-    """
-    Endpoint para actualizar datos de una impresora.
-    
-    Permite a los agentes enviar información actualizada de una impresora.
-    """
-    try:
-        monitor_service = PrinterMonitorService(db)
-        updated_printer = monitor_service.update_printer_data(agent_id, printer_data)
-        return {
-            "status": "success",
-            "printer_id": updated_printer.id,
-            "message": "Printer data updated successfully"
-        }
-    except Exception as e:
-        logger.error(f"Error updating printer data: {str(e)}")
-        raise HTTPException(status_code=400, detail=str(e))
+def update_printer_data(self, agent_id: int, printer_data: Dict[str, Any]) -> Printer:
+        """
+        Actualiza los datos de una impresora para un agente específico.
+        """
+        try:
+            if not printer_data:
+                raise ValueError("No se proporcionaron datos de la impresora")
+
+            # Valores requeridos
+            required_fields = ["name", "model", "ip_address"]
+            for field in required_fields:
+                if not printer_data.get(field):
+                    raise ValueError(f"El campo {field} es requerido")
+
+            # Buscar la impresora por IP
+            printer = self.db.query(Printer).filter(
+                Printer.ip_address == printer_data["ip_address"]
+            ).first()
+
+            # Si no existe, crear una nueva
+            if not printer:
+                printer = Printer(
+                    name=printer_data["name"],
+                    model=printer_data["model"],
+                    ip_address=printer_data["ip_address"],
+                    agent_id=agent_id,
+                    status=printer_data.get("status", "offline"),
+                    last_update=datetime.utcnow()
+                )
+                self.db.add(printer)
+            
+            # Actualizar datos de la impresora
+            printer.name = printer_data["name"]
+            printer.model = printer_data["model"]
+            printer.status = printer_data.get("status", printer.status)
+            printer.last_update = datetime.utcnow()
+
+            # Actualizar suministros si se proporcionan
+            if "supplies" in printer_data:
+                printer.supplies = printer_data["supplies"]
+
+            # Actualizar contadores si se proporcionan
+            if "counters" in printer_data:
+                printer.counters = printer_data["counters"]
+
+            # Confirmar cambios
+            self.db.commit()
+            self.db.refresh(printer)
+
+            logger.info(f"Printer data updated successfully for IP: {printer.ip_address}")
+            return printer
+
+        except Exception as e:
+            self.db.rollback()
+            logger.error(f"Error updating printer data: {str(e)}")
+            raise
 @router.get("/critical-supplies", response_model=List[Dict[str, Any]])
 def get_critical_supplies(
     db: Session = Depends(get_db)
