@@ -11,44 +11,85 @@ class PrinterMonitorService:
         self.db = db
 
     def update_printer_data(self, agent_id: int, printer_data: Dict[str, Any]) -> Printer:
-        """
-        Actualiza los datos de una impresora para un agente específico.
-        
-        :param agent_id: ID del agente que reporta los datos
-        :param printer_data: Diccionario con los datos de la impresora
-        :return: Instancia de Printer actualizada
-        """
         try:
-            # Buscar la impresora por IP o número de serie
+            logger.info(f"Iniciando creación/actualización de impresora con datos: {printer_data}")
+
+            if not printer_data:
+                raise ValueError("No se proporcionaron datos de la impresora")
+
+            # Buscar la impresora existente por IP
             printer = self.db.query(Printer).filter(
-                (Printer.ip_address == printer_data.get('ip_address')) | 
-                (Printer.serial_number == printer_data.get('serial_number'))
+                Printer.ip_address == printer_data["ip_address"]
             ).first()
 
-            # Si no existe, crear una nueva
+            logger.info(f"Impresora existente encontrada: {printer is not None}")
+
             if not printer:
+                logger.info("Creando nueva impresora")
                 printer = Printer(
-                    name=printer_data.get('name', 'Unnamed Printer'),
-                    model=printer_data.get('model'),
-                    brand=printer_data.get('brand'),
-                    serial_number=printer_data.get('serial_number'),
-                    ip_address=printer_data.get('ip_address'),
-                    agent_id=agent_id  # Usar el agent_id pasado como parámetro
+                    name=printer_data["name"],
+                    model=printer_data["model"],
+                    ip_address=printer_data["ip_address"],
+                    agent_id=agent_id,
+                    status="offline",
+                    last_check=datetime.utcnow(),
+                    oid_config_id=1  # ID por defecto para PrinterOIDs
                 )
                 self.db.add(printer)
 
-            # Actualizar datos de la impresora
-            printer.update_printer_data(printer_data)
-            
+                # Actualiza printer_data con la estructura completa
+                printer.printer_data = {
+                    "counters": {
+                        "total": 0,
+                        "color": {
+                            "total": 0,
+                            "cyan": 0,
+                            "magenta": 0,
+                            "yellow": 0,
+                            "black": 0
+                        },
+                        "black_white": 0
+                    },
+                    "supplies": {
+                        "toners": {
+                            "black": {
+                                "current_level": 100,
+                                "max_level": 100,
+                                "percentage": 100,
+                                "status": "ok"
+                            },
+                            "cyan": {
+                                "current_level": 100,
+                                "max_level": 100,
+                                "percentage": 100,
+                                "status": "ok"
+                            },
+                            "magenta": {
+                                "current_level": 100,
+                                "max_level": 100,
+                                "percentage": 100,
+                                "status": "ok"
+                            },
+                            "yellow": {
+                                "current_level": 100,
+                                "max_level": 100,
+                                "percentage": 100,
+                                "status": "ok"
+                            }
+                        }
+                    }
+                }
+
             # Confirmar cambios
             self.db.commit()
             self.db.refresh(printer)
 
+            logger.info(f"Impresora actualizada exitosamente. ID: {printer.id}, IP: {printer.ip_address}")
             return printer
 
         except Exception as e:
+            logger.error(f"Error en update_printer_data: {str(e)}")
             self.db.rollback()
-            logger.error(f"Error updating printer data: {str(e)}")
             raise
 
     def get_printers_by_agent(self, agent_id: int) -> List[Printer]:
