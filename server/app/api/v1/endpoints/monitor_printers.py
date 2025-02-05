@@ -17,6 +17,8 @@ def update_printer_data(self, agent_id: int, printer_data: Dict[str, Any]) -> Pr
         Actualiza los datos de una impresora para un agente específico.
         """
         try:
+            logger.info(f"Iniciando creación/actualización de impresora con datos: {printer_data}")
+
             if not printer_data:
                 raise ValueError("No se proporcionaron datos de la impresora")
 
@@ -31,8 +33,53 @@ def update_printer_data(self, agent_id: int, printer_data: Dict[str, Any]) -> Pr
                 Printer.ip_address == printer_data["ip_address"]
             ).first()
 
+            logger.info(f"Impresora existente encontrada: {printer is not None}")
+
             # Si no existe, crear una nueva
             if not printer:
+                logger.info("Creando nueva impresora")
+                default_printer_data = {
+                    "counters": {
+                        "total": 0,
+                        "color": {
+                            "total": 0,
+                            "cyan": 0,
+                            "magenta": 0,
+                            "yellow": 0,
+                            "black": 0
+                        },
+                        "black_white": 0,
+                    },
+                    "supplies": {
+                        "toners": {
+                            "black": {
+                                "current_level": 100,
+                                "max_level": 100,
+                                "percentage": 100,
+                                "status": "ok"
+                            },
+                            "cyan": {
+                                "current_level": 100,
+                                "max_level": 100,
+                                "percentage": 100,
+                                "status": "ok"
+                            },
+                            "magenta": {
+                                "current_level": 100,
+                                "max_level": 100,
+                                "percentage": 100,
+                                "status": "ok"
+                            },
+                            "yellow": {
+                                "current_level": 100,
+                                "max_level": 100,
+                                "percentage": 100,
+                                "status": "ok"
+                            }
+                        }
+                    }
+                }
+
                 printer = Printer(
                     name=printer_data["name"],
                     model=printer_data["model"],
@@ -40,51 +87,14 @@ def update_printer_data(self, agent_id: int, printer_data: Dict[str, Any]) -> Pr
                     agent_id=agent_id,
                     status="offline",
                     last_check=datetime.utcnow(),
-                    printer_data={
-                        "counters": {
-                            "total": 0,
-                            "color": {
-                                "total": 0,
-                                "cyan": 0,
-                                "magenta": 0,
-                                "yellow": 0,
-                                "black": 0
-                            },
-                            "black_white": 0
-                        },
-                        "supplies": {
-                            "toners": {
-                                "black": {
-                                    "current_level": 100,
-                                    "max_level": 100,
-                                    "percentage": 100,
-                                    "status": "ok"
-                                },
-                                "cyan": {
-                                    "current_level": 100,
-                                    "max_level": 100,
-                                    "percentage": 100,
-                                    "status": "ok"
-                                },
-                                "magenta": {
-                                    "current_level": 100,
-                                    "max_level": 100,
-                                    "percentage": 100,
-                                    "status": "ok"
-                                },
-                                "yellow": {
-                                    "current_level": 100,
-                                    "max_level": 100,
-                                    "percentage": 100,
-                                    "status": "ok"
-                                }
-                            }
-                        }
-                    }
+                    printer_data=default_printer_data,
+                    oid_config_id=1  # ID por defecto para PrinterOIDs
                 )
                 self.db.add(printer)
-            
+                logger.info(f"Nueva impresora creada con datos: {printer_data}")
+
             # Actualizar datos básicos
+            logger.info("Actualizando datos básicos de la impresora")
             printer.name = printer_data["name"]
             printer.model = printer_data["model"]
             printer.status = printer_data.get("status", "offline")
@@ -94,12 +104,12 @@ def update_printer_data(self, agent_id: int, printer_data: Dict[str, Any]) -> Pr
             self.db.commit()
             self.db.refresh(printer)
 
-            logger.info(f"Printer data updated successfully for IP: {printer.ip_address}")
+            logger.info(f"Impresora actualizada exitosamente. ID: {printer.id}, IP: {printer.ip_address}")
             return printer
 
         except Exception as e:
+            logger.error(f"Error en update_printer_data: {str(e)}")
             self.db.rollback()
-            logger.error(f"Error updating printer data: {str(e)}")
             raise
 @router.get("/critical-supplies", response_model=List[Dict[str, Any]])
 def get_critical_supplies(
