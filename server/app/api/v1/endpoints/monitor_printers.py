@@ -200,16 +200,19 @@ async def create_printer(
     request: Request,
     db: Session = Depends(get_db)
 ):
+    """
+    Endpoint para crear una nueva impresora.
+    """
     try:
         form_data = await request.json()
         logger.info(f"Recibiendo solicitud de creación de impresora con datos: {form_data}")
         
         monitor_service = PrinterMonitorService(db)
         
-        # Simplificar los datos enviados
+        # Asegurarnos de preservar todos los campos necesarios, incluyendo brand
         printer_data = {
             "name": form_data.get("name"),
-            "brand": form_data.get("brand"),
+            "brand": form_data.get("brand"),  # <-- El campo brand estaba faltando aquí
             "model": form_data.get("model"),
             "ip_address": form_data.get("ip_address"),
             "client_id": form_data.get("client_id"),
@@ -218,16 +221,24 @@ async def create_printer(
         
         logger.debug(f"Datos de impresora a crear: {printer_data}")
         
-        new_printer = monitor_service.update_printer_data(
-            agent_id=form_data.get("agent_id", 1),
-            printer_data=printer_data
-        )
-        
-        return {
-            "status": "success",
-            "printer_id": new_printer.id,
-            "message": "Impresora creada exitosamente"
-        }
+        try:
+            new_printer = monitor_service.update_printer_data(
+                agent_id=form_data.get("agent_id", 1),
+                printer_data=printer_data
+            )
+            
+            return {
+                "status": "success",
+                "printer_id": new_printer.id,
+                "message": "Impresora creada exitosamente"
+            }
+            
+        except ValueError as ve:
+            logger.error(f"Error de validación al crear impresora: {str(ve)}")
+            raise HTTPException(status_code=400, detail=str(ve))
+            
+    except HTTPException as he:
+        raise he
         
     except Exception as e:
         logger.error(f"Error inesperado al crear impresora: {str(e)}")
