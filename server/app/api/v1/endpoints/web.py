@@ -622,6 +622,7 @@ async def create_printer(request: Request, db: Session = Depends(get_db)):
     """
     try:
         form_data = await request.json()
+        logger.info(f"Received printer creation request with data: {form_data}")
         
         # Validar datos requeridos
         required_fields = ["name", "model", "ip_address"]
@@ -635,24 +636,11 @@ async def create_printer(request: Request, db: Session = Depends(get_db)):
             "name": form_data.get("name"),
             "model": form_data.get("model"),
             "ip_address": form_data.get("ip_address"),
-            "status": "offline",
-            "supplies": {
-                "black": {"level": 100},
-                "cyan": {"level": 100},
-                "magenta": {"level": 100},
-                "yellow": {"level": 100}
-            },
-            "counters": {
-                "total": 0,
-                "color": 0,
-                "bw": 0
-            }
+            "status": "offline"
         }
         
-        logger.info(f"Creating printer with data: {printer_data}")
-        
         new_printer = printer_service.update_printer_data(
-            agent_id=form_data.get("agent_id", 1),
+            agent_id=1,  # ID del agente por defecto
             printer_data=printer_data
         )
         
