@@ -393,38 +393,61 @@ templates.env.filters['numberformat'] = lambda value: "{:,}".format(value)
 @router.get("/monitor/printers")
 async def list_printers(request: Request, db: Session = Depends(get_db)):
     try:
-        printer_service = PrinterMonitorService(db)
+        logger.info("Iniciando listado de impresoras")
         printers = db.query(Printer).all()
+        logger.info(f"Encontradas {len(printers)} impresoras")
         
         processed_printers = []
         for printer in printers:
-            supplies_data = printer.printer_data.get('supplies', {}).get('toners', {})
-            printer_info = {
-                'id': printer.id,
-                'name': printer.name,
-                'model': printer.model,
-                'ip_address': printer.ip_address,
-                'status': printer.status,
-                'has_alerts': bool(printer.check_critical_supplies()),
-                'supplies': {
-                    'black': {
-                        'level': supplies_data.get('black', {}).get('percentage', 0)
+            try:
+                logger.debug(f"Procesando impresora ID: {printer.id}")
+                logger.debug(f"Datos de impresora: {printer.printer_data}")
+                
+                # Acceder a los datos de manera segura
+                printer_data = printer.printer_data or {}
+                supplies = printer_data.get('supplies', {})
+                toners = supplies.get('toners', {})
+                
+                printer_info = {
+                    'id': printer.id,
+                    'name': printer.name,
+                    'model': printer.model,
+                    'ip_address': printer.ip_address,
+                    'status': printer.status,
+                    'has_alerts': False,  # Por defecto
+                    'supplies': {
+                        'black': {
+                            'level': toners.get('black', {}).get('percentage', 0)
+                        },
+                        'cyan': {
+                            'level': toners.get('cyan', {}).get('percentage', 0)
+                        },
+                        'magenta': {
+                            'level': toners.get('magenta', {}).get('percentage', 0)
+                        },
+                        'yellow': {
+                            'level': toners.get('yellow', {}).get('percentage', 0)
+                        }
                     },
-                    'cyan': {
-                        'level': supplies_data.get('cyan', {}).get('percentage', 0)
-                    },
-                    'magenta': {
-                        'level': supplies_data.get('magenta', {}).get('percentage', 0)
-                    },
-                    'yellow': {
-                        'level': supplies_data.get('yellow', {}).get('percentage', 0)
+                    'counters': {
+                        'total': printer_data.get('counters', {}).get('total', 0)
                     }
-                },
-                'counters': {
-                    'total': printer.printer_data.get('counters', {}).get('total', 0)
                 }
-            }
-            processed_printers.append(printer_info)
+                
+                # Intentar obtener alertas si el método existe
+                try:
+                    printer_info['has_alerts'] = bool(printer.check_critical_supplies())
+                except Exception as e:
+                    logger.warning(f"Error checking critical supplies for printer {printer.id}: {e}")
+
+                processed_printers.append(printer_info)
+                logger.debug(f"Impresora {printer.id} procesada exitosamente")
+                
+            except Exception as e:
+                logger.error(f"Error procesando impresora {printer.id}: {str(e)}")
+                continue
+
+        logger.info(f"Procesadas exitosamente {len(processed_printers)} impresoras")
 
         return templates.TemplateResponse(
             "monitor/monitor_printers.html",
@@ -439,7 +462,7 @@ async def list_printers(request: Request, db: Session = Depends(get_db)):
             }
         )
     except Exception as e:
-        logger.error(f"Error en monitor de impresoras: {str(e)}")
+        logger.error(f"Error general en list_printers: {str(e)}")
         return templates.TemplateResponse(
             "monitor/monitor_printers.html",
             {
