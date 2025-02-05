@@ -412,6 +412,7 @@ async def list_printers(request: Request, db: Session = Depends(get_db)):
                     'model': printer.model,
                     'ip_address': printer.ip_address,
                     'status': printer.status,
+                    'client': printer.client.name if printer.client else 'Sin cliente',
                     'has_alerts': False,
                     'supplies': {
                         'black': {'level': toners.get('black', {}).get('percentage', 0)},
