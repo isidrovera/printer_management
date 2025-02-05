@@ -212,3 +212,18 @@ async def create_printer(
     except Exception as e:
         logger.error(f"Error creating printer: {str(e)}")
         raise HTTPException(status_code=400, detail=str(e))
+
+@router.delete("/monitor/printers/{printer_id}")
+async def delete_printer(printer_id: int, db: Session = Depends(get_db)):
+    try:
+        printer = db.query(Printer).filter(Printer.id == printer_id).first()
+        if not printer:
+            raise HTTPException(status_code=404, detail="Impresora no encontrada")
+        
+        db.delete(printer)
+        db.commit()
+        
+        return {"success": True}
+    except Exception as e:
+        logger.error(f"Error eliminando impresora: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))

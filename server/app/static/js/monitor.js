@@ -475,3 +475,33 @@ function showNotification(message, type = 'info') {
         setTimeout(() => notification.remove(), 300);
     }, 5000);
 }
+
+
+let printerToDelete = null;
+
+function confirmDeletePrinter(printerId) {
+    printerToDelete = printerId;
+    document.getElementById('deletePrinterModal').classList.remove('hidden');
+}
+
+async function deletePrinter() {
+    try {
+        const response = await fetch(`/api/v1/monitor/printers/${printerToDelete}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.ok) {
+            showNotification('Impresora eliminada exitosamente', 'success');
+            closeModal('deletePrinterModal');
+            updatePrintersList();
+        } else {
+            const data = await response.json();
+            throw new Error(data.detail || 'Error al eliminar la impresora');
+        }
+    } catch (error) {
+        showNotification(error.message, 'error');
+    }
+}

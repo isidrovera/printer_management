@@ -12,27 +12,25 @@
         <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto">
             <!-- Barra de búsqueda -->
             <div class="relative flex-grow sm:flex-grow-0">
-                <input type="text" 
-                       id="searchInput" 
-                       placeholder="Buscar impresoras..." 
-                       class="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <input type="text" id="searchInput" placeholder="Buscar impresoras..."
+                    class="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                 <i class="fas fa-search absolute right-3 top-2.5 h-5 w-5 text-gray-400"></i>
             </div>
-            
-            
+
+
             <!-- Selector de intervalo de actualización -->
-            <select id="refreshInterval" 
-                    class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            <select id="refreshInterval"
+                class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                 <option value="30">Actualizar cada 30s</option>
                 <option value="60">Actualizar cada 1m</option>
                 <option value="300">Actualizar cada 5m</option>
                 <option value="600">Actualizar cada 10m</option>
             </select>
             <!-- Botón para Crear Registro -->
-        <!-- Botón para agregar impresora -->
+            <!-- Botón para agregar impresora -->
             <button onclick="openCreateModal()"
-            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-            <i class="fas fa-plus mr-2"></i> Nueva Impresora
+                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                <i class="fas fa-plus mr-2"></i> Nueva Impresora
             </button>
 
         </div>
@@ -52,13 +50,14 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Online -->
         <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-500">Online</p>
-                    <h3 class="text-2xl font-bold text-green-600">{{ printers|selectattr('status', 'equalto', 'online')|list|length }}</h3>
+                    <h3 class="text-2xl font-bold text-green-600">{{ printers|selectattr('status', 'equalto',
+                        'online')|list|length }}</h3>
                 </div>
                 <div class="bg-green-100 p-3 rounded-lg">
                     <i class="fas fa-check-circle text-green-600 text-xl"></i>
@@ -71,7 +70,8 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-500">Con Alertas</p>
-                    <h3 class="text-2xl font-bold text-yellow-600">{{ printers|selectattr('has_alerts', 'equalto', true)|list|length }}</h3>
+                    <h3 class="text-2xl font-bold text-yellow-600">{{ printers|selectattr('has_alerts', 'equalto',
+                        true)|list|length }}</h3>
                 </div>
                 <div class="bg-yellow-100 p-3 rounded-lg">
                     <i class="fas fa-exclamation-triangle text-yellow-600 text-xl"></i>
@@ -84,7 +84,8 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-500">Con Error</p>
-                    <h3 class="text-2xl font-bold text-red-600">{{ printers|selectattr('status', 'equalto', 'error')|list|length }}</h3>
+                    <h3 class="text-2xl font-bold text-red-600">{{ printers|selectattr('status', 'equalto',
+                        'error')|list|length }}</h3>
                 </div>
                 <div class="bg-red-100 p-3 rounded-lg">
                     <i class="fas fa-times-circle text-red-600 text-xl"></i>
@@ -98,13 +99,19 @@
         <table class="w-full border-collapse">
             <thead class="bg-gray-50">
                 <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Modelo</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Modelo
+                    </th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">IP</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Toners</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contadores</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Toners
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Contadores</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado
+                    </th>
+                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones
+                    </th>
                 </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
@@ -129,50 +136,54 @@
                         </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="flex space-x-2">
-                        <!-- Negro -->
-                        <div class="relative w-6 h-6" title="Negro: {{ printer.supplies.black.level|default(0) }}%">
-                            <div class="absolute inset-0 bg-gray-200 rounded"></div>
-                            <div class="absolute inset-0 bg-gray-800 rounded" 
-                                 style="clip-path: inset({{ 100 - (printer.supplies.black.level|default(0)) }}% 0 0 0);">
+                        <div class="flex space-x-2">
+                            <!-- Negro -->
+                            <div class="relative w-6 h-6" title="Negro: {{ printer.supplies.black.level|default(0) }}%">
+                                <div class="absolute inset-0 bg-gray-200 rounded"></div>
+                                <div class="absolute inset-0 bg-gray-800 rounded"
+                                    style="clip-path: inset({{ 100 - (printer.supplies.black.level|default(0)) }}% 0 0 0);">
+                                </div>
+                            </div>
+                            <!-- Cyan -->
+                            <div class="relative w-6 h-6" title="Cyan: {{ printer.supplies.cyan.level|default(0) }}%">
+                                <div class="absolute inset-0 bg-gray-200 rounded"></div>
+                                <div class="absolute inset-0 bg-cyan-500 rounded"
+                                    style="clip-path: inset({{ 100 - (printer.supplies.cyan.level|default(0)) }}% 0 0 0);">
+                                </div>
+                            </div>
+                            <!-- Magenta -->
+                            <div class="relative w-6 h-6"
+                                title="Magenta: {{ printer.supplies.magenta.level|default(0) }}%">
+                                <div class="absolute inset-0 bg-gray-200 rounded"></div>
+                                <div class="absolute inset-0 bg-pink-500 rounded"
+                                    style="clip-path: inset({{ 100 - (printer.supplies.magenta.level|default(0)) }}% 0 0 0);">
+                                </div>
+                            </div>
+                            <!-- Amarillo -->
+                            <div class="relative w-6 h-6"
+                                title="Amarillo: {{ printer.supplies.yellow.level|default(0) }}%">
+                                <div class="absolute inset-0 bg-gray-200 rounded"></div>
+                                <div class="absolute inset-0 bg-yellow-500 rounded"
+                                    style="clip-path: inset({{ 100 - (printer.supplies.yellow.level|default(0)) }}% 0 0 0);">
+                                </div>
                             </div>
                         </div>
-                        <!-- Cyan -->
-                        <div class="relative w-6 h-6" title="Cyan: {{ printer.supplies.cyan.level|default(0) }}%">
-                            <div class="absolute inset-0 bg-gray-200 rounded"></div>
-                            <div class="absolute inset-0 bg-cyan-500 rounded" 
-                                 style="clip-path: inset({{ 100 - (printer.supplies.cyan.level|default(0)) }}% 0 0 0);">
-                            </div>
+                    </td>
+
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-sm text-gray-500">Total:</span>
+                            <span class="text-sm font-medium">{{ printer.counters.total|default(0)|numberformat
+                                }}</span>
                         </div>
-                        <!-- Magenta -->
-                        <div class="relative w-6 h-6" title="Magenta: {{ printer.supplies.magenta.level|default(0) }}%">
-                            <div class="absolute inset-0 bg-gray-200 rounded"></div>
-                            <div class="absolute inset-0 bg-pink-500 rounded" 
-                                 style="clip-path: inset({{ 100 - (printer.supplies.magenta.level|default(0)) }}% 0 0 0);">
-                            </div>
-                        </div>
-                        <!-- Amarillo -->
-                        <div class="relative w-6 h-6" title="Amarillo: {{ printer.supplies.yellow.level|default(0) }}%">
-                            <div class="absolute inset-0 bg-gray-200 rounded"></div>
-                            <div class="absolute inset-0 bg-yellow-500 rounded" 
-                                 style="clip-path: inset({{ 100 - (printer.supplies.yellow.level|default(0)) }}% 0 0 0);">
-                            </div>
-                        </div>
-                    </div>
-                </td>
-                
-                                    <td class="px-6 py-4 whitespace-nowrap">
-    <div class="flex items-center space-x-2">
-        <span class="text-sm text-gray-500">Total:</span>
-        <span class="text-sm font-medium">{{ printer.counters.total|default(0)|numberformat }}</span>
-    </div>
-</td>
+                    </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
                                    {% if printer.status == 'online' %}bg-green-100 text-green-800
                                    {% elif printer.status == 'error' %}bg-red-100 text-red-800
                                    {% else %}bg-gray-100 text-gray-800{% endif %}">
-                            <i class="fas fa-{% if printer.status == 'online' %}check-circle{% elif printer.status == 'error' %}times-circle{% else %}circle{% endif %} mr-2"></i>
+                            <i
+                                class="fas fa-{% if printer.status == 'online' %}check-circle{% elif printer.status == 'error' %}times-circle{% else %}circle{% endif %} mr-2"></i>
                             {{ printer.status|capitalize }}
                         </span>
                     </td>
@@ -182,34 +193,40 @@
 
                             <!-- Botón Info -->
                             <button onclick="showPrinterInfo('{{ printer.id }}')"
-                                    class="inline-flex items-center px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
-                                    title="Ver información detallada">
+                                class="inline-flex items-center px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
+                                title="Ver información detallada">
                                 <i class="fas fa-info-circle mr-2"></i>
                                 <span>Info</span>
                             </button>
 
                             <!-- Botón Suministros -->
                             <button onclick="showSupplies('{{ printer.id }}')"
-                                    class="inline-flex items-center px-3 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors"
-                                    title="Ver detalles de suministros">
+                                class="inline-flex items-center px-3 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors"
+                                title="Ver detalles de suministros">
                                 <i class="fas fa-tint mr-2"></i>
                                 <span>Suministros</span>
                             </button>
 
                             <!-- Botón Contadores -->
                             <button onclick="showCounters('{{ printer.id }}')"
-                                    class="inline-flex items-center px-3 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors"
-                                    title="Ver contadores detallados">
+                                class="inline-flex items-center px-3 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors"
+                                title="Ver contadores detallados">
                                 <i class="fas fa-calculator mr-2"></i>
                                 <span>Contadores</span>
                             </button>
 
                             <!-- Botón Historial -->
                             <button onclick="showHistory('{{ printer.id }}')"
-                                    class="inline-flex items-center px-3 py-2 bg-amber-100 text-amber-700 rounded-lg hover:bg-amber-200 transition-colors"
-                                    title="Ver historial">
+                                class="inline-flex items-center px-3 py-2 bg-amber-100 text-amber-700 rounded-lg hover:bg-amber-200 transition-colors"
+                                title="Ver historial">
                                 <i class="fas fa-history mr-2"></i>
                                 <span>Historial</span>
+                            </button>
+                            <button onclick="confirmDeletePrinter('{{ printer.id }}')"
+                                class="inline-flex items-center px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
+                                title="Eliminar impresora">
+                                <i class="fas fa-trash mr-2"></i>
+                                <span>Eliminar</span>
                             </button>
                         </div>
                     </td>
@@ -242,12 +259,12 @@
                         <i class="fas fa-info-circle text-blue-500 text-xl"></i>
                         <h3 class="text-2xl font-semibold text-gray-800">Información de Impresora</h3>
                     </div>
-                    <button onclick="closeModal('printerInfoModal')" 
-                            class="text-gray-500 hover:text-gray-800 transition-colors">
+                    <button onclick="closeModal('printerInfoModal')"
+                        class="text-gray-500 hover:text-gray-800 transition-colors">
                         <i class="fas fa-times-circle text-2xl"></i>
                     </button>
                 </div>
-                
+
                 <!-- Contenido -->
                 <div class="p-6 overflow-y-auto max-h-[calc(100vh-200px)]" id="printerInfoContent">
                     <div class="flex justify-center items-center">
@@ -258,12 +275,32 @@
 
                 <!-- Footer -->
                 <div class="sticky bottom-0 flex justify-end items-center p-6 border-t bg-gray-50 rounded-b-lg">
-                    <button onclick="closeModal('printerInfoModal')" 
-                            class="flex items-center space-x-2 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">
+                    <button onclick="closeModal('printerInfoModal')"
+                        class="flex items-center space-x-2 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">
                         <i class="fas fa-times"></i>
                         <span>Cerrar</span>
                     </button>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal de Confirmación de Eliminación -->
+<div class="fixed inset-0 hidden z-50" id="deletePrinterModal">
+    <div class="absolute inset-0 bg-black bg-opacity-50"></div>
+    <div class="absolute inset-0 overflow-y-auto flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg max-w-md w-full p-6">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">¿Eliminar impresora?</h3>
+            <p class="text-sm text-gray-500 mb-4">Esta acción no se puede deshacer.</p>
+
+            <div class="flex justify-end space-x-3">
+                <button onclick="closeModal('deletePrinterModal')"
+                    class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">
+                    Cancelar
+                </button>
+                <button onclick="deletePrinter()" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+                    Eliminar
+                </button>
             </div>
         </div>
     </div>
@@ -279,58 +316,59 @@
                     <i class="fas fa-print text-blue-500"></i>
                     <h3 class="text-xl font-semibold text-gray-800">Registrar Nueva Impresora</h3>
                 </div>
-                <button onclick="closeModal('createPrinterModal')" 
-                        class="text-gray-500 hover:text-gray-800 transition-colors">
+                <button onclick="closeModal('createPrinterModal')"
+                    class="text-gray-500 hover:text-gray-800 transition-colors">
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
-            
+
             <!-- Formulario -->
+            <!-- Modificar el formulario dentro del createPrinterModal -->
             <form id="createPrinterForm" class="p-6" onsubmit="handleCreatePrinter(event)">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="col-span-2">
+                        <label for="clientId" class="block text-sm font-medium text-gray-700">Cliente *</label>
+                        <select id="clientId" name="client_id" required
+                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                            <option value="">Seleccione un cliente</option>
+                            {% for client in clients %}
+                            <option value="{{ client.id }}">{{ client.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
                     <div>
                         <label for="printerName" class="block text-sm font-medium text-gray-700">Nombre *</label>
-                        <input type="text" 
-                               id="printerName" 
-                               name="name" 
-                               required
-                               placeholder="Ej: Impresora RR.HH."
-                               class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <input type="text" id="printerName" name="name" required placeholder="Ej: Impresora RR.HH."
+                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
                     </div>
+
                     <div>
                         <label for="printerModel" class="block text-sm font-medium text-gray-700">Modelo *</label>
-                        <input type="text" 
-                               id="printerModel" 
-                               name="model" 
-                               required
-                               placeholder="Ej: HP LaserJet Pro M404n"
-                               class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <input type="text" id="printerModel" name="model" required
+                            placeholder="Ej: HP LaserJet Pro M404n"
+                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
                     </div>
+
                     <div>
                         <label for="printerIP" class="block text-sm font-medium text-gray-700">Dirección IP *</label>
-                        <input type="text" 
-                               id="printerIP" 
-                               name="ip_address" 
-                               required
-                               pattern="^(\d{1,3}\.){3}\d{1,3}$"
-                               placeholder="Ej: 192.168.1.100"
-                               title="Ingrese una dirección IP válida (ej: 192.168.1.100)"
-                               class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <input type="text" id="printerIP" name="ip_address" required pattern="^(\d{1,3}\.){3}\d{1,3}$"
+                            placeholder="Ej: 192.168.1.100" title="Ingrese una dirección IP válida (ej: 192.168.1.100)"
+                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
                     </div>
                 </div>
-                
+
                 <div class="mt-4 text-sm text-gray-500">
                     <p>(*) Campos obligatorios</p>
                 </div>
 
                 <div class="flex justify-end mt-6 space-x-2">
-                    <button type="button" 
-                            onclick="closeModal('createPrinterModal')"
-                            class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+                    <button type="button" onclick="closeModal('createPrinterModal')"
+                        class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
                         Cancelar
                     </button>
-                    <button type="submit" 
-                            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center">
+                    <button type="submit"
+                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center">
                         <i class="fas fa-save mr-2"></i>
                         Guardar
                     </button>
@@ -356,7 +394,7 @@
                         <i class="fas fa-times text-xl"></i>
                     </button>
                 </div>
-                
+
                 <div class="p-6" id="suppliesContent">
                     <div class="flex justify-center items-center">
                         <i class="fas fa-circle-notch fa-spin text-purple-500 text-2xl mr-3"></i>
@@ -383,7 +421,7 @@
                         <i class="fas fa-times text-xl"></i>
                     </button>
                 </div>
-                
+
                 <div class="p-6" id="countersContent">
                     <div class="flex justify-center items-center">
                         <i class="fas fa-circle-notch fa-spin text-green-500 text-2xl mr-3"></i>
@@ -410,7 +448,7 @@
                         <i class="fas fa-times text-xl"></i>
                     </button>
                 </div>
-                
+
                 <div class="p-6 overflow-y-auto max-h-[calc(100vh-200px)]" id="historyContent">
                     <div class="flex justify-center items-center">
                         <i class="fas fa-circle-notch fa-spin text-amber-500 text-2xl mr-3"></i>
