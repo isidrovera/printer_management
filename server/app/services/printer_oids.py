@@ -62,7 +62,7 @@ class PrinterOIDsService:
            self.db.rollback()
            raise
 
-    def delete(self, oid_id: int) -> bool:
+   def delete(self, oid_id: int) -> bool:
        """Elimina un registro de OIDs."""
        try:
            logger.info(f"Intentando eliminar registro de OIDs con ID: {oid_id}")
