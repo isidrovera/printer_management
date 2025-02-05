@@ -390,17 +390,47 @@ templates.env.filters['numberformat'] = lambda value: "{:,}".format(value)
 async def list_printers(request: Request, db: Session = Depends(get_db)):
     try:
         printer_service = PrinterMonitorService(db)
-        critical_printers = printer_service.get_critical_printers()
+        printers = db.query(Printer).all()
         
+        processed_printers = []
+        for printer in printers:
+            supplies_data = printer.printer_data.get('supplies', {}).get('toners', {})
+            printer_info = {
+                'id': printer.id,
+                'name': printer.name,
+                'model': printer.model,
+                'ip_address': printer.ip_address,
+                'status': printer.status,
+                'has_alerts': bool(printer.check_critical_supplies()),
+                'supplies': {
+                    'black': {
+                        'level': supplies_data.get('black', {}).get('percentage', 0)
+                    },
+                    'cyan': {
+                        'level': supplies_data.get('cyan', {}).get('percentage', 0)
+                    },
+                    'magenta': {
+                        'level': supplies_data.get('magenta', {}).get('percentage', 0)
+                    },
+                    'yellow': {
+                        'level': supplies_data.get('yellow', {}).get('percentage', 0)
+                    }
+                },
+                'counters': {
+                    'total': printer.printer_data.get('counters', {}).get('total', 0)
+                }
+            }
+            processed_printers.append(printer_info)
+
         return templates.TemplateResponse(
             "monitor/monitor_printers.html",
             {
                 "request": request,
-                "printers": critical_printers,
+                "printers": processed_printers,
                 "stats": {
-                    "total": len(critical_printers),
-                    "online": len([p for p in critical_printers if p.status == 'online']),
-                    "error": len([p for p in critical_printers if p.status == 'error'])
+                    "total": len(processed_printers),
+                    "online": len([p for p in processed_printers if p['status'] == 'online']),
+                    "error": len([p for p in processed_printers if p['status'] == 'error'])
                 }
             }
         )
