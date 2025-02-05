@@ -10,7 +10,6 @@ import paramiko
 import threading
 import select
 import time
-import tempfile
 import platform
 import socket
 import aiohttp
@@ -19,6 +18,7 @@ from ..core.config import settings
 from .system_info_service import SystemInfoService
 from .printer_service import PrinterService
 from .printer_monitor_service import PrinterMonitorService
+from datetime import datetime
 
 # Configurar logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -95,7 +95,7 @@ class AgentService:
                         return
                     
                     if response.status == 200:
-                        if data.get("token"):  # Asumiendo que el servidor devuelve el token en esta clave
+                        if data.get("token"):
                             self._save_agent_token(data["token"])
                             logger.info("✅ Registro exitoso, conectando...")
                             await self._connect()
@@ -108,6 +108,7 @@ class AgentService:
             logger.error(f"🚨 Error en el registro: {str(e)}")
             if hasattr(e, '__cause__'):
                 logger.error(f"Causa: {str(e.__cause__)}")
+
     def _save_agent_token(self, token: str):
         """Guarda el token del agente en el archivo .env y en la configuración."""
         try:
@@ -118,7 +119,6 @@ class AgentService:
         except Exception as e:
             logger.error(f"Error saving agent token: {e}")
             raise
-    
     async def _connect(self):
         """Conecta el agente al servidor usando el token existente y mantiene la conexión."""
         while True:
@@ -143,15 +143,6 @@ class AgentService:
                 logger.error(f"🚨 Error en la conexión WebSocket: {e}")
                 await asyncio.sleep(self.reconnect_interval)
 
-    async def _periodic_updates(self, websocket):
-        """Maneja las actualizaciones periódicas mientras la conexión está activa."""
-        try:
-            while True:
-                await self._update_agent_info()
-                await asyncio.sleep(300)  # 5 minutos entre actualizaciones
-        except Exception as e:
-            logger.error(f"Error en actualizaciones periódicas: {e}")
-            raise
     async def _handle_connection(self, websocket):
         """Maneja la conexión WebSocket activa."""
         try:
@@ -191,6 +182,10 @@ class AgentService:
                 await self._handle_tunnel_creation(data, websocket)
             elif message_type == 'close_tunnel':
                 await self._handle_tunnel_closure(data, websocket)
+            elif message_type == 'printer_created':
+                await self._handle_printer_created(data, websocket)
+            elif message_type == 'scan_printers':
+                await self._handle_printer_scan(data, websocket)
             else:
                 logger.warning(f"Tipo de mensaje desconocido: {message_type}")
                 
@@ -198,16 +193,6 @@ class AgentService:
             logger.error(f"Error procesando mensaje: {e}")
             await self._send_error_response(websocket, str(e))
 
-    async def _send_error_response(self, websocket, error_message: str):
-        """Envía una respuesta de error al servidor."""
-        try:
-            await websocket.send(json.dumps({
-                'type': 'error',
-                'message': error_message
-            }))
-        except Exception as e:
-            logger.error(f"Error enviando respuesta de error: {e}")
-    
     async def _handle_heartbeat(self, websocket):
         """Maneja los mensajes de heartbeat."""
         try:
@@ -218,13 +203,19 @@ class AgentService:
             }))
         except Exception as e:
             logger.error(f"Error sending heartbeat response: {e}")
-    
-    
 
+    async def _send_error_response(self, websocket, error_message: str):
+        """Envía una respuesta de error al servidor."""
+        try:
+            await websocket.send(json.dumps({
+                'type': 'error',
+                'message': error_message
+            }))
+        except Exception as e:
+            logger.error(f"Error enviando respuesta de error: {e}")
     async def _handle_printer_installation(self, data, websocket):
         """Maneja la instalación de impresoras."""
         try:
-            # Obtener la URL de descarga y otros datos
             driver_url = data.get('driver_url')
             if not driver_url:
                 raise ValueError("Driver URL not provided in the command.")
@@ -234,16 +225,13 @@ class AgentService:
             model = data.get('model')
             driver_filename = data.get('driver_filename')
 
-            # Obtener el nombre del driver sin la extensión
             driver_name = os.path.splitext(driver_filename)[0]
             logger.debug(f"Nombre del driver a usar: {driver_name}")
 
-            # Crear un directorio temporal para la descarga
             with tempfile.TemporaryDirectory() as temp_dir:
                 driver_path = os.path.join(temp_dir, driver_filename)
                 logger.debug(f"Driver se guardará en: {driver_path}")
                 
-                # Realizar la descarga
                 async with aiohttp.ClientSession() as session:
                     logger.debug(f"Iniciando descarga desde: {driver_url}")
                     async with session.get(driver_url) as response:
@@ -256,39 +244,22 @@ class AgentService:
                         with open(driver_path, 'wb') as f:
                             f.write(content)
                         
-                        logger.debug(f"Archivo guardado en {driver_path}")
-                        
-                        # Verificar el archivo ZIP
                         try:
                             with zipfile.ZipFile(driver_path, 'r') as zip_ref:
-                                logger.debug("Contenido del ZIP:")
-                                files = zip_ref.namelist()
-                                for name in files:
-                                    logger.debug(f"- {name}")
-                                
-                                # Extraer en un subdirectorio
                                 extract_dir = os.path.join(temp_dir, "extracted")
                                 os.makedirs(extract_dir, exist_ok=True)
                                 zip_ref.extractall(extract_dir)
                                 logger.debug(f"ZIP extraído en: {extract_dir}")
-                                
-                                # Listar archivos extraídos
-                                for root, dirs, files in os.walk(extract_dir):
-                                    logger.debug(f"Contenido de {root}:")
-                                    for file in files:
-                                        logger.debug(f"- {file}")
                         except Exception as e:
                             logger.error(f"Error con el archivo ZIP: {e}")
                             raise
 
-                        # Instalar la impresora pasando el nombre del driver
-                        logger.debug("Iniciando instalación con printer_service")
                         result = await self.printer_service.install(
                             driver_path,
                             printer_ip,
                             manufacturer,
                             model,
-                            driver_name  # Pasamos el nombre del driver sin extensión
+                            driver_name
                         )
                         
                         logger.info(f"Printer installation result: {result}")
@@ -302,17 +273,130 @@ class AgentService:
             logger.error(f"Error during printer installation: {e}")
             await self._send_error_response(websocket, f"Error en instalación: {e}")
 
-    async def _update_agent_info(self):
-        """Obtiene la información actualizada del sistema y la envía al servidor si hay cambios."""
+    async def _handle_printer_created(self, data, websocket):
+        """Maneja la notificación de una nueva impresora creada."""
         try:
-            import socket  # Asegurar que esté importado
+            printer_data = data.get('printer_data')
+            if not printer_data:
+                raise ValueError("Datos de impresora no proporcionados")
+            
+            logger.info(f"Nueva impresora creada: {printer_data}")
+            
+            if not all(key in printer_data for key in ['ip_address', 'brand']):
+                raise ValueError("Faltan datos requeridos (ip_address o brand)")
+                
+            collected_data = await self.printer_monitor.collect_printer_data(
+                ip=printer_data['ip_address'],
+                brand=printer_data['brand']
+            )
+            
+            if collected_data:
+                success = await self.printer_monitor.update_printer_data(
+                    ip=printer_data['ip_address'],
+                    data=collected_data,
+                    agent_id=settings.AGENT_ID
+                )
+                
+                response_data = {
+                    'type': 'printer_status',
+                    'printer_ip': printer_data['ip_address'],
+                    'status': 'success' if success else 'error',
+                    'message': 'Datos actualizados correctamente' if success else 'Error actualizando datos'
+                }
+            else:
+                response_data = {
+                    'type': 'printer_status',
+                    'printer_ip': printer_data['ip_address'],
+                    'status': 'error',
+                    'message': 'No se pudieron obtener datos de la impresora'
+                }
+                
+            await websocket.send(json.dumps(response_data))
+            
+        except Exception as e:
+            error_msg = f"Error procesando nueva impresora: {str(e)}"
+            logger.error(error_msg)
+            await self._send_error_response(websocket, error_msg)
 
+    async def _handle_printer_scan(self, data, websocket):
+        """Maneja una solicitud de escaneo de impresoras."""
+        try:
+            logger.info("Iniciando escaneo de impresoras")
+            
+            networks = data.get('networks', [])
+            if not networks:
+                local_network = await self.system_info.get_network_info()
+                networks = [local_network] if local_network else []
+            
+            discovered_printers = []
+            
+            for network in networks:
+                logger.info(f"Escaneando red: {network}")
+                printers = await self.printer_monitor.scan_network(
+                    network_ip=network.get('ip'),
+                    netmask=network.get('netmask')
+                )
+                discovered_printers.extend(printers)
+            
+            await websocket.send(json.dumps({
+                'type': 'scan_results',
+                'printers': discovered_printers,
+                'timestamp': datetime.utcnow().isoformat()
+            }))
+            
+        except Exception as e:
+            error_msg = f"Error en escaneo de impresoras: {str(e)}"
+            logger.error(error_msg)
+            await self._send_error_response(websocket, error_msg)
+
+    async def _periodic_updates(self, websocket):
+        """Maneja las actualizaciones periódicas mientras la conexión está activa."""
+        try:
+            while True:
+                # Actualizar información del sistema
+                await self._update_agent_info()
+                
+                # Actualizar datos de impresoras monitoreadas
+                try:
+                    printers = await self.printer_monitor.get_monitored_printers()
+                    
+                    for printer in printers:
+                        try:
+                            data = await self.printer_monitor.collect_printer_data(
+                                ip=printer['ip_address'],
+                                brand=printer['brand']
+                            )
+                            
+                            if data:
+                                await self.printer_monitor.update_printer_data(
+                                    ip=printer['ip_address'],
+                                    data=data,
+                                    agent_id=settings.AGENT_ID
+                                )
+                                logger.debug(f"Datos actualizados para {printer['ip_address']}")
+                            else:
+                                logger.warning(f"No se pudieron obtener datos de {printer['ip_address']}")
+                                
+                        except Exception as e:
+                            logger.error(f"Error actualizando impresora {printer['ip_address']}: {e}")
+                            continue
+                            
+                except Exception as e:
+                    logger.error(f"Error en actualización de impresoras: {e}")
+                
+                await asyncio.sleep(300)  # 5 minutos
+                
+        except Exception as e:
+            logger.error(f"Error en actualizaciones periódicas: {e}")
+            raise
+
+    async def _update_agent_info(self):
+        """Actualiza la información del agente en el servidor."""
+        try:
             new_system_info = await self.system_info.get_system_info()
-
-            # 🔍 Obtener la IP correctamente en cualquier sistema operativo
             try:
-                new_ip = socket.gethostbyname(socket.gethostname())  # ✅ Método confiable multiplataforma
-                if new_ip == "127.0.0.1":  # Si la IP es localhost, buscar una IP real
+                new_ip = socket.gethostbyname(socket.gethostname())
+                if new_ip == "127.0.0.1":
                     import netifaces
                     interfaces = netifaces.interfaces()
                     for interface in interfaces:
@@ -332,29 +416,26 @@ class AgentService:
                 "ip_address": new_ip
             }
 
-            logger.debug(f"🆕 [AGENTE] Enviando actualización al servidor: {json.dumps(update_data, indent=4)}")
-
             async with aiohttp.ClientSession() as session:
                 async with session.put(f"{settings.SERVER_URL}/api/v1/agents/update", json=update_data) as response:
                     data = await response.json()
                     if response.status == 200:
-                        logger.info(f"✅ [AGENTE] Actualización exitosa en el servidor.")
+                        logger.info("✅ Actualización exitosa en el servidor.")
                     else:
-                        logger.error(f"❌ [AGENTE] Error en la actualización: {data}")
+                        logger.error(f"❌ Error en la actualización: {data}")
 
         except Exception as e:
-            logger.error(f"🚨 [AGENTE] Error en la actualización del agente: {e}")
-
-
-
+            logger.error(f"🚨 Error en la actualización del agente: {e}")
+    
     async def _handle_tunnel_creation(self, data, websocket):
+        """Maneja la creación de túneles SSH."""
         try:
             tunnel_id = f"{data['remote_host']}:{data['remote_port']}-{data['local_port']}"
             
             if tunnel_id in self.active_tunnels:
                 raise ValueError(f"Ya existe un túnel activo para {tunnel_id}")
 
-            # Registrar el túnel y su websocket antes de iniciar el thread
+            # Registrar el túnel y su websocket
             self.active_tunnels[tunnel_id] = {
                 'config': data,
                 'websocket': websocket,
@@ -385,7 +466,6 @@ class AgentService:
             )
             tunnel_thread.daemon = True
             
-            # Agregar el thread al diccionario
             self.active_tunnels[tunnel_id]['thread'] = tunnel_thread
             tunnel_thread.start()
 
@@ -399,6 +479,7 @@ class AgentService:
             }))
 
     def _create_tunnel(self, ssh_host, ssh_port, username, password, remote_host, remote_port, local_port, tunnel_id, loop):
+        """Crea y mantiene un túnel SSH."""
         try:
             ssh = paramiko.SSHClient()
             ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -414,10 +495,8 @@ class AgentService:
             logger.info("Conexión SSH establecida")
 
             transport = ssh.get_transport()
-            # Establecer el reenvío de puerto remoto
             transport.request_port_forward('', local_port)
 
-            # Manejar el reenvío de tráfico
             def handle_channel():
                 while tunnel_id in self.active_tunnels:
                     try:
@@ -437,7 +516,6 @@ class AgentService:
                         logger.error(f"Error en el canal: {e}")
                         break
 
-            # Iniciar thread para manejar canales
             handler_thread = threading.Thread(target=handle_channel)
             handler_thread.daemon = True
             handler_thread.start()
@@ -468,6 +546,7 @@ class AgentService:
             future.result()
 
     def _handle_tunnel(self, chan, sock):
+        """Maneja la transferencia de datos del túnel."""
         while True:
             r, w, x = select.select([sock, chan], [], [])
             if sock in r:
@@ -491,9 +570,7 @@ class AgentService:
                 raise ValueError("Se requiere tunnel_id")
 
             if tunnel_id in self.active_tunnels:
-                # Marcar el túnel para cierre
                 tunnel_info = self.active_tunnels.pop(tunnel_id)
-                # El thread se cerrará en la siguiente iteración
                 
                 await websocket.send(json.dumps({
                     'type': 'tunnel_status',
@@ -519,6 +596,7 @@ class AgentService:
             }))
 
     async def _send_tunnel_status(self, tunnel_id, status, message):
+        """Envía actualizaciones de estado del túnel al servidor."""
         try:
             if tunnel_id in self.active_tunnels and 'websocket' in self.active_tunnels[tunnel_id]:
                 websocket = self.active_tunnels[tunnel_id]['websocket']
@@ -532,22 +610,3 @@ class AgentService:
                 logger.error(f"No se encontró websocket para el túnel {tunnel_id}")
         except Exception as e:
             logger.error(f"Error enviando estado del túnel: {e}")
-
-    async def _periodic_updates(self, websocket):
-        try:
-            while True:
-                # Actualizar info del sistema
-                await self._update_agent_info()
-                
-                # Escanear y monitorear impresoras
-                printers = await self.printer_monitor.scan_and_monitor()
-                for printer in printers:
-                    await websocket.send(json.dumps({
-                        'type': 'printer_update',
-                        'data': printer
-                    }))
-                
-                await asyncio.sleep(300)  # 5 minutos
-        except Exception as e:
-            logger.error(f"Error en actualizaciones periódicas: {e}")
-            raise

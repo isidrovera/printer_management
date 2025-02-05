@@ -253,3 +253,40 @@ async def delete_printer(printer_id: int, db: Session = Depends(get_db)):
     except Exception as e:
         logger.error(f"Error eliminando impresora: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+
+@router.get("/", response_model=List[Dict[str, Any]])
+def get_printers(
+    db: Session = Depends(get_db),
+    agent_id: Optional[int] = None
+):
+    """
+    Obtiene todas las impresoras o las filtradas por agente.
+    """
+    try:
+        logger.info(f"Obteniendo impresoras" + (f" para agente {agent_id}" if agent_id else ""))
+        
+        monitor_service = PrinterMonitorService(db)
+        query = db.query(Printer)
+        
+        if agent_id:
+            query = query.filter(Printer.agent_id == agent_id)
+            
+        printers = query.all()
+        
+        return [
+            {
+                "ip_address": printer.ip_address,
+                "brand": printer.brand or "",  # Asegurarse de que no sea None
+                "model": printer.model,
+                "name": printer.name,
+                "status": printer.status,
+                "client_id": printer.client_id
+            }
+            for printer in printers
+        ]
+        
+    except Exception as e:
+        logger.error(f"Error obteniendo impresoras: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
