@@ -204,20 +204,22 @@ async def create_printer(
     Endpoint para crear una nueva impresora.
     """
     try:
+        # Obtener los datos del formulario
         form_data = await request.json()
         logger.info(f"Recibiendo solicitud de creación de impresora con datos: {form_data}")
         
         monitor_service = PrinterMonitorService(db)
         
-        # Asegurarnos de preservar todos los campos necesarios, incluyendo brand
-        printer_data = {
-            "name": form_data.get("name"),
-            "brand": form_data.get("brand"),  # <-- El campo brand estaba faltando aquí
-            "model": form_data.get("model"),
-            "ip_address": form_data.get("ip_address"),
-            "client_id": form_data.get("client_id"),
-            "status": "offline"
-        }
+        # Crear el diccionario con todos los campos necesarios
+        printer_data = {}
+        
+        # Copiar todos los campos necesarios del form_data
+        for field in ["name", "brand", "model", "ip_address", "client_id"]:
+            if field in form_data:
+                printer_data[field] = form_data[field]
+                
+        # Agregar el estado por defecto
+        printer_data["status"] = "offline"
         
         logger.debug(f"Datos de impresora a crear: {printer_data}")
         
