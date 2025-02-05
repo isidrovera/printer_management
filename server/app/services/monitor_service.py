@@ -11,11 +11,34 @@ class PrinterMonitorService:
         self.db = db
 
     def update_printer_data(self, agent_id: int, printer_data: Dict[str, Any]) -> Printer:
+        """
+        Actualiza los datos de una impresora para un agente específico.
+        Si la impresora no existe, la crea.
+        
+        Args:
+            agent_id (int): ID del agente
+            printer_data (Dict[str, Any]): Datos de la impresora
+            
+        Returns:
+            Printer: Objeto impresora actualizado o creado
+            
+        Raises:
+            ValueError: Si faltan datos requeridos
+            Exception: Para otros errores durante el proceso
+        """
         try:
             logger.info(f"Iniciando creación/actualización de impresora con datos: {printer_data}")
 
             if not printer_data:
+                logger.error("No se proporcionaron datos de la impresora")
                 raise ValueError("No se proporcionaron datos de la impresora")
+
+            # Validar campos requeridos
+            required_fields = ["name", "brand", "model", "ip_address"]
+            for field in required_fields:
+                if field not in printer_data:
+                    logger.error(f"Campo requerido faltante: {field}")
+                    raise ValueError(f"El campo {field} es requerido")
 
             # Buscar la impresora existente por IP
             printer = self.db.query(Printer).filter(
@@ -44,7 +67,7 @@ class PrinterMonitorService:
 
                 self.db.add(printer)
 
-                # Estructura de datos predeterminada
+                # Estructura de datos predeterminada para nueva impresora
                 printer.printer_data = {
                     "counters": {
                         "total": 0,
@@ -100,7 +123,7 @@ class PrinterMonitorService:
                     printer.client_id = int(printer_data["client_id"])
                     logger.info(f"Cliente actualizado para la impresora: {printer_data['client_id']}")
 
-            # Confirmar cambios
+            # Confirmar cambios en la base de datos
             self.db.commit()
             self.db.refresh(printer)
 
