@@ -622,13 +622,20 @@ async def create_printer(request: Request, db: Session = Depends(get_db)):
     """
     try:
         form_data = await request.json()
+        
+        # Validar datos requeridos
+        required_fields = ["name", "model", "ip_address"]
+        for field in required_fields:
+            if not form_data.get(field):
+                raise ValueError(f"El campo {field} es requerido")
+
         printer_service = PrinterMonitorService(db)
         
         printer_data = {
             "name": form_data.get("name"),
             "model": form_data.get("model"),
             "ip_address": form_data.get("ip_address"),
-            "status": "offline",  # Estado inicial
+            "status": "offline",
             "supplies": {
                 "black": {"level": 100},
                 "cyan": {"level": 100},
@@ -642,11 +649,14 @@ async def create_printer(request: Request, db: Session = Depends(get_db)):
             }
         }
         
-        # Usar el método existente para crear/actualizar
+        logger.info(f"Creating printer with data: {printer_data}")
+        
         new_printer = printer_service.update_printer_data(
-            agent_id=form_data.get("agent_id", 1),  # ID del agente por defecto
+            agent_id=form_data.get("agent_id", 1),
             printer_data=printer_data
         )
+        
+        logger.info(f"Printer created successfully with ID: {new_printer.id}")
         
         return JSONResponse(content={
             "status": "success",
@@ -654,12 +664,21 @@ async def create_printer(request: Request, db: Session = Depends(get_db)):
             "message": "Impresora creada exitosamente"
         })
         
-    except Exception as e:
-        logger.error(f"Error creating printer: {str(e)}")
+    except ValueError as e:
+        logger.error(f"Validation error creating printer: {str(e)}")
         return JSONResponse(
             status_code=400,
             content={
                 "status": "error",
                 "detail": str(e)
+            }
+        )
+    except Exception as e:
+        logger.error(f"Error creating printer: {str(e)}")
+        return JSONResponse(
+            status_code=500,
+            content={
+                "status": "error",
+                "detail": "Error interno al crear la impresora"
             }
         )
