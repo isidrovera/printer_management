@@ -730,24 +730,23 @@ async def create_printer(request: Request, db: Session = Depends(get_db)):
 
 
 @router.delete("/monitor/printers/{printer_id}")
-async def delete_printer(printer_id: int, db: Session = Depends(get_db)):
-    try:
-        printer = db.query(Printer).filter(Printer.id == printer_id).first()
-        if not printer:
-            return JSONResponse(
-                status_code=404,
-                content={"success": False, "detail": "Impresora no encontrada"}
-            )
-        
-        db.delete(printer)
-        db.commit()
-        
-        logger.info(f"Impresora {printer_id} eliminada exitosamente")
-        return JSONResponse(content={"success": True})
-        
-    except Exception as e:
-        logger.error(f"Error eliminando impresora {printer_id}: {str(e)}")
-        return JSONResponse(
-            status_code=500,
-            content={"success": False, "detail": str(e)}
-        )
+async function deletePrinter() {
+   try {
+       const response = await fetch(`/monitor/printers/${printerToDelete}`, {
+           method: 'DELETE'
+       });
+
+       if (response.ok) {
+           showNotification('Impresora eliminada exitosamente', 'success');
+           closeModal('deletePrinterModal');
+           await updatePrintersList();
+       } else {
+           const data = await response.json();
+           throw new Error(data.detail || 'Error al eliminar la impresora');
+       }
+   } catch (error) {
+       showNotification(error.message, 'error');
+   } finally {
+       printerToDelete = null;
+   }
+}
