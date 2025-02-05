@@ -24,6 +24,9 @@ import logging
 logger = logging.getLogger(__name__)
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
+# Agregar estos filtros después de la declaración de templates
+templates.env.filters['numberformat'] = lambda value: "{:,}".format(value)
+templates.env.filters['default'] = lambda value, default_value: value if value is not None else default_value
 
 
 @router.get("/")
