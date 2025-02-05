@@ -113,7 +113,7 @@ def update_printer_data(self, agent_id: int, printer_data: Dict[str, Any]) -> Pr
            # Actualizar datos básicos de impresora existente
            logger.info("Actualizando datos básicos de la impresora existente")
            printer.name = printer_data["name"]
-           printer_brand = printer_data["brand"]
+           printer.brand = printer_data["brand"]
            printer.model = printer_data["model"]
            printer.status = printer_data.get("status", "offline")
            printer.last_check = datetime.utcnow()
