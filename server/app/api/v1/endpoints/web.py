@@ -1,6 +1,7 @@
 # server/app/api/v1/endpoints/web.py
 from fastapi import APIRouter, Request, Depends
 from fastapi.templating import Jinja2Templates
+from sqlalchemy.orm import joinedload
 from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 from app.db.session import get_db
@@ -394,14 +395,21 @@ templates.env.filters['numberformat'] = lambda value: "{:,}".format(value)
 async def list_printers(request: Request, db: Session = Depends(get_db)):
     try:
         logger.info("Iniciando listado de impresoras")
-        printers = db.query(Printer).all()
+        # Cargar impresoras con sus clientes
+        printers = db.query(Printer).options(joinedload(Printer.client)).all()
+        
+        # Obtener lista de clientes
         client_service = ClientService(db)
-        clients = await client_service.get_all()  # Obtener lista de clientes
+        clients = await client_service.get_all()
         
         processed_printers = []
         for printer in printers:
             try:
-                logger.debug(f"Procesando impresora ID: {printer.id}")
+                # Log de depuración para el cliente
+                logger.debug(f"Impresora ID: {printer.id}")
+                logger.debug(f"Cliente asociado: {printer.client}")
+                logger.debug(f"Nombre del cliente: {printer.client.name if printer.client else 'Sin cliente'}")
+
                 printer_data = printer.printer_data or {}
                 supplies = printer_data.get('supplies', {})
                 toners = supplies.get('toners', {})
@@ -428,7 +436,7 @@ async def list_printers(request: Request, db: Session = Depends(get_db)):
                 try:
                     printer_info['has_alerts'] = bool(printer.check_critical_supplies())
                 except Exception as e:
-                    logger.warning(f"Error checking critical supplies for printer {printer.id}: {e}")
+                    logger.warning(f"Error verificando suministros críticos para impresora {printer.id}: {e}")
 
                 processed_printers.append(printer_info)
                 
@@ -441,7 +449,7 @@ async def list_printers(request: Request, db: Session = Depends(get_db)):
             {
                 "request": request,
                 "printers": processed_printers,
-                "clients": clients,  # Agregamos los clientes al contexto
+                "clients": clients,
                 "stats": {
                     "total": len(processed_printers),
                     "online": len([p for p in processed_printers if p['status'] == 'online']),
@@ -456,7 +464,7 @@ async def list_printers(request: Request, db: Session = Depends(get_db)):
             {
                 "request": request,
                 "printers": [],
-                "clients": [],  # También lo incluimos en caso de error
+                "clients": [],
                 "error": str(e)
             }
         )
