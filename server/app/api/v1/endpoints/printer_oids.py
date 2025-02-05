@@ -2,6 +2,7 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.db.session import get_db
+from app.db.models.printer_oids import PrinterOIDs
 from app.services.printer_oids import PrinterOIDsService
 from app.schemas.printer_oids import (
     PrinterOIDsCreate,
@@ -123,3 +124,28 @@ def get_brands_and_families(
         })
     
     return response
+
+@router.get("/brands/{brand}", response_model=List[PrinterOIDsResponse])
+def get_oids_by_brand(
+    brand: str,
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(get_db)
+):
+    """
+    Obtiene las configuraciones de OIDs para una marca específica.
+    """
+    service = PrinterOIDsService(db)
+    oids = (service.db.query(PrinterOIDs)
+            .filter(PrinterOIDs.brand == brand)
+            .offset(skip)
+            .limit(limit)
+            .all())
+    
+    if not oids:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"No se encontraron configuraciones para la marca {brand}"
+        )
+    
+    return oids
