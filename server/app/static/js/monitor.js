@@ -461,10 +461,10 @@ function confirmDeletePrinter(printerId) {
 
 async function deletePrinter() {
     try {
-        const response = await fetch(`/api/v1/monitor/printers/${printerToDelete}`, {
+        const response = await fetch(`/monitor/printers/${printerToDelete}`, {
             method: 'DELETE'
         });
-
+ 
         if (response.ok) {
             showNotification('Impresora eliminada exitosamente', 'success');
             closeModal('deletePrinterModal');
@@ -478,4 +478,4 @@ async function deletePrinter() {
     } finally {
         printerToDelete = null;
     }
-}
+ }
