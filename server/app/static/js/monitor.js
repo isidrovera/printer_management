@@ -2,6 +2,7 @@
 let updateInterval;
 let currentPrinters = [];
 let charts = {};
+let printerToDelete = null;
 
 // Función para inicializar la aplicación
 document.addEventListener('DOMContentLoaded', function() {
@@ -359,7 +360,7 @@ function capitalize(string) {
 // Event Listeners para cerrar modales con Escape
 document.addEventListener('keydown', function(event) {
     if (event.key === 'Escape') {
-        const modals = ['printerInfoModal', 'suppliesModal', 'countersModal', 'historyModal'];
+        const modals = ['printerInfoModal', 'suppliesModal', 'countersModal', 'historyModal','deletePrinterModal'];
         modals.forEach(modalId => {
             if (!document.getElementById(modalId).classList.contains('hidden')) {
                 closeModal(modalId);
@@ -445,42 +446,14 @@ async function handleCreatePrinter(event) {
     }
 }
 
-// Función para mostrar notificaciones
-function showNotification(message, type = 'info') {
-    const container = document.getElementById('notification-container');
-    const notification = document.createElement('div');
-    
-    const bgColor = type === 'success' ? 'bg-green-100' : 
-                    type === 'error' ? 'bg-red-100' : 
-                    'bg-blue-100';
-    
-    const textColor = type === 'success' ? 'text-green-800' : 
-                     type === 'error' ? 'text-red-800' : 
-                     'text-blue-800';
-    
-    const icon = type === 'success' ? 'fa-check-circle' :
-                type === 'error' ? 'fa-exclamation-circle' :
-                'fa-info-circle';
-    
-    notification.className = `flex items-center p-4 mb-4 rounded-lg text-sm ${bgColor} ${textColor}`;
-    
-    notification.innerHTML = `
-        <i class="fas ${icon} mr-2"></i>
-        ${message}
-    `;
-    
-    container.appendChild(notification);
-    setTimeout(() => {
-        notification.classList.add('opacity-0', 'transition-opacity');
-        setTimeout(() => notification.remove(), 300);
-    }, 5000);
-}
 
 
-// Agregar al archivo monitor.js
 
-let printerToDelete = null;
 
+
+// Resto del código...
+
+// En la sección de funciones de modal, agrega:
 function confirmDeletePrinter(printerId) {
     printerToDelete = printerId;
     document.getElementById('deletePrinterModal').classList.remove('hidden');
@@ -505,24 +478,4 @@ async function deletePrinter() {
     } finally {
         printerToDelete = null;
     }
-}
-
-// Agregar al final de monitor.js si no existe
-function showNotification(message, type = 'info') {
-    const container = document.getElementById('notification-container');
-    const notification = document.createElement('div');
-    
-    const bgColor = type === 'success' ? 'bg-green-100' : 
-                    type === 'error' ? 'bg-red-100' : 
-                    'bg-blue-100';
-    
-    const textColor = type === 'success' ? 'text-green-800' : 
-                     type === 'error' ? 'text-red-800' : 
-                     'text-blue-800';
-    
-    notification.className = `flex items-center p-4 mb-4 rounded-lg text-sm ${bgColor} ${textColor}`;
-    notification.innerHTML = message;
-    
-    container.appendChild(notification);
-    setTimeout(() => notification.remove(), 5000);
 }
