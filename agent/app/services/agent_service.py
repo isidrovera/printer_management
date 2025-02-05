@@ -19,6 +19,7 @@ from .system_info_service import SystemInfoService
 from .printer_service import PrinterService
 from .printer_monitor_service import PrinterMonitorService
 from datetime import datetime
+from ..core.config import settings
 
 # Configurar logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')

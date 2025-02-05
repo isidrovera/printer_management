@@ -28,6 +28,7 @@ class PrinterMonitorService:
                 logger.info("Creando nueva impresora")
                 printer = Printer(
                     name=printer_data["name"],
+                    brand=printer_data["brand"],
                     model=printer_data["model"],
                     ip_address=printer_data["ip_address"],
                     agent_id=agent_id,
@@ -89,6 +90,7 @@ class PrinterMonitorService:
             else:
                 # Actualizar datos de impresora existente
                 printer.name = printer_data["name"]
+                printer.brand = printer_data["brand"]
                 printer.model = printer_data["model"]
                 printer.status = printer_data.get("status", "offline")
                 printer.last_check = datetime.utcnow()

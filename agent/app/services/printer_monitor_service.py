@@ -6,6 +6,13 @@ import json
 from datetime import datetime
 from typing import Dict, Any, List, Optional
 from pysnmp.hlapi import *
+import sys
+import os
+
+# Agregar el directorio raíz al path para importaciones absolutas
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+
+from app.core.config import settings  # Importación absoluta
 
 logger = logging.getLogger(__name__)
 
@@ -15,34 +22,56 @@ class PrinterMonitorService:
         self.oids_cache = {}
         self.monitored_printers = set()
         self.last_check = datetime.now()
-        
+        logger.info(f"PrinterMonitorService inicializado con URL: {server_url}")
+        # Verificar configuración al inicializar
+        try:
+            logger.debug(f"Verificando configuración:")
+            logger.debug(f"  SERVER_URL: {settings.SERVER_URL}")
+            logger.debug(f"  CLIENT_TOKEN presente: {'Sí' if settings.CLIENT_TOKEN else 'No'}")
+            logger.debug(f"  AGENT_TOKEN presente: {'Sí' if settings.AGENT_TOKEN else 'No'}")
+        except Exception as e:
+            logger.error(f"Error verificando configuración: {e}")
+
     async def get_monitored_printers(self) -> List[Dict[str, Any]]:
         """Obtiene la lista de impresoras a monitorear del servidor"""
         try:
-            logger.info("Obteniendo lista de impresoras del servidor")
+            logger.info(f"Obteniendo lista de impresoras del servidor ({self.server_url})")
+            
+            # Verificar configuración
+            if not hasattr(settings, 'AGENT_TOKEN') or not settings.AGENT_TOKEN:
+                logger.error("AGENT_TOKEN no está configurado en el .env")
+                logger.debug("Configuración actual:")
+                logger.debug(f"  SERVER_URL: {settings.SERVER_URL if hasattr(settings, 'SERVER_URL') else 'No definido'}")
+                logger.debug(f"  CLIENT_TOKEN: {'Presente' if hasattr(settings, 'CLIENT_TOKEN') else 'No definido'}")
+                return []
+
+            headers = {
+                "Authorization": f"Bearer {settings.AGENT_TOKEN}",
+                "Content-Type": "application/json"
+            }
+            
+            logger.debug(f"Realizando petición GET a: {self.server_url}/api/v1/monitor/printers")
             async with aiohttp.ClientSession() as session:
-                # Agregar el agent_id como parámetro de consulta
                 url = f"{self.server_url}/api/v1/monitor/printers"
-                params = {'agent_id': settings.AGENT_ID} if settings.AGENT_ID else None
+                logger.debug(f"URL completa: {url}")
+                logger.debug(f"Headers: {headers}")
                 
-                headers = {
-                    "Authorization": f"Bearer {settings.AGENT_TOKEN}",
-                    "Content-Type": "application/json"
-                }
-                
-                async with session.get(url, params=params, headers=headers) as response:
+                async with session.get(url, headers=headers) as response:
+                    response_text = await response.text()
+                    logger.debug(f"Código de respuesta: {response.status}")
+                    logger.debug(f"Respuesta: {response_text[:200]}...")
+                    
                     if response.status == 200:
-                        printers = await response.json()
-                        logger.info(f"Se obtuvieron {len(printers)} impresoras para monitorear")
-                        self.monitored_printers = set(p['ip_address'] for p in printers)
+                        printers = json.loads(response_text)
+                        logger.info(f"Se obtuvieron {len(printers)} impresoras")
                         return printers
                     else:
-                        error_text = await response.text()
-                        logger.error(f"Error obteniendo impresoras: {response.status} - {error_text}")
+                        logger.error(f"Error {response.status}: {response_text}")
                         return []
-            except Exception as e:
-                logger.error(f"Error en get_monitored_printers: {e}")
-                return []
+
+        except Exception as e:
+            logger.error(f"Error en get_monitored_printers: {str(e)}", exc_info=True)
+            return []
     async def collect_printer_data(self, ip: str, brand: str) -> Dict[str, Any]:
         """Recolecta datos de una impresora específica"""
         try:
@@ -81,7 +110,11 @@ class PrinterMonitorService:
             logger.info(f"Obteniendo OIDs para marca {brand}")
             async with aiohttp.ClientSession() as session:
                 url = f"{self.server_url}/api/v1/printer-oids/brand/{brand}"
-                async with session.get(url) as response:
+                headers = {
+                    "Authorization": f"Bearer {settings.AGENT_TOKEN}",
+                    "Content-Type": "application/json"
+                }
+                async with session.get(url, headers=headers) as response:
                     if response.status == 200:
                         oids = await response.json()
                         self.oids_cache[brand] = oids
@@ -106,7 +139,6 @@ class PrinterMonitorService:
         except Exception as e:
             logger.error(f"Error obteniendo contadores de {ip}: {e}")
             return {}
-
     async def _get_supplies_data(self, ip: str, oids: Dict) -> Dict[str, Any]:
         """Obtiene datos de suministros usando SNMP"""
         try:
@@ -134,6 +166,7 @@ class PrinterMonitorService:
         except Exception as e:
             logger.error(f"Error obteniendo suministros de {ip}: {e}")
             return {}
+
 
     async def _get_snmp_value(self, ip: str, oid: str) -> Any:
         """Obtiene un valor SNMP específico"""
@@ -165,19 +198,16 @@ class PrinterMonitorService:
                     "Authorization": f"Bearer {settings.AGENT_TOKEN}",
                     "Content-Type": "application/json"
                 }
-                
-                # Incluir agent_id en los datos
-                data["agent_id"] = agent_id
+                data['agent_id'] = agent_id
                 
                 async with session.post(url, json=data, headers=headers) as response:
-                    if response.status == 200:
+                    success = response.status == 200
+                    if success:
                         logger.info(f"Datos actualizados exitosamente para {ip}")
-                        return True
                     else:
-                        error_text = await response.text()
-                        logger.error(f"Error actualizando datos para {ip}: {response.status} - {error_text}")
-                        return False
-                        
+                        logger.error(f"Error actualizando datos para {ip}: {response.status}")
+                    return success
+                    
         except Exception as e:
             logger.error(f"Error en update_printer_data para {ip}: {e}")
             return False

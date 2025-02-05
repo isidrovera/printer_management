@@ -91,6 +91,7 @@ def update_printer_data(self, agent_id: int, printer_data: Dict[str, Any]) -> Pr
 
            printer = Printer(
                name=printer_data["name"],
+               brand=printer_data["brand"],
                model=printer_data["model"],
                ip_address=printer_data["ip_address"],
                agent_id=agent_id,
@@ -112,6 +113,7 @@ def update_printer_data(self, agent_id: int, printer_data: Dict[str, Any]) -> Pr
            # Actualizar datos básicos de impresora existente
            logger.info("Actualizando datos básicos de la impresora existente")
            printer.name = printer_data["name"]
+           printer_brand = printer_data["brand"]
            printer.model = printer_data["model"]
            printer.status = printer_data.get("status", "offline")
            printer.last_check = datetime.utcnow()
@@ -207,6 +209,7 @@ async def create_printer(
         
         printer_data = {
             "name": form_data.get("name"),
+            "brand": form_data.get("brand"),
             "model": form_data.get("model"),
             "ip_address": form_data.get("ip_address"),
             "status": "offline",  # Estado inicial

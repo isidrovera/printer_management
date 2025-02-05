@@ -418,6 +418,7 @@ async def list_printers(request: Request, db: Session = Depends(get_db)):
                 printer_info = {
                     'id': printer.id,
                     'name': printer.name,
+                    'brand': printer.brand,
                     'model': printer.model,
                     'ip_address': printer.ip_address,
                     'status': printer.status,
