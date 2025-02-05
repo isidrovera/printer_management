@@ -649,58 +649,84 @@ async def delete_printer_oids(oid_id: int, db: Session = Depends(get_db)):
         
 # Agregar este endpoint en web.py
 
-@router.post("/monitor/printers/create")
-async def create_printer(request: Request, db: Session = Depends(get_db)):
-    """
-    Endpoint para crear una nueva impresora desde la interfaz web.
-    """
+@router.get("/monitor/printers")
+async def list_printers(request: Request, db: Session = Depends(get_db)):
     try:
-        form_data = await request.json()
-        logger.info(f"Received printer creation request with data: {form_data}")
+        logger.info("Iniciando listado de impresoras")
+        printers = db.query(Printer).all()
+        logger.info(f"Encontradas {len(printers)} impresoras")
         
-        # Validar datos requeridos
-        required_fields = ["name", "model", "ip_address"]
-        for field in required_fields:
-            if not form_data.get(field):
-                raise ValueError(f"El campo {field} es requerido")
+        processed_printers = []
+        for printer in printers:
+            try:
+                logger.debug(f"Procesando impresora ID: {printer.id}")
+                logger.debug(f"Datos de impresora: {printer.printer_data}")
+                
+                # Acceder a los datos de manera segura
+                printer_data = printer.printer_data or {}
+                supplies = printer_data.get('supplies', {})
+                toners = supplies.get('toners', {})
+                
+                printer_info = {
+                    'id': printer.id,
+                    'name': printer.name,
+                    'model': printer.model,
+                    'ip_address': printer.ip_address,
+                    'status': printer.status,
+                    'has_alerts': False,  # Por defecto
+                    'supplies': {
+                        'black': {
+                            'level': toners.get('black', {}).get('percentage', 0)
+                        },
+                        'cyan': {
+                            'level': toners.get('cyan', {}).get('percentage', 0)
+                        },
+                        'magenta': {
+                            'level': toners.get('magenta', {}).get('percentage', 0)
+                        },
+                        'yellow': {
+                            'level': toners.get('yellow', {}).get('percentage', 0)
+                        }
+                    },
+                    'counters': {
+                        'total': printer_data.get('counters', {}).get('total', 0)
+                    }
+                }
+                
+                # Intentar obtener alertas si el método existe
+                try:
+                    printer_info['has_alerts'] = bool(printer.check_critical_supplies())
+                except Exception as e:
+                    logger.warning(f"Error checking critical supplies for printer {printer.id}: {e}")
 
-        printer_service = PrinterMonitorService(db)
-        
-        printer_data = {
-            "name": form_data.get("name"),
-            "model": form_data.get("model"),
-            "ip_address": form_data.get("ip_address"),
-            "status": "offline"
-        }
-        
-        new_printer = printer_service.update_printer_data(
-            agent_id=1,  # ID del agente por defecto
-            printer_data=printer_data
-        )
-        
-        logger.info(f"Printer created successfully with ID: {new_printer.id}")
-        
-        return JSONResponse(content={
-            "status": "success",
-            "printer_id": new_printer.id,
-            "message": "Impresora creada exitosamente"
-        })
-        
-    except ValueError as e:
-        logger.error(f"Validation error creating printer: {str(e)}")
-        return JSONResponse(
-            status_code=400,
-            content={
-                "status": "error",
-                "detail": str(e)
+                processed_printers.append(printer_info)
+                logger.debug(f"Impresora {printer.id} procesada exitosamente")
+                
+            except Exception as e:
+                logger.error(f"Error procesando impresora {printer.id}: {str(e)}")
+                continue
+
+        logger.info(f"Procesadas exitosamente {len(processed_printers)} impresoras")
+
+        return templates.TemplateResponse(
+            "monitor/monitor_printers.html",
+            {
+                "request": request,
+                "printers": processed_printers,
+                "stats": {
+                    "total": len(processed_printers),
+                    "online": len([p for p in processed_printers if p['status'] == 'online']),
+                    "error": len([p for p in processed_printers if p['status'] == 'error'])
+                }
             }
         )
     except Exception as e:
-        logger.error(f"Error creating printer: {str(e)}")
-        return JSONResponse(
-            status_code=500,
-            content={
-                "status": "error",
-                "detail": "Error interno al crear la impresora"
+        logger.error(f"Error general en list_printers: {str(e)}")
+        return templates.TemplateResponse(
+            "monitor/monitor_printers.html",
+            {
+                "request": request,
+                "printers": [],
+                "error": str(e)
             }
         )
