@@ -31,13 +31,19 @@ class PrinterMonitorService:
                     model=printer_data["model"],
                     ip_address=printer_data["ip_address"],
                     agent_id=agent_id,
-                    status="offline",
+                    status=printer_data.get("status", "offline"),
                     last_check=datetime.utcnow(),
                     oid_config_id=1  # ID por defecto para PrinterOIDs
                 )
+
+                # Asignar cliente si se proporciona
+                if printer_data.get("client_id"):
+                    printer.client_id = int(printer_data["client_id"])
+                    logger.info(f"Cliente asignado a la nueva impresora: {printer_data['client_id']}")
+
                 self.db.add(printer)
 
-                # Actualiza printer_data con la estructura completa
+                # Estructura de datos predeterminada
                 printer.printer_data = {
                     "counters": {
                         "total": 0,
@@ -79,6 +85,18 @@ class PrinterMonitorService:
                         }
                     }
                 }
+
+            else:
+                # Actualizar datos de impresora existente
+                printer.name = printer_data["name"]
+                printer.model = printer_data["model"]
+                printer.status = printer_data.get("status", "offline")
+                printer.last_check = datetime.utcnow()
+
+                # Actualizar cliente si se proporciona
+                if printer_data.get("client_id"):
+                    printer.client_id = int(printer_data["client_id"])
+                    logger.info(f"Cliente actualizado para la impresora: {printer_data['client_id']}")
 
             # Confirmar cambios
             self.db.commit()
