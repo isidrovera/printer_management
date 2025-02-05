@@ -477,6 +477,8 @@ function showNotification(message, type = 'info') {
 }
 
 
+// Agregar al archivo monitor.js
+
 let printerToDelete = null;
 
 function confirmDeletePrinter(printerId) {
@@ -487,21 +489,40 @@ function confirmDeletePrinter(printerId) {
 async function deletePrinter() {
     try {
         const response = await fetch(`/api/v1/monitor/printers/${printerToDelete}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json'
-            }
+            method: 'DELETE'
         });
 
         if (response.ok) {
             showNotification('Impresora eliminada exitosamente', 'success');
             closeModal('deletePrinterModal');
-            updatePrintersList();
+            await updatePrintersList();
         } else {
             const data = await response.json();
             throw new Error(data.detail || 'Error al eliminar la impresora');
         }
     } catch (error) {
         showNotification(error.message, 'error');
+    } finally {
+        printerToDelete = null;
     }
+}
+
+// Agregar al final de monitor.js si no existe
+function showNotification(message, type = 'info') {
+    const container = document.getElementById('notification-container');
+    const notification = document.createElement('div');
+    
+    const bgColor = type === 'success' ? 'bg-green-100' : 
+                    type === 'error' ? 'bg-red-100' : 
+                    'bg-blue-100';
+    
+    const textColor = type === 'success' ? 'text-green-800' : 
+                     type === 'error' ? 'text-red-800' : 
+                     'text-blue-800';
+    
+    notification.className = `flex items-center p-4 mb-4 rounded-lg text-sm ${bgColor} ${textColor}`;
+    notification.innerHTML = message;
+    
+    container.appendChild(notification);
+    setTimeout(() => notification.remove(), 5000);
 }
