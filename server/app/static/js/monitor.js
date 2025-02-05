@@ -36,18 +36,28 @@ function setUpdateInterval(seconds) {
 }
 
 // Función para actualizar la lista de impresoras
-async function updatePrintersList() {
-    try {
-        const response = await fetch('/monitor/printers');
-        if (!response.ok) {
-            throw new Error('Error al obtener datos de las impresoras');
-        }
-        const data = await response.json();
-        currentPrinters = data.printers;
-        updateUI(data);
-    } catch (error) {
-        showNotification('Error al actualizar los datos: ' + error.message, 'error');
-    }
+function updateUI(data) {
+    const tableBody = document.querySelector('tbody');
+    
+    // Limpiar tabla actual
+    tableBody.innerHTML = '';
+    
+    // Repoblar tabla con nuevos datos
+    data.printers.forEach(printer => {
+        const row = createPrinterRow(printer);
+        tableBody.appendChild(row);
+    });
+
+    // Actualizar estadísticas
+    updateStatistics(data.printers);
+}
+
+function updateStatistics(printers) {
+    // Actualizar contadores de estado
+    document.querySelector('.total-printers').textContent = printers.length;
+    document.querySelector('.online-printers').textContent = 
+        printers.filter(p => p.status === 'online').length;
+    // Otros contadores similares
 }
 
 // Función para filtrar impresoras
