@@ -697,7 +697,7 @@ async def create_printer(request: Request, db: Session = Depends(get_db)):
        
        printer_data = {
            "name": form_data.get("name"),
-           "brand": form_data.get("brand")
+           "brand": form_data.get("brand"),
            "model": form_data.get("model"),
            "ip_address": form_data.get("ip_address"),
            "client_id": form_data.get("client_id"),
