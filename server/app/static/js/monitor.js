@@ -379,6 +379,27 @@ document.addEventListener('click', function(event) {
     });
 });
 
+
+
+
+
+// Funciones para manejar modales
+function openCreateModal() {
+    document.getElementById("createPrinterModal").classList.remove("hidden");
+}
+
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.classList.add("hidden");
+        // Si es el modal de crear, limpiar el formulario
+        if (modalId === 'createPrinterModal') {
+            const form = document.getElementById('createPrinterForm');
+            if (form) form.reset();
+        }
+    }
+}
+
 // Función para manejar la creación de una nueva impresora
 async function handleCreatePrinter(event) {
     event.preventDefault();
@@ -411,7 +432,6 @@ async function handleCreatePrinter(event) {
             showNotification('Impresora creada exitosamente', 'success');
             closeModal('createPrinterModal');
             await updatePrintersList(); // Actualizar la lista de impresoras
-            // Limpiar el formulario
             document.getElementById("createPrinterForm").reset();
         } else {
             throw new Error(data.detail || 'Error al crear la impresora');
@@ -425,7 +445,7 @@ async function handleCreatePrinter(event) {
     }
 }
 
-// Actualizar la función showNotification para soportar diferentes tipos
+// Función para mostrar notificaciones
 function showNotification(message, type = 'info') {
     const container = document.getElementById('notification-container');
     const notification = document.createElement('div');
@@ -454,17 +474,4 @@ function showNotification(message, type = 'info') {
         notification.classList.add('opacity-0', 'transition-opacity');
         setTimeout(() => notification.remove(), 300);
     }, 5000);
-}
-
-// Actualizar la función closeModal
-function closeModal(modalId) {
-    const modal = document.getElementById(modalId);
-    if (modal) {
-        modal.classList.add('hidden');
-        // Si es el modal de crear, limpiar el formulario
-        if (modalId === 'createPrinterModal') {
-            const form = document.getElementById('createPrinterForm');
-            if (form) form.reset();
-        }
-    }
 }
