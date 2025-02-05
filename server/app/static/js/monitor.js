@@ -459,7 +459,30 @@ async function handleCreatePrinter(event) {
 
 
 
-
+async function updatePrintersList() {
+    try {
+        const response = await fetch('/monitor/printers');
+        if (!response.ok) {
+            throw new Error('Error al obtener datos de las impresoras');
+        }
+        const data = await response.text(); // Cambiar a .text() en lugar de .json()
+        
+        // Reemplazar el contenido del cuerpo de la tabla
+        const tableBody = document.querySelector('tbody');
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = data;
+        const newTableBody = tempDiv.querySelector('tbody');
+        
+        if (newTableBody) {
+            tableBody.innerHTML = newTableBody.innerHTML;
+            
+            // Actualizar estadísticas
+            updateStatistics();
+        }
+    } catch (error) {
+        showNotification('Error al actualizar los datos: ' + error.message, 'error');
+    }
+}
 
 
 // Resto del código...
