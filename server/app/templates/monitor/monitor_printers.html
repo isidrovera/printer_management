@@ -129,43 +129,44 @@
                         </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="flex space-x-2">
-                            <!-- Negro -->
-                            <div class="relative w-6 h-6" title="Negro: {{ printer.supplies.black.level }}%">
-                                <div class="absolute inset-0 bg-gray-200 rounded"></div>
-                                <div class="absolute inset-0 bg-gray-800 rounded" 
-                                     style="clip-path: inset({{ 100 - printer.supplies.black.level }}% 0 0 0);">
-                                </div>
-                            </div>
-                            <!-- Cyan -->
-                            <div class="relative w-6 h-6" title="Cyan: {{ printer.supplies.cyan.level }}%">
-                                <div class="absolute inset-0 bg-gray-200 rounded"></div>
-                                <div class="absolute inset-0 bg-cyan-500 rounded" 
-                                     style="clip-path: inset({{ 100 - printer.supplies.cyan.level }}% 0 0 0);">
-                                </div>
-                            </div>
-                            <!-- Magenta -->
-                            <div class="relative w-6 h-6" title="Magenta: {{ printer.supplies.magenta.level }}%">
-                                <div class="absolute inset-0 bg-gray-200 rounded"></div>
-                                <div class="absolute inset-0 bg-pink-500 rounded" 
-                                     style="clip-path: inset({{ 100 - printer.supplies.magenta.level }}% 0 0 0);">
-                                </div>
-                            </div>
-                            <!-- Amarillo -->
-                            <div class="relative w-6 h-6" title="Amarillo: {{ printer.supplies.yellow.level }}%">
-                                <div class="absolute inset-0 bg-gray-200 rounded"></div>
-                                <div class="absolute inset-0 bg-yellow-500 rounded" 
-                                     style="clip-path: inset({{ 100 - printer.supplies.yellow.level }}% 0 0 0);">
-                                </div>
+                    <div class="flex space-x-2">
+                        <!-- Negro -->
+                        <div class="relative w-6 h-6" title="Negro: {{ printer.supplies.black.level|default(0) }}%">
+                            <div class="absolute inset-0 bg-gray-200 rounded"></div>
+                            <div class="absolute inset-0 bg-gray-800 rounded" 
+                                 style="clip-path: inset({{ 100 - (printer.supplies.black.level|default(0)) }}% 0 0 0);">
                             </div>
                         </div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="flex items-center space-x-2">
-                            <span class="text-sm text-gray-500">Total:</span>
-                            <span class="text-sm font-medium">{{ printer.counters.total|numberformat }}</span>
+                        <!-- Cyan -->
+                        <div class="relative w-6 h-6" title="Cyan: {{ printer.supplies.cyan.level|default(0) }}%">
+                            <div class="absolute inset-0 bg-gray-200 rounded"></div>
+                            <div class="absolute inset-0 bg-cyan-500 rounded" 
+                                 style="clip-path: inset({{ 100 - (printer.supplies.cyan.level|default(0)) }}% 0 0 0);">
+                            </div>
                         </div>
-                    </td>
+                        <!-- Magenta -->
+                        <div class="relative w-6 h-6" title="Magenta: {{ printer.supplies.magenta.level|default(0) }}%">
+                            <div class="absolute inset-0 bg-gray-200 rounded"></div>
+                            <div class="absolute inset-0 bg-pink-500 rounded" 
+                                 style="clip-path: inset({{ 100 - (printer.supplies.magenta.level|default(0)) }}% 0 0 0);">
+                            </div>
+                        </div>
+                        <!-- Amarillo -->
+                        <div class="relative w-6 h-6" title="Amarillo: {{ printer.supplies.yellow.level|default(0) }}%">
+                            <div class="absolute inset-0 bg-gray-200 rounded"></div>
+                            <div class="absolute inset-0 bg-yellow-500 rounded" 
+                                 style="clip-path: inset({{ 100 - (printer.supplies.yellow.level|default(0)) }}% 0 0 0);">
+                            </div>
+                        </div>
+                    </div>
+                </td>
+                
+                                    <td class="px-6 py-4 whitespace-nowrap">
+    <div class="flex items-center space-x-2">
+        <span class="text-sm text-gray-500">Total:</span>
+        <span class="text-sm font-medium">{{ printer.counters.total|default(0)|numberformat }}</span>
+    </div>
+</td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
                                    {% if printer.status == 'online' %}bg-green-100 text-green-800
