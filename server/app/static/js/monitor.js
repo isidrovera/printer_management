@@ -379,10 +379,92 @@ document.addEventListener('click', function(event) {
     });
 });
 
-function openCreateModal() {
-    document.getElementById("createPrinterModal").classList.remove("hidden");
+// Función para manejar la creación de una nueva impresora
+async function handleCreatePrinter(event) {
+    event.preventDefault();
+    
+    const submitButton = event.target.querySelector('button[type="submit"]');
+    const originalContent = submitButton.innerHTML;
+    
+    try {
+        // Deshabilitar el botón y mostrar estado de carga
+        submitButton.disabled = true;
+        submitButton.innerHTML = `<i class="fas fa-circle-notch fa-spin mr-2"></i>Guardando...`;
+        
+        const formData = {
+            name: document.getElementById("printerName").value,
+            model: document.getElementById("printerModel").value,
+            ip_address: document.getElementById("printerIP").value
+        };
+
+        const response = await fetch('/monitor/printers/create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        });
+
+        const data = await response.json();
+        
+        if (response.ok) {
+            showNotification('Impresora creada exitosamente', 'success');
+            closeModal('createPrinterModal');
+            await updatePrintersList(); // Actualizar la lista de impresoras
+            // Limpiar el formulario
+            document.getElementById("createPrinterForm").reset();
+        } else {
+            throw new Error(data.detail || 'Error al crear la impresora');
+        }
+    } catch (error) {
+        showNotification(error.message, 'error');
+    } finally {
+        // Restaurar el botón
+        submitButton.disabled = false;
+        submitButton.innerHTML = originalContent;
+    }
 }
 
+// Actualizar la función showNotification para soportar diferentes tipos
+function showNotification(message, type = 'info') {
+    const container = document.getElementById('notification-container');
+    const notification = document.createElement('div');
+    
+    const bgColor = type === 'success' ? 'bg-green-100' : 
+                    type === 'error' ? 'bg-red-100' : 
+                    'bg-blue-100';
+    
+    const textColor = type === 'success' ? 'text-green-800' : 
+                     type === 'error' ? 'text-red-800' : 
+                     'text-blue-800';
+    
+    const icon = type === 'success' ? 'fa-check-circle' :
+                type === 'error' ? 'fa-exclamation-circle' :
+                'fa-info-circle';
+    
+    notification.className = `flex items-center p-4 mb-4 rounded-lg text-sm ${bgColor} ${textColor}`;
+    
+    notification.innerHTML = `
+        <i class="fas ${icon} mr-2"></i>
+        ${message}
+    `;
+    
+    container.appendChild(notification);
+    setTimeout(() => {
+        notification.classList.add('opacity-0', 'transition-opacity');
+        setTimeout(() => notification.remove(), 300);
+    }, 5000);
+}
+
+// Actualizar la función closeModal
 function closeModal(modalId) {
-    document.getElementById(modalId).classList.add("hidden");
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.classList.add('hidden');
+        // Si es el modal de crear, limpiar el formulario
+        if (modalId === 'createPrinterModal') {
+            const form = document.getElementById('createPrinterForm');
+            if (form) form.reset();
+        }
+    }
 }
