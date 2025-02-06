@@ -15,180 +15,331 @@ const Logger = {
 };
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Inicializar elementos
-    function initializeElements() {
-        // Solo obtener los elementos que existen en el HTML
-        const elements = {
+    // Sistema de notificaciones
+    const NotificationSystem = {
+        container: document.getElementById('notification-container'),
+        show: function(message, type = 'success', duration = 3000) {
+            if (!this.container) return;
+
+            const notification = document.createElement('div');
+            notification.className = `transform transition-all duration-300 ease-in-out ${
+                type === 'success' ? 'bg-green-500' :
+                type === 'error' ? 'bg-red-500' :
+                type === 'warning' ? 'bg-yellow-500' : 'bg-blue-500'
+            } text-white px-6 py-3 rounded-lg shadow-lg`;
+
+            // Agregar icono según el tipo
+            const icon = document.createElement('i');
+            icon.className = `fas ${
+                type === 'success' ? 'fa-check-circle' :
+                type === 'error' ? 'fa-exclamation-circle' :
+                type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle'
+            } mr-2`;
+            
+            notification.appendChild(icon);
+            notification.appendChild(document.createTextNode(message));
+            
+            // Agregar botón de cerrar
+            const closeButton = document.createElement('button');
+            closeButton.className = 'ml-3 text-white hover:text-gray-200 transition-colors';
+            closeButton.innerHTML = '<i class="fas fa-times"></i>';
+            closeButton.onclick = () => notification.remove();
+            notification.appendChild(closeButton);
+
+            this.container.appendChild(notification);
+
+            // Animación de entrada
+            requestAnimationFrame(() => {
+                notification.style.transform = 'translateX(0)';
+                notification.style.opacity = '1';
+            });
+
+            // Auto-eliminar después del tiempo especificado
+            setTimeout(() => {
+                notification.style.transform = 'translateX(100%)';
+                notification.style.opacity = '0';
+                setTimeout(() => notification.remove(), 300);
+            }, duration);
+        }
+    };
+
+    // Sistema de modales
+    const ModalSystem = {
+        show: function(modalId) {
+            const modal = document.getElementById(modalId);
+            if (!modal) return;
+            
+            modal.classList.remove('hidden');
+            modal.setAttribute('aria-hidden', 'false');
+            
+            // Bloquear scroll del body
+            document.body.style.overflow = 'hidden';
+        },
+        
+        hide: function(modalId) {
+            const modal = document.getElementById(modalId);
+            if (!modal) return;
+            
+            modal.classList.add('hidden');
+            modal.setAttribute('aria-hidden', 'true');
+            
+            // Restaurar scroll del body
+            document.body.style.overflow = '';
+        }
+    };
+
+    // Sistema de pestañas
+    const TabSystem = {
+        initialize: function() {
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabName = button.getAttribute('data-tab');
+                    
+                    // Actualizar botones
+                    tabButtons.forEach(btn => {
+                        btn.classList.remove('text-blue-600', 'border-blue-600');
+                        btn.classList.add('text-gray-500', 'border-transparent');
+                    });
+                    button.classList.add('text-blue-600', 'border-blue-600');
+                    button.classList.remove('text-gray-500', 'border-transparent');
+
+                    // Actualizar contenido
+                    tabContents.forEach(content => {
+                        if (content.id === `${tabName}Tab`) {
+                            content.classList.remove('hidden');
+                        } else {
+                            content.classList.add('hidden');
+                        }
+                    });
+                });
+            });
+        }
+    };
+
+    // Sistema de filtrado
+    const FilterSystem = {
+        elements: {
             searchInput: document.getElementById('searchInput'),
             statusFilter: document.getElementById('statusFilter'),
-            typeFilter: document.getElementById('typeFilter'),
-            clientDetailsModal: document.getElementById('clientDetailsModal'),
-            deleteConfirmModal: document.getElementById('deleteConfirmModal'),
-            notificationContainer: document.getElementById('notification-container')
-        };
+            typeFilter: document.getElementById('typeFilter')
+        },
 
-        // Agregar event listeners solo si los elementos existen
-        if (elements.searchInput) {
-            elements.searchInput.addEventListener('input', () => filterClients(elements));
+        initialize: function() {
+            if (this.elements.searchInput) {
+                this.elements.searchInput.addEventListener('input', () => this.filterClients());
+            }
+            if (this.elements.statusFilter) {
+                this.elements.statusFilter.addEventListener('change', () => this.filterClients());
+            }
+            if (this.elements.typeFilter) {
+                this.elements.typeFilter.addEventListener('change', () => this.filterClients());
+            }
+        },
+
+        filterClients: function() {
+            const searchTerm = this.elements.searchInput?.value?.toLowerCase() || '';
+            const statusValue = this.elements.statusFilter?.value?.toLowerCase() || '';
+            const typeValue = this.elements.typeFilter?.value?.toLowerCase() || '';
+
+            const rows = document.querySelectorAll('tbody tr');
+            let visibleCount = 0;
+
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                const statusCell = row.querySelector('td:nth-child(5)');
+                const typeCell = row.querySelector('td:nth-child(3)');
+                
+                const status = statusCell?.textContent?.toLowerCase().trim() || '';
+                const type = typeCell?.textContent?.toLowerCase().trim() || '';
+
+                const matchesSearch = text.includes(searchTerm);
+                const matchesStatus = statusValue === '' || status.includes(statusValue);
+                const matchesType = typeValue === '' || type.includes(typeValue);
+
+                const isVisible = matchesSearch && matchesStatus && matchesType;
+                row.style.display = isVisible ? '' : 'none';
+                if (isVisible) visibleCount++;
+            });
+
+            // Mostrar mensaje si no hay resultados
+            const noResultsMessage = document.getElementById('noResultsMessage');
+            if (noResultsMessage) {
+                noResultsMessage.style.display = visibleCount === 0 ? 'block' : 'none';
+            }
         }
+    };
 
-        if (elements.statusFilter) {
-            elements.statusFilter.addEventListener('change', () => filterClients(elements));
-        }
+    // Sistema de detalles del cliente
+    const ClientSystem = {
+        loadDetails: async function(clientId) {
+            try {
+                const response = await fetch(`/clients/${clientId}/details`);
+                if (!response.ok) throw new Error('Error al cargar los detalles');
+                
+                const client = await response.json();
+                
+                // Actualizar campos básicos
+                const fields = {
+                    clientName: client.name,
+                    businessName: client.business_name,
+                    taxId: client.tax_id,
+                    clientType: client.client_type,
+                    clientStatus: client.status,
+                    activeAgents: client.active_agents || '0',
+                    totalPrinters: client.total_printers || '0',
+                    lastContact: client.last_contact_date || 'Sin contacto',
+                    mainAddress: client.service_address,
+                    mainCity: client.service_city,
+                    mainState: client.service_state,
+                    mainZipCode: client.service_zip_code,
+                    mainCountry: client.service_country
+                };
 
-        if (elements.typeFilter) {
-            elements.typeFilter.addEventListener('change', () => filterClients(elements));
-        }
+                Object.entries(fields).forEach(([id, value]) => {
+                    const element = document.getElementById(id);
+                    if (element) element.textContent = value || '';
+                });
 
-        return elements;
-    }
+                // Actualizar contactos
+                this.updateContactInfo('mainContactInfo', client.contact_info);
+                this.updateContactInfo('technicalContactInfo', client.technical_contact_info);
+                this.updateContactInfo('billingContactInfo', client.billing_contact_info);
 
-    // Función de filtrado
-    function filterClients(elements) {
-        const searchTerm = elements.searchInput?.value?.toLowerCase() || '';
-        const statusValue = elements.statusFilter?.value?.toLowerCase() || '';
-        const typeValue = elements.typeFilter?.value?.toLowerCase() || '';
+                // Actualizar información del contrato
+                this.updateContractInfo(client.contract_info);
 
-        const rows = document.querySelectorAll('tbody tr');
-        rows.forEach(row => {
-            const text = row.textContent.toLowerCase();
-            const statusCell = row.querySelector('td:nth-child(5)');
-            const typeCell = row.querySelector('td:nth-child(3)');
-            
-            const status = statusCell?.textContent?.toLowerCase().trim() || '';
-            const type = typeCell?.textContent?.toLowerCase().trim() || '';
+                // Mostrar modal
+                ModalSystem.show('clientDetailsModal');
+                TabSystem.initialize();
 
-            const matchesSearch = text.includes(searchTerm);
-            const matchesStatus = statusValue === '' || status.includes(statusValue);
-            const matchesType = typeValue === '' || type.includes(typeValue);
+            } catch (error) {
+                NotificationSystem.show('Error al cargar los detalles del cliente', 'error');
+            }
+        },
 
-            row.style.display = matchesSearch && matchesStatus && matchesType ? '' : 'none';
-        });
-    }
+        updateContactInfo: function(containerId, contactInfo) {
+            const container = document.getElementById(containerId);
+            if (!container || !contactInfo) return;
 
-    // Función para mostrar notificaciones
-    function showNotification(message, type = 'success') {
-        const container = document.getElementById('notification-container');
-        if (!container) return;
+            container.innerHTML = `
+                <div class="space-y-2">
+                    <div class="flex flex-col">
+                        <span class="text-sm text-gray-500">Nombre</span>
+                        <span class="text-base text-gray-900">${contactInfo.name || ''}</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-sm text-gray-500">Email</span>
+                        <span class="text-base text-gray-900">${contactInfo.email || ''}</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-sm text-gray-500">Teléfono</span>
+                        <span class="text-base text-gray-900">${contactInfo.phone || ''}</span>
+                    </div>
+                </div>
+            `;
+        },
 
-        const notification = document.createElement('div');
-        notification.className = `${type === 'success' ? 'bg-green-500' : 'bg-red-500'} text-white px-6 py-3 rounded-lg shadow-lg`;
-        notification.textContent = message;
-        container.appendChild(notification);
-        setTimeout(() => notification.remove(), 3000);
-    }
+        updateContractInfo: function(contractInfo) {
+            if (!contractInfo) return;
 
-    // Funciones para manejo de modales
-    window.showClientDetails = async function(clientId) {
-        const modal = document.getElementById('clientDetailsModal');
-        if (!modal) return;
-
-        try {
-            const response = await fetch(`/clients/${clientId}/details`);
-            const client = await response.json();
-
-            // Actualizar campos del modal
-            const fields = {
-                clientName: client.name,
-                businessName: client.business_name,
-                taxId: client.tax_id,
-                clientType: client.client_type
+            const elements = {
+                contractNumber: contractInfo.number,
+                contractStartDate: contractInfo.start_date,
+                contractEndDate: contractInfo.end_date,
+                serviceLevel: contractInfo.service_level,
+                paymentTerms: contractInfo.payment_terms,
+                creditLimit: contractInfo.credit_limit,
+                currentBalance: contractInfo.current_balance,
+                pendingInvoices: contractInfo.pending_invoices,
+                lastPayment: contractInfo.last_payment
             };
 
-            Object.entries(fields).forEach(([id, value]) => {
+            Object.entries(elements).forEach(([id, value]) => {
                 const element = document.getElementById(id);
                 if (element) element.textContent = value || '';
             });
+        },
 
-            // Actualizar botón de edición
-            const editButton = document.getElementById('editClientButton');
-            if (editButton) {
-                editButton.href = `/clients/${clientId}/edit`;
+        delete: async function(clientId) {
+            try {
+                const response = await fetch(`/clients/${clientId}`, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    NotificationSystem.show('Cliente eliminado con éxito', 'success');
+                    const row = document.querySelector(`tr[data-client-id="${clientId}"]`);
+                    if (row) {
+                        row.style.animation = 'fadeOut 0.3s ease';
+                        setTimeout(() => row.remove(), 300);
+                    }
+                    ModalSystem.hide('deleteConfirmModal');
+                } else {
+                    throw new Error(data.error || 'Error al eliminar el cliente');
+                }
+            } catch (error) {
+                NotificationSystem.show(error.message, 'error');
             }
-
-            modal.classList.remove('hidden');
-            initializeTabs();
-        } catch (error) {
-            console.error('Error al cargar detalles:', error);
-            showNotification('Error al cargar los detalles del cliente', 'error');
         }
+    };
+
+    // Funciones globales
+    window.showClientDetails = function(clientId) {
+        ClientSystem.loadDetails(clientId);
     };
 
     window.closeModal = function(modalId) {
-        const modal = document.getElementById(modalId);
-        if (modal) modal.classList.add('hidden');
+        ModalSystem.hide(modalId);
     };
 
     window.confirmDelete = function(clientId) {
-        const modal = document.getElementById('deleteConfirmModal');
-        if (modal) {
-            window.clientToDelete = clientId;
-            modal.classList.remove('hidden');
-        }
+        window.clientToDelete = clientId;
+        ModalSystem.show('deleteConfirmModal');
     };
 
-    window.executeDelete = async function() {
+    window.executeDelete = function() {
         const clientId = window.clientToDelete;
-        if (!clientId) return;
-
-        try {
-            const response = await fetch(`/clients/${clientId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            const data = await response.json();
-
-            if (data.success) {
-                showNotification('Cliente eliminado con éxito');
-                const row = document.querySelector(`tr[data-client-id="${clientId}"]`);
-                if (row) {
-                    row.style.animation = 'fadeOut 0.3s ease';
-                    setTimeout(() => row.remove(), 300);
-                }
-                closeModal('deleteConfirmModal');
-            } else {
-                throw new Error(data.error || 'Error al eliminar el cliente');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            showNotification(error.message || 'Error al eliminar el cliente', 'error');
-        }
+        if (clientId) ClientSystem.delete(clientId);
     };
 
-    function initializeTabs() {
-        const tabButtons = document.querySelectorAll('.tab-button');
-        const tabContents = document.querySelectorAll('.tab-content');
+    // Inicialización
+    FilterSystem.initialize();
+    TabSystem.initialize();
 
-        tabButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                const tabName = button.getAttribute('data-tab');
-                
-                tabButtons.forEach(btn => {
-                    btn.classList.remove('text-blue-600', 'border-blue-600');
-                    btn.classList.add('text-gray-500', 'border-transparent');
-                });
-                button.classList.add('text-blue-600', 'border-blue-600');
-                button.classList.remove('text-gray-500', 'border-transparent');
-
-                tabContents.forEach(content => {
-                    content.classList.toggle('hidden', content.id !== `${tabName}Tab`);
-                });
-            });
-        });
-    }
-
-    // Inicializar la aplicación
-    const elements = initializeElements();
-
-    // Agregar estilos de animación
+    // Estilos de animación
     const style = document.createElement('style');
     style.textContent = `
         @keyframes fadeOut {
             from { opacity: 1; transform: translateY(0); }
             to { opacity: 0; transform: translateY(-10px); }
+        }
+
+        .notification-enter {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+
+        .notification-enter-active {
+            transform: translateX(0);
+            opacity: 1;
+            transition: transform 300ms ease-out, opacity 300ms ease-out;
+        }
+
+        .notification-exit {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .notification-exit-active {
+            transform: translateX(100%);
+            opacity: 0;
+            transition: transform 300ms ease-in, opacity 300ms ease-in;
         }
     `;
     document.head.appendChild(style);
