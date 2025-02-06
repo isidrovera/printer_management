@@ -295,10 +295,17 @@ async def edit_client(request: Request, client_id: int, db: Session = Depends(ge
             if not date_str or date_str in ['None', 'none', '']:
                 return None
             try:
-                # Convertir a datetime con hora 00:00:00 para TIMESTAMP
                 return datetime.strptime(date_str, '%Y-%m-%d')
             except ValueError:
                 return None
+
+        # Mapeo de prioridades a valores enteros
+        PRIORITY_MAP = {
+            'low': 1,
+            'medium': 2,
+            'high': 3,
+            'critical': 4
+        }
 
         # Convertir credit_limit a Integer
         try:
@@ -306,62 +313,48 @@ async def edit_client(request: Request, client_id: int, db: Session = Depends(ge
         except ValueError:
             credit_limit = None
 
+        # Conversión de support_priority
+        support_priority = PRIORITY_MAP.get(form.get('support_priority', '').lower(), 1)
+
         client_data = {
-            # Información básica
+            # Información Básica
             "name": clean_value(form.get("name")),
             "business_name": clean_value(form.get("business_name")),
             "tax_id": clean_value(form.get("tax_id")),
             "client_type": form.get("client_type", "EMPRESA").upper(),
+            "status": form.get("status", "ACTIVO").upper(),
             "client_code": clean_value(form.get("client_code")),
-            
-            # Contacto principal
-            "contact_name": clean_value(form.get("contact_name")),
-            "contact_email": clean_value(form.get("contact_email")),
-            "contact_phone": clean_value(form.get("contact_phone")),
-            
-            # Contacto técnico
-            "technical_contact_name": clean_value(form.get("technical_contact_name")),
-            "technical_contact_email": clean_value(form.get("technical_contact_email")),
-            "technical_contact_phone": clean_value(form.get("technical_contact_phone")),
-            
-            # Contacto facturación
+
+            # Contacto de Facturación
             "billing_contact_name": clean_value(form.get("billing_contact_name")),
             "billing_contact_email": clean_value(form.get("billing_contact_email")),
             "billing_contact_phone": clean_value(form.get("billing_contact_phone")),
-            
-            # Dirección fiscal
+
+            # Dirección de Facturación
             "billing_address": clean_value(form.get("billing_address")),
             "billing_city": clean_value(form.get("billing_city")),
             "billing_state": clean_value(form.get("billing_state")),
             "billing_zip_code": clean_value(form.get("billing_zip_code")),
             "billing_country": clean_value(form.get("billing_country")),
-            
-            # Dirección de servicio
-            "service_address": clean_value(form.get("service_address")),
-            "service_city": clean_value(form.get("service_city")),
-            "service_state": clean_value(form.get("service_state")),
-            "service_zip_code": clean_value(form.get("service_zip_code")),
-            "service_country": clean_value(form.get("service_country")),
-            
-            # Información comercial
+
+            # Información del Contrato
             "contract_number": clean_value(form.get("contract_number")),
             "contract_start_date": parse_date(form.get("contract_start_date")),
             "contract_end_date": parse_date(form.get("contract_end_date")),
+            "service_level": clean_value(form.get("service_level")),
             "payment_terms": clean_value(form.get("payment_terms")),
             "credit_limit": credit_limit,
-            
-            # Información de gestión
+
+            # Información Adicional
             "account_manager": clean_value(form.get("account_manager")),
-            "service_level": clean_value(form.get("service_level")),
-            "support_priority": int(form.get("support_priority", 1)),
-            
-            # Estado y configuración
-            "status": form.get("status", "ACTIVO").upper(),
-            "is_active": form.get("is_active", "true").lower() == "true",
-            "notes": clean_value(form.get("notes"))
+            "support_priority": support_priority,
+            "notes": clean_value(form.get("notes")),
+
+            # Campos de control
+            "updated_at": datetime.utcnow()
         }
 
-        # Eliminar valores None
+        # Eliminar campos None para no sobrescribir datos existentes
         client_data = {k: v for k, v in client_data.items() if v is not None}
 
         logger.debug(f"Datos a actualizar para cliente {client_id}: {client_data}")
@@ -372,28 +365,39 @@ async def edit_client(request: Request, client_id: int, db: Session = Depends(ge
         if not client:
             raise ValueError("Cliente no encontrado")
 
+        logger.info(f"Cliente {client_id} actualizado exitosamente")
         return RedirectResponse("/clients", status_code=303)
         
-    except Exception as e:
-        logger.error(f"Error updating client: {str(e)}")
-        client_dict = dict(form)
-        client_dict['id'] = client_id
-        
-        # Convertir fechas para el template
-        date_fields = ['contract_start_date', 'contract_end_date', 'last_contact_date']
-        for field in date_fields:
-            if form.get(field):
-                try:
-                    client_dict[field] = datetime.strptime(form.get(field), '%Y-%m-%d')
-                except ValueError:
-                    client_dict[field] = None
-
+    except ValueError as e:
+        logger.error(f"Error de validación al actualizar cliente: {str(e)}")
         return templates.TemplateResponse(
             "clients/form.html",
             {
                 "request": request,
-                "client": client_dict,
-                "error": f"Error al actualizar cliente: {str(e)}",
+                "client": {
+                    "id": client_id,
+                    **form,
+                    "contract_start_date": parse_date(form.get("contract_start_date")),
+                    "contract_end_date": parse_date(form.get("contract_end_date"))
+                },
+                "error": str(e),
+                "client_types": ClientType,
+                "client_statuses": ClientStatus
+            }
+        )
+    except Exception as e:
+        logger.error(f"Error al actualizar cliente: {str(e)}")
+        return templates.TemplateResponse(
+            "clients/form.html",
+            {
+                "request": request,
+                "client": {
+                    "id": client_id,
+                    **form,
+                    "contract_start_date": parse_date(form.get("contract_start_date")),
+                    "contract_end_date": parse_date(form.get("contract_end_date"))
+                },
+                "error": "Error al actualizar el cliente. Por favor, intente nuevamente.",
                 "client_types": ClientType,
                 "client_statuses": ClientStatus
             }
