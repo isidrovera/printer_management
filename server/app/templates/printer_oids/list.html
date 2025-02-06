@@ -1,313 +1,188 @@
 {% extends "base.html" %}
-{% block title %}{% if printer_oids %}Editar{% else %}Nueva{% endif %} Configuración OID{% endblock %}
+{% block title %}Configuración de OIDs{% endblock %}
 
 {% block content %}
 <div class="bg-white shadow-lg rounded-lg p-6 mx-auto max-w-7xl">
-    <!-- Header -->
-    <div class="flex items-center space-x-2 mb-6">
-        <i class="fas fa-sitemap text-blue-600 text-2xl"></i>
-        <h2 class="text-2xl font-bold text-gray-800">
-            {% if printer_oids %}Editar{% else %}Nueva{% endif %} Configuración de OIDs
-        </h2>
-    </div>
-
-    {% if error %}
-    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-        <span class="block sm:inline">{{ error }}</span>
-    </div>
-    {% endif %}
-
-    <form method="POST" class="space-y-6">
-        <!-- Información Básica -->
-        <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
-            <h3 class="text-lg font-medium text-gray-900 mb-4">
-                <i class="fas fa-info-circle text-blue-600 mr-2"></i>
-                Información Básica
-            </h3>
-            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-                <div>
-                    <label for="brand" class="block text-sm font-medium text-gray-700">Marca</label>
-                    <input type="text" name="brand" id="brand" value="{{ printer_oids.brand if printer_oids else '' }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
-                </div>
-                <div>
-                    <label for="model_family" class="block text-sm font-medium text-gray-700">Familia de Modelo</label>
-                    <input type="text" name="model_family" id="model_family" value="{{ printer_oids.model_family if printer_oids else '' }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
-                </div>
-                <div class="md:col-span-2">
-                    <label for="description" class="block text-sm font-medium text-gray-700">Descripción</label>
-                    <textarea name="description" id="description" rows="3" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">{{ printer_oids.description if printer_oids else '' }}</textarea>
-                </div>
-            </div>
+    <!-- Header con búsqueda -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <div class="flex items-center space-x-2">
+            <i class="fas fa-sitemap text-blue-600 text-2xl"></i>
+            <h2 class="text-2xl font-bold text-gray-800">Configuración de OIDs</h2>
         </div>
-        <!-- OIDs para contadores de páginas -->
-        <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
-            <h3 class="text-lg font-medium text-gray-900 mb-4">
-                <i class="fas fa-print text-blue-600 mr-2"></i>
-                OIDs de Contadores de Páginas
-            </h3>
-            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-                <div>
-                    <label for="oid_total_pages" class="block text-sm font-medium text-gray-700">Total de Páginas</label>
-                    <input type="text" name="oid_total_pages" id="oid_total_pages" value="{{ printer_oids.oid_total_pages if printer_oids else '' }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
-                </div>
-                <div>
-                    <label for="oid_total_color_pages" class="block text-sm font-medium text-gray-700">Páginas Color</label>
-                    <input type="text" name="oid_total_color_pages" id="oid_total_color_pages" value="{{ printer_oids.oid_total_color_pages if printer_oids else '' }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
-                </div>
-                <div>
-                    <label for="oid_total_bw_pages" class="block text-sm font-medium text-gray-700">Páginas B/N</label>
-                    <input type="text" name="oid_total_bw_pages" id="oid_total_bw_pages" value="{{ printer_oids.oid_total_bw_pages if printer_oids else '' }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
-                </div>
-                <div>
-                    <label for="oid_total_copies" class="block text-sm font-medium text-gray-700">Total Copias</label>
-                    <input type="text" name="oid_total_copies" id="oid_total_copies" value="{{ printer_oids.oid_total_copies if printer_oids else '' }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
-                </div>
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto">
+            <!-- Barra de búsqueda -->
+            <div class="relative flex-grow sm:flex-grow-0">
+                <input type="text" 
+                       id="searchInput" 
+                       placeholder="Buscar configuraciones..." 
+                       class="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <i class="fas fa-search absolute right-3 top-2.5 h-5 w-5 text-gray-400"></i>
             </div>
-        </div>
-
-        <!-- OIDs para tóner -->
-        <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
-            <h3 class="text-lg font-medium text-gray-900 mb-4">
-                <i class="fas fa-tint text-blue-600 mr-2"></i>
-                OIDs de Tóner
-            </h3>
-            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-                <div>
-                    <label for="oid_black_toner_level" class="block text-sm font-medium text-gray-700">Nivel Tóner Negro</label>
-                    <input type="text" name="oid_black_toner_level" id="oid_black_toner_level" value="{{ printer_oids.oid_black_toner_level if printer_oids else '' }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
-                </div>
-                <div>
-                    <label for="oid_cyan_toner_level" class="block text-sm font-medium text-gray-700">Nivel Tóner Cyan</label>
-                    <input type="text" name="oid_cyan_toner_level" id="oid_cyan_toner_level" value="{{ printer_oids.oid_cyan_toner_level if printer_oids else '' }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
-                </div>
-                <div>
-                    <label for="oid_magenta_toner_level" class="block text-sm font-medium text-gray-700">Nivel Tóner Magenta</label>
-                    <input type="text" name="oid_magenta_toner_level" id="oid_magenta_toner_level" value="{{ printer_oids.oid_magenta_toner_level if printer_oids else '' }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
-                </div>
-                <div>
-                    <label for="oid_yellow_toner_level" class="block text-sm font-medium text-gray-700">Nivel Tóner Amarillo</label>
-                    <input type="text" name="oid_yellow_toner_level" id="oid_yellow_toner_level" value="{{ printer_oids.oid_yellow_toner_level if printer_oids else '' }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
-                </div>
-            </div>
-        </div>
-        <!-- OIDs para unidades de imagen -->
-        <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
-            <h3 class="text-lg font-medium text-gray-900 mb-4">
-                <i class="fas fa-drum text-blue-600 mr-2"></i>
-                OIDs de Unidades de Imagen
-            </h3>
-            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-                <div>
-                    <label for="oid_black_drum_level" class="block text-sm font-medium text-gray-700">Nivel Drum Negro</label>
-                    <input type="text" name="oid_black_drum_level" id="oid_black_drum_level" value="{{ printer_oids.oid_black_drum_level if printer_oids else '' }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
-                </div>
-                <div>
-                    <label for="oid_cyan_drum_level" class="block text-sm font-medium text-gray-700">Nivel Drum Cyan</label>
-                    <input type="text" name="oid_cyan_drum_level" id="oid_cyan_drum_level" value="{{ printer_oids.oid_cyan_drum_level if printer_oids else '' }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
-                </div>
-                <div>
-                    <label for="oid_magenta_drum_level" class="block text-sm font-medium text-gray-700">Nivel Drum Magenta</label>
-                    <input type="text" name="oid_magenta_drum_level" id="oid_magenta_drum_level" value="{{ printer_oids.oid_magenta_drum_level if printer_oids else '' }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
-                </div>
-                <div>
-                    <label for="oid_yellow_drum_level" class="block text-sm font-medium text-gray-700">Nivel Drum Amarillo</label>
-                    <input type="text" name="oid_yellow_drum_level" id="oid_yellow_drum_level" value="{{ printer_oids.oid_yellow_drum_level if printer_oids else '' }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
-                </div>
-            </div>
-        </div>
-
-        <!-- OIDs para otros consumibles -->
-        <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
-            <h3 class="text-lg font-medium text-gray-900 mb-4">
-                <i class="fas fa-tools text-blue-600 mr-2"></i>
-                OIDs de Otros Consumibles
-            </h3>
-            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-                <div>
-                    <label for="oid_fuser_unit_level" class="block text-sm font-medium text-gray-700">Nivel Unidad Fusora</label>
-                    <input type="text" name="oid_fuser_unit_level" id="oid_fuser_unit_level" value="{{ printer_oids.oid_fuser_unit_level if printer_oids else '' }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
-                </div>
-                <div>
-                    <label for="oid_transfer_belt_level" class="block text-sm font-medium text-gray-700">Nivel Banda de Transferencia</label>
-                    <input type="text" name="oid_transfer_belt_level" id="oid_transfer_belt_level" value="{{ printer_oids.oid_transfer_belt_level if printer_oids else '' }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
-                </div>
-                <div>
-                    <label for="oid_waste_toner_level" class="block text-sm font-medium text-gray-700">Nivel Tóner Residual</label>
-                    <input type="text" name="oid_waste_toner_level" id="oid_waste_toner_level" value="{{ printer_oids.oid_waste_toner_level if printer_oids else '' }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
-                </div>
-                <div>
-                    <label for="oid_waste_toner_max" class="block text-sm font-medium text-gray-700">Capacidad Máx. Tóner Residual</label>
-                    <input type="text" name="oid_waste_toner_max" id="oid_waste_toner_max" value="{{ printer_oids.oid_waste_toner_max if printer_oids else '' }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
-                </div>
-            </div>
-        </div>
-        <!-- OIDs para bandejas -->
-        <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
-            <h3 class="text-lg font-medium text-gray-900 mb-4">
-                <i class="fas fa-inbox text-blue-600 mr-2"></i>
-                OIDs de Bandejas
-            </h3>
-            <div class="grid grid-cols-1 gap-6">
-                <!-- Bandeja 1 -->
-                <div class="border-b pb-4">
-                    <h4 class="text-md font-medium text-gray-800 mb-3">
-                        <i class="fas fa-layer-group text-blue-500 mr-2"></i>
-                        Bandeja 1
-                    </h4>
-                    <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
-                        <div>
-                            <label for="oid_tray1_level" class="block text-sm font-medium text-gray-700">Nivel</label>
-                            <input type="text" name="oid_tray1_level" id="oid_tray1_level" value="{{ printer_oids.oid_tray1_level if printer_oids else '' }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
-                        </div>
-                        <div>
-                            <label for="oid_tray1_max_capacity" class="block text-sm font-medium text-gray-700">Capacidad Máxima</label>
-                            <input type="text" name="oid_tray1_max_capacity" id="oid_tray1_max_capacity" value="{{ printer_oids.oid_tray1_max_capacity if printer_oids else '' }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
-                        </div>
-                        <div>
-                            <label for="oid_tray1_status" class="block text-sm font-medium text-gray-700">Estado</label>
-                            <input type="text" name="oid_tray1_status" id="oid_tray1_status" value="{{ printer_oids.oid_tray1_status if printer_oids else '' }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
-                        </div>
-                        <div>
-                            <label for="oid_tray1_paper_size" class="block text-sm font-medium text-gray-700">Tamaño de Papel</label>
-                            <input type="text" name="oid_tray1_paper_size" id="oid_tray1_paper_size" value="{{ printer_oids.oid_tray1_paper_size if printer_oids else '' }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
-                        </div>
-                        <div>
-                            <label for="oid_tray1_paper_type" class="block text-sm font-medium text-gray-700">Tipo de Papel</label>
-                            <input type="text" name="oid_tray1_paper_type" id="oid_tray1_paper_type" value="{{ printer_oids.oid_tray1_paper_type if printer_oids else '' }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Bandeja 2 -->
-                <div class="border-b pb-4">
-                    <h4 class="text-md font-medium text-gray-800 mb-3">
-                        <i class="fas fa-layer-group text-blue-500 mr-2"></i>
-                        Bandeja 2
-                    </h4>
-                    <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
-                        <div>
-                            <label for="oid_tray2_level" class="block text-sm font-medium text-gray-700">Nivel</label>
-                            <input type="text" name="oid_tray2_level" id="oid_tray2_level" value="{{ printer_oids.oid_tray2_level if printer_oids else '' }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
-                        </div>
-                        <div>
-                            <label for="oid_tray2_max_capacity" class="block text-sm font-medium text-gray-700">Capacidad Máxima</label>
-                            <input type="text" name="oid_tray2_max_capacity" id="oid_tray2_max_capacity" value="{{ printer_oids.oid_tray2_max_capacity if printer_oids else '' }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
-                        </div>
-                        <div>
-                            <label for="oid_tray2_status" class="block text-sm font-medium text-gray-700">Estado</label>
-                            <input type="text" name="oid_tray2_status" id="oid_tray2_status" value="{{ printer_oids.oid_tray2_status if printer_oids else '' }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
-                        </div>
-                        <div>
-                            <label for="oid_tray2_paper_size" class="block text-sm font-medium text-gray-700">Tamaño de Papel</label>
-                            <input type="text" name="oid_tray2_paper_size" id="oid_tray2_paper_size" value="{{ printer_oids.oid_tray2_paper_size if printer_oids else '' }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
-                        </div>
-                        <div>
-                            <label for="oid_tray2_paper_type" class="block text-sm font-medium text-gray-700">Tipo de Papel</label>
-                            <input type="text" name="oid_tray2_paper_type" id="oid_tray2_paper_type" value="{{ printer_oids.oid_tray2_paper_type if printer_oids else '' }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Bandeja 3 -->
-                <div class="border-b pb-4">
-                    <h4 class="text-md font-medium text-gray-800 mb-3">
-                        <i class="fas fa-layer-group text-blue-500 mr-2"></i>
-                        Bandeja 3
-                    </h4>
-                    <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
-                        <div>
-                            <label for="oid_tray3_level" class="block text-sm font-medium text-gray-700">Nivel</label>
-                            <input type="text" name="oid_tray3_level" id="oid_tray3_level" value="{{ printer_oids.oid_tray3_level if printer_oids else '' }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
-                        </div>
-                        <div>
-                            <label for="oid_tray3_max_capacity" class="block text-sm font-medium text-gray-700">Capacidad Máxima</label>
-                            <input type="text" name="oid_tray3_max_capacity" id="oid_tray3_max_capacity" value="{{ printer_oids.oid_tray3_max_capacity if printer_oids else '' }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
-                        </div>
-                        <div>
-                            <label for="oid_tray3_status" class="block text-sm font-medium text-gray-700">Estado</label>
-                            <input type="text" name="oid_tray3_status" id="oid_tray3_status" value="{{ printer_oids.oid_tray3_status if printer_oids else '' }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
-                        </div>
-                        <div>
-                            <label for="oid_tray3_paper_size" class="block text-sm font-medium text-gray-700">Tamaño de Papel</label>
-                            <input type="text" name="oid_tray3_paper_size" id="oid_tray3_paper_size" value="{{ printer_oids.oid_tray3_paper_size if printer_oids else '' }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
-                        </div>
-                        <div>
-                            <label for="oid_tray3_paper_type" class="block text-sm font-medium text-gray-700">Tipo de Papel</label>
-                            <input type="text" name="oid_tray3_paper_type" id="oid_tray3_paper_type" value="{{ printer_oids.oid_tray3_paper_type if printer_oids else '' }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Bandeja Bypass -->
-                <div class="border-b pb-4">
-                    <h4 class="text-md font-medium text-gray-800 mb-3">
-                        <i class="fas fa-layer-group text-blue-500 mr-2"></i>
-                        Bandeja Bypass
-                    </h4>
-                    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-                        <div>
-                            <label for="oid_bypass_tray_level" class="block text-sm font-medium text-gray-700">Nivel</label>
-                            <input type="text" name="oid_bypass_tray_level" id="oid_bypass_tray_level" value="{{ printer_oids.oid_bypass_tray_level if printer_oids else '' }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
-                        </div>
-                        <div>
-                            <label for="oid_bypass_tray_status" class="block text-sm font-medium text-gray-700">Estado</label>
-                            <input type="text" name="oid_bypass_tray_status" id="oid_bypass_tray_status" value="{{ printer_oids.oid_bypass_tray_status if printer_oids else '' }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- OIDs para información del sistema -->
-        <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
-            <h3 class="text-lg font-medium text-gray-900 mb-4">
-                <i class="fas fa-cogs text-blue-600 mr-2"></i>
-                OIDs de Información del Sistema
-            </h3>
-            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-                <div>
-                    <label for="oid_printer_status" class="block text-sm font-medium text-gray-700">Estado de Impresora</label>
-                    <input type="text" name="oid_printer_status" id="oid_printer_status" value="{{ printer_oids.oid_printer_status if printer_oids else '' }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
-                </div>
-                <div>
-                    <label for="oid_printer_model" class="block text-sm font-medium text-gray-700">Modelo de Impresora</label>
-                    <input type="text" name="oid_printer_model" id="oid_printer_model" value="{{ printer_oids.oid_printer_model if printer_oids else '' }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
-                </div>
-                <div>
-                    <label for="oid_serial_number" class="block text-sm font-medium text-gray-700">Número de Serie</label>
-                    <input type="text" name="oid_serial_number" id="oid_serial_number" value="{{ printer_oids.oid_serial_number if printer_oids else '' }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
-                </div>
-                <div>
-                    <label for="oid_firmware_version" class="block text-sm font-medium text-gray-700">Versión de Firmware</label>
-                    <input type="text" name="oid_firmware_version" id="oid_firmware_version" value="{{ printer_oids.oid_firmware_version if printer_oids else '' }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
-                </div>
-                <div>
-                    <label for="oid_system_contact" class="block text-sm font-medium text-gray-700">Contacto del Sistema</label>
-                    <input type="text" name="oid_system_contact" id="oid_system_contact" value="{{ printer_oids.oid_system_contact if printer_oids else '' }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
-                </div>
-                <div>
-                    <label for="oid_system_name" class="block text-sm font-medium text-gray-700">Nombre del Sistema</label>
-                    <input type="text" name="oid_system_name" id="oid_system_name" value="{{ printer_oids.oid_system_name if printer_oids else '' }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
-                </div>
-            </div>
-        </div>
-        <!-- Botones de acción -->
-        <div class="flex justify-end space-x-3 mt-6">
-            <a href="/printer-oids" 
-               class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                <i class="fas fa-times mr-2"></i>
-                Cancelar
+            
+            <!-- Botón Agregar -->
+            <a href="/printer-oids/create" 
+               class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                <i class="fas fa-plus mr-2"></i>
+                <span>Agregar OIDs</span>
             </a>
-            <button type="submit"
-                    class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                <i class="fas fa-save mr-2"></i>
-                {% if printer_oids %}Actualizar{% else %}Crear{% endif %}
-            </button>
         </div>
-    </form>
+    </div>
+
+    <!-- Resumen de configuraciones -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+        <!-- Total Configuraciones -->
+        <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500">Total Configuraciones</p>
+                    <h3 class="text-2xl font-bold text-gray-900">{{ printer_oids|length }}</h3>
+                </div>
+                <div class="bg-blue-100 p-3 rounded-lg">
+                    <i class="fas fa-sitemap text-blue-600 text-xl"></i>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Total Marcas -->
+        <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500">Total Marcas</p>
+                    <h3 class="text-2xl font-bold text-green-600">{{ printer_oids|map(attribute='brand')|unique|list|length }}</h3>
+                </div>
+                <div class="bg-green-100 p-3 rounded-lg">
+                    <i class="fas fa-tag text-green-600 text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Familias -->
+        <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500">Total Familias</p>
+                    <h3 class="text-2xl font-bold text-purple-600">{{ printer_oids|map(attribute='model_family')|unique|list|length }}</h3>
+                </div>
+                <div class="bg-purple-100 p-3 rounded-lg">
+                    <i class="fas fa-layer-group text-purple-600 text-xl"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de Configuraciones OID -->
+    <div class="overflow-x-auto shadow ring-1 ring-black ring-opacity-5 rounded-lg">
+        <table class="w-full border-collapse">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Marca</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Familia de Modelo</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descripción</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Impresoras Usando</th>
+                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200" id="oidsTableBody">
+                {% for oid in printer_oids %}
+                <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <i class="fas fa-tag text-blue-400 mr-2"></i>
+                            <span class="text-sm text-gray-900">{{ oid.brand }}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <i class="fas fa-layer-group text-purple-400 mr-2"></i>
+                            <span class="text-sm text-gray-900">{{ oid.model_family }}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="text-sm text-gray-500">{{ oid.description or 'Sin descripción' }}</span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            {{ oid.printers|length }} impresoras
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <div class="flex items-center justify-end space-x-2">
+                            <!-- Botón Ver Detalles -->
+                            <button onclick="showOIDDetails('{{ oid.id }}')"
+                                    class="inline-flex items-center px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors">
+                                <i class="fas fa-eye mr-2"></i>
+                                <span>Ver</span>
+                            </button>
+
+                            <!-- Botón Editar -->
+                            <a href="/printer-oids/{{ oid.id }}/edit"
+                               class="inline-flex items-center px-3 py-2 bg-amber-100 text-amber-700 rounded-lg hover:bg-amber-200 transition-colors">
+                                <i class="fas fa-edit mr-2"></i>
+                                <span>Editar</span>
+                            </a>
+
+                            <!-- Botón Eliminar -->
+                            <button onclick="deleteOID('{{ oid.id }}')"
+                                    class="inline-flex items-center px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors">
+                                <i class="fas fa-trash-alt mr-2"></i>
+                                <span>Eliminar</span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% if not printer_oids %}
+        <div class="text-center py-12">
+            <div class="flex flex-col items-center">
+                <i class="fas fa-sitemap text-gray-400 text-5xl mb-4"></i>
+                <h3 class="text-lg font-medium text-gray-900">No hay configuraciones de OIDs</h3>
+                <p class="text-gray-500 mt-2">Agrega una nueva configuración para comenzar.</p>
+                <a href="/printer-oids/create" 
+                   class="mt-4 inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                    <i class="fas fa-plus mr-2"></i>
+                    <span>Agregar OIDs</span>
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
 </div>
+
+<!-- Modal de Detalles -->
+<div class="fixed inset-0 hidden z-50" id="oidDetailsModal">
+    <div class="absolute inset-0 bg-black bg-opacity-50"></div>
+    <div class="absolute inset-0 overflow-y-auto">
+        <div class="flex min-h-full items-center justify-center p-4">
+            <div class="relative w-full max-w-4xl bg-white rounded-lg shadow-xl">
+                <div class="flex justify-between items-center p-6 border-b">
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-sitemap text-blue-500 text-xl"></i>
+                        <h3 class="text-xl font-semibold text-gray-800">Detalles de Configuración OID</h3>
+                    </div>
+                    <button onclick="closeModal('oidDetailsModal')" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                
+                <div class="p-6" id="oidDetailsContent">
+                    <div class="flex justify-center items-center">
+                        <i class="fas fa-circle-notch fa-spin text-blue-500 text-2xl mr-3"></i>
+                        <p class="text-gray-500 text-lg">Cargando información...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Contenedor de notificaciones -->
+<div id="notification-container" class="fixed bottom-4 right-4 z-50 space-y-2"></div>
 {% endblock %}
 
 {% block scripts %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+<script src="/static/js/oids.js"></script>
 {% endblock %}
