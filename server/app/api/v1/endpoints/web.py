@@ -565,29 +565,9 @@ def get_oids_by_brand(
         )
     
     return oids
-@router.get("/printer-oids")
-async def list_printer_oids(request: Request, db: Session = Depends(get_db)):
-    try:
-        printer_oids_service = PrinterOIDsService(db)
-        oids = printer_oids_service.get_all()
-        return templates.TemplateResponse(
-            "printer_oids/list.html",
-            {"request": request, "printer_oids": oids}
-        )
-    except Exception as e:
-        logger.error(f"Error listing printer OIDs: {str(e)}")
-        return templates.TemplateResponse(
-            "printer_oids/list.html",
-            {"request": request, "printer_oids": [], "error": str(e)}
-        )
-
-@router.get("/printer-oids/create")
-async def create_printer_oids_form(request: Request):
-    return templates.TemplateResponse(
-        "printer_oids/form.html",
-        {"request": request, "printer_oids": None}
-    )
-
+    
+    
+    
 @router.post("/printer-oids/create")
 async def create_printer_oids(request: Request, db: Session = Depends(get_db)):
     try:
@@ -625,6 +605,31 @@ async def create_printer_oids(request: Request, db: Session = Depends(get_db)):
         
         await printer_oids_service.create(oid_data)
         return RedirectResponse("/printer-oids", status_code=303)
+        
+@router.get("/printer-oids")
+async def list_printer_oids(request: Request, db: Session = Depends(get_db)):
+    try:
+        printer_oids_service = PrinterOIDsService(db)
+        oids = printer_oids_service.get_all()
+        return templates.TemplateResponse(
+            "printer_oids/list.html",
+            {"request": request, "printer_oids": oids}
+        )
+    except Exception as e:
+        logger.error(f"Error listing printer OIDs: {str(e)}")
+        return templates.TemplateResponse(
+            "printer_oids/list.html",
+            {"request": request, "printer_oids": [], "error": str(e)}
+        )
+
+@router.get("/printer-oids/create")
+async def create_printer_oids_form(request: Request):
+    return templates.TemplateResponse(
+        "printer_oids/form.html",
+        {"request": request, "printer_oids": None}
+    )
+
+
     
     except Exception as e:
         logger.error(f"Error creating printer OIDs: {str(e)}")
