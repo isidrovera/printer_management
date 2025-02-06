@@ -1,5 +1,5 @@
 # server/app/api/v1/endpoints/web.py
-from fastapi import APIRouter, Request, Depends
+from fastapi import APIRouter, Request, Depends, Optional
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import joinedload
 from fastapi.responses import RedirectResponse
