@@ -1,140 +1,197 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const listView = document.getElementById('listView');
-    const kanbanView = document.getElementById('kanbanView');
-    const listViewBtn = document.getElementById('listViewBtn');
-    const kanbanViewBtn = document.getElementById('kanbanViewBtn');
+    // Referencias a elementos DOM
     const searchInput = document.getElementById('searchInput');
+    const statusFilter = document.getElementById('statusFilter');
+    const typeFilter = document.getElementById('typeFilter');
+    const notificationContainer = document.getElementById('notification-container');
 
-    // Función para actualizar los botones de vista
-    function updateViewButtons(activeView) {
-        if (activeView === 'list') {
-            listViewBtn.classList.add('bg-white', 'shadow', 'text-blue-600');
-            listViewBtn.classList.remove('text-gray-600');
-            kanbanViewBtn.classList.remove('bg-white', 'shadow', 'text-blue-600');
-            kanbanViewBtn.classList.add('text-gray-600');
-        } else {
-            kanbanViewBtn.classList.add('bg-white', 'shadow', 'text-blue-600');
-            kanbanViewBtn.classList.remove('text-gray-600');
-            listViewBtn.classList.remove('bg-white', 'shadow', 'text-blue-600');
-            listViewBtn.classList.add('text-gray-600');
-        }
+    // Función para mostrar notificaciones
+    function showNotification(message, type = 'success') {
+        const notification = document.createElement('div');
+        notification.className = `${type === 'success' ? 'bg-green-500' : 'bg-red-500'} text-white px-6 py-3 rounded-lg shadow-lg transition-opacity duration-300`;
+        notification.textContent = message;
+        notificationContainer.appendChild(notification);
+
+        // Eliminar después de 3 segundos
+        setTimeout(() => {
+            notification.style.opacity = '0';
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
     }
 
-    // Función para cambiar entre vistas
-    function switchView(view) {
-        if (view === 'list') {
-            listView.classList.remove('hidden');
-            kanbanView.classList.add('hidden');
-        } else {
-            kanbanView.classList.remove('hidden');
-            listView.classList.add('hidden');
-        }
-        updateViewButtons(view);
-        localStorage.setItem('preferredView', view);
-    }
-
-    // Event listeners para los botones de vista
-    listViewBtn.addEventListener('click', () => switchView('list'));
-    kanbanViewBtn.addEventListener('click', () => switchView('kanban'));
-
-    // Funcionalidad de búsqueda
-    searchInput.addEventListener('input', function(e) {
-        const searchTerm = e.target.value.toLowerCase();
+    // Función de búsqueda y filtrado
+    function filterClients() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const statusValue = statusFilter.value.toLowerCase();
+        const typeValue = typeFilter.value.toLowerCase();
         const rows = document.querySelectorAll('tbody tr');
-        const cards = document.querySelectorAll('#kanbanView > div');
 
         rows.forEach(row => {
             const text = row.textContent.toLowerCase();
-            row.style.display = text.includes(searchTerm) ? '' : 'none';
-        });
+            const status = row.querySelector('td:nth-child(5)').textContent.toLowerCase();
+            const type = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
 
-        cards.forEach(card => {
-            const text = card.textContent.toLowerCase();
-            card.style.display = text.includes(searchTerm) ? '' : 'none';
+            const matchesSearch = text.includes(searchTerm);
+            const matchesStatus = statusValue === '' || status.includes(statusValue);
+            const matchesType = typeValue === '' || type.includes(typeValue);
+
+            row.style.display = matchesSearch && matchesStatus && matchesType ? '' : 'none';
+        });
+    }
+
+    // Event listeners para búsqueda y filtros
+    if (searchInput) {
+        searchInput.addEventListener('input', filterClients);
+    }
+    if (statusFilter) {
+        statusFilter.addEventListener('change', filterClients);
+    }
+    if (typeFilter) {
+        typeFilter.addEventListener('change', filterClients);
+    }
+
+    // Manejo de tabs en el modal de detalles
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const tabName = button.getAttribute('data-tab');
+            
+            // Actualizar clases de botones
+            tabButtons.forEach(btn => {
+                btn.classList.remove('text-blue-600', 'border-blue-600');
+                btn.classList.add('text-gray-500', 'border-transparent');
+            });
+            button.classList.add('text-blue-600', 'border-blue-600');
+            button.classList.remove('text-gray-500', 'border-transparent');
+
+            // Mostrar contenido de tab seleccionado
+            tabContents.forEach(content => {
+                if (content.id === `${tabName}Tab`) {
+                    content.classList.remove('hidden');
+                } else {
+                    content.classList.add('hidden');
+                }
+            });
         });
     });
 
-    // Cargar la vista preferida del usuario
-    const preferredView = localStorage.getItem('preferredView') || 'list';
-    switchView(preferredView);
-});
+    // Funciones para modales
+    window.showClientDetails = function(clientId) {
+        const modal = document.getElementById('clientDetailsModal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            // Aquí irían las llamadas a la API para cargar los detalles del cliente
+            loadClientDetails(clientId);
+        }
+    };
 
-// Función para eliminar clientes
-async function confirmDelete(id) {
-    if (confirm('¿Estás seguro de que deseas eliminar este cliente?')) {
+    window.closeModal = function(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.classList.add('hidden');
+        }
+    };
+
+    window.confirmDelete = async function(clientId) {
+        const modal = document.getElementById('deleteConfirmModal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            window.clientToDelete = clientId; // Guardar el ID para usar en executeDelete
+        }
+    };
+
+    window.executeDelete = async function() {
+        const clientId = window.clientToDelete;
+        if (!clientId) return;
+
         try {
-            const response = await fetch(`/clients/${id}`, {
+            const response = await fetch(`/clients/${clientId}`, {
                 method: 'DELETE',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCsrfToken() // Función para obtener el token CSRF
                 }
             });
 
             const data = await response.json();
 
             if (data.success) {
-                // Mostrar mensaje de éxito
-                const successMessage = document.createElement('div');
-                successMessage.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg';
-                successMessage.textContent = 'Cliente eliminado con éxito';
-                document.body.appendChild(successMessage);
-
-                // Eliminar el mensaje después de 3 segundos
-                setTimeout(() => {
-                    successMessage.remove();
-                }, 3000);
-
-                // Actualizar la UI
-                const listRow = document.querySelector(`tr[data-client-id="${id}"]`);
-                const kanbanCard = document.querySelector(`div[data-client-id="${id}"]`);
-
-                if (listRow) {
-                    listRow.style.animation = 'fadeOut 0.3s ease';
-                    setTimeout(() => listRow.remove(), 300);
+                showNotification('Cliente eliminado con éxito');
+                const row = document.querySelector(`tr[data-client-id="${clientId}"]`);
+                if (row) {
+                    row.style.animation = 'fadeOut 0.3s ease';
+                    setTimeout(() => row.remove(), 300);
                 }
-                if (kanbanCard) {
-                    kanbanCard.style.animation = 'fadeOut 0.3s ease';
-                    setTimeout(() => kanbanCard.remove(), 300);
-                }
-
-                // Recargar la página después de 0.5 segundos
-                setTimeout(() => {
-                    window.location.reload();
-                }, 500);
             } else {
-                // Mostrar mensaje de error
-                const errorMessage = document.createElement('div');
-                errorMessage.className = 'fixed bottom-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg';
-                errorMessage.textContent = data.error || 'Error al eliminar el cliente';
-                document.body.appendChild(errorMessage);
-
-                // Eliminar el mensaje después de 3 segundos
-                setTimeout(() => {
-                    errorMessage.remove();
-                }, 3000);
+                showNotification(data.error || 'Error al eliminar el cliente', 'error');
             }
         } catch (error) {
             console.error('Error:', error);
-            // Mostrar mensaje de error
-            const errorMessage = document.createElement('div');
-            errorMessage.className = 'fixed bottom-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg';
-            errorMessage.textContent = 'Error al eliminar el cliente';
-            document.body.appendChild(errorMessage);
+            showNotification('Error al eliminar el cliente', 'error');
+        }
 
-            // Eliminar el mensaje después de 3 segundos
-            setTimeout(() => {
-                errorMessage.remove();
-            }, 3000);
+        closeModal('deleteConfirmModal');
+    };
+
+    // Función para obtener el token CSRF
+    function getCsrfToken() {
+        const name = 'csrftoken';
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // Función para cargar detalles del cliente
+    async function loadClientDetails(clientId) {
+        try {
+            const response = await fetch(`/clients/${clientId}/details`);
+            const client = await response.json();
+
+            // Actualizar información básica
+            document.getElementById('clientName').textContent = client.name;
+            document.getElementById('businessName').textContent = client.business_name;
+            document.getElementById('taxId').textContent = client.tax_id;
+            document.getElementById('clientType').textContent = client.client_type;
+
+            // Actualizar estado y métricas
+            const statusElement = document.getElementById('clientStatus');
+            statusElement.textContent = client.status;
+            statusElement.className = `px-3 py-1 rounded-full text-sm font-medium ${
+                client.status === 'activo' ? 'bg-green-100 text-green-800' :
+                client.status === 'inactivo' ? 'bg-red-100 text-red-800' :
+                'bg-gray-100 text-gray-800'
+            }`;
+
+            // Actualizar enlace de edición
+            const editButton = document.getElementById('editClientButton');
+            if (editButton) {
+                editButton.href = `/clients/${clientId}/edit`;
+            }
+
+        } catch (error) {
+            console.error('Error cargando detalles:', error);
+            showNotification('Error al cargar los detalles del cliente', 'error');
         }
     }
-}
 
-// Agregar estilos de animación
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes fadeOut {
-        from { opacity: 1; transform: translateY(0); }
-        to { opacity: 0; transform: translateY(-10px); }
-    }
-`;
-document.head.appendChild(style);
+    // Agregar estilos de animación
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-10px); }
+        }
+    `;
+    document.head.appendChild(style);
+});
