@@ -369,10 +369,10 @@ class AgentService:
                             )
                             
                             if data:
+                                # Eliminar la referencia a agent_id
                                 await self.printer_monitor.update_printer_data(
                                     ip=printer['ip_address'],
-                                    data=data,
-                                    agent_id=settings.AGENT_ID
+                                    data=data
                                 )
                                 logger.debug(f"Datos actualizados para {printer['ip_address']}")
                             else:
@@ -390,7 +390,6 @@ class AgentService:
         except Exception as e:
             logger.error(f"Error en actualizaciones periódicas: {e}")
             raise
-
     async def _update_agent_info(self):
         """Actualiza la información del agente en el servidor."""
         try:
