@@ -286,13 +286,19 @@ async def edit_client(request: Request, client_id: int, db: Session = Depends(ge
     try:
         form = await request.form()
         
-        # Función helper para manejar valores None
+        # Mapeo de valores de support_priority a integers
+        PRIORITY_MAP = {
+            'low': 1,
+            'medium': 2,
+            'high': 3,
+            'critical': 4
+        }
+
         def clean_value(value):
             if value in ['None', 'none', '', None]:
                 return None
             return value
 
-        # Función helper para procesar fechas
         def parse_date(date_str):
             if not date_str or date_str in ['None', 'none', '']:
                 return None
@@ -301,19 +307,22 @@ async def edit_client(request: Request, client_id: int, db: Session = Depends(ge
             except ValueError:
                 return None
 
-        # Procesar credit_limit
+        # Convertir credit_limit a decimal
         try:
             credit_limit = float(form.get('credit_limit', 0)) if form.get('credit_limit') else None
         except ValueError:
             credit_limit = None
+
+        # Convertir support_priority a integer
+        support_priority = PRIORITY_MAP.get(form.get('support_priority', '').lower())
 
         client_data = {
             # Información básica
             "name": clean_value(form.get("name")),
             "business_name": clean_value(form.get("business_name")),
             "tax_id": clean_value(form.get("tax_id")),
-            "client_type": form.get("client_type"),  # Este es un enum, no aplicar clean_value
-            "status": form.get("status"),  # Este es un enum, no aplicar clean_value
+            "client_type": ClientType[form.get("client_type", "EMPRESA").upper()].value,
+            "status": ClientStatus[form.get("status", "ACTIVO").upper()].value,
             "client_code": clean_value(form.get("client_code")),
             
             # Contactos
@@ -342,11 +351,11 @@ async def edit_client(request: Request, client_id: int, db: Session = Depends(ge
             
             # Adicional
             "account_manager": clean_value(form.get("account_manager")),
-            "support_priority": clean_value(form.get("support_priority")),
+            "support_priority": support_priority,  # Ahora es un integer
             "notes": clean_value(form.get("notes"))
         }
 
-        # Remover campos None para no sobrescribir datos existentes
+        # Remover campos None
         client_data = {k: v for k, v in client_data.items() if v is not None}
 
         logger.debug(f"Datos a actualizar para cliente {client_id}: {client_data}")
