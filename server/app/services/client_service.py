@@ -71,13 +71,6 @@ class ClientService:
             raise
 
     async def update(self, client_id: int, client_data: Dict[str, Any]) -> Optional[Client]:
-        """
-        Actualiza los datos de un cliente existente.
-        
-        Args:
-            client_id: ID del cliente a actualizar
-            client_data: Diccionario con los datos a actualizar
-        """
         try:
             client = await self.get_by_id(client_id)
             if not client:
@@ -89,11 +82,7 @@ class ClientService:
             if 'status' in client_data:
                 client_data['status'] = ClientStatus(client_data['status'])
 
-            # Procesamiento de fechas
-            date_fields = ['contract_start_date', 'contract_end_date', 'last_contact_date']
-            for field in date_fields:
-                if field in client_data and client_data[field]:
-                    client_data[field] = datetime.fromisoformat(client_data[field])
+            # Las fechas ya vienen como datetime del endpoint
 
             # Actualizar todos los campos proporcionados
             for key, value in client_data.items():
