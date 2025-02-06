@@ -299,6 +299,15 @@ async def edit_client(request: Request, client_id: int, db: Session = Depends(ge
             except ValueError:
                 return None
 
+        def get_enum_value(enum_class, value):
+            if not value:
+                return None
+            try:
+                # Convertir el valor a mayúsculas para coincidir con el enum
+                return enum_class[value.upper()]
+            except KeyError:
+                return None
+
         # Mapeo de prioridades a valores enteros
         PRIORITY_MAP = {
             'low': 1,
@@ -313,16 +322,17 @@ async def edit_client(request: Request, client_id: int, db: Session = Depends(ge
         except ValueError:
             credit_limit = None
 
-        # Conversión de support_priority
-        support_priority = PRIORITY_MAP.get(form.get('support_priority', '').lower(), 1)
+        # Obtener los valores de enum de forma segura
+        client_type = get_enum_value(ClientType, form.get("client_type"))
+        status = get_enum_value(ClientStatus, form.get("status"))
 
         client_data = {
             # Información Básica
             "name": clean_value(form.get("name")),
             "business_name": clean_value(form.get("business_name")),
             "tax_id": clean_value(form.get("tax_id")),
-            "client_type": form.get("client_type", "EMPRESA").upper(),
-            "status": form.get("status", "ACTIVO").upper(),
+            "client_type": client_type,  # Usando el enum directamente
+            "status": status,  # Usando el enum directamente
             "client_code": clean_value(form.get("client_code")),
 
             # Contacto de Facturación
@@ -347,14 +357,14 @@ async def edit_client(request: Request, client_id: int, db: Session = Depends(ge
 
             # Información Adicional
             "account_manager": clean_value(form.get("account_manager")),
-            "support_priority": support_priority,
+            "support_priority": PRIORITY_MAP.get(form.get('support_priority', '').lower(), 1),
             "notes": clean_value(form.get("notes")),
 
             # Campos de control
             "updated_at": datetime.utcnow()
         }
 
-        # Eliminar campos None para no sobrescribir datos existentes
+        # Eliminar valores None y valores de enum no válidos
         client_data = {k: v for k, v in client_data.items() if v is not None}
 
         logger.debug(f"Datos a actualizar para cliente {client_id}: {client_data}")

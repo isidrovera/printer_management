@@ -63,12 +63,10 @@
                     </label>
                     <select name="client_type" 
                             class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                        {% for type in client_types %}
-                        <option value="{{ type.value }}" 
-                                {{ 'selected' if client and client.client_type == type else '' }}>
-                            {{ type.value|capitalize }}
-                        </option>
-                        {% endfor %}
+                        <option value="EMPRESA" {{ 'selected' if client and client.client_type.value == 'EMPRESA' else '' }}>Empresa</option>
+                        <option value="PERSONAL" {{ 'selected' if client and client.client_type.value == 'PERSONAL' else '' }}>Personal</option>
+                        <option value="GOBIERNO" {{ 'selected' if client and client.client_type.value == 'GOBIERNO' else '' }}>Gobierno</option>
+                        <option value="EDUCACION" {{ 'selected' if client and client.client_type.value == 'EDUCACION' else '' }}>Educación</option>
                     </select>
                 </div>
 
