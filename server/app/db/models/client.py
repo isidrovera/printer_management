@@ -6,13 +6,14 @@ import uuid
 from datetime import datetime
 import enum
 
-class ClientType(enum.Enum):
+# Definir las enumeraciones
+class ClientType(str, enum.Enum):
     EMPRESA = "empresa"
     PERSONAL = "personal"
     GOBIERNO = "gobierno"
     EDUCACION = "educacion"
 
-class ClientStatus(enum.Enum):
+class ClientStatus(str, enum.Enum):
     ACTIVO = "activo"
     INACTIVO = "inactivo"
     SUSPENDIDO = "suspendido"
@@ -20,6 +21,7 @@ class ClientStatus(enum.Enum):
 
 class Client(BaseModel):
     __tablename__ = 'clients'
+    # ... resto del código del modelo ...
     
     # Información básica
     name = Column(String(100), nullable=False)
