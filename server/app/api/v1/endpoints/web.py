@@ -285,73 +285,93 @@ async def edit_client_form(request: Request, client_id: int, db: Session = Depen
 async def edit_client(request: Request, client_id: int, db: Session = Depends(get_db)):
     try:
         form = await request.form()
+        
+        # Función helper para manejar valores None
+        def clean_value(value):
+            if value in ['None', 'none', '', None]:
+                return None
+            return value
+
+        # Función helper para procesar fechas
+        def parse_date(date_str):
+            if not date_str or date_str in ['None', 'none', '']:
+                return None
+            try:
+                return datetime.strptime(date_str, '%Y-%m-%d')
+            except ValueError:
+                return None
+
+        # Procesar credit_limit
+        try:
+            credit_limit = float(form.get('credit_limit', 0)) if form.get('credit_limit') else None
+        except ValueError:
+            credit_limit = None
+
         client_data = {
-            "name": form.get("name"),
-            "business_name": form.get("business_name"),
-            "tax_id": form.get("tax_id"),
-            "client_type": form.get("client_type"),
-            "status": form.get("status"),
-            "client_code": form.get("client_code"),
+            # Información básica
+            "name": clean_value(form.get("name")),
+            "business_name": clean_value(form.get("business_name")),
+            "tax_id": clean_value(form.get("tax_id")),
+            "client_type": form.get("client_type"),  # Este es un enum, no aplicar clean_value
+            "status": form.get("status"),  # Este es un enum, no aplicar clean_value
+            "client_code": clean_value(form.get("client_code")),
             
-            # Contacto Principal
-            "contact_name": form.get("contact_name"),
-            "contact_email": form.get("contact_email"),
-            "contact_phone": form.get("contact_phone"),
-            "contact_position": form.get("contact_position"),
+            # Contactos
+            "contact_name": clean_value(form.get("contact_name")),
+            "contact_email": clean_value(form.get("contact_email")),
+            "contact_phone": clean_value(form.get("contact_phone")),
+            "contact_position": clean_value(form.get("contact_position")),
             
-            # Contacto Técnico
-            "technical_contact_name": form.get("technical_contact_name"),
-            "technical_contact_email": form.get("technical_contact_email"),
-            "technical_contact_phone": form.get("technical_contact_phone"),
-            "technical_department": form.get("technical_department"),
+            # Facturación
+            "billing_contact_name": clean_value(form.get("billing_contact_name")),
+            "billing_contact_email": clean_value(form.get("billing_contact_email")),
+            "billing_contact_phone": clean_value(form.get("billing_contact_phone")),
+            "billing_address": clean_value(form.get("billing_address")),
+            "billing_city": clean_value(form.get("billing_city")),
+            "billing_state": clean_value(form.get("billing_state")),
+            "billing_zip_code": clean_value(form.get("billing_zip_code")),
+            "billing_country": clean_value(form.get("billing_country")),
             
-            # Contacto de Facturación
-            "billing_contact_name": form.get("billing_contact_name"),
-            "billing_contact_email": form.get("billing_contact_email"),
-            "billing_contact_phone": form.get("billing_contact_phone"),
-            "billing_method": form.get("billing_method"),
+            # Contrato
+            "contract_number": clean_value(form.get("contract_number")),
+            "contract_start_date": parse_date(form.get("contract_start_date")),
+            "contract_end_date": parse_date(form.get("contract_end_date")),
+            "payment_terms": clean_value(form.get("payment_terms")),
+            "credit_limit": credit_limit,
+            "service_level": clean_value(form.get("service_level")),
             
-            # Dirección de Facturación
-            "billing_address": form.get("billing_address"),
-            "billing_city": form.get("billing_city"),
-            "billing_state": form.get("billing_state"),
-            "billing_zip_code": form.get("billing_zip_code"),
-            "billing_country": form.get("billing_country"),
-            
-            # Información del Contrato
-            "contract_number": form.get("contract_number"),
-            "contract_start_date": form.get("contract_start_date"),
-            "contract_end_date": form.get("contract_end_date"),
-            "service_level": form.get("service_level"),
-            "payment_terms": form.get("payment_terms"),
-            "credit_limit": form.get("credit_limit"),
-            
-            # Información Adicional
-            "account_manager": form.get("account_manager"),
-            "support_priority": form.get("support_priority"),
-            "notes": form.get("notes")
+            # Adicional
+            "account_manager": clean_value(form.get("account_manager")),
+            "support_priority": clean_value(form.get("support_priority")),
+            "notes": clean_value(form.get("notes"))
         }
 
+        # Remover campos None para no sobrescribir datos existentes
+        client_data = {k: v for k, v in client_data.items() if v is not None}
+
+        logger.debug(f"Datos a actualizar para cliente {client_id}: {client_data}")
+        
         client_service = ClientService(db)
         client = await client_service.update(client_id, client_data)
         
         if not client:
             raise ValueError("Cliente no encontrado")
 
+        logger.info(f"Cliente {client_id} actualizado exitosamente")
         return RedirectResponse("/clients", status_code=303)
+        
     except Exception as e:
         logger.error(f"Error updating client: {str(e)}")
         return templates.TemplateResponse(
             "clients/form.html",
             {
                 "request": request,
-                "client": {"id": client_id, **client_data},
-                "error": str(e),
+                "client": {"id": client_id, **form},
+                "error": f"Error al actualizar cliente: {str(e)}",
                 "client_types": ClientType,
                 "client_statuses": ClientStatus
             }
         )
-
 @router.delete("/clients/{client_id}")
 async def delete_client(client_id: int, db: Session = Depends(get_db)):
     """Elimina un cliente"""
