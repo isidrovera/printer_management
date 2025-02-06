@@ -15,48 +15,22 @@ const Logger = {
 };
 
 document.addEventListener('DOMContentLoaded', function() {
-    Logger.info('Iniciando aplicación de gestión de clientes');
-
-    // Objeto para mantener las referencias a elementos DOM
-    const elements = {
-        searchInput: document.getElementById('searchInput'),
-        statusFilter: document.getElementById('statusFilter'),
-        typeFilter: document.getElementById('typeFilter'),
-        notificationContainer: document.getElementById('notification-container'),
-        clientDetailsModal: document.getElementById('clientDetailsModal'),
-        deleteConfirmModal: document.getElementById('deleteConfirmModal')
+    // Sistema de logging
+    const Logger = {
+        info: (message) => console.log(`[INFO] ${message}`),
+        error: (message) => console.error(`[ERROR] ${message}`),
+        warn: (message) => console.warn(`[WARN] ${message}`)
     };
 
-    // Inicialización segura de event listeners
-    function initializeEventListeners() {
-        Logger.debug('Inicializando event listeners');
-
-        // Event listener para búsqueda
-        if (elements.searchInput) {
-            elements.searchInput.addEventListener('input', handleFilter);
-            Logger.debug('Event listener agregado a searchInput');
-        }
-
-        // Event listener para filtro de estado
-        if (elements.statusFilter) {
-            elements.statusFilter.addEventListener('change', handleFilter);
-            Logger.debug('Event listener agregado a statusFilter');
-        }
-
-        // Event listener para filtro de tipo
-        if (elements.typeFilter) {
-            elements.typeFilter.addEventListener('change', handleFilter);
-            Logger.debug('Event listener agregado a typeFilter');
-        }
-    }
-
-    // Función para manejar el filtrado
-    function handleFilter() {
-        Logger.debug('Ejecutando filtrado');
+    // Función principal de filtrado
+    function filterClients() {
+        const searchInput = document.getElementById('searchInput');
+        const statusFilter = document.getElementById('statusFilter');
+        const typeFilter = document.getElementById('typeFilter');
         
-        const searchTerm = elements.searchInput?.value?.toLowerCase() || '';
-        const statusValue = elements.statusFilter?.value?.toLowerCase() || '';
-        const typeValue = elements.typeFilter?.value?.toLowerCase() || '';
+        const searchTerm = searchInput?.value?.toLowerCase() || '';
+        const statusValue = statusFilter?.value?.toLowerCase() || '';
+        const typeValue = typeFilter?.value?.toLowerCase() || '';
 
         const rows = document.querySelectorAll('tbody tr');
         rows.forEach(row => {
@@ -74,95 +48,67 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 row.style.display = matchesSearch && matchesStatus && matchesType ? '' : 'none';
             } catch (error) {
-                Logger.error('Error al filtrar fila:', error);
+                Logger.error('Error al filtrar fila: ' + error);
                 row.style.display = '';
             }
         });
     }
 
+    // Inicialización segura de event listeners
+    function initializeFilters() {
+        const searchInput = document.getElementById('searchInput');
+        const statusFilter = document.getElementById('statusFilter');
+        const typeFilter = document.getElementById('typeFilter');
+
+        if (searchInput) {
+            searchInput.addEventListener('input', filterClients);
+        }
+        if (statusFilter) {
+            statusFilter.addEventListener('change', filterClients);
+        }
+        if (typeFilter) {
+            typeFilter.addEventListener('change', filterClients);
+        }
+    }
+
     // Función para mostrar notificaciones
     function showNotification(message, type = 'success') {
-        if (!elements.notificationContainer) {
-            Logger.error('Contenedor de notificaciones no encontrado');
-            return;
-        }
+        const container = document.getElementById('notification-container');
+        if (!container) return;
 
         const notification = document.createElement('div');
         notification.className = `${type === 'success' ? 'bg-green-500' : 'bg-red-500'} text-white px-6 py-3 rounded-lg shadow-lg`;
         notification.textContent = message;
-
-        elements.notificationContainer.appendChild(notification);
+        
+        container.appendChild(notification);
         setTimeout(() => notification.remove(), 3000);
     }
 
-    // Función para manejar los tabs
-    function initializeTabs() {
-        const tabButtons = document.querySelectorAll('.tab-button');
-        const tabContents = document.querySelectorAll('.tab-content');
-
-        if (!tabButtons.length || !tabContents.length) {
-            Logger.warn('No se encontraron elementos de tabs');
-            return;
-        }
-
-        tabButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                const tabName = button.getAttribute('data-tab');
-                
-                // Actualizar botones
-                tabButtons.forEach(btn => {
-                    btn.classList.remove('text-blue-600', 'border-blue-600');
-                    btn.classList.add('text-gray-500', 'border-transparent');
-                });
-                button.classList.add('text-blue-600', 'border-blue-600');
-                button.classList.remove('text-gray-500', 'border-transparent');
-
-                // Actualizar contenido
-                tabContents.forEach(content => {
-                    content.classList.toggle('hidden', content.id !== `${tabName}Tab`);
-                });
-            });
-        });
-    }
-
-    // Funciones globales para la gestión de clientes
+    // Funciones globales
     window.showClientDetails = async function(clientId) {
+        const modal = document.getElementById('clientDetailsModal');
+        if (!modal) return;
+
         try {
             const response = await fetch(`/clients/${clientId}/details`);
             const client = await response.json();
 
-            // Actualizar campos
-            const fields = {
+            // Actualizar información básica
+            const elements = {
                 clientName: client.name,
                 businessName: client.business_name,
                 taxId: client.tax_id,
                 clientType: client.client_type
             };
 
-            Object.entries(fields).forEach(([id, value]) => {
+            Object.entries(elements).forEach(([id, value]) => {
                 const element = document.getElementById(id);
                 if (element) element.textContent = value || '';
             });
 
-            // Actualizar estado
-            const statusElement = document.getElementById('clientStatus');
-            if (statusElement) {
-                statusElement.textContent = client.status;
-                statusElement.className = `px-3 py-1 rounded-full text-sm font-medium ${
-                    client.status === 'activo' ? 'bg-green-100 text-green-800' :
-                    client.status === 'inactivo' ? 'bg-red-100 text-red-800' :
-                    'bg-gray-100 text-gray-800'
-                }`;
-            }
-
-            // Mostrar modal
-            if (elements.clientDetailsModal) {
-                elements.clientDetailsModal.classList.remove('hidden');
-                initializeTabs();
-            }
-
+            modal.classList.remove('hidden');
         } catch (error) {
-            Logger.error('Error al cargar detalles del cliente:', error);
+            Logger.error('Error al cargar detalles del cliente: ' + error);
             showNotification('Error al cargar los detalles del cliente', 'error');
         }
     };
@@ -173,9 +119,10 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     window.confirmDelete = function(clientId) {
-        if (elements.deleteConfirmModal) {
+        const modal = document.getElementById('deleteConfirmModal');
+        if (modal) {
             window.clientToDelete = clientId;
-            elements.deleteConfirmModal.classList.remove('hidden');
+            modal.classList.remove('hidden');
         }
     };
 
@@ -190,7 +137,6 @@ document.addEventListener('DOMContentLoaded', function() {
             });
 
             const data = await response.json();
-
             if (data.success) {
                 showNotification('Cliente eliminado con éxito');
                 const row = document.querySelector(`tr[data-client-id="${clientId}"]`);
@@ -203,14 +149,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 throw new Error(data.error || 'Error al eliminar el cliente');
             }
         } catch (error) {
-            Logger.error('Error al eliminar cliente:', error);
+            Logger.error('Error al eliminar cliente: ' + error);
             showNotification(error.message, 'error');
         }
     };
 
     // Inicializar la aplicación
-    initializeEventListeners();
-    
+    initializeFilters();
+
     // Agregar estilos de animación
     const style = document.createElement('style');
     style.textContent = `
