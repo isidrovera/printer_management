@@ -151,82 +151,179 @@ def handle_dashboard_error(request: Request, error_message: str = "Error al carg
             "error": error_message
         }
     )
+# Rutas para el manejo de clientes
 @router.get("/clients")
-async def list_clients(request: Request, db: Session = Depends(get_db)):
-    client_service = ClientService(db)
-    clients = await client_service.get_all()
-    return templates.TemplateResponse(
-        "clients/list.html",
-        {"request": request, "clients": clients}
-    )
+async def list_clients(
+    request: Request, 
+    search: Optional[str] = None,
+    status: Optional[str] = None,
+    db: Session = Depends(get_db)
+):
+    """Vista de listado de clientes con opciones de filtrado"""
+    try:
+        client_service = ClientService(db)
+        if search:
+            clients = await client_service.search_clients(search)
+        elif status:
+            clients = await client_service.get_by_status(ClientStatus(status))
+        else:
+            clients = await client_service.get_all()
+            
+        return templates.TemplateResponse(
+            "clients/list.html",
+            {
+                "request": request, 
+                "clients": clients,
+                "statuses": ClientStatus,
+                "current_search": search,
+                "current_status": status
+            }
+        )
+    except Exception as e:
+        logger.error(f"Error listing clients: {str(e)}")
+        return templates.TemplateResponse(
+            "clients/list.html",
+            {"request": request, "clients": [], "error": str(e)}
+        )
 
 @router.get("/clients/create")
 async def create_client_form(request: Request):
+    """Formulario de creación de cliente"""
     return templates.TemplateResponse(
         "clients/form.html",
-        {"request": request, "client": None}
+        {
+            "request": request,
+            "client": None,
+            "client_types": ClientType,
+            "client_statuses": ClientStatus
+        }
     )
-
-@router.get("/clients/{client_id}/edit")
-async def edit_client_form(request: Request, client_id: int, db: Session = Depends(get_db)):
-    client_service = ClientService(db)
-    client = await client_service.get_by_id(client_id)
-    return templates.TemplateResponse(
-        "clients/form.html",
-        {"request": request, "client": client}
-    )
-@router.post("/clients/{client_id}/edit")
-async def edit_client(request: Request, client_id: int, db: Session = Depends(get_db)):
-    try:
-        form = await request.form()
-        name = form.get("name")
-        logger.info(f"Editing client with ID {client_id}, new name: {name}")
-
-        client_service = ClientService(db)
-        client = await client_service.get_by_id(client_id)
-
-        if not client:
-            return templates.TemplateResponse(
-                "clients/form.html",
-                {"request": request, "client": None, "error": "Cliente no encontrado"}
-            )
-
-        await client_service.update(client_id, name=name)
-        logger.info(f"Client with ID {client_id} updated successfully")
-        return RedirectResponse("/clients", status_code=303)
-    except Exception as e:
-        logger.error(f"Error editing client: {str(e)}")
-        return templates.TemplateResponse(
-            "clients/form.html",
-            {"request": request, "client": {"id": client_id, "name": form.get("name")}, "error": str(e)}
-        )
 
 @router.post("/clients/create")
 async def create_client(request: Request, db: Session = Depends(get_db)):
+    """Procesa la creación de un nuevo cliente"""
     try:
         form = await request.form()
-        name = form.get("name")
-        logger.info(f"Creating client with name: {name}")
-        
+        client_data = {
+            "name": form.get("name"),
+            "business_name": form.get("business_name"),
+            "tax_id": form.get("tax_id"),
+            "client_type": form.get("client_type"),
+            "contact_name": form.get("contact_name"),
+            "contact_email": form.get("contact_email"),
+            "contact_phone": form.get("contact_phone"),
+            "contact_position": form.get("contact_position"),
+            "technical_contact_name": form.get("technical_contact_name"),
+            "technical_contact_email": form.get("technical_contact_email"),
+            "technical_contact_phone": form.get("technical_contact_phone"),
+            "billing_contact_name": form.get("billing_contact_name"),
+            "billing_contact_email": form.get("billing_contact_email"),
+            "billing_contact_phone": form.get("billing_contact_phone"),
+            "billing_address": form.get("billing_address"),
+            "billing_city": form.get("billing_city"),
+            "billing_state": form.get("billing_state"),
+            "billing_zip_code": form.get("billing_zip_code"),
+            "billing_country": form.get("billing_country"),
+            "service_address": form.get("service_address"),
+            "service_city": form.get("service_city"),
+            "service_state": form.get("service_state"),
+            "service_zip_code": form.get("service_zip_code"),
+            "service_country": form.get("service_country"),
+            "contract_number": form.get("contract_number"),
+            "contract_start_date": form.get("contract_start_date"),
+            "contract_end_date": form.get("contract_end_date"),
+            "payment_terms": form.get("payment_terms"),
+            "credit_limit": form.get("credit_limit"),
+            "account_manager": form.get("account_manager"),
+            "service_level": form.get("service_level"),
+            "support_priority": form.get("support_priority"),
+            "status": form.get("status"),
+            "notes": form.get("notes")
+        }
+
         client_service = ClientService(db)
-        await client_service.create(name=name)
+        client = await client_service.create(client_data)
         
-        logger.info("Client created successfully")
+        logger.info(f"Cliente creado exitosamente: {client.name}")
         return RedirectResponse("/clients", status_code=303)
+    
     except Exception as e:
-        logger.error(f"Error creating client: {e}")
+        logger.error(f"Error creating client: {str(e)}")
         return templates.TemplateResponse(
             "clients/form.html",
-            {"request": request, "client": None, "error": str(e)}
+            {
+                "request": request,
+                "client": None,
+                "error": str(e),
+                "client_types": ClientType,
+                "client_statuses": ClientStatus,
+                "form_data": client_data
+            }
+        )
+
+@router.get("/clients/{client_id}/edit")
+async def edit_client_form(request: Request, client_id: int, db: Session = Depends(get_db)):
+    """Formulario de edición de cliente"""
+    client_service = ClientService(db)
+    client = await client_service.get_by_id(client_id)
+    
+    if not client:
+        return RedirectResponse("/clients", status_code=303)
+        
+    return templates.TemplateResponse(
+        "clients/form.html",
+        {
+            "request": request,
+            "client": client,
+            "client_types": ClientType,
+            "client_statuses": ClientStatus
+        }
+    )
+
+@router.post("/clients/{client_id}/edit")
+async def edit_client(request: Request, client_id: int, db: Session = Depends(get_db)):
+    """Procesa la actualización de un cliente"""
+    try:
+        form = await request.form()
+        client_data = {
+            # Los mismos campos que en create_client
+            "name": form.get("name"),
+            "business_name": form.get("business_name"),
+            # ... [resto de los campos]
+        }
+
+        client_service = ClientService(db)
+        client = await client_service.update(client_id, client_data)
+        
+        if not client:
+            raise ValueError("Cliente no encontrado")
+
+        logger.info(f"Cliente actualizado exitosamente: {client.name}")
+        return RedirectResponse("/clients", status_code=303)
+    
+    except Exception as e:
+        logger.error(f"Error updating client: {str(e)}")
+        return templates.TemplateResponse(
+            "clients/form.html",
+            {
+                "request": request,
+                "client": {"id": client_id, **client_data},
+                "error": str(e),
+                "client_types": ClientType,
+                "client_statuses": ClientStatus
+            }
         )
 
 @router.delete("/clients/{client_id}")
 async def delete_client(client_id: int, db: Session = Depends(get_db)):
+    """Elimina un cliente"""
     try:
         client_service = ClientService(db)
         deleted = await client_service.delete(client_id)
+        
         if deleted:
             return {"success": True}
+            
         return JSONResponse(
             status_code=404,
             content={"success": False, "error": "Cliente no encontrado"}
@@ -237,6 +334,21 @@ async def delete_client(client_id: int, db: Session = Depends(get_db)):
             status_code=500,
             content={"success": False, "error": str(e)}
         )
+
+# Rutas adicionales útiles
+@router.get("/clients/{client_id}/details")
+async def client_details(request: Request, client_id: int, db: Session = Depends(get_db)):
+    """Vista detallada de un cliente"""
+    client_service = ClientService(db)
+    client = await client_service.get_by_id(client_id)
+    
+    if not client:
+        return RedirectResponse("/clients", status_code=303)
+        
+    return templates.TemplateResponse(
+        "clients/details.html",
+        {"request": request, "client": client}
+    )
 
 @router.get("/agents")
 async def list_agents(request: Request, db: Session = Depends(get_db)):
