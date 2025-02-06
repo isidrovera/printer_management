@@ -567,47 +567,14 @@ def get_oids_by_brand(
     return oids
     
     
-    
-@router.post("/printer-oids/create")
-async def create_printer_oids(request: Request, db: Session = Depends(get_db)):
-    try:
-        form = await request.form()
-        
-        # Crear diccionario con los datos del formulario
-        oid_data = {
-            "brand": form.get("brand"),
-            "model_family": form.get("model_family"),
-            "description": form.get("description"),
-            "oid_total_pages": form.get("oid_total_pages"),
-            "oid_total_color_pages": form.get("oid_total_color_pages"),
-            "oid_black_toner_level": form.get("oid_black_toner_level"),
-            "oid_cyan_toner_level": form.get("oid_cyan_toner_level"),
-            "oid_magenta_toner_level": form.get("oid_magenta_toner_level"),
-            "oid_yellow_toner_level": form.get("oid_yellow_toner_level")
-        }
-        
-        printer_oids_service = PrinterOIDsService(db)
-        # Verificar si ya existe una configuración para esta marca y familia
-        existing = printer_oids_service.get_by_brand_and_family(
-            oid_data["brand"],
-            oid_data["model_family"]
-        )
-        
-        if existing:
-            return templates.TemplateResponse(
-                "printer_oids/form.html",
-                {
-                    "request": request,
-                    "printer_oids": None,
-                    "error": "Ya existe una configuración para esta marca y familia de modelos"
-                }
-            )
-        
-        await printer_oids_service.create(oid_data)
-        return RedirectResponse("/printer-oids", status_code=303)
-        
-@router.get("/printer-oids")
+# ============= Manejo de OIDS de Impresoras =============
+
+# 1. Listado de OIDs
+@router.get("/printer-oids", name="list_printer_oids")
 async def list_printer_oids(request: Request, db: Session = Depends(get_db)):
+    """
+    Muestra la lista de todas las configuraciones de OIDs
+    """
     try:
         printer_oids_service = PrinterOIDsService(db)
         oids = printer_oids_service.get_all()
@@ -616,23 +583,96 @@ async def list_printer_oids(request: Request, db: Session = Depends(get_db)):
             {"request": request, "printer_oids": oids}
         )
     except Exception as e:
-        logger.error(f"Error listing printer OIDs: {str(e)}")
+        logger.error(f"Error al listar OIDs: {str(e)}")
         return templates.TemplateResponse(
             "printer_oids/list.html",
             {"request": request, "printer_oids": [], "error": str(e)}
         )
 
-@router.get("/printer-oids/create")
+# 2. Creación de OIDs
+@router.get("/printer-oids/create", name="create_printer_oids_form")
 async def create_printer_oids_form(request: Request):
+    """
+    Muestra el formulario para crear nuevas configuraciones de OIDs
+    """
     return templates.TemplateResponse(
         "printer_oids/form.html",
         {"request": request, "printer_oids": None}
     )
 
-
+@router.post("/printer-oids/create", name="create_printer_oids")
+async def create_printer_oids(request: Request, db: Session = Depends(get_db)):
+    """
+    Procesa la creación de nuevas configuraciones de OIDs
+    """
+    try:
+        form = await request.form()
+        
+        # Recopilar todos los campos del formulario
+        oid_data = {
+            # Información básica
+            "brand": form.get("brand"),
+            "model_family": form.get("model_family"),
+            "description": form.get("description"),
+            
+            # Contadores de páginas
+            "oid_total_pages": form.get("oid_total_pages"),
+            "oid_total_color_pages": form.get("oid_total_color_pages"),
+            "oid_total_bw_pages": form.get("oid_total_bw_pages"),
+            "oid_total_copies": form.get("oid_total_copies"),
+            "oid_total_prints": form.get("oid_total_prints"),
+            "oid_total_scans": form.get("oid_total_scans"),
+            "oid_duplex_pages": form.get("oid_duplex_pages"),
+            "oid_total_faxes": form.get("oid_total_faxes"),
+            
+            # Niveles de tóner
+            "oid_black_toner_level": form.get("oid_black_toner_level"),
+            "oid_cyan_toner_level": form.get("oid_cyan_toner_level"),
+            "oid_magenta_toner_level": form.get("oid_magenta_toner_level"),
+            "oid_yellow_toner_level": form.get("oid_yellow_toner_level"),
+            
+            # Capacidades máximas de tóner
+            "oid_black_toner_max": form.get("oid_black_toner_max"),
+            "oid_cyan_toner_max": form.get("oid_cyan_toner_max"),
+            "oid_magenta_toner_max": form.get("oid_magenta_toner_max"),
+            "oid_yellow_toner_max": form.get("oid_yellow_toner_max"),
+            
+            # Estados de tóner
+            "oid_black_toner_status": form.get("oid_black_toner_status"),
+            "oid_cyan_toner_status": form.get("oid_cyan_toner_status"),
+            "oid_magenta_toner_status": form.get("oid_magenta_toner_status"),
+            "oid_yellow_toner_status": form.get("oid_yellow_toner_status"),
+            
+            # Unidades de imagen/drums
+            "oid_black_drum_level": form.get("oid_black_drum_level"),
+            "oid_cyan_drum_level": form.get("oid_cyan_drum_level"),
+            "oid_magenta_drum_level": form.get("oid_magenta_drum_level"),
+            "oid_yellow_drum_level": form.get("oid_yellow_drum_level"),
+            
+            # Otros consumibles
+            "oid_fuser_unit_level": form.get("oid_fuser_unit_level"),
+            "oid_transfer_belt_level": form.get("oid_transfer_belt_level"),
+            "oid_waste_toner_level": form.get("oid_waste_toner_level"),
+            "oid_waste_toner_max": form.get("oid_waste_toner_max")
+        }
+        
+        printer_oids_service = PrinterOIDsService(db)
+        
+        # Verificar existencia previa
+        existing = printer_oids_service.get_by_brand_and_family(
+            oid_data["brand"],
+            oid_data["model_family"]
+        )
+        
+        if existing:
+            raise ValueError("Ya existe una configuración para esta marca y familia de modelos")
+        
+        # Crear nueva configuración
+        await printer_oids_service.create(oid_data)
+        return RedirectResponse("/printer-oids", status_code=303)
     
-    except Exception as e:
-        logger.error(f"Error creating printer OIDs: {str(e)}")
+    except ValueError as e:
+        logger.warning(f"Error de validación al crear OIDs: {str(e)}")
         return templates.TemplateResponse(
             "printer_oids/form.html",
             {
@@ -641,9 +681,23 @@ async def create_printer_oids_form(request: Request):
                 "error": str(e)
             }
         )
+    except Exception as e:
+        logger.error(f"Error inesperado al crear OIDs: {str(e)}")
+        return templates.TemplateResponse(
+            "printer_oids/form.html",
+            {
+                "request": request,
+                "printer_oids": None,
+                "error": "Error interno al crear la configuración"
+            }
+        )
 
-@router.get("/printer-oids/{oid_id}/edit")
+# 3. Edición de OIDs
+@router.get("/printer-oids/{oid_id}/edit", name="edit_printer_oids_form")
 async def edit_printer_oids_form(request: Request, oid_id: int, db: Session = Depends(get_db)):
+    """
+    Muestra el formulario para editar una configuración existente
+    """
     printer_oids_service = PrinterOIDsService(db)
     oids = printer_oids_service.get_by_id(oid_id)
     if not oids:
@@ -653,32 +707,38 @@ async def edit_printer_oids_form(request: Request, oid_id: int, db: Session = De
         {"request": request, "printer_oids": oids}
     )
 
-@router.post("/printer-oids/{oid_id}/edit")
+@router.post("/printer-oids/{oid_id}/edit", name="edit_printer_oids")
 async def edit_printer_oids(request: Request, oid_id: int, db: Session = Depends(get_db)):
+    """
+    Procesa la actualización de una configuración existente
+    """
     try:
         form = await request.form()
         printer_oids_service = PrinterOIDsService(db)
         
+        # Recopilar todos los campos actualizados
         oid_data = {
             "brand": form.get("brand"),
             "model_family": form.get("model_family"),
             "description": form.get("description"),
-            "oid_total_pages": form.get("oid_total_pages"),
-            "oid_black_toner_level": form.get("oid_black_toner_level"),
-            # Agregar todos los campos OID necesarios
+            # ... [incluir todos los campos como en create]
         }
         
         await printer_oids_service.update(oid_id, oid_data)
         return RedirectResponse("/printer-oids", status_code=303)
     except Exception as e:
-        logger.error(f"Error updating printer OIDs: {str(e)}")
+        logger.error(f"Error al actualizar OIDs: {str(e)}")
         return templates.TemplateResponse(
             "printer_oids/form.html",
             {"request": request, "printer_oids": {"id": oid_id, **oid_data}, "error": str(e)}
         )
 
-@router.delete("/printer-oids/{oid_id}")
+# 4. Eliminación de OIDs
+@router.delete("/printer-oids/{oid_id}", name="delete_printer_oids")
 async def delete_printer_oids(oid_id: int, db: Session = Depends(get_db)):
+    """
+    Elimina una configuración de OIDs existente
+    """
     try:
         printer_oids_service = PrinterOIDsService(db)
         success = await printer_oids_service.delete(oid_id)
@@ -686,10 +746,10 @@ async def delete_printer_oids(oid_id: int, db: Session = Depends(get_db)):
             return {"success": True}
         return JSONResponse(
             status_code=404,
-            content={"success": False, "error": "OIDs configuration not found"}
+            content={"success": False, "error": "Configuración de OIDs no encontrada"}
         )
     except Exception as e:
-        logger.error(f"Error deleting printer OIDs: {str(e)}")
+        logger.error(f"Error al eliminar OIDs: {str(e)}")
         return JSONResponse(
             status_code=500,
             content={"success": False, "error": str(e)}
