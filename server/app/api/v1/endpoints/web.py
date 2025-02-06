@@ -283,14 +283,53 @@ async def edit_client_form(request: Request, client_id: int, db: Session = Depen
 
 @router.post("/clients/{client_id}/edit")
 async def edit_client(request: Request, client_id: int, db: Session = Depends(get_db)):
-    """Procesa la actualización de un cliente"""
     try:
         form = await request.form()
         client_data = {
-            # Los mismos campos que en create_client
             "name": form.get("name"),
             "business_name": form.get("business_name"),
-            # ... [resto de los campos]
+            "tax_id": form.get("tax_id"),
+            "client_type": form.get("client_type"),
+            "status": form.get("status"),
+            "client_code": form.get("client_code"),
+            
+            # Contacto Principal
+            "contact_name": form.get("contact_name"),
+            "contact_email": form.get("contact_email"),
+            "contact_phone": form.get("contact_phone"),
+            "contact_position": form.get("contact_position"),
+            
+            # Contacto Técnico
+            "technical_contact_name": form.get("technical_contact_name"),
+            "technical_contact_email": form.get("technical_contact_email"),
+            "technical_contact_phone": form.get("technical_contact_phone"),
+            "technical_department": form.get("technical_department"),
+            
+            # Contacto de Facturación
+            "billing_contact_name": form.get("billing_contact_name"),
+            "billing_contact_email": form.get("billing_contact_email"),
+            "billing_contact_phone": form.get("billing_contact_phone"),
+            "billing_method": form.get("billing_method"),
+            
+            # Dirección de Facturación
+            "billing_address": form.get("billing_address"),
+            "billing_city": form.get("billing_city"),
+            "billing_state": form.get("billing_state"),
+            "billing_zip_code": form.get("billing_zip_code"),
+            "billing_country": form.get("billing_country"),
+            
+            # Información del Contrato
+            "contract_number": form.get("contract_number"),
+            "contract_start_date": form.get("contract_start_date"),
+            "contract_end_date": form.get("contract_end_date"),
+            "service_level": form.get("service_level"),
+            "payment_terms": form.get("payment_terms"),
+            "credit_limit": form.get("credit_limit"),
+            
+            # Información Adicional
+            "account_manager": form.get("account_manager"),
+            "support_priority": form.get("support_priority"),
+            "notes": form.get("notes")
         }
 
         client_service = ClientService(db)
@@ -299,9 +338,7 @@ async def edit_client(request: Request, client_id: int, db: Session = Depends(ge
         if not client:
             raise ValueError("Cliente no encontrado")
 
-        logger.info(f"Cliente actualizado exitosamente: {client.name}")
         return RedirectResponse("/clients", status_code=303)
-    
     except Exception as e:
         logger.error(f"Error updating client: {str(e)}")
         return templates.TemplateResponse(
