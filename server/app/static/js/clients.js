@@ -14,52 +14,26 @@ const Logger = {
     }
 };
 
+// Función para agregar event listener de forma segura
+function addSafeEventListener(elementId, event, handler) {
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.addEventListener(event, handler);
+        Logger.debug(`Event listener agregado a ${elementId}`);
+    } else {
+        Logger.warn(`Elemento ${elementId} no encontrado para event listener`);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     Logger.info('Iniciando aplicación de gestión de clientes');
 
-    // Referencias a elementos DOM
-    const searchInput = document.getElementById('searchInput');
-    const statusFilter = document.getElementById('statusFilter');
-    const typeFilter = document.getElementById('typeFilter');
-    const notificationContainer = document.getElementById('notification-container');
-    const clientDetailsModal = document.getElementById('clientDetailsModal');
-    const deleteConfirmModal = document.getElementById('deleteConfirmModal');
-
-    // Verificación de elementos críticos
-    if (!searchInput) Logger.warn('Elemento searchInput no encontrado');
-    if (!statusFilter) Logger.warn('Elemento statusFilter no encontrado');
-    if (!typeFilter) Logger.warn('Elemento typeFilter no encontrado');
-    if (!notificationContainer) Logger.warn('Elemento notificationContainer no encontrado');
-    if (!clientDetailsModal) Logger.warn('Elemento clientDetailsModal no encontrado');
-    if (!deleteConfirmModal) Logger.warn('Elemento deleteConfirmModal no encontrado');
-
-    // Función para mostrar notificaciones
-    function showNotification(message, type = 'success') {
-        Logger.info(`Mostrando notificación: ${message} (tipo: ${type})`);
-        
-        const notification = document.createElement('div');
-        notification.className = `${type === 'success' ? 'bg-green-500' : 'bg-red-500'} text-white px-6 py-3 rounded-lg shadow-lg transition-opacity duration-300`;
-        notification.textContent = message;
-        
-        if (notificationContainer) {
-            notificationContainer.appendChild(notification);
-            Logger.debug('Notificación agregada al contenedor');
-
-            setTimeout(() => {
-                notification.style.opacity = '0';
-                setTimeout(() => {
-                    notification.remove();
-                    Logger.debug('Notificación removida');
-                }, 300);
-            }, 3000);
-        } else {
-            Logger.error('No se pudo mostrar la notificación: contenedor no encontrado');
-        }
-    }
-
-    // Función de búsqueda y filtrado
+    // Filtrado y búsqueda
     function filterClients() {
         Logger.debug('Iniciando filtrado de clientes');
+        const searchInput = document.getElementById('searchInput');
+        const statusFilter = document.getElementById('statusFilter');
+        const typeFilter = document.getElementById('typeFilter');
         
         const searchTerm = searchInput?.value?.toLowerCase() || '';
         const statusValue = statusFilter?.value?.toLowerCase() || '';
@@ -99,65 +73,40 @@ document.addEventListener('DOMContentLoaded', function() {
         Logger.info(`Filtrado completado: ${visibleRows} filas visibles de ${rows.length} totales`);
     }
 
-    // Event listeners para búsqueda y filtros
-    if (searchInput) {
-        searchInput.addEventListener('input', () => {
-            Logger.debug('Evento input en searchInput');
-            filterClients();
-        });
+    // Agregar event listeners de manera segura
+    addSafeEventListener('searchInput', 'input', filterClients);
+    addSafeEventListener('statusFilter', 'change', filterClients);
+    addSafeEventListener('typeFilter', 'change', filterClients);
+
+    // Funciones para modales
+    window.showNotification = function(message, type = 'success') {
+        Logger.info(`Mostrando notificación: ${message} (tipo: ${type})`);
+        const container = document.getElementById('notification-container');
+        if (!container) {
+            Logger.error('Contenedor de notificaciones no encontrado');
+            return;
+        }
+
+        const notification = document.createElement('div');
+        notification.className = `${type === 'success' ? 'bg-green-500' : 'bg-red-500'} text-white px-6 py-3 rounded-lg shadow-lg transition-opacity duration-300`;
+        notification.textContent = message;
+        container.appendChild(notification);
+
+        setTimeout(() => {
+            notification.style.opacity = '0';
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
     }
 
-    if (statusFilter) {
-        statusFilter.addEventListener('change', () => {
-            Logger.debug('Evento change en statusFilter');
-            filterClients();
-        });
-    }
-
-    if (typeFilter) {
-        typeFilter.addEventListener('change', () => {
-            Logger.debug('Evento change en typeFilter');
-            filterClients();
-        });
-    }
-
-    // Manejo de tabs en el modal de detalles
-    const tabButtons = document.querySelectorAll('.tab-button');
-    const tabContents = document.querySelectorAll('.tab-content');
-
-    Logger.debug(`Encontrados: ${tabButtons.length} botones de tab y ${tabContents.length} contenidos de tab`);
-
-    if (tabButtons.length && tabContents.length) {
-        tabButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                const tabName = button.getAttribute('data-tab');
-                Logger.debug(`Cambiando a tab: ${tabName}`);
-
-                // Actualizar clases de botones
-                tabButtons.forEach(btn => {
-                    btn.classList.remove('text-blue-600', 'border-blue-600');
-                    btn.classList.add('text-gray-500', 'border-transparent');
-                });
-                button.classList.add('text-blue-600', 'border-blue-600');
-                button.classList.remove('text-gray-500', 'border-transparent');
-
-                // Mostrar contenido de tab seleccionado
-                tabContents.forEach(content => {
-                    if (content.id === `${tabName}Tab`) {
-                        content.classList.remove('hidden');
-                        Logger.debug(`Mostrando contenido de tab: ${content.id}`);
-                    } else {
-                        content.classList.add('hidden');
-                    }
-                });
-            });
-        });
-    }
-
-    // Funciones globales
     window.showClientDetails = async function(clientId) {
         Logger.info(`Cargando detalles del cliente: ${clientId}`);
+        const modal = document.getElementById('clientDetailsModal');
         
+        if (!modal) {
+            Logger.error('Modal de detalles no encontrado');
+            return;
+        }
+
         try {
             const response = await fetch(`/clients/${clientId}/details`);
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
@@ -165,50 +114,20 @@ document.addEventListener('DOMContentLoaded', function() {
             const client = await response.json();
             Logger.debug('Datos del cliente recibidos:', client);
 
-            // Actualizar campos del modal
-            const fields = {
-                'clientName': client.name,
-                'businessName': client.business_name,
-                'taxId': client.tax_id,
-                'clientType': client.client_type
-            };
-
-            Object.entries(fields).forEach(([elementId, value]) => {
-                const element = document.getElementById(elementId);
-                if (element) {
-                    element.textContent = value;
-                } else {
-                    Logger.warn(`Elemento ${elementId} no encontrado`);
-                }
-            });
-
-            // Actualizar estado
-            const statusElement = document.getElementById('clientStatus');
-            if (statusElement) {
-                statusElement.textContent = client.status;
-                const statusClasses = {
-                    'activo': 'bg-green-100 text-green-800',
-                    'inactivo': 'bg-red-100 text-red-800',
-                    'default': 'bg-gray-100 text-gray-800'
-                };
-                statusElement.className = `px-3 py-1 rounded-full text-sm font-medium ${
-                    statusClasses[client.status] || statusClasses.default
-                }`;
-            }
-
-            // Actualizar botón de edición
+            // Actualizar información básica
+            updateElementText('clientName', client.name);
+            updateElementText('businessName', client.business_name);
+            updateElementText('taxId', client.tax_id);
+            updateElementText('clientType', client.client_type);
+            
+            // Actualizar el enlace de edición
             const editButton = document.getElementById('editClientButton');
             if (editButton) {
                 editButton.href = `/clients/${clientId}/edit`;
             }
 
-            // Mostrar modal
-            if (clientDetailsModal) {
-                clientDetailsModal.classList.remove('hidden');
-                Logger.info('Modal de detalles mostrado exitosamente');
-            } else {
-                Logger.error('Modal de detalles no encontrado');
-            }
+            modal.classList.remove('hidden');
+            initializeTabs();
 
         } catch (error) {
             Logger.error('Error cargando detalles del cliente:', error);
@@ -216,25 +135,52 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
+    function updateElementText(elementId, text) {
+        const element = document.getElementById(elementId);
+        if (element) {
+            element.textContent = text || '';
+        } else {
+            Logger.warn(`Elemento ${elementId} no encontrado`);
+        }
+    }
+
+    function initializeTabs() {
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const tabName = button.getAttribute('data-tab');
+                
+                tabButtons.forEach(btn => {
+                    btn.classList.remove('text-blue-600', 'border-blue-600');
+                    btn.classList.add('text-gray-500', 'border-transparent');
+                });
+                
+                button.classList.add('text-blue-600', 'border-blue-600');
+                button.classList.remove('text-gray-500', 'border-transparent');
+
+                tabContents.forEach(content => {
+                    content.classList.toggle('hidden', content.id !== `${tabName}Tab`);
+                });
+            });
+        });
+    }
+
     window.closeModal = function(modalId) {
         Logger.debug(`Cerrando modal: ${modalId}`);
         const modal = document.getElementById(modalId);
         if (modal) {
             modal.classList.add('hidden');
-            Logger.debug('Modal cerrado exitosamente');
-        } else {
-            Logger.warn(`Modal ${modalId} no encontrado`);
         }
     };
 
     window.confirmDelete = function(clientId) {
         Logger.debug(`Iniciando confirmación de eliminación para cliente: ${clientId}`);
-        if (deleteConfirmModal) {
+        const modal = document.getElementById('deleteConfirmModal');
+        if (modal) {
             window.clientToDelete = clientId;
-            deleteConfirmModal.classList.remove('hidden');
-            Logger.info('Modal de confirmación de eliminación mostrado');
-        } else {
-            Logger.error('Modal de confirmación de eliminación no encontrado');
+            modal.classList.remove('hidden');
         }
     };
 
@@ -244,8 +190,6 @@ document.addEventListener('DOMContentLoaded', function() {
             Logger.error('No se encontró ID de cliente para eliminar');
             return;
         }
-
-        Logger.info(`Iniciando eliminación del cliente: ${clientId}`);
 
         try {
             const response = await fetch(`/clients/${clientId}`, {
@@ -264,20 +208,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 const row = document.querySelector(`tr[data-client-id="${clientId}"]`);
                 if (row) {
                     row.style.animation = 'fadeOut 0.3s ease';
-                    setTimeout(() => {
-                        row.remove();
-                        Logger.debug('Fila de cliente removida del DOM');
-                    }, 300);
+                    setTimeout(() => row.remove(), 300);
                 }
                 
                 closeModal('deleteConfirmModal');
             } else {
-                Logger.error('Error en la respuesta al eliminar cliente:', data.error);
-                showNotification(data.error || 'Error al eliminar el cliente', 'error');
+                throw new Error(data.error || 'Error desconocido');
             }
         } catch (error) {
             Logger.error('Error durante la eliminación del cliente:', error);
-            showNotification('Error al eliminar el cliente', 'error');
+            showNotification(error.message || 'Error al eliminar el cliente', 'error');
         }
     };
 
@@ -290,5 +230,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     `;
     document.head.appendChild(style);
+    
     Logger.info('Aplicación de gestión de clientes inicializada completamente');
 });

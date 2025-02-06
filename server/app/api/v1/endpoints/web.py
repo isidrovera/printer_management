@@ -15,7 +15,7 @@ from app.services.driver_service import DriverService
 from app.services.tunnel_service import TunnelService
 from app.services.monitor_service import PrinterMonitorService
 from app.db.models.printer import Printer
-from app.db.models.client import Client
+from app.db.models.client import Client, ClientStatus, ClientType
 from fastapi import File, UploadFile
 from pathlib import Path
 from app.core.config import settings
