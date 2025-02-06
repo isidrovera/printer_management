@@ -14,38 +14,52 @@ const Logger = {
     }
 };
 
-// Función para agregar event listener de forma segura
-function addSafeEventListener(elementId, event, handler) {
-    const element = document.getElementById(elementId);
-    if (element) {
-        element.addEventListener(event, handler);
-        Logger.debug(`Event listener agregado a ${elementId}`);
-    } else {
-        Logger.warn(`Elemento ${elementId} no encontrado para event listener`);
-    }
-}
-
 document.addEventListener('DOMContentLoaded', function() {
     Logger.info('Iniciando aplicación de gestión de clientes');
 
-    // Filtrado y búsqueda
-    function filterClients() {
-        Logger.debug('Iniciando filtrado de clientes');
-        const searchInput = document.getElementById('searchInput');
-        const statusFilter = document.getElementById('statusFilter');
-        const typeFilter = document.getElementById('typeFilter');
+    // Objeto para mantener las referencias a elementos DOM
+    const elements = {
+        searchInput: document.getElementById('searchInput'),
+        statusFilter: document.getElementById('statusFilter'),
+        typeFilter: document.getElementById('typeFilter'),
+        notificationContainer: document.getElementById('notification-container'),
+        clientDetailsModal: document.getElementById('clientDetailsModal'),
+        deleteConfirmModal: document.getElementById('deleteConfirmModal')
+    };
+
+    // Inicialización segura de event listeners
+    function initializeEventListeners() {
+        Logger.debug('Inicializando event listeners');
+
+        // Event listener para búsqueda
+        if (elements.searchInput) {
+            elements.searchInput.addEventListener('input', handleFilter);
+            Logger.debug('Event listener agregado a searchInput');
+        }
+
+        // Event listener para filtro de estado
+        if (elements.statusFilter) {
+            elements.statusFilter.addEventListener('change', handleFilter);
+            Logger.debug('Event listener agregado a statusFilter');
+        }
+
+        // Event listener para filtro de tipo
+        if (elements.typeFilter) {
+            elements.typeFilter.addEventListener('change', handleFilter);
+            Logger.debug('Event listener agregado a typeFilter');
+        }
+    }
+
+    // Función para manejar el filtrado
+    function handleFilter() {
+        Logger.debug('Ejecutando filtrado');
         
-        const searchTerm = searchInput?.value?.toLowerCase() || '';
-        const statusValue = statusFilter?.value?.toLowerCase() || '';
-        const typeValue = typeFilter?.value?.toLowerCase() || '';
-        
-        Logger.debug('Términos de búsqueda:', { searchTerm, statusValue, typeValue });
+        const searchTerm = elements.searchInput?.value?.toLowerCase() || '';
+        const statusValue = elements.statusFilter?.value?.toLowerCase() || '';
+        const typeValue = elements.typeFilter?.value?.toLowerCase() || '';
 
         const rows = document.querySelectorAll('tbody tr');
-        Logger.debug(`Encontradas ${rows.length} filas para filtrar`);
-
-        let visibleRows = 0;
-        rows.forEach((row, index) => {
+        rows.forEach(row => {
             try {
                 const text = row.textContent.toLowerCase();
                 const statusCell = row.querySelector('td:nth-child(5)');
@@ -58,108 +72,52 @@ document.addEventListener('DOMContentLoaded', function() {
                 const matchesStatus = statusValue === '' || status.includes(statusValue);
                 const matchesType = typeValue === '' || type.includes(typeValue);
 
-                const isVisible = matchesSearch && matchesStatus && matchesType;
-                row.style.display = isVisible ? '' : 'none';
-                
-                if (isVisible) visibleRows++;
-                
+                row.style.display = matchesSearch && matchesStatus && matchesType ? '' : 'none';
             } catch (error) {
-                Logger.error(`Error al filtrar fila ${index}:`, error);
+                Logger.error('Error al filtrar fila:', error);
                 row.style.display = '';
-                visibleRows++;
             }
         });
-
-        Logger.info(`Filtrado completado: ${visibleRows} filas visibles de ${rows.length} totales`);
     }
 
-    // Agregar event listeners de manera segura
-    addSafeEventListener('searchInput', 'input', filterClients);
-    addSafeEventListener('statusFilter', 'change', filterClients);
-    addSafeEventListener('typeFilter', 'change', filterClients);
-
-    // Funciones para modales
-    window.showNotification = function(message, type = 'success') {
-        Logger.info(`Mostrando notificación: ${message} (tipo: ${type})`);
-        const container = document.getElementById('notification-container');
-        if (!container) {
+    // Función para mostrar notificaciones
+    function showNotification(message, type = 'success') {
+        if (!elements.notificationContainer) {
             Logger.error('Contenedor de notificaciones no encontrado');
             return;
         }
 
         const notification = document.createElement('div');
-        notification.className = `${type === 'success' ? 'bg-green-500' : 'bg-red-500'} text-white px-6 py-3 rounded-lg shadow-lg transition-opacity duration-300`;
+        notification.className = `${type === 'success' ? 'bg-green-500' : 'bg-red-500'} text-white px-6 py-3 rounded-lg shadow-lg`;
         notification.textContent = message;
-        container.appendChild(notification);
 
-        setTimeout(() => {
-            notification.style.opacity = '0';
-            setTimeout(() => notification.remove(), 300);
-        }, 3000);
+        elements.notificationContainer.appendChild(notification);
+        setTimeout(() => notification.remove(), 3000);
     }
 
-    window.showClientDetails = async function(clientId) {
-        Logger.info(`Cargando detalles del cliente: ${clientId}`);
-        const modal = document.getElementById('clientDetailsModal');
-        
-        if (!modal) {
-            Logger.error('Modal de detalles no encontrado');
-            return;
-        }
-
-        try {
-            const response = await fetch(`/clients/${clientId}/details`);
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-            
-            const client = await response.json();
-            Logger.debug('Datos del cliente recibidos:', client);
-
-            // Actualizar información básica
-            updateElementText('clientName', client.name);
-            updateElementText('businessName', client.business_name);
-            updateElementText('taxId', client.tax_id);
-            updateElementText('clientType', client.client_type);
-            
-            // Actualizar el enlace de edición
-            const editButton = document.getElementById('editClientButton');
-            if (editButton) {
-                editButton.href = `/clients/${clientId}/edit`;
-            }
-
-            modal.classList.remove('hidden');
-            initializeTabs();
-
-        } catch (error) {
-            Logger.error('Error cargando detalles del cliente:', error);
-            showNotification('Error al cargar los detalles del cliente', 'error');
-        }
-    };
-
-    function updateElementText(elementId, text) {
-        const element = document.getElementById(elementId);
-        if (element) {
-            element.textContent = text || '';
-        } else {
-            Logger.warn(`Elemento ${elementId} no encontrado`);
-        }
-    }
-
+    // Función para manejar los tabs
     function initializeTabs() {
         const tabButtons = document.querySelectorAll('.tab-button');
         const tabContents = document.querySelectorAll('.tab-content');
+
+        if (!tabButtons.length || !tabContents.length) {
+            Logger.warn('No se encontraron elementos de tabs');
+            return;
+        }
 
         tabButtons.forEach(button => {
             button.addEventListener('click', () => {
                 const tabName = button.getAttribute('data-tab');
                 
+                // Actualizar botones
                 tabButtons.forEach(btn => {
                     btn.classList.remove('text-blue-600', 'border-blue-600');
                     btn.classList.add('text-gray-500', 'border-transparent');
                 });
-                
                 button.classList.add('text-blue-600', 'border-blue-600');
                 button.classList.remove('text-gray-500', 'border-transparent');
 
+                // Actualizar contenido
                 tabContents.forEach(content => {
                     content.classList.toggle('hidden', content.id !== `${tabName}Tab`);
                 });
@@ -167,60 +125,92 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    window.closeModal = function(modalId) {
-        Logger.debug(`Cerrando modal: ${modalId}`);
-        const modal = document.getElementById(modalId);
-        if (modal) {
-            modal.classList.add('hidden');
+    // Funciones globales para la gestión de clientes
+    window.showClientDetails = async function(clientId) {
+        try {
+            const response = await fetch(`/clients/${clientId}/details`);
+            const client = await response.json();
+
+            // Actualizar campos
+            const fields = {
+                clientName: client.name,
+                businessName: client.business_name,
+                taxId: client.tax_id,
+                clientType: client.client_type
+            };
+
+            Object.entries(fields).forEach(([id, value]) => {
+                const element = document.getElementById(id);
+                if (element) element.textContent = value || '';
+            });
+
+            // Actualizar estado
+            const statusElement = document.getElementById('clientStatus');
+            if (statusElement) {
+                statusElement.textContent = client.status;
+                statusElement.className = `px-3 py-1 rounded-full text-sm font-medium ${
+                    client.status === 'activo' ? 'bg-green-100 text-green-800' :
+                    client.status === 'inactivo' ? 'bg-red-100 text-red-800' :
+                    'bg-gray-100 text-gray-800'
+                }`;
+            }
+
+            // Mostrar modal
+            if (elements.clientDetailsModal) {
+                elements.clientDetailsModal.classList.remove('hidden');
+                initializeTabs();
+            }
+
+        } catch (error) {
+            Logger.error('Error al cargar detalles del cliente:', error);
+            showNotification('Error al cargar los detalles del cliente', 'error');
         }
     };
 
+    window.closeModal = function(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) modal.classList.add('hidden');
+    };
+
     window.confirmDelete = function(clientId) {
-        Logger.debug(`Iniciando confirmación de eliminación para cliente: ${clientId}`);
-        const modal = document.getElementById('deleteConfirmModal');
-        if (modal) {
+        if (elements.deleteConfirmModal) {
             window.clientToDelete = clientId;
-            modal.classList.remove('hidden');
+            elements.deleteConfirmModal.classList.remove('hidden');
         }
     };
 
     window.executeDelete = async function() {
         const clientId = window.clientToDelete;
-        if (!clientId) {
-            Logger.error('No se encontró ID de cliente para eliminar');
-            return;
-        }
+        if (!clientId) return;
 
         try {
             const response = await fetch(`/clients/${clientId}`, {
                 method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
+                headers: { 'Content-Type': 'application/json' }
             });
 
             const data = await response.json();
 
             if (data.success) {
-                Logger.info(`Cliente ${clientId} eliminado exitosamente`);
                 showNotification('Cliente eliminado con éxito');
-                
                 const row = document.querySelector(`tr[data-client-id="${clientId}"]`);
                 if (row) {
                     row.style.animation = 'fadeOut 0.3s ease';
                     setTimeout(() => row.remove(), 300);
                 }
-                
                 closeModal('deleteConfirmModal');
             } else {
-                throw new Error(data.error || 'Error desconocido');
+                throw new Error(data.error || 'Error al eliminar el cliente');
             }
         } catch (error) {
-            Logger.error('Error durante la eliminación del cliente:', error);
-            showNotification(error.message || 'Error al eliminar el cliente', 'error');
+            Logger.error('Error al eliminar cliente:', error);
+            showNotification(error.message, 'error');
         }
     };
 
+    // Inicializar la aplicación
+    initializeEventListeners();
+    
     // Agregar estilos de animación
     const style = document.createElement('style');
     style.textContent = `
@@ -230,6 +220,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     `;
     document.head.appendChild(style);
-    
-    Logger.info('Aplicación de gestión de clientes inicializada completamente');
+
+    Logger.info('Aplicación inicializada correctamente');
 });
