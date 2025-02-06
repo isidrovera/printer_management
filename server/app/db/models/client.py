@@ -1,12 +1,12 @@
 # server/app/db/models/client.py
+
 from app.db.base import BaseModel
-from sqlalchemy import Column, String, Boolean, DateTime, Text, Enum, Integer
+from sqlalchemy import Column, String, Boolean, DateTime, Text, Enum, Integer, TIMESTAMP
 from sqlalchemy.orm import relationship
 import uuid
 from datetime import datetime
 import enum
 
-# Definir las enumeraciones
 class ClientType(str, enum.Enum):
     EMPRESA = "empresa"
     PERSONAL = "personal"
@@ -21,20 +21,18 @@ class ClientStatus(str, enum.Enum):
 
 class Client(BaseModel):
     __tablename__ = 'clients'
-    # ... resto del código del modelo ...
     
     # Información básica
     name = Column(String(100), nullable=False)
-    business_name = Column(String(150))  # Razón social
-    tax_id = Column(String(20))  # RFC o identificación fiscal
+    business_name = Column(String(150))
+    tax_id = Column(String(20))
     client_type = Column(Enum(ClientType), default=ClientType.EMPRESA)
-    client_code = Column(String(20), unique=True)  # Código interno del cliente
+    client_code = Column(String(20), unique=True)
     
     # Contacto principal
     contact_name = Column(String(100))
     contact_email = Column(String(100))
     contact_phone = Column(String(20))
-    contact_position = Column(String(50))
     
     # Contacto técnico
     technical_contact_name = Column(String(100))
@@ -51,57 +49,52 @@ class Client(BaseModel):
     billing_city = Column(String(100))
     billing_state = Column(String(100))
     billing_zip_code = Column(String(10))
-    billing_country = Column(String(100), default="México")
+    billing_country = Column(String(100))
     
-    # Dirección de servicio (si es diferente a la fiscal)
+    # Dirección de servicio
     service_address = Column(String(200))
     service_city = Column(String(100))
     service_state = Column(String(100))
     service_zip_code = Column(String(10))
-    service_country = Column(String(100), default="México")
+    service_country = Column(String(100))
     
     # Información comercial
     contract_number = Column(String(50))
-    contract_start_date = Column(DateTime)
-    contract_end_date = Column(DateTime)
-    payment_terms = Column(String(100))  # Términos de pago (30 días, 60 días, etc.)
-    credit_limit = Column(Integer)  # Límite de crédito
+    contract_start_date = Column(TIMESTAMP)
+    contract_end_date = Column(TIMESTAMP)
+    payment_terms = Column(String(100))
+    credit_limit = Column(Integer)
     
     # Información de gestión
-    account_manager = Column(String(100))  # Ejecutivo de cuenta asignado
-    service_level = Column(String(50))  # Nivel de servicio contratado
-    support_priority = Column(Integer)  # Prioridad de soporte (1-5)
+    account_manager = Column(String(100))
+    service_level = Column(String(50))
+    support_priority = Column(Integer)
     
     # Estado y configuración
     status = Column(Enum(ClientStatus), default=ClientStatus.ACTIVO)
     is_active = Column(Boolean, default=True)
     token = Column(String, unique=True, nullable=False)
-    notes = Column(Text)  # Notas generales sobre el cliente
+    notes = Column(Text)
     
     # Fechas importantes
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    last_contact_date = Column(DateTime)  # Última fecha de contacto
+    created_at = Column(TIMESTAMP, default=datetime.utcnow)
+    updated_at = Column(TIMESTAMP, default=datetime.utcnow, onupdate=datetime.utcnow)
+    last_contact_date = Column(TIMESTAMP)
     
     # Relaciones
     agents = relationship("Agent", back_populates="client")
     printers = relationship("Printer", back_populates="client")
-    
+
     @staticmethod
     def generate_token():
         return f"cli_{uuid.uuid4().hex}"
-    
-    @staticmethod
-    def generate_client_code():
-        """Genera un código único para el cliente"""
-        return f"C{uuid.uuid4().hex[:8].upper()}"
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         if not self.token:
             self.token = self.generate_token()
         if not self.client_code:
-            self.client_code = self.generate_client_code()
+            self.client_code = f"C{uuid.uuid4().hex[:8].upper()}"
     
     def to_dict(self):
         """Convierte el objeto a diccionario para serialización"""
