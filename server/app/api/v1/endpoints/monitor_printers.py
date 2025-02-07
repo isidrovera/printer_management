@@ -26,7 +26,16 @@ def update_printer_data(
         logger.info(f"Iniciando creación/actualización de impresora con datos: {printer_data}")
         
         monitor_service = PrinterMonitorService(db)
-        return monitor_service.update_printer_data(agent_id=agent_id, printer_data=printer_data)
+        printer = monitor_service.update_printer_data(
+            printer_data=printer_data,
+            agent_id=agent_id
+        )
+        
+        return {
+            "status": "success",
+            "printer_id": printer.id,
+            "message": "Impresora actualizada exitosamente"
+        }
         
     except ValueError as ve:
         logger.error(f"Error de validación: {str(ve)}")
@@ -34,6 +43,7 @@ def update_printer_data(
     except Exception as e:
         logger.error(f"Error inesperado en update_printer_data: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+
 @router.get("/critical-supplies", response_model=List[Dict[str, Any]])
 def get_critical_supplies(
     db: Session = Depends(get_db)

@@ -10,125 +10,90 @@ class PrinterMonitorService:
     def __init__(self, db: Session):
         self.db = db
 
-    async def update_printer_data(self, ip: str, data: Dict[str, Any]) -> bool:
+    def update_printer_data(self, printer_data: Dict[str, Any], agent_id: int = None) -> Printer:
         """
-        Envía datos actualizados al servidor.
+        Actualiza los datos de una impresora.
         
         Args:
-            ip (str): IP de la impresora
-            data (Dict[str, Any]): Datos a actualizar
+            printer_data (Dict[str, Any]): Datos de la impresora
+            agent_id (int, optional): ID del agente que envía los datos
             
         Returns:
-            bool: True si la actualización fue exitosa
+            Printer: Objeto impresora actualizado o creado
+            
+        Raises:
+            ValueError: Si faltan datos requeridos
+            Exception: Para otros errores durante el proceso
         """
         try:
-            logger.info(f"Preparando actualización de datos para {ip}")
-            
-            # Obtener los datos de la impresora del servidor
-            printers = await self.get_monitored_printers()
-            printer_info = next((p for p in printers if p['ip_address'] == ip), None)
-            
-            if not printer_info:
-                logger.error(f"No se encontró información de la impresora {ip} en el servidor")
-                return False
-            
-            # Convertir todos los valores SNMP
-            processed_data = self._convert_nested_snmp_values(data)
-            
-            # Preparar los datos según el formato requerido por el servidor
-            update_data = {
-                'ip_address': ip,
-                'name': printer_info.get('name'),
-                'brand': printer_info.get('brand'),
-                'model': printer_info.get('model'),
-                'client_id': printer_info.get('client_id'),
-                'status': processed_data.get('status', 'offline'),
-                'oid_config_id': 1,  # Valor por defecto
-                'last_check': datetime.utcnow().isoformat(),
-                'agent_id': self._get_agent_id()
-            }
-            
-            # Agregar datos de monitoreo
-            if processed_data.get('counters'):
-                update_data['printer_data'] = {
-                    'counters': {
-                        'total': processed_data['counters'].get('total_pages', 0),
-                        'color': {
-                            'total': processed_data['counters'].get('color_pages', 0),
-                            'black': 0,
-                            'cyan': 0,
-                            'magenta': 0,
-                            'yellow': 0
-                        },
-                        'black_white': processed_data['counters'].get('bw_pages', 0)
-                    }
-                }
-            
-            if processed_data.get('supplies', {}).get('toners'):
-                if 'printer_data' not in update_data:
-                    update_data['printer_data'] = {}
-                
-                update_data['printer_data']['supplies'] = {
-                    'toners': {
-                        color: {
-                            'current_level': toner.get('level', 100),
-                            'max_level': toner.get('max', 100),
-                            'percentage': min(100, int((toner.get('level', 100) / toner.get('max', 100)) * 100)),
-                            'status': 'ok'
-                        }
-                        for color, toner in processed_data['supplies']['toners'].items()
-                    }
-                }
-            
-            # Validar serialización antes de enviar
-            try:
-                json.dumps(update_data)
-            except Exception as e:
-                logger.error(f"Error de serialización para {ip}: {str(e)}")
-                return False
-            
-            async with aiohttp.ClientSession() as session:
-                base_url = self.server_url.replace('ws://', 'http://')
-                url = f"{base_url}/api/v1/monitor/printers/update"
-                
-                headers = {
-                    "Authorization": f"Bearer {settings.AGENT_TOKEN}",
-                    "Content-Type": "application/json"
-                }
-                
-                # Parámetros de consulta requeridos - quitamos el self
-                params = {
-                    'agent_id': str(self._get_agent_id())
-                }
-                
-                logger.debug(f"Enviando datos a {url}")
-                logger.debug(f"Headers: {headers}")
-                logger.debug(f"Parámetros: {params}")
-                logger.debug(f"Datos: {json.dumps(update_data, indent=2)}")
-                
-                async with session.post(
-                    url, 
-                    json=update_data, 
-                    headers=headers,
-                    params=params
-                ) as response:
-                    response_text = await response.text()
-                    
-                    if response.status == 200:
-                        logger.info(f"Datos actualizados exitosamente para {ip}")
-                        return True
-                    else:
-                        logger.error(f"Error actualizando datos para {ip}")
-                        logger.error(f"Status: {response.status}")
-                        logger.error(f"Respuesta: {response_text}")
-                        return False
-                        
-        except aiohttp.ClientError as e:
-            logger.error(f"Error de conexión actualizando {ip}: {str(e)}", exc_info=True)
-            return False
+            logger.info(f"Iniciando creación/actualización de impresora con datos: {printer_data}")
+
+            if not printer_data:
+                logger.error("No se proporcionaron datos de la impresora")
+                raise ValueError("No se proporcionaron datos de la impresora")
+
+            # Validar campos requeridos
+            required_fields = ["name", "brand", "model", "ip_address"]
+            for field in required_fields:
+                if not printer_data.get(field):
+                    logger.error(f"Campo requerido faltante: {field}")
+                    raise ValueError(f"El campo {field} es requerido")
+
+            # Buscar la impresora existente por IP
+            printer = self.db.query(Printer).filter(
+                Printer.ip_address == printer_data["ip_address"]
+            ).first()
+
+            if not printer:
+                logger.info("Creando nueva impresora")
+                printer = Printer(
+                    name=printer_data["name"],
+                    brand=printer_data["brand"],
+                    model=printer_data["model"],
+                    ip_address=printer_data["ip_address"],
+                    agent_id=agent_id,
+                    status=printer_data.get("status", "offline"),
+                    last_check=datetime.utcnow(),
+                    oid_config_id=1  # ID por defecto para PrinterOIDs
+                )
+
+                # Asignar cliente si se proporciona
+                if printer_data.get("client_id"):
+                    printer.client_id = int(printer_data["client_id"])
+                    logger.info(f"Cliente asignado a la nueva impresora: {printer_data['client_id']}")
+
+                self.db.add(printer)
+
+            else:
+                # Actualizar datos básicos de impresora existente
+                printer.name = printer_data["name"]
+                printer.brand = printer_data["brand"]
+                printer.model = printer_data["model"]
+                printer.status = printer_data.get("status", "offline")
+                printer.last_check = datetime.utcnow()
+
+                # Actualizar agent_id si se proporciona
+                if agent_id is not None:
+                    printer.agent_id = agent_id
+
+                # Actualizar cliente si se proporciona
+                if printer_data.get("client_id"):
+                    printer.client_id = int(printer_data["client_id"])
+
+                # Actualizar datos de monitoreo si están presentes
+                if printer_data.get("printer_data"):
+                    printer.printer_data = printer_data["printer_data"]
+
+            self.db.commit()
+            self.db.refresh(printer)
+
+            logger.info(f"Impresora actualizada exitosamente. ID: {printer.id}, IP: {printer.ip_address}")
+            return printer
+
         except Exception as e:
-            logger.error(f"Error inesperado actualizando {ip}: {str(e)}", exc_info=True)
-            return False
+            logger.error(f"Error en update_printer_data: {str(e)}")
+            self.db.rollback()
+            raise
 
     def get_printers_by_agent(self, agent_id: int) -> List[Printer]:
         """
