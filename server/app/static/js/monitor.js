@@ -171,6 +171,56 @@ async function loadSuppliesInfo(printerId) {
     }
 }
 
+async function updatePrintersList() {
+    try {
+        const response = await fetch('/api/v1/monitor/printers');
+        if (!response.ok) {
+            throw new Error('Error al obtener datos de las impresoras');
+        }
+        const printers = await response.json(); // Ahora espera JSON
+        
+        const tableBody = document.querySelector('tbody');
+        tableBody.innerHTML = ''; // Limpiar tabla
+        
+        printers.forEach(printer => {
+            const row = createPrinterRow(printer);
+            tableBody.appendChild(row);
+        });
+        
+        updateStatistics(printers);
+    } catch (error) {
+        showNotification('Error al actualizar los datos: ' + error.message, 'error');
+    }
+}
+
+// Función auxiliar para crear filas de la tabla
+function createPrinterRow(printer) {
+    const row = document.createElement('tr');
+    row.setAttribute('data-printer-id', printer.id);
+    row.innerHTML = `
+        <td class="px-6 py-4 whitespace-nowrap">
+            <div class="flex items-center">
+                <i class="fas fa-building text-gray-400 mr-2"></i>
+                <span class="text-sm text-gray-900">${printer.client}</span>
+            </div>
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap">
+            <div class="flex items-center">
+                <i class="fas fa-print text-gray-400 mr-2"></i>
+                <span class="text-sm text-gray-900">${printer.name}</span>
+            </div>
+        </td>
+        <!-- Resto de las columnas similar al código anterior -->
+    `;
+    return row;
+}
+
+function updateStatistics(printers) {
+    // Actualizar contadores de estado
+    document.querySelector('[data-stat="total"]').textContent = printers.length;
+    // Otras estadísticas...
+}
+
 // Función para cargar información de contadores
 async function loadCountersInfo(printerId) {
     const contentDiv = document.getElementById('countersContent');

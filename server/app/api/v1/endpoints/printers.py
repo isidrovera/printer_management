@@ -250,3 +250,62 @@ def get_printer_supplies(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error interno al obtener suministros: {str(e)}"
         )
+
+
+@router.get("/monitor", response_model=List[Dict[str, Any]])
+async def get_monitored_printers(
+    db: Session = Depends(get_db)
+):
+    """
+    Obtiene la lista de impresoras para monitoreo con detalles completos.
+    """
+    try:
+        # Cargar impresoras con sus clientes
+        printers = db.query(Printer).options(joinedload(Printer.client)).all()
+        
+        processed_printers = []
+        for printer in printers:
+            try:
+                printer_data = printer.printer_data or {}
+                supplies = printer_data.get('supplies', {})
+                toners = supplies.get('toners', {})
+                
+                printer_info = {
+                    'id': printer.id,
+                    'name': printer.name,
+                    'brand': printer.brand,
+                    'model': printer.model,
+                    'ip_address': printer.ip_address,
+                    'status': printer.status,
+                    'client': printer.client.name if printer.client else 'Sin cliente',
+                    'has_alerts': False,
+                    'supplies': {
+                        'black': {'level': toners.get('black', {}).get('percentage', 0)},
+                        'cyan': {'level': toners.get('cyan', {}).get('percentage', 0)},
+                        'magenta': {'level': toners.get('magenta', {}).get('percentage', 0)},
+                        'yellow': {'level': toners.get('yellow', {}).get('percentage', 0)}
+                    },
+                    'counters': {
+                        'total': printer_data.get('counters', {}).get('total', 0)
+                    }
+                }
+                
+                try:
+                    printer_info['has_alerts'] = bool(printer.check_critical_supplies())
+                except Exception as e:
+                    logger.warning(f"Error verificando suministros críticos para impresora {printer.id}: {e}")
+
+                processed_printers.append(printer_info)
+                
+            except Exception as e:
+                logger.error(f"Error procesando impresora {printer.id}: {str(e)}")
+                continue
+
+        return processed_printers
+        
+    except Exception as e:
+        logger.error(f"Error obteniendo impresoras monitoreadas: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e)
+        )
