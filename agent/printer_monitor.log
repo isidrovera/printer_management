@@ -4292,3 +4292,1507 @@
 2025-02-07 14:53:09,539 - DEBUG - [protocol.py:175] - = connection is CLOSED
 2025-02-07 14:53:09,541 - DEBUG - [connection.py:951] - x half-closing TCP connection
 2025-02-07 14:53:09,542 - INFO - [agent_service.py:166] - Conexión cerrada por el servidor
+2025-02-07 14:56:06,868 - DEBUG - [proactor_events.py:625] - Using proactor: IocpProactor
+2025-02-07 14:56:06,868 - INFO - [printer_monitor_service.py:51] - PrinterMonitorService inicializado con URL: ws://161.132.39.159:8000
+2025-02-07 14:56:06,868 - DEBUG - [printer_monitor_service.py:52] - Verificando configuración inicial:
+2025-02-07 14:56:06,868 - DEBUG - [printer_monitor_service.py:53] -   SERVER_URL: ws://161.132.39.159:8000
+2025-02-07 14:56:06,868 - DEBUG - [printer_monitor_service.py:54] -   CLIENT_TOKEN presente: Sí
+2025-02-07 14:56:06,868 - DEBUG - [printer_monitor_service.py:55] -   AGENT_TOKEN presente: Sí
+2025-02-07 14:56:06,868 - DEBUG - [printer_monitor_service.py:56] -   SNMP Community: public
+2025-02-07 14:56:06,868 - DEBUG - [printer_monitor_service.py:57] -   SNMP Port: 161
+2025-02-07 14:56:06,871 - DEBUG - [printer_monitor_service.py:58] -   SNMP Timeout: 2s
+2025-02-07 14:56:06,871 - DEBUG - [printer_monitor_service.py:59] -   SNMP Retries: 1
+2025-02-07 14:56:06,871 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 14:56:06,905 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-07 14:56:06,907 - DEBUG - [client.py:307] - > GET /api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5 HTTP/1.1
+2025-02-07 14:56:06,909 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-07 14:56:06,909 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-07 14:56:06,910 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-07 14:56:06,910 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: O8g57aOwf8A5fPbVk5sIVA==
+2025-02-07 14:56:06,911 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-07 14:56:06,911 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-07 14:56:06,912 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-07 14:56:07,076 - DEBUG - [client.py:333] - < HTTP/1.1 101 Switching Protocols
+2025-02-07 14:56:07,078 - DEBUG - [client.py:335] - < Upgrade: websocket
+2025-02-07 14:56:07,078 - DEBUG - [client.py:335] - < Connection: Upgrade
+2025-02-07 14:56:07,078 - DEBUG - [client.py:335] - < Sec-WebSocket-Accept: qZuNsbgJgV9q4BGzPZ4upgYkktw=
+2025-02-07 14:56:07,078 - DEBUG - [client.py:335] - < Sec-WebSocket-Extensions: permessage-deflate
+2025-02-07 14:56:07,078 - DEBUG - [client.py:335] - < date: Fri, 07 Feb 2025 19:56:06 GMT
+2025-02-07 14:56:07,078 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-07 14:56:07,078 - DEBUG - [protocol.py:175] - = connection is OPEN
+2025-02-07 14:56:07,080 - INFO - [agent_service.py:131] - ✅ Conectado al servidor WebSocket correctamente.
+2025-02-07 14:56:08,271 - INFO - [agent_service.py:423] - ✅ Actualización exitosa en el servidor.
+2025-02-07 14:56:08,276 - INFO - [printer_monitor_service.py:69] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-07 14:56:08,276 - DEBUG - [printer_monitor_service.py:81] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-07 14:56:08,278 - DEBUG - [printer_monitor_service.py:82] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_277c92e42b554050bb83241f2f730ec5', 'Content-Type': 'application/json'}
+2025-02-07 14:56:08,328 - DEBUG - [printer_monitor_service.py:87] - 📥 Respuesta (200): [{"ip_address":"192.168.18.79","brand":"Ricoh","model":"MPC 307","name":"RRHH","status":"offline","client_id":4}]...
+2025-02-07 14:56:08,328 - INFO - [printer_monitor_service.py:91] - ✅ Se obtuvieron 1 impresoras
+2025-02-07 14:56:08,328 - DEBUG - [printer_monitor_service.py:92] - 📋 Lista de impresoras: [
+  {
+    "ip_address": "192.168.18.79",
+    "brand": "Ricoh",
+    "model": "MPC 307",
+    "name": "RRHH",
+    "status": "offline",
+    "client_id": 4
+  }
+]
+2025-02-07 14:56:08,329 - INFO - [printer_monitor_service.py:120] - 🔄 Iniciando recolección de datos - IP: 192.168.18.79, Marca: Ricoh
+2025-02-07 14:56:08,329 - INFO - [printer_monitor_service.py:514] - 🔌 Verificando conexión con impresora 192.168.18.79
+2025-02-07 14:56:08,330 - DEBUG - [printer_monitor_service.py:312] - 🔍 Consultando SNMP 192.168.18.79 - OID: 1.3.6.1.2.1.1.1.0
+2025-02-07 14:56:08,506 - DEBUG - [printer_monitor_service.py:337] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.2.1.1.1.0: RICOH MP C307 1.25 / RICOH Network Printer C model / RICOH Network Scanner C model / RICOH Network Facsimile C model
+2025-02-07 14:56:08,506 - INFO - [printer_monitor_service.py:523] - ✅ Impresora 192.168.18.79 responde correctamente
+2025-02-07 14:56:08,506 - INFO - [printer_monitor_service.py:184] - 🔍 Obteniendo OIDs para marca Ricoh
+2025-02-07 14:56:08,507 - DEBUG - [printer_monitor_service.py:191] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/printer-oids/brands/Ricoh
+2025-02-07 14:56:08,540 - DEBUG - [printer_monitor_service.py:196] - 📥 Respuesta OIDs (200): [{"brand":"Ricoh","model_family":"Color","description":"","oid_total_pages":"1.3.6.1.2.1.43.10.2.1.4.1.1","oid_total_color_pages":"1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11","oid_total_bw_pages":null,"oid_black_toner_level":"1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11","oid_cyan_toner_level":"1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11","oid_magenta_toner_level":"1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11","oid_yellow_toner_level":"1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11","id":5}]
+2025-02-07 14:56:08,540 - INFO - [printer_monitor_service.py:201] - ✅ OIDs obtenidos y cacheados para Ricoh
+2025-02-07 14:56:08,540 - DEBUG - [printer_monitor_service.py:202] - 📋 OIDs: [
+  {
+    "brand": "Ricoh",
+    "model_family": "Color",
+    "description": "",
+    "oid_total_pages": "1.3.6.1.2.1.43.10.2.1.4.1.1",
+    "oid_total_color_pages": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_total_bw_pages": null,
+    "oid_black_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_cyan_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_magenta_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_yellow_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "id": 5
+  }
+]
+2025-02-07 14:56:08,547 - DEBUG - [printer_monitor_service.py:223] - 📊 Obteniendo contadores para 192.168.18.79
+2025-02-07 14:56:08,547 - DEBUG - [printer_monitor_service.py:224] - 🔧 OIDs configurados: [
+  {
+    "brand": "Ricoh",
+    "model_family": "Color",
+    "description": "",
+    "oid_total_pages": "1.3.6.1.2.1.43.10.2.1.4.1.1",
+    "oid_total_color_pages": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_total_bw_pages": null,
+    "oid_black_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_cyan_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_magenta_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_yellow_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "id": 5
+  }
+]
+2025-02-07 14:56:08,547 - DEBUG - [printer_monitor_service.py:312] - 🔍 Consultando SNMP 192.168.18.79 - OID: 1.3.6.1.2.1.43.10.2.1.4.1.1
+2025-02-07 14:56:08,703 - DEBUG - [printer_monitor_service.py:337] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.2.1.43.10.2.1.4.1.1: 138872
+2025-02-07 14:56:08,703 - DEBUG - [printer_monitor_service.py:312] - 🔍 Consultando SNMP 192.168.18.79 - OID: 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11
+2025-02-07 14:56:08,900 - DEBUG - [printer_monitor_service.py:337] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11: 111081
+2025-02-07 14:56:08,900 - WARNING - [printer_monitor_service.py:309] - ⚠️ OID nulo para 192.168.18.79
+2025-02-07 14:56:08,900 - DEBUG - [printer_monitor_service.py:238] - 📊 Contadores obtenidos para 192.168.18.79: {'total_pages': 138872, 'color_pages': 111081, 'bw_pages': None}
+2025-02-07 14:56:08,903 - DEBUG - [printer_monitor_service.py:257] - 🔋 Obteniendo suministros para 192.168.18.79
+2025-02-07 14:56:08,903 - DEBUG - [printer_monitor_service.py:258] - 🔧 OIDs configurados: [
+  {
+    "brand": "Ricoh",
+    "model_family": "Color",
+    "description": "",
+    "oid_total_pages": "1.3.6.1.2.1.43.10.2.1.4.1.1",
+    "oid_total_color_pages": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_total_bw_pages": null,
+    "oid_black_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_cyan_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_magenta_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_yellow_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "id": 5
+  }
+]
+2025-02-07 14:56:08,903 - DEBUG - [printer_monitor_service.py:312] - 🔍 Consultando SNMP 192.168.18.79 - OID: 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11
+2025-02-07 14:56:09,052 - DEBUG - [printer_monitor_service.py:337] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11: 111081
+2025-02-07 14:56:09,052 - DEBUG - [printer_monitor_service.py:312] - 🔍 Consultando SNMP 192.168.18.79 - OID: 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11
+2025-02-07 14:56:09,202 - DEBUG - [printer_monitor_service.py:337] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11: 111081
+2025-02-07 14:56:09,202 - DEBUG - [printer_monitor_service.py:312] - 🔍 Consultando SNMP 192.168.18.79 - OID: 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11
+2025-02-07 14:56:09,403 - DEBUG - [printer_monitor_service.py:337] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11: 111081
+2025-02-07 14:56:09,403 - DEBUG - [printer_monitor_service.py:312] - 🔍 Consultando SNMP 192.168.18.79 - OID: 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11
+2025-02-07 14:56:09,561 - DEBUG - [printer_monitor_service.py:337] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11: 111081
+2025-02-07 14:56:09,561 - DEBUG - [printer_monitor_service.py:289] - 🔋 Suministros obtenidos para 192.168.18.79: {'toners': {'black': {'level': 111081, 'max': 100}, 'cyan': {'level': 111081, 'max': 100}, 'magenta': {'level': 111081, 'max': 100}, 'yellow': {'level': 111081, 'max': 100}}}
+2025-02-07 14:56:09,561 - INFO - [printer_monitor_service.py:544] - 🔍 Obteniendo estado de impresora 192.168.18.79
+2025-02-07 14:56:09,562 - DEBUG - [printer_monitor_service.py:312] - 🔍 Consultando SNMP 192.168.18.79 - OID: 1.3.6.1.2.1.25.3.5.1.1.1
+2025-02-07 14:56:09,708 - DEBUG - [printer_monitor_service.py:337] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.2.1.25.3.5.1.1.1: 3
+2025-02-07 14:56:09,708 - INFO - [printer_monitor_service.py:575] - 📊 Estado obtenido para 192.168.18.79: {'status': 'idle', 'details': 'Status code: 3', 'raw_status': 3}
+2025-02-07 14:56:09,708 - INFO - [printer_monitor_service.py:154] - ✅ Datos recolectados exitosamente para 192.168.18.79
+2025-02-07 14:56:09,708 - DEBUG - [printer_monitor_service.py:155] - 📊 Datos recolectados: {
+  "ip_address": "192.168.18.79",
+  "brand": "Ricoh",
+  "last_check": "2025-02-07T19:56:09.708566",
+  "status": "idle",
+  "counters": {
+    "total_pages": 138872,
+    "color_pages": 111081,
+    "bw_pages": null
+  },
+  "supplies": {
+    "toners": {
+      "black": {
+        "level": 111081,
+        "max": 100
+      },
+      "cyan": {
+        "level": 111081,
+        "max": 100
+      },
+      "magenta": {
+        "level": 111081,
+        "max": 100
+      },
+      "yellow": {
+        "level": 111081,
+        "max": 100
+      }
+    }
+  },
+  "error": null
+}
+2025-02-07 14:56:09,717 - INFO - [printer_monitor_service.py:423] - Preparando actualización de datos para 192.168.18.79
+2025-02-07 14:56:09,717 - INFO - [printer_monitor_service.py:69] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-07 14:56:09,717 - DEBUG - [printer_monitor_service.py:81] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-07 14:56:09,717 - DEBUG - [printer_monitor_service.py:82] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_277c92e42b554050bb83241f2f730ec5', 'Content-Type': 'application/json'}
+2025-02-07 14:56:09,744 - DEBUG - [printer_monitor_service.py:87] - 📥 Respuesta (200): [{"ip_address":"192.168.18.79","brand":"Ricoh","model":"MPC 307","name":"RRHH","status":"offline","client_id":4}]...
+2025-02-07 14:56:09,751 - INFO - [printer_monitor_service.py:91] - ✅ Se obtuvieron 1 impresoras
+2025-02-07 14:56:09,752 - DEBUG - [printer_monitor_service.py:92] - 📋 Lista de impresoras: [
+  {
+    "ip_address": "192.168.18.79",
+    "brand": "Ricoh",
+    "model": "MPC 307",
+    "name": "RRHH",
+    "status": "offline",
+    "client_id": 4
+  }
+]
+2025-02-07 14:56:09,753 - DEBUG - [printer_monitor_service.py:475] - Enviando datos a http://161.132.39.159:8000/api/v1/monitor/printers/update
+2025-02-07 14:56:09,753 - DEBUG - [printer_monitor_service.py:476] - Headers: {'Authorization': 'Bearer agt_277c92e42b554050bb83241f2f730ec5', 'Content-Type': 'application/json'}
+2025-02-07 14:56:09,754 - DEBUG - [printer_monitor_service.py:477] - Parámetros: {'agent_id': '1'}
+2025-02-07 14:56:09,754 - DEBUG - [printer_monitor_service.py:478] - Datos: {
+  "ip_address": "192.168.18.79",
+  "name": "RRHH",
+  "brand": "Ricoh",
+  "model": "MPC 307",
+  "client_id": 4,
+  "status": "idle",
+  "last_check": "2025-02-07T19:56:09.753973",
+  "printer_data": {
+    "counters": {
+      "total_pages": 138872,
+      "color_pages": 111081,
+      "bw_pages": null
+    },
+    "supplies": {
+      "toners": {
+        "black": {
+          "level": 111081,
+          "max": 100
+        },
+        "cyan": {
+          "level": 111081,
+          "max": 100
+        },
+        "magenta": {
+          "level": 111081,
+          "max": 100
+        },
+        "yellow": {
+          "level": 111081,
+          "max": 100
+        }
+      }
+    },
+    "status": "idle"
+  }
+}
+2025-02-07 14:56:09,790 - INFO - [printer_monitor_service.py:489] - Datos actualizados exitosamente para 192.168.18.79
+2025-02-07 14:56:09,790 - DEBUG - [agent_service.py:377] - Datos actualizados para 192.168.18.79
+2025-02-07 14:56:27,067 - DEBUG - [protocol.py:599] - < PING 04 45 60 99 [binary, 4 bytes]
+2025-02-07 14:56:27,081 - DEBUG - [protocol.py:745] - > PONG 04 45 60 99 [binary, 4 bytes]
+2025-02-07 14:56:27,081 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-07 14:56:27,084 - DEBUG - [protocol.py:745] - > PING 48 a9 ad f6 [binary, 4 bytes]
+2025-02-07 14:56:27,089 - DEBUG - [protocol.py:599] - < PONG 48 a9 ad f6 [binary, 4 bytes]
+2025-02-07 14:56:27,096 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-07 14:56:47,081 - DEBUG - [protocol.py:599] - < PING 1d b1 c3 c2 [binary, 4 bytes]
+2025-02-07 14:56:47,081 - DEBUG - [protocol.py:745] - > PONG 1d b1 c3 c2 [binary, 4 bytes]
+2025-02-07 14:56:47,097 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-07 14:56:47,097 - DEBUG - [protocol.py:745] - > PING a3 6c d7 e4 [binary, 4 bytes]
+2025-02-07 14:56:47,097 - DEBUG - [protocol.py:599] - < PONG a3 6c d7 e4 [binary, 4 bytes]
+2025-02-07 14:56:47,097 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-07 14:57:07,103 - DEBUG - [protocol.py:599] - < PING 45 0b 80 dd [binary, 4 bytes]
+2025-02-07 14:57:07,103 - DEBUG - [protocol.py:745] - > PONG 45 0b 80 dd [binary, 4 bytes]
+2025-02-07 14:57:07,103 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-07 14:57:07,103 - DEBUG - [protocol.py:745] - > PING 5f 76 48 94 [binary, 4 bytes]
+2025-02-07 14:57:07,113 - DEBUG - [protocol.py:599] - < PONG 5f 76 48 94 [binary, 4 bytes]
+2025-02-07 14:57:07,113 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-07 14:57:27,111 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-07 14:57:27,113 - DEBUG - [protocol.py:745] - > PING 7e 3e bb 95 [binary, 4 bytes]
+2025-02-07 14:57:27,116 - DEBUG - [protocol.py:599] - < PING 8b 3d aa c0 [binary, 4 bytes]
+2025-02-07 14:57:27,117 - DEBUG - [protocol.py:745] - > PONG 8b 3d aa c0 [binary, 4 bytes]
+2025-02-07 14:57:27,121 - DEBUG - [protocol.py:599] - < PONG 7e 3e bb 95 [binary, 4 bytes]
+2025-02-07 14:57:27,123 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-07 14:57:47,121 - DEBUG - [protocol.py:599] - < PING 29 47 a7 2b [binary, 4 bytes]
+2025-02-07 14:57:47,121 - DEBUG - [protocol.py:745] - > PONG 29 47 a7 2b [binary, 4 bytes]
+2025-02-07 14:57:47,129 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-07 14:57:47,129 - DEBUG - [protocol.py:745] - > PING bc b7 a0 ad [binary, 4 bytes]
+2025-02-07 14:57:47,137 - DEBUG - [protocol.py:599] - < PONG bc b7 a0 ad [binary, 4 bytes]
+2025-02-07 14:57:47,139 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-07 14:58:07,134 - DEBUG - [protocol.py:599] - < PING 66 fb 4c be [binary, 4 bytes]
+2025-02-07 14:58:07,138 - DEBUG - [protocol.py:745] - > PONG 66 fb 4c be [binary, 4 bytes]
+2025-02-07 14:58:07,138 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-07 14:58:07,142 - DEBUG - [protocol.py:745] - > PING 7c fe fb 4a [binary, 4 bytes]
+2025-02-07 14:58:07,148 - DEBUG - [protocol.py:599] - < PONG 7c fe fb 4a [binary, 4 bytes]
+2025-02-07 14:58:07,151 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-07 14:58:21,369 - DEBUG - [protocol.py:599] - < CLOSE 1012 (service restart) [2 bytes]
+2025-02-07 14:58:21,371 - DEBUG - [protocol.py:745] - > CLOSE 1012 (service restart) [2 bytes]
+2025-02-07 14:58:21,371 - DEBUG - [protocol.py:175] - = connection is CLOSING
+2025-02-07 14:58:21,373 - DEBUG - [protocol.py:649] - < EOF
+2025-02-07 14:58:21,373 - DEBUG - [protocol.py:757] - > EOF
+2025-02-07 14:58:21,373 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-07 14:58:21,373 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-07 14:58:21,375 - INFO - [agent_service.py:166] - Conexión cerrada por el servidor
+2025-02-07 15:00:11,639 - DEBUG - [proactor_events.py:625] - Using proactor: IocpProactor
+2025-02-07 15:00:11,639 - INFO - [printer_monitor_service.py:51] - PrinterMonitorService inicializado con URL: ws://161.132.39.159:8000
+2025-02-07 15:00:11,639 - DEBUG - [printer_monitor_service.py:52] - Verificando configuración inicial:
+2025-02-07 15:00:11,639 - DEBUG - [printer_monitor_service.py:53] -   SERVER_URL: ws://161.132.39.159:8000
+2025-02-07 15:00:11,639 - DEBUG - [printer_monitor_service.py:54] -   CLIENT_TOKEN presente: Sí
+2025-02-07 15:00:11,639 - DEBUG - [printer_monitor_service.py:55] -   AGENT_TOKEN presente: Sí
+2025-02-07 15:00:11,639 - DEBUG - [printer_monitor_service.py:56] -   SNMP Community: public
+2025-02-07 15:00:11,653 - DEBUG - [printer_monitor_service.py:57] -   SNMP Port: 161
+2025-02-07 15:00:11,653 - DEBUG - [printer_monitor_service.py:58] -   SNMP Timeout: 2s
+2025-02-07 15:00:11,653 - DEBUG - [printer_monitor_service.py:59] -   SNMP Retries: 1
+2025-02-07 15:00:11,653 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:00:21,682 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: timed out during handshake
+2025-02-07 15:00:31,686 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:00:33,756 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:00:43,758 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:00:45,820 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:00:55,829 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:00:57,873 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:01:07,890 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:01:09,942 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:01:19,945 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:01:22,015 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:01:32,023 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:01:34,082 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:01:44,088 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:01:46,157 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:01:56,170 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:01:58,222 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:02:08,225 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:02:10,286 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:02:20,290 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:02:22,367 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:02:32,381 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:02:34,438 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:02:44,453 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:02:46,534 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:02:56,549 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:02:58,606 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:03:08,617 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:03:10,662 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:03:20,666 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:03:22,729 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:03:32,737 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:03:34,809 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:03:44,824 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:03:46,888 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:03:56,904 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:03:58,971 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:04:08,981 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:04:11,034 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:04:21,041 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:04:23,089 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:04:33,092 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:04:35,151 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:04:45,155 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:04:47,221 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:04:57,236 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:04:59,299 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:05:09,314 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:05:11,394 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:05:21,417 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:05:23,477 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:05:33,479 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:05:35,561 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:05:45,567 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:05:47,640 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:05:57,654 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:05:59,720 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:06:09,737 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:06:11,793 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:06:21,797 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:06:23,858 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:06:33,870 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:06:35,947 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:06:45,958 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:06:48,017 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:06:58,027 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:07:00,097 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:07:10,107 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:07:12,196 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:07:22,208 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:07:24,282 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:07:34,293 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:07:36,362 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:07:46,371 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:07:48,443 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:07:58,455 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:08:00,502 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:08:10,514 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:08:12,587 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:08:22,594 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:08:24,666 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:08:34,668 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:08:36,737 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:08:46,746 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:08:48,826 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:08:58,829 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:09:00,900 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:09:10,908 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:09:12,971 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:09:22,977 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:09:25,054 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:09:35,057 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:09:37,115 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:09:47,124 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:09:49,191 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:09:59,202 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:10:01,261 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:10:11,272 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:10:13,330 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:10:23,331 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:10:25,391 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:10:35,401 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:10:37,475 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:10:47,479 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:10:49,537 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:10:59,542 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:11:01,603 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:11:11,609 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:11:13,687 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:11:23,692 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:11:25,776 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:11:35,796 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:11:37,862 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:11:47,875 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:11:49,933 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:11:59,937 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:12:02,008 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:12:12,017 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:12:14,105 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:12:24,108 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:12:26,164 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:12:36,170 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:12:38,244 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:12:48,252 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:12:50,318 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:13:00,327 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:13:02,391 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:13:12,399 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:13:14,463 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:13:24,477 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:13:26,521 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:13:36,529 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:13:38,614 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:13:48,624 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:13:50,676 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:14:00,683 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:14:02,745 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:14:12,751 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:14:14,815 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:14:24,827 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:14:26,891 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:14:36,906 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:14:38,950 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:14:48,964 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:14:51,015 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:15:01,024 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:15:03,110 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:15:13,123 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:15:15,180 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:15:25,182 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:15:27,238 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:15:37,250 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:15:39,310 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:15:49,313 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:15:51,381 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:16:01,384 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:16:03,454 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:16:13,461 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:16:15,535 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:16:25,542 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:16:27,588 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:16:37,597 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:16:39,652 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:16:49,661 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:16:51,708 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:17:01,717 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:17:03,776 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:17:13,788 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:17:15,847 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:17:25,857 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:17:27,904 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:17:37,916 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:17:39,954 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:17:49,962 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:17:52,009 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:18:02,017 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:18:04,106 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:18:14,112 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:18:16,183 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:18:26,191 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:18:28,265 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:18:38,275 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:18:40,339 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:18:50,354 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:18:52,431 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:19:02,438 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:19:04,483 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:19:14,491 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:19:16,566 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:19:26,577 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:19:28,637 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:19:38,649 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:19:40,731 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:19:50,736 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:19:52,800 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:20:02,807 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:20:04,881 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:20:14,884 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:20:16,957 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:20:26,965 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:20:29,027 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:20:39,041 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:20:41,105 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:20:51,107 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:20:53,171 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:21:03,174 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:21:05,223 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:21:15,234 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:21:17,312 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:21:27,329 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:21:29,401 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:21:39,411 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:21:41,476 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:21:51,487 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:21:53,544 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:22:03,559 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:22:05,631 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:22:15,641 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:22:17,705 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:22:27,719 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:22:29,776 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:22:39,782 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:22:41,841 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:22:51,854 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:22:53,928 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:23:03,929 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:23:05,999 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:23:16,007 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:23:18,055 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:23:28,066 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:23:30,127 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:23:40,139 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:23:42,199 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-07 15:23:52,213 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:23:52,218 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-07 15:23:52,223 - DEBUG - [client.py:307] - > GET /api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5 HTTP/1.1
+2025-02-07 15:23:52,226 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-07 15:23:52,226 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-07 15:23:52,229 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-07 15:23:52,230 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: wlGOlR013GVEEntaZdlnHg==
+2025-02-07 15:23:52,232 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-07 15:23:52,234 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-07 15:23:52,238 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-07 15:23:52,418 - DEBUG - [client.py:333] - < HTTP/1.1 101 Switching Protocols
+2025-02-07 15:23:52,426 - DEBUG - [client.py:335] - < Upgrade: websocket
+2025-02-07 15:23:52,428 - DEBUG - [client.py:335] - < Connection: Upgrade
+2025-02-07 15:23:52,429 - DEBUG - [client.py:335] - < Sec-WebSocket-Accept: 1XME3Q8037uUQo2Lr4vFSxV3t28=
+2025-02-07 15:23:52,430 - DEBUG - [client.py:335] - < Sec-WebSocket-Extensions: permessage-deflate
+2025-02-07 15:23:52,431 - DEBUG - [client.py:335] - < date: Fri, 07 Feb 2025 20:23:51 GMT
+2025-02-07 15:23:52,431 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-07 15:23:52,433 - DEBUG - [protocol.py:175] - = connection is OPEN
+2025-02-07 15:23:52,434 - INFO - [agent_service.py:131] - ✅ Conectado al servidor WebSocket correctamente.
+2025-02-07 15:23:53,578 - INFO - [agent_service.py:423] - ✅ Actualización exitosa en el servidor.
+2025-02-07 15:23:53,580 - INFO - [printer_monitor_service.py:69] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-07 15:23:53,580 - DEBUG - [printer_monitor_service.py:81] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-07 15:23:53,582 - DEBUG - [printer_monitor_service.py:82] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_277c92e42b554050bb83241f2f730ec5', 'Content-Type': 'application/json'}
+2025-02-07 15:23:53,620 - DEBUG - [printer_monitor_service.py:87] - 📥 Respuesta (200): [{"ip_address":"192.168.18.79","brand":"Ricoh","model":"MPC 307","name":"RRHH","status":"idle","client_id":4}]...
+2025-02-07 15:23:53,622 - INFO - [printer_monitor_service.py:91] - ✅ Se obtuvieron 1 impresoras
+2025-02-07 15:23:53,623 - DEBUG - [printer_monitor_service.py:92] - 📋 Lista de impresoras: [
+  {
+    "ip_address": "192.168.18.79",
+    "brand": "Ricoh",
+    "model": "MPC 307",
+    "name": "RRHH",
+    "status": "idle",
+    "client_id": 4
+  }
+]
+2025-02-07 15:23:53,625 - INFO - [printer_monitor_service.py:120] - 🔄 Iniciando recolección de datos - IP: 192.168.18.79, Marca: Ricoh
+2025-02-07 15:23:53,626 - INFO - [printer_monitor_service.py:514] - 🔌 Verificando conexión con impresora 192.168.18.79
+2025-02-07 15:23:53,627 - DEBUG - [printer_monitor_service.py:312] - 🔍 Consultando SNMP 192.168.18.79 - OID: 1.3.6.1.2.1.1.1.0
+2025-02-07 15:23:53,805 - DEBUG - [printer_monitor_service.py:337] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.2.1.1.1.0: RICOH MP C307 1.25 / RICOH Network Printer C model / RICOH Network Scanner C model / RICOH Network Facsimile C model
+2025-02-07 15:23:53,806 - INFO - [printer_monitor_service.py:523] - ✅ Impresora 192.168.18.79 responde correctamente
+2025-02-07 15:23:53,806 - INFO - [printer_monitor_service.py:184] - 🔍 Obteniendo OIDs para marca Ricoh
+2025-02-07 15:23:53,807 - DEBUG - [printer_monitor_service.py:191] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/printer-oids/brands/Ricoh
+2025-02-07 15:23:53,837 - DEBUG - [printer_monitor_service.py:196] - 📥 Respuesta OIDs (200): [{"brand":"Ricoh","model_family":"Color","description":"","oid_total_pages":"1.3.6.1.2.1.43.10.2.1.4.1.1","oid_total_color_pages":"1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11","oid_total_bw_pages":null,"oid_black_toner_level":"1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11","oid_cyan_toner_level":"1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11","oid_magenta_toner_level":"1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11","oid_yellow_toner_level":"1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11","id":5}]
+2025-02-07 15:23:53,839 - INFO - [printer_monitor_service.py:201] - ✅ OIDs obtenidos y cacheados para Ricoh
+2025-02-07 15:23:53,840 - DEBUG - [printer_monitor_service.py:202] - 📋 OIDs: [
+  {
+    "brand": "Ricoh",
+    "model_family": "Color",
+    "description": "",
+    "oid_total_pages": "1.3.6.1.2.1.43.10.2.1.4.1.1",
+    "oid_total_color_pages": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_total_bw_pages": null,
+    "oid_black_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_cyan_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_magenta_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_yellow_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "id": 5
+  }
+]
+2025-02-07 15:23:53,841 - DEBUG - [printer_monitor_service.py:223] - 📊 Obteniendo contadores para 192.168.18.79
+2025-02-07 15:23:53,841 - DEBUG - [printer_monitor_service.py:224] - 🔧 OIDs configurados: [
+  {
+    "brand": "Ricoh",
+    "model_family": "Color",
+    "description": "",
+    "oid_total_pages": "1.3.6.1.2.1.43.10.2.1.4.1.1",
+    "oid_total_color_pages": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_total_bw_pages": null,
+    "oid_black_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_cyan_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_magenta_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_yellow_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "id": 5
+  }
+]
+2025-02-07 15:23:53,842 - DEBUG - [printer_monitor_service.py:312] - 🔍 Consultando SNMP 192.168.18.79 - OID: 1.3.6.1.2.1.43.10.2.1.4.1.1
+2025-02-07 15:23:54,009 - DEBUG - [printer_monitor_service.py:337] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.2.1.43.10.2.1.4.1.1: 138872
+2025-02-07 15:23:54,009 - DEBUG - [printer_monitor_service.py:312] - 🔍 Consultando SNMP 192.168.18.79 - OID: 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11
+2025-02-07 15:23:54,206 - DEBUG - [printer_monitor_service.py:337] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11: 111081
+2025-02-07 15:23:54,206 - WARNING - [printer_monitor_service.py:309] - ⚠️ OID nulo para 192.168.18.79
+2025-02-07 15:23:54,207 - DEBUG - [printer_monitor_service.py:238] - 📊 Contadores obtenidos para 192.168.18.79: {'total_pages': 138872, 'color_pages': 111081, 'bw_pages': None}
+2025-02-07 15:23:54,207 - DEBUG - [printer_monitor_service.py:257] - 🔋 Obteniendo suministros para 192.168.18.79
+2025-02-07 15:23:54,207 - DEBUG - [printer_monitor_service.py:258] - 🔧 OIDs configurados: [
+  {
+    "brand": "Ricoh",
+    "model_family": "Color",
+    "description": "",
+    "oid_total_pages": "1.3.6.1.2.1.43.10.2.1.4.1.1",
+    "oid_total_color_pages": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_total_bw_pages": null,
+    "oid_black_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_cyan_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_magenta_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_yellow_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "id": 5
+  }
+]
+2025-02-07 15:23:54,208 - DEBUG - [printer_monitor_service.py:312] - 🔍 Consultando SNMP 192.168.18.79 - OID: 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11
+2025-02-07 15:23:54,366 - DEBUG - [printer_monitor_service.py:337] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11: 111081
+2025-02-07 15:23:54,367 - DEBUG - [printer_monitor_service.py:312] - 🔍 Consultando SNMP 192.168.18.79 - OID: 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11
+2025-02-07 15:23:54,532 - DEBUG - [printer_monitor_service.py:337] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11: 111081
+2025-02-07 15:23:54,532 - DEBUG - [printer_monitor_service.py:312] - 🔍 Consultando SNMP 192.168.18.79 - OID: 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11
+2025-02-07 15:23:54,727 - DEBUG - [printer_monitor_service.py:337] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11: 111081
+2025-02-07 15:23:54,728 - DEBUG - [printer_monitor_service.py:312] - 🔍 Consultando SNMP 192.168.18.79 - OID: 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11
+2025-02-07 15:23:54,883 - DEBUG - [printer_monitor_service.py:337] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11: 111081
+2025-02-07 15:23:54,883 - DEBUG - [printer_monitor_service.py:289] - 🔋 Suministros obtenidos para 192.168.18.79: {'toners': {'black': {'level': 111081, 'max': 100}, 'cyan': {'level': 111081, 'max': 100}, 'magenta': {'level': 111081, 'max': 100}, 'yellow': {'level': 111081, 'max': 100}}}
+2025-02-07 15:23:54,883 - INFO - [printer_monitor_service.py:544] - 🔍 Obteniendo estado de impresora 192.168.18.79
+2025-02-07 15:23:54,885 - DEBUG - [printer_monitor_service.py:312] - 🔍 Consultando SNMP 192.168.18.79 - OID: 1.3.6.1.2.1.25.3.5.1.1.1
+2025-02-07 15:23:55,039 - DEBUG - [printer_monitor_service.py:337] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.2.1.25.3.5.1.1.1: 3
+2025-02-07 15:23:55,040 - INFO - [printer_monitor_service.py:575] - 📊 Estado obtenido para 192.168.18.79: {'status': 'idle', 'details': 'Status code: 3', 'raw_status': 3}
+2025-02-07 15:23:55,041 - INFO - [printer_monitor_service.py:154] - ✅ Datos recolectados exitosamente para 192.168.18.79
+2025-02-07 15:23:55,041 - DEBUG - [printer_monitor_service.py:155] - 📊 Datos recolectados: {
+  "ip_address": "192.168.18.79",
+  "brand": "Ricoh",
+  "last_check": "2025-02-07T20:23:55.041373",
+  "status": "idle",
+  "counters": {
+    "total_pages": 138872,
+    "color_pages": 111081,
+    "bw_pages": null
+  },
+  "supplies": {
+    "toners": {
+      "black": {
+        "level": 111081,
+        "max": 100
+      },
+      "cyan": {
+        "level": 111081,
+        "max": 100
+      },
+      "magenta": {
+        "level": 111081,
+        "max": 100
+      },
+      "yellow": {
+        "level": 111081,
+        "max": 100
+      }
+    }
+  },
+  "error": null
+}
+2025-02-07 15:23:55,042 - INFO - [printer_monitor_service.py:423] - Preparando actualización de datos para 192.168.18.79
+2025-02-07 15:23:55,042 - INFO - [printer_monitor_service.py:69] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-07 15:23:55,042 - DEBUG - [printer_monitor_service.py:81] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-07 15:23:55,043 - DEBUG - [printer_monitor_service.py:82] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_277c92e42b554050bb83241f2f730ec5', 'Content-Type': 'application/json'}
+2025-02-07 15:23:55,070 - DEBUG - [printer_monitor_service.py:87] - 📥 Respuesta (200): [{"ip_address":"192.168.18.79","brand":"Ricoh","model":"MPC 307","name":"RRHH","status":"idle","client_id":4}]...
+2025-02-07 15:23:55,072 - INFO - [printer_monitor_service.py:91] - ✅ Se obtuvieron 1 impresoras
+2025-02-07 15:23:55,072 - DEBUG - [printer_monitor_service.py:92] - 📋 Lista de impresoras: [
+  {
+    "ip_address": "192.168.18.79",
+    "brand": "Ricoh",
+    "model": "MPC 307",
+    "name": "RRHH",
+    "status": "idle",
+    "client_id": 4
+  }
+]
+2025-02-07 15:23:55,073 - DEBUG - [printer_monitor_service.py:475] - Enviando datos a http://161.132.39.159:8000/api/v1/monitor/printers/update
+2025-02-07 15:23:55,074 - DEBUG - [printer_monitor_service.py:476] - Headers: {'Authorization': 'Bearer agt_277c92e42b554050bb83241f2f730ec5', 'Content-Type': 'application/json'}
+2025-02-07 15:23:55,074 - DEBUG - [printer_monitor_service.py:477] - Parámetros: {'agent_id': '1'}
+2025-02-07 15:23:55,074 - DEBUG - [printer_monitor_service.py:478] - Datos: {
+  "ip_address": "192.168.18.79",
+  "name": "RRHH",
+  "brand": "Ricoh",
+  "model": "MPC 307",
+  "client_id": 4,
+  "status": "idle",
+  "last_check": "2025-02-07T20:23:55.073444",
+  "printer_data": {
+    "counters": {
+      "total_pages": 138872,
+      "color_pages": 111081,
+      "bw_pages": null
+    },
+    "supplies": {
+      "toners": {
+        "black": {
+          "level": 111081,
+          "max": 100
+        },
+        "cyan": {
+          "level": 111081,
+          "max": 100
+        },
+        "magenta": {
+          "level": 111081,
+          "max": 100
+        },
+        "yellow": {
+          "level": 111081,
+          "max": 100
+        }
+      }
+    },
+    "status": "idle"
+  }
+}
+2025-02-07 15:23:55,104 - INFO - [printer_monitor_service.py:489] - Datos actualizados exitosamente para 192.168.18.79
+2025-02-07 15:23:55,105 - DEBUG - [agent_service.py:377] - Datos actualizados para 192.168.18.79
+2025-02-07 15:24:12,417 - DEBUG - [protocol.py:599] - < PING 2b 47 6b d6 [binary, 4 bytes]
+2025-02-07 15:24:12,418 - DEBUG - [protocol.py:745] - > PONG 2b 47 6b d6 [binary, 4 bytes]
+2025-02-07 15:24:12,420 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-07 15:24:12,421 - DEBUG - [protocol.py:745] - > PING dd 4e 8f e5 [binary, 4 bytes]
+2025-02-07 15:24:12,426 - DEBUG - [protocol.py:599] - < PONG dd 4e 8f e5 [binary, 4 bytes]
+2025-02-07 15:24:12,427 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-07 15:24:18,696 - DEBUG - [protocol.py:745] - > CLOSE 1000 (OK) [2 bytes]
+2025-02-07 15:24:18,699 - DEBUG - [protocol.py:175] - = connection is CLOSING
+2025-02-07 15:24:18,705 - DEBUG - [protocol.py:599] - < CLOSE 1000 (OK) [2 bytes]
+2025-02-07 15:24:18,707 - DEBUG - [protocol.py:649] - < EOF
+2025-02-07 15:24:18,707 - DEBUG - [protocol.py:757] - > EOF
+2025-02-07 15:24:18,709 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-07 15:24:18,710 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-07 15:24:25,556 - DEBUG - [proactor_events.py:625] - Using proactor: IocpProactor
+2025-02-07 15:24:25,558 - INFO - [printer_monitor_service.py:51] - PrinterMonitorService inicializado con URL: ws://161.132.39.159:8000
+2025-02-07 15:24:25,558 - DEBUG - [printer_monitor_service.py:52] - Verificando configuración inicial:
+2025-02-07 15:24:25,558 - DEBUG - [printer_monitor_service.py:53] -   SERVER_URL: ws://161.132.39.159:8000
+2025-02-07 15:24:25,558 - DEBUG - [printer_monitor_service.py:54] -   CLIENT_TOKEN presente: Sí
+2025-02-07 15:24:25,558 - DEBUG - [printer_monitor_service.py:55] -   AGENT_TOKEN presente: Sí
+2025-02-07 15:24:25,558 - DEBUG - [printer_monitor_service.py:56] -   SNMP Community: public
+2025-02-07 15:24:25,558 - DEBUG - [printer_monitor_service.py:57] -   SNMP Port: 161
+2025-02-07 15:24:25,558 - DEBUG - [printer_monitor_service.py:58] -   SNMP Timeout: 2s
+2025-02-07 15:24:25,558 - DEBUG - [printer_monitor_service.py:59] -   SNMP Retries: 1
+2025-02-07 15:24:25,558 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:24:25,594 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-07 15:24:25,596 - DEBUG - [client.py:307] - > GET /api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5 HTTP/1.1
+2025-02-07 15:24:25,596 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-07 15:24:25,596 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-07 15:24:25,596 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-07 15:24:25,596 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: /AIMAaCtYaIPu0DC0+BcwA==
+2025-02-07 15:24:25,596 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-07 15:24:25,596 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-07 15:24:25,596 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-07 15:24:25,620 - DEBUG - [client.py:333] - < HTTP/1.1 101 Switching Protocols
+2025-02-07 15:24:25,620 - DEBUG - [client.py:335] - < Upgrade: websocket
+2025-02-07 15:24:25,620 - DEBUG - [client.py:335] - < Connection: Upgrade
+2025-02-07 15:24:25,622 - DEBUG - [client.py:335] - < Sec-WebSocket-Accept: wjLoCqBMYgJn6yiMp+RvBbHa7wo=
+2025-02-07 15:24:25,622 - DEBUG - [client.py:335] - < Sec-WebSocket-Extensions: permessage-deflate
+2025-02-07 15:24:25,623 - DEBUG - [client.py:335] - < date: Fri, 07 Feb 2025 20:24:24 GMT
+2025-02-07 15:24:25,623 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-07 15:24:25,623 - DEBUG - [protocol.py:175] - = connection is OPEN
+2025-02-07 15:24:25,625 - INFO - [agent_service.py:131] - ✅ Conectado al servidor WebSocket correctamente.
+2025-02-07 15:24:26,716 - INFO - [agent_service.py:423] - ✅ Actualización exitosa en el servidor.
+2025-02-07 15:24:26,716 - INFO - [printer_monitor_service.py:69] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-07 15:24:26,716 - DEBUG - [printer_monitor_service.py:81] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-07 15:24:26,719 - DEBUG - [printer_monitor_service.py:82] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_277c92e42b554050bb83241f2f730ec5', 'Content-Type': 'application/json'}
+2025-02-07 15:24:26,746 - DEBUG - [printer_monitor_service.py:87] - 📥 Respuesta (200): [{"ip_address":"192.168.18.79","brand":"Ricoh","model":"MPC 307","name":"RRHH","status":"idle","client_id":4}]...
+2025-02-07 15:24:26,746 - INFO - [printer_monitor_service.py:91] - ✅ Se obtuvieron 1 impresoras
+2025-02-07 15:24:26,751 - DEBUG - [printer_monitor_service.py:92] - 📋 Lista de impresoras: [
+  {
+    "ip_address": "192.168.18.79",
+    "brand": "Ricoh",
+    "model": "MPC 307",
+    "name": "RRHH",
+    "status": "idle",
+    "client_id": 4
+  }
+]
+2025-02-07 15:24:26,751 - INFO - [printer_monitor_service.py:120] - 🔄 Iniciando recolección de datos - IP: 192.168.18.79, Marca: Ricoh
+2025-02-07 15:24:26,751 - INFO - [printer_monitor_service.py:514] - 🔌 Verificando conexión con impresora 192.168.18.79
+2025-02-07 15:24:26,751 - DEBUG - [printer_monitor_service.py:312] - 🔍 Consultando SNMP 192.168.18.79 - OID: 1.3.6.1.2.1.1.1.0
+2025-02-07 15:24:28,582 - DEBUG - [printer_monitor_service.py:337] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.2.1.1.1.0: RICOH MP C307 1.25 / RICOH Network Printer C model / RICOH Network Scanner C model / RICOH Network Facsimile C model
+2025-02-07 15:24:28,585 - INFO - [printer_monitor_service.py:523] - ✅ Impresora 192.168.18.79 responde correctamente
+2025-02-07 15:24:28,586 - INFO - [printer_monitor_service.py:184] - 🔍 Obteniendo OIDs para marca Ricoh
+2025-02-07 15:24:28,588 - DEBUG - [printer_monitor_service.py:191] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/printer-oids/brands/Ricoh
+2025-02-07 15:24:28,611 - DEBUG - [printer_monitor_service.py:196] - 📥 Respuesta OIDs (200): [{"brand":"Ricoh","model_family":"Color","description":"","oid_total_pages":"1.3.6.1.2.1.43.10.2.1.4.1.1","oid_total_color_pages":"1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11","oid_total_bw_pages":null,"oid_black_toner_level":"1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11","oid_cyan_toner_level":"1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11","oid_magenta_toner_level":"1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11","oid_yellow_toner_level":"1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11","id":5}]
+2025-02-07 15:24:28,615 - INFO - [printer_monitor_service.py:201] - ✅ OIDs obtenidos y cacheados para Ricoh
+2025-02-07 15:24:28,615 - DEBUG - [printer_monitor_service.py:202] - 📋 OIDs: [
+  {
+    "brand": "Ricoh",
+    "model_family": "Color",
+    "description": "",
+    "oid_total_pages": "1.3.6.1.2.1.43.10.2.1.4.1.1",
+    "oid_total_color_pages": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_total_bw_pages": null,
+    "oid_black_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_cyan_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_magenta_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_yellow_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "id": 5
+  }
+]
+2025-02-07 15:24:28,617 - DEBUG - [printer_monitor_service.py:223] - 📊 Obteniendo contadores para 192.168.18.79
+2025-02-07 15:24:28,617 - DEBUG - [printer_monitor_service.py:224] - 🔧 OIDs configurados: [
+  {
+    "brand": "Ricoh",
+    "model_family": "Color",
+    "description": "",
+    "oid_total_pages": "1.3.6.1.2.1.43.10.2.1.4.1.1",
+    "oid_total_color_pages": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_total_bw_pages": null,
+    "oid_black_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_cyan_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_magenta_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_yellow_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "id": 5
+  }
+]
+2025-02-07 15:24:28,618 - DEBUG - [printer_monitor_service.py:312] - 🔍 Consultando SNMP 192.168.18.79 - OID: 1.3.6.1.2.1.43.10.2.1.4.1.1
+2025-02-07 15:24:28,777 - DEBUG - [printer_monitor_service.py:337] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.2.1.43.10.2.1.4.1.1: 138872
+2025-02-07 15:24:28,777 - DEBUG - [printer_monitor_service.py:312] - 🔍 Consultando SNMP 192.168.18.79 - OID: 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11
+2025-02-07 15:24:28,966 - DEBUG - [printer_monitor_service.py:337] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11: 111081
+2025-02-07 15:24:28,966 - WARNING - [printer_monitor_service.py:309] - ⚠️ OID nulo para 192.168.18.79
+2025-02-07 15:24:28,966 - DEBUG - [printer_monitor_service.py:238] - 📊 Contadores obtenidos para 192.168.18.79: {'total_pages': 138872, 'color_pages': 111081, 'bw_pages': None}
+2025-02-07 15:24:28,969 - DEBUG - [printer_monitor_service.py:257] - 🔋 Obteniendo suministros para 192.168.18.79
+2025-02-07 15:24:28,969 - DEBUG - [printer_monitor_service.py:258] - 🔧 OIDs configurados: [
+  {
+    "brand": "Ricoh",
+    "model_family": "Color",
+    "description": "",
+    "oid_total_pages": "1.3.6.1.2.1.43.10.2.1.4.1.1",
+    "oid_total_color_pages": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_total_bw_pages": null,
+    "oid_black_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_cyan_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_magenta_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_yellow_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "id": 5
+  }
+]
+2025-02-07 15:24:28,969 - DEBUG - [printer_monitor_service.py:312] - 🔍 Consultando SNMP 192.168.18.79 - OID: 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11
+2025-02-07 15:24:29,127 - DEBUG - [printer_monitor_service.py:337] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11: 111081
+2025-02-07 15:24:29,127 - DEBUG - [printer_monitor_service.py:312] - 🔍 Consultando SNMP 192.168.18.79 - OID: 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11
+2025-02-07 15:24:29,279 - DEBUG - [printer_monitor_service.py:337] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11: 111081
+2025-02-07 15:24:29,279 - DEBUG - [printer_monitor_service.py:312] - 🔍 Consultando SNMP 192.168.18.79 - OID: 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11
+2025-02-07 15:24:29,476 - DEBUG - [printer_monitor_service.py:337] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11: 111081
+2025-02-07 15:24:29,476 - DEBUG - [printer_monitor_service.py:312] - 🔍 Consultando SNMP 192.168.18.79 - OID: 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11
+2025-02-07 15:24:29,627 - DEBUG - [printer_monitor_service.py:337] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11: 111081
+2025-02-07 15:24:29,627 - DEBUG - [printer_monitor_service.py:289] - 🔋 Suministros obtenidos para 192.168.18.79: {'toners': {'black': {'level': 111081, 'max': 100}, 'cyan': {'level': 111081, 'max': 100}, 'magenta': {'level': 111081, 'max': 100}, 'yellow': {'level': 111081, 'max': 100}}}
+2025-02-07 15:24:29,627 - INFO - [printer_monitor_service.py:544] - 🔍 Obteniendo estado de impresora 192.168.18.79
+2025-02-07 15:24:29,627 - DEBUG - [printer_monitor_service.py:312] - 🔍 Consultando SNMP 192.168.18.79 - OID: 1.3.6.1.2.1.25.3.5.1.1.1
+2025-02-07 15:24:29,777 - DEBUG - [printer_monitor_service.py:337] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.2.1.25.3.5.1.1.1: 3
+2025-02-07 15:24:29,781 - INFO - [printer_monitor_service.py:575] - 📊 Estado obtenido para 192.168.18.79: {'status': 'idle', 'details': 'Status code: 3', 'raw_status': 3}
+2025-02-07 15:24:29,781 - INFO - [printer_monitor_service.py:154] - ✅ Datos recolectados exitosamente para 192.168.18.79
+2025-02-07 15:24:29,781 - DEBUG - [printer_monitor_service.py:155] - 📊 Datos recolectados: {
+  "ip_address": "192.168.18.79",
+  "brand": "Ricoh",
+  "last_check": "2025-02-07T20:24:29.781829",
+  "status": "idle",
+  "counters": {
+    "total_pages": 138872,
+    "color_pages": 111081,
+    "bw_pages": null
+  },
+  "supplies": {
+    "toners": {
+      "black": {
+        "level": 111081,
+        "max": 100
+      },
+      "cyan": {
+        "level": 111081,
+        "max": 100
+      },
+      "magenta": {
+        "level": 111081,
+        "max": 100
+      },
+      "yellow": {
+        "level": 111081,
+        "max": 100
+      }
+    }
+  },
+  "error": null
+}
+2025-02-07 15:24:29,781 - INFO - [printer_monitor_service.py:423] - Preparando actualización de datos para 192.168.18.79
+2025-02-07 15:24:29,781 - INFO - [printer_monitor_service.py:69] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-07 15:24:29,781 - DEBUG - [printer_monitor_service.py:81] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-07 15:24:29,781 - DEBUG - [printer_monitor_service.py:82] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_277c92e42b554050bb83241f2f730ec5', 'Content-Type': 'application/json'}
+2025-02-07 15:24:29,816 - DEBUG - [printer_monitor_service.py:87] - 📥 Respuesta (200): [{"ip_address":"192.168.18.79","brand":"Ricoh","model":"MPC 307","name":"RRHH","status":"idle","client_id":4}]...
+2025-02-07 15:24:29,816 - INFO - [printer_monitor_service.py:91] - ✅ Se obtuvieron 1 impresoras
+2025-02-07 15:24:29,816 - DEBUG - [printer_monitor_service.py:92] - 📋 Lista de impresoras: [
+  {
+    "ip_address": "192.168.18.79",
+    "brand": "Ricoh",
+    "model": "MPC 307",
+    "name": "RRHH",
+    "status": "idle",
+    "client_id": 4
+  }
+]
+2025-02-07 15:24:29,816 - DEBUG - [printer_monitor_service.py:475] - Enviando datos a http://161.132.39.159:8000/api/v1/monitor/printers/update
+2025-02-07 15:24:29,816 - DEBUG - [printer_monitor_service.py:476] - Headers: {'Authorization': 'Bearer agt_277c92e42b554050bb83241f2f730ec5', 'Content-Type': 'application/json'}
+2025-02-07 15:24:29,816 - DEBUG - [printer_monitor_service.py:477] - Parámetros: {'agent_id': '1'}
+2025-02-07 15:24:29,816 - DEBUG - [printer_monitor_service.py:478] - Datos: {
+  "ip_address": "192.168.18.79",
+  "name": "RRHH",
+  "brand": "Ricoh",
+  "model": "MPC 307",
+  "client_id": 4,
+  "status": "idle",
+  "last_check": "2025-02-07T20:24:29.816692",
+  "printer_data": {
+    "counters": {
+      "total_pages": 138872,
+      "color_pages": 111081,
+      "bw_pages": null
+    },
+    "supplies": {
+      "toners": {
+        "black": {
+          "level": 111081,
+          "max": 100
+        },
+        "cyan": {
+          "level": 111081,
+          "max": 100
+        },
+        "magenta": {
+          "level": 111081,
+          "max": 100
+        },
+        "yellow": {
+          "level": 111081,
+          "max": 100
+        }
+      }
+    },
+    "status": "idle"
+  }
+}
+2025-02-07 15:24:29,856 - INFO - [printer_monitor_service.py:489] - Datos actualizados exitosamente para 192.168.18.79
+2025-02-07 15:24:29,857 - DEBUG - [agent_service.py:377] - Datos actualizados para 192.168.18.79
+2025-02-07 15:24:45,623 - DEBUG - [protocol.py:599] - < PING b3 5e 1a 49 [binary, 4 bytes]
+2025-02-07 15:24:45,623 - DEBUG - [protocol.py:745] - > PONG b3 5e 1a 49 [binary, 4 bytes]
+2025-02-07 15:24:45,623 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-07 15:24:45,628 - DEBUG - [protocol.py:745] - > PING 11 d0 c3 91 [binary, 4 bytes]
+2025-02-07 15:24:45,636 - DEBUG - [protocol.py:599] - < PONG 11 d0 c3 91 [binary, 4 bytes]
+2025-02-07 15:24:45,636 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-07 15:25:05,629 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-07 15:25:05,629 - DEBUG - [protocol.py:745] - > PING 07 18 48 dd [binary, 4 bytes]
+2025-02-07 15:25:05,629 - DEBUG - [protocol.py:599] - < PING f5 d6 b9 90 [binary, 4 bytes]
+2025-02-07 15:25:05,629 - DEBUG - [protocol.py:745] - > PONG f5 d6 b9 90 [binary, 4 bytes]
+2025-02-07 15:25:05,641 - DEBUG - [protocol.py:599] - < PONG 07 18 48 dd [binary, 4 bytes]
+2025-02-07 15:25:05,642 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-07 15:25:25,635 - DEBUG - [protocol.py:599] - < PING 22 95 8a 3c [binary, 4 bytes]
+2025-02-07 15:25:25,635 - DEBUG - [protocol.py:745] - > PONG 22 95 8a 3c [binary, 4 bytes]
+2025-02-07 15:25:25,651 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-07 15:25:25,651 - DEBUG - [protocol.py:745] - > PING 1f c3 10 4c [binary, 4 bytes]
+2025-02-07 15:25:25,658 - DEBUG - [protocol.py:599] - < PONG 1f c3 10 4c [binary, 4 bytes]
+2025-02-07 15:25:25,659 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-07 15:25:45,657 - DEBUG - [protocol.py:599] - < PING 91 e7 8a 90 [binary, 4 bytes]
+2025-02-07 15:25:45,657 - DEBUG - [protocol.py:745] - > PONG 91 e7 8a 90 [binary, 4 bytes]
+2025-02-07 15:25:45,679 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-07 15:25:45,681 - DEBUG - [protocol.py:745] - > PING c9 de 20 da [binary, 4 bytes]
+2025-02-07 15:25:45,692 - DEBUG - [protocol.py:599] - < PONG c9 de 20 da [binary, 4 bytes]
+2025-02-07 15:25:45,695 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-07 15:26:05,669 - DEBUG - [protocol.py:599] - < PING 7d 45 ec 53 [binary, 4 bytes]
+2025-02-07 15:26:05,671 - DEBUG - [protocol.py:745] - > PONG 7d 45 ec 53 [binary, 4 bytes]
+2025-02-07 15:26:05,673 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-07 15:26:05,674 - DEBUG - [protocol.py:745] - > PING 1c 0e af 3d [binary, 4 bytes]
+2025-02-07 15:26:05,680 - DEBUG - [protocol.py:599] - < PONG 1c 0e af 3d [binary, 4 bytes]
+2025-02-07 15:26:05,683 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-07 15:26:25,678 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-07 15:26:25,680 - DEBUG - [protocol.py:745] - > PING b3 9c 03 a8 [binary, 4 bytes]
+2025-02-07 15:26:25,682 - DEBUG - [protocol.py:599] - < PING 2c dd a3 bf [binary, 4 bytes]
+2025-02-07 15:26:25,684 - DEBUG - [protocol.py:745] - > PONG 2c dd a3 bf [binary, 4 bytes]
+2025-02-07 15:26:25,687 - DEBUG - [protocol.py:599] - < PONG b3 9c 03 a8 [binary, 4 bytes]
+2025-02-07 15:26:25,689 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-07 15:26:25,743 - DEBUG - [protocol.py:745] - > CLOSE 1000 (OK) [2 bytes]
+2025-02-07 15:26:25,744 - DEBUG - [protocol.py:175] - = connection is CLOSING
+2025-02-07 15:26:25,752 - DEBUG - [protocol.py:599] - < CLOSE 1000 (OK) [2 bytes]
+2025-02-07 15:26:25,753 - DEBUG - [protocol.py:649] - < EOF
+2025-02-07 15:26:25,754 - DEBUG - [protocol.py:757] - > EOF
+2025-02-07 15:26:25,754 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-07 15:26:25,755 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-07 15:26:30,472 - DEBUG - [proactor_events.py:625] - Using proactor: IocpProactor
+2025-02-07 15:26:30,475 - INFO - [printer_monitor_service.py:51] - PrinterMonitorService inicializado con URL: ws://161.132.39.159:8000
+2025-02-07 15:26:30,475 - DEBUG - [printer_monitor_service.py:52] - Verificando configuración inicial:
+2025-02-07 15:26:30,476 - DEBUG - [printer_monitor_service.py:53] -   SERVER_URL: ws://161.132.39.159:8000
+2025-02-07 15:26:30,476 - DEBUG - [printer_monitor_service.py:54] -   CLIENT_TOKEN presente: Sí
+2025-02-07 15:26:30,476 - DEBUG - [printer_monitor_service.py:55] -   AGENT_TOKEN presente: Sí
+2025-02-07 15:26:30,476 - DEBUG - [printer_monitor_service.py:56] -   SNMP Community: public
+2025-02-07 15:26:30,476 - DEBUG - [printer_monitor_service.py:57] -   SNMP Port: 161
+2025-02-07 15:26:30,476 - DEBUG - [printer_monitor_service.py:58] -   SNMP Timeout: 2s
+2025-02-07 15:26:30,476 - DEBUG - [printer_monitor_service.py:59] -   SNMP Retries: 1
+2025-02-07 15:26:30,477 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5
+2025-02-07 15:26:30,507 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-07 15:26:30,507 - DEBUG - [client.py:307] - > GET /api/v1/ws/agent/agt_277c92e42b554050bb83241f2f730ec5 HTTP/1.1
+2025-02-07 15:26:30,507 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-07 15:26:30,507 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-07 15:26:30,507 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-07 15:26:30,507 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: ECSX/Fqh97Ag/yb+L6tV7A==
+2025-02-07 15:26:30,507 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-07 15:26:30,507 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-07 15:26:30,507 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-07 15:26:30,536 - DEBUG - [client.py:333] - < HTTP/1.1 101 Switching Protocols
+2025-02-07 15:26:30,536 - DEBUG - [client.py:335] - < Upgrade: websocket
+2025-02-07 15:26:30,536 - DEBUG - [client.py:335] - < Connection: Upgrade
+2025-02-07 15:26:30,536 - DEBUG - [client.py:335] - < Sec-WebSocket-Accept: l/huP7yeBc+Ufp551ZpEf/MHbgY=
+2025-02-07 15:26:30,536 - DEBUG - [client.py:335] - < Sec-WebSocket-Extensions: permessage-deflate
+2025-02-07 15:26:30,536 - DEBUG - [client.py:335] - < date: Fri, 07 Feb 2025 20:26:29 GMT
+2025-02-07 15:26:30,538 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-07 15:26:30,538 - DEBUG - [protocol.py:175] - = connection is OPEN
+2025-02-07 15:26:30,538 - INFO - [agent_service.py:131] - ✅ Conectado al servidor WebSocket correctamente.
+2025-02-07 15:26:31,621 - INFO - [agent_service.py:423] - ✅ Actualización exitosa en el servidor.
+2025-02-07 15:26:31,621 - INFO - [printer_monitor_service.py:69] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-07 15:26:31,622 - DEBUG - [printer_monitor_service.py:81] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-07 15:26:31,623 - DEBUG - [printer_monitor_service.py:82] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_277c92e42b554050bb83241f2f730ec5', 'Content-Type': 'application/json'}
+2025-02-07 15:26:31,644 - DEBUG - [printer_monitor_service.py:87] - 📥 Respuesta (200): [{"ip_address":"192.168.18.79","brand":"Ricoh","model":"MPC 307","name":"RRHH","status":"idle","client_id":4}]...
+2025-02-07 15:26:31,644 - INFO - [printer_monitor_service.py:91] - ✅ Se obtuvieron 1 impresoras
+2025-02-07 15:26:31,652 - DEBUG - [printer_monitor_service.py:92] - 📋 Lista de impresoras: [
+  {
+    "ip_address": "192.168.18.79",
+    "brand": "Ricoh",
+    "model": "MPC 307",
+    "name": "RRHH",
+    "status": "idle",
+    "client_id": 4
+  }
+]
+2025-02-07 15:26:31,653 - INFO - [printer_monitor_service.py:120] - 🔄 Iniciando recolección de datos - IP: 192.168.18.79, Marca: Ricoh
+2025-02-07 15:26:31,653 - INFO - [printer_monitor_service.py:514] - 🔌 Verificando conexión con impresora 192.168.18.79
+2025-02-07 15:26:31,654 - DEBUG - [printer_monitor_service.py:312] - 🔍 Consultando SNMP 192.168.18.79 - OID: 1.3.6.1.2.1.1.1.0
+2025-02-07 15:26:31,832 - DEBUG - [printer_monitor_service.py:337] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.2.1.1.1.0: RICOH MP C307 1.25 / RICOH Network Printer C model / RICOH Network Scanner C model / RICOH Network Facsimile C model
+2025-02-07 15:26:31,833 - INFO - [printer_monitor_service.py:523] - ✅ Impresora 192.168.18.79 responde correctamente
+2025-02-07 15:26:31,833 - INFO - [printer_monitor_service.py:184] - 🔍 Obteniendo OIDs para marca Ricoh
+2025-02-07 15:26:31,833 - DEBUG - [printer_monitor_service.py:191] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/printer-oids/brands/Ricoh
+2025-02-07 15:26:31,854 - DEBUG - [printer_monitor_service.py:196] - 📥 Respuesta OIDs (200): [{"brand":"Ricoh","model_family":"Color","description":"","oid_total_pages":"1.3.6.1.2.1.43.10.2.1.4.1.1","oid_total_color_pages":"1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11","oid_total_bw_pages":null,"oid_black_toner_level":"1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11","oid_cyan_toner_level":"1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11","oid_magenta_toner_level":"1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11","oid_yellow_toner_level":"1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11","id":5}]
+2025-02-07 15:26:31,855 - INFO - [printer_monitor_service.py:201] - ✅ OIDs obtenidos y cacheados para Ricoh
+2025-02-07 15:26:31,855 - DEBUG - [printer_monitor_service.py:202] - 📋 OIDs: [
+  {
+    "brand": "Ricoh",
+    "model_family": "Color",
+    "description": "",
+    "oid_total_pages": "1.3.6.1.2.1.43.10.2.1.4.1.1",
+    "oid_total_color_pages": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_total_bw_pages": null,
+    "oid_black_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_cyan_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_magenta_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_yellow_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "id": 5
+  }
+]
+2025-02-07 15:26:31,855 - DEBUG - [printer_monitor_service.py:223] - 📊 Obteniendo contadores para 192.168.18.79
+2025-02-07 15:26:31,856 - DEBUG - [printer_monitor_service.py:224] - 🔧 OIDs configurados: [
+  {
+    "brand": "Ricoh",
+    "model_family": "Color",
+    "description": "",
+    "oid_total_pages": "1.3.6.1.2.1.43.10.2.1.4.1.1",
+    "oid_total_color_pages": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_total_bw_pages": null,
+    "oid_black_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_cyan_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_magenta_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_yellow_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "id": 5
+  }
+]
+2025-02-07 15:26:31,856 - DEBUG - [printer_monitor_service.py:312] - 🔍 Consultando SNMP 192.168.18.79 - OID: 1.3.6.1.2.1.43.10.2.1.4.1.1
+2025-02-07 15:26:32,023 - DEBUG - [printer_monitor_service.py:337] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.2.1.43.10.2.1.4.1.1: 138872
+2025-02-07 15:26:32,024 - DEBUG - [printer_monitor_service.py:312] - 🔍 Consultando SNMP 192.168.18.79 - OID: 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11
+2025-02-07 15:26:32,261 - DEBUG - [printer_monitor_service.py:337] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11: 111081
+2025-02-07 15:26:32,261 - WARNING - [printer_monitor_service.py:309] - ⚠️ OID nulo para 192.168.18.79
+2025-02-07 15:26:32,261 - DEBUG - [printer_monitor_service.py:238] - 📊 Contadores obtenidos para 192.168.18.79: {'total_pages': 138872, 'color_pages': 111081, 'bw_pages': None}
+2025-02-07 15:26:32,261 - DEBUG - [printer_monitor_service.py:257] - 🔋 Obteniendo suministros para 192.168.18.79
+2025-02-07 15:26:32,263 - DEBUG - [printer_monitor_service.py:258] - 🔧 OIDs configurados: [
+  {
+    "brand": "Ricoh",
+    "model_family": "Color",
+    "description": "",
+    "oid_total_pages": "1.3.6.1.2.1.43.10.2.1.4.1.1",
+    "oid_total_color_pages": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_total_bw_pages": null,
+    "oid_black_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_cyan_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_magenta_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_yellow_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "id": 5
+  }
+]
+2025-02-07 15:26:32,263 - DEBUG - [printer_monitor_service.py:312] - 🔍 Consultando SNMP 192.168.18.79 - OID: 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11
+2025-02-07 15:26:32,424 - DEBUG - [printer_monitor_service.py:337] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11: 111081
+2025-02-07 15:26:32,425 - DEBUG - [printer_monitor_service.py:312] - 🔍 Consultando SNMP 192.168.18.79 - OID: 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11
+2025-02-07 15:26:32,586 - DEBUG - [printer_monitor_service.py:337] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11: 111081
+2025-02-07 15:26:32,586 - DEBUG - [printer_monitor_service.py:312] - 🔍 Consultando SNMP 192.168.18.79 - OID: 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11
+2025-02-07 15:26:32,783 - DEBUG - [printer_monitor_service.py:337] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11: 111081
+2025-02-07 15:26:32,784 - DEBUG - [printer_monitor_service.py:312] - 🔍 Consultando SNMP 192.168.18.79 - OID: 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11
+2025-02-07 15:26:32,942 - DEBUG - [printer_monitor_service.py:337] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11: 111081
+2025-02-07 15:26:32,942 - DEBUG - [printer_monitor_service.py:289] - 🔋 Suministros obtenidos para 192.168.18.79: {'toners': {'black': {'level': 111081, 'max': 100}, 'cyan': {'level': 111081, 'max': 100}, 'magenta': {'level': 111081, 'max': 100}, 'yellow': {'level': 111081, 'max': 100}}}
+2025-02-07 15:26:32,942 - INFO - [printer_monitor_service.py:544] - 🔍 Obteniendo estado de impresora 192.168.18.79
+2025-02-07 15:26:32,943 - DEBUG - [printer_monitor_service.py:312] - 🔍 Consultando SNMP 192.168.18.79 - OID: 1.3.6.1.2.1.25.3.5.1.1.1
+2025-02-07 15:26:33,086 - DEBUG - [printer_monitor_service.py:337] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.2.1.25.3.5.1.1.1: 3
+2025-02-07 15:26:33,086 - INFO - [printer_monitor_service.py:575] - 📊 Estado obtenido para 192.168.18.79: {'status': 'idle', 'details': 'Status code: 3', 'raw_status': 3}
+2025-02-07 15:26:33,086 - INFO - [printer_monitor_service.py:154] - ✅ Datos recolectados exitosamente para 192.168.18.79
+2025-02-07 15:26:33,086 - DEBUG - [printer_monitor_service.py:155] - 📊 Datos recolectados: {
+  "ip_address": "192.168.18.79",
+  "brand": "Ricoh",
+  "last_check": "2025-02-07T20:26:33.086764",
+  "status": "idle",
+  "counters": {
+    "total_pages": 138872,
+    "color_pages": 111081,
+    "bw_pages": null
+  },
+  "supplies": {
+    "toners": {
+      "black": {
+        "level": 111081,
+        "max": 100
+      },
+      "cyan": {
+        "level": 111081,
+        "max": 100
+      },
+      "magenta": {
+        "level": 111081,
+        "max": 100
+      },
+      "yellow": {
+        "level": 111081,
+        "max": 100
+      }
+    }
+  },
+  "error": null
+}
+2025-02-07 15:26:33,100 - INFO - [printer_monitor_service.py:423] - Preparando actualización de datos para 192.168.18.79
+2025-02-07 15:26:33,100 - INFO - [printer_monitor_service.py:69] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-07 15:26:33,101 - DEBUG - [printer_monitor_service.py:81] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-07 15:26:33,101 - DEBUG - [printer_monitor_service.py:82] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_277c92e42b554050bb83241f2f730ec5', 'Content-Type': 'application/json'}
+2025-02-07 15:26:33,125 - DEBUG - [printer_monitor_service.py:87] - 📥 Respuesta (200): [{"ip_address":"192.168.18.79","brand":"Ricoh","model":"MPC 307","name":"RRHH","status":"idle","client_id":4}]...
+2025-02-07 15:26:33,125 - INFO - [printer_monitor_service.py:91] - ✅ Se obtuvieron 1 impresoras
+2025-02-07 15:26:33,125 - DEBUG - [printer_monitor_service.py:92] - 📋 Lista de impresoras: [
+  {
+    "ip_address": "192.168.18.79",
+    "brand": "Ricoh",
+    "model": "MPC 307",
+    "name": "RRHH",
+    "status": "idle",
+    "client_id": 4
+  }
+]
+2025-02-07 15:26:33,125 - DEBUG - [printer_monitor_service.py:475] - Enviando datos a http://161.132.39.159:8000/api/v1/monitor/printers/update
+2025-02-07 15:26:33,125 - DEBUG - [printer_monitor_service.py:476] - Headers: {'Authorization': 'Bearer agt_277c92e42b554050bb83241f2f730ec5', 'Content-Type': 'application/json'}
+2025-02-07 15:26:33,125 - DEBUG - [printer_monitor_service.py:477] - Parámetros: {'agent_id': '1'}
+2025-02-07 15:26:33,125 - DEBUG - [printer_monitor_service.py:478] - Datos: {
+  "ip_address": "192.168.18.79",
+  "name": "RRHH",
+  "brand": "Ricoh",
+  "model": "MPC 307",
+  "client_id": 4,
+  "status": "idle",
+  "last_check": "2025-02-07T20:26:33.125214",
+  "printer_data": {
+    "counters": {
+      "total_pages": 138872,
+      "color_pages": 111081,
+      "bw_pages": null
+    },
+    "supplies": {
+      "toners": {
+        "black": {
+          "level": 111081,
+          "max": 100
+        },
+        "cyan": {
+          "level": 111081,
+          "max": 100
+        },
+        "magenta": {
+          "level": 111081,
+          "max": 100
+        },
+        "yellow": {
+          "level": 111081,
+          "max": 100
+        }
+      }
+    },
+    "status": "idle"
+  }
+}
+2025-02-07 15:26:33,154 - INFO - [printer_monitor_service.py:489] - Datos actualizados exitosamente para 192.168.18.79
+2025-02-07 15:26:33,154 - DEBUG - [agent_service.py:377] - Datos actualizados para 192.168.18.79
+2025-02-07 15:26:50,539 - DEBUG - [protocol.py:599] - < PING 21 00 cd f7 [binary, 4 bytes]
+2025-02-07 15:26:50,540 - DEBUG - [protocol.py:745] - > PONG 21 00 cd f7 [binary, 4 bytes]
+2025-02-07 15:26:50,544 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-07 15:26:50,544 - DEBUG - [protocol.py:745] - > PING 03 5a 01 e2 [binary, 4 bytes]
+2025-02-07 15:26:50,556 - DEBUG - [protocol.py:599] - < PONG 03 5a 01 e2 [binary, 4 bytes]
+2025-02-07 15:26:50,558 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-07 15:27:10,546 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-07 15:27:10,548 - DEBUG - [protocol.py:745] - > PING 4a a0 cb 1d [binary, 4 bytes]
+2025-02-07 15:27:10,549 - DEBUG - [protocol.py:599] - < PING a6 0a 51 ab [binary, 4 bytes]
+2025-02-07 15:27:10,550 - DEBUG - [protocol.py:745] - > PONG a6 0a 51 ab [binary, 4 bytes]
+2025-02-07 15:27:10,552 - DEBUG - [protocol.py:599] - < PONG 4a a0 cb 1d [binary, 4 bytes]
+2025-02-07 15:27:10,554 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-07 15:27:30,542 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-07 15:27:30,542 - DEBUG - [protocol.py:745] - > PING a8 36 fb 99 [binary, 4 bytes]
+2025-02-07 15:27:30,542 - DEBUG - [protocol.py:599] - < PONG a8 36 fb 99 [binary, 4 bytes]
+2025-02-07 15:27:30,542 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-07 15:27:30,558 - DEBUG - [protocol.py:599] - < PING f8 07 08 8c [binary, 4 bytes]
+2025-02-07 15:27:30,558 - DEBUG - [protocol.py:745] - > PONG f8 07 08 8c [binary, 4 bytes]
+2025-02-07 15:27:50,559 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-07 15:27:50,559 - DEBUG - [protocol.py:745] - > PING 49 9f 16 98 [binary, 4 bytes]
+2025-02-07 15:27:50,559 - DEBUG - [protocol.py:599] - < PING 3a e0 24 1b [binary, 4 bytes]
+2025-02-07 15:27:50,559 - DEBUG - [protocol.py:745] - > PONG 3a e0 24 1b [binary, 4 bytes]
+2025-02-07 15:27:50,573 - DEBUG - [protocol.py:599] - < PONG 49 9f 16 98 [binary, 4 bytes]
+2025-02-07 15:27:50,575 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-07 15:28:10,572 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-07 15:28:10,572 - DEBUG - [protocol.py:745] - > PING 03 ea 15 3a [binary, 4 bytes]
+2025-02-07 15:28:10,572 - DEBUG - [protocol.py:599] - < PING 11 8c 25 36 [binary, 4 bytes]
+2025-02-07 15:28:10,572 - DEBUG - [protocol.py:745] - > PONG 11 8c 25 36 [binary, 4 bytes]
+2025-02-07 15:28:10,572 - DEBUG - [protocol.py:599] - < PONG 03 ea 15 3a [binary, 4 bytes]
+2025-02-07 15:28:10,572 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-07 15:28:30,584 - DEBUG - [protocol.py:599] - < PING f7 fb c2 01 [binary, 4 bytes]
+2025-02-07 15:28:30,584 - DEBUG - [protocol.py:745] - > PONG f7 fb c2 01 [binary, 4 bytes]
+2025-02-07 15:28:30,584 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-07 15:28:30,584 - DEBUG - [protocol.py:745] - > PING 'zȼ]' [text, 4 bytes]
+2025-02-07 15:28:30,584 - DEBUG - [protocol.py:599] - < PONG 'zȼ]' [text, 4 bytes]
+2025-02-07 15:28:30,584 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-07 15:28:50,594 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-07 15:28:50,596 - DEBUG - [protocol.py:745] - > PING 9b 2b f4 e6 [binary, 4 bytes]
+2025-02-07 15:28:50,598 - DEBUG - [protocol.py:599] - < PING '`݄V' [text, 4 bytes]
+2025-02-07 15:28:50,600 - DEBUG - [protocol.py:745] - > PONG '`݄V' [text, 4 bytes]
+2025-02-07 15:28:50,604 - DEBUG - [protocol.py:599] - < PONG 9b 2b f4 e6 [binary, 4 bytes]
+2025-02-07 15:28:50,606 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-07 15:29:10,598 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-07 15:29:10,600 - DEBUG - [protocol.py:745] - > PING 88 94 c5 9b [binary, 4 bytes]
+2025-02-07 15:29:10,608 - DEBUG - [protocol.py:599] - < PING 91 25 09 3f [binary, 4 bytes]
+2025-02-07 15:29:10,609 - DEBUG - [protocol.py:745] - > PONG 91 25 09 3f [binary, 4 bytes]
+2025-02-07 15:29:10,612 - DEBUG - [protocol.py:599] - < PONG 88 94 c5 9b [binary, 4 bytes]
+2025-02-07 15:29:10,616 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-07 15:29:30,606 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-07 15:29:30,607 - DEBUG - [protocol.py:745] - > PING 2a 1d 87 2f [binary, 4 bytes]
+2025-02-07 15:29:30,615 - DEBUG - [protocol.py:599] - < PING b8 18 3e 79 [binary, 4 bytes]
+2025-02-07 15:29:30,616 - DEBUG - [protocol.py:745] - > PONG b8 18 3e 79 [binary, 4 bytes]
+2025-02-07 15:29:30,618 - DEBUG - [protocol.py:599] - < PONG 2a 1d 87 2f [binary, 4 bytes]
+2025-02-07 15:29:30,619 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-07 15:29:50,612 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-07 15:29:50,615 - DEBUG - [protocol.py:745] - > PING 01 a2 b8 f7 [binary, 4 bytes]
+2025-02-07 15:29:50,623 - DEBUG - [protocol.py:599] - < PONG 01 a2 b8 f7 [binary, 4 bytes]
+2025-02-07 15:29:50,625 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-07 15:29:50,627 - DEBUG - [protocol.py:599] - < PING b3 38 e2 e7 [binary, 4 bytes]
+2025-02-07 15:29:50,631 - DEBUG - [protocol.py:745] - > PONG b3 38 e2 e7 [binary, 4 bytes]
+2025-02-07 15:30:10,632 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-07 15:30:10,634 - DEBUG - [protocol.py:745] - > PING e8 f7 6f c7 [binary, 4 bytes]
+2025-02-07 15:30:10,642 - DEBUG - [protocol.py:599] - < PING 80 7f 13 be [binary, 4 bytes]
+2025-02-07 15:30:10,644 - DEBUG - [protocol.py:745] - > PONG 80 7f 13 be [binary, 4 bytes]
+2025-02-07 15:30:10,649 - DEBUG - [protocol.py:599] - < PONG e8 f7 6f c7 [binary, 4 bytes]
+2025-02-07 15:30:10,651 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-07 15:30:30,654 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-07 15:30:30,656 - DEBUG - [protocol.py:745] - > PING 9e 30 63 ad [binary, 4 bytes]
+2025-02-07 15:30:30,658 - DEBUG - [protocol.py:599] - < PING 85 f9 81 f0 [binary, 4 bytes]
+2025-02-07 15:30:30,660 - DEBUG - [protocol.py:745] - > PONG 85 f9 81 f0 [binary, 4 bytes]
+2025-02-07 15:30:30,665 - DEBUG - [protocol.py:599] - < PONG 9e 30 63 ad [binary, 4 bytes]
+2025-02-07 15:30:30,667 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-07 15:30:50,658 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-07 15:30:50,660 - DEBUG - [protocol.py:745] - > PING 81 92 8d d5 [binary, 4 bytes]
+2025-02-07 15:30:50,668 - DEBUG - [protocol.py:599] - < PING b1 a0 e8 86 [binary, 4 bytes]
+2025-02-07 15:30:50,670 - DEBUG - [protocol.py:745] - > PONG b1 a0 e8 86 [binary, 4 bytes]
+2025-02-07 15:30:50,674 - DEBUG - [protocol.py:599] - < PONG 81 92 8d d5 [binary, 4 bytes]
+2025-02-07 15:30:50,677 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-07 15:31:10,667 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-07 15:31:10,670 - DEBUG - [protocol.py:745] - > PING c9 af 00 86 [binary, 4 bytes]
+2025-02-07 15:31:10,678 - DEBUG - [protocol.py:599] - < PONG c9 af 00 86 [binary, 4 bytes]
+2025-02-07 15:31:10,681 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-07 15:31:10,684 - DEBUG - [protocol.py:599] - < PING 54 c9 34 9b [binary, 4 bytes]
+2025-02-07 15:31:10,686 - DEBUG - [protocol.py:745] - > PONG 54 c9 34 9b [binary, 4 bytes]
+2025-02-07 15:31:30,685 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-07 15:31:30,687 - DEBUG - [protocol.py:745] - > PING 49 58 c7 cf [binary, 4 bytes]
+2025-02-07 15:31:30,694 - DEBUG - [protocol.py:599] - < PING 39 52 bb 6b [binary, 4 bytes]
+2025-02-07 15:31:30,695 - DEBUG - [protocol.py:745] - > PONG 39 52 bb 6b [binary, 4 bytes]
+2025-02-07 15:31:30,699 - DEBUG - [protocol.py:599] - < PONG 49 58 c7 cf [binary, 4 bytes]
+2025-02-07 15:31:30,703 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-07 15:31:34,238 - INFO - [agent_service.py:423] - ✅ Actualización exitosa en el servidor.
+2025-02-07 15:31:34,239 - INFO - [printer_monitor_service.py:69] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-07 15:31:34,239 - DEBUG - [printer_monitor_service.py:81] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-07 15:31:34,240 - DEBUG - [printer_monitor_service.py:82] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_277c92e42b554050bb83241f2f730ec5', 'Content-Type': 'application/json'}
+2025-02-07 15:31:34,273 - DEBUG - [printer_monitor_service.py:87] - 📥 Respuesta (200): [{"ip_address":"192.168.18.79","brand":"Ricoh","model":"MPC 307","name":"RRHH","status":"idle","client_id":4}]...
+2025-02-07 15:31:34,274 - INFO - [printer_monitor_service.py:91] - ✅ Se obtuvieron 1 impresoras
+2025-02-07 15:31:34,275 - DEBUG - [printer_monitor_service.py:92] - 📋 Lista de impresoras: [
+  {
+    "ip_address": "192.168.18.79",
+    "brand": "Ricoh",
+    "model": "MPC 307",
+    "name": "RRHH",
+    "status": "idle",
+    "client_id": 4
+  }
+]
+2025-02-07 15:31:34,277 - INFO - [printer_monitor_service.py:120] - 🔄 Iniciando recolección de datos - IP: 192.168.18.79, Marca: Ricoh
+2025-02-07 15:31:34,277 - INFO - [printer_monitor_service.py:514] - 🔌 Verificando conexión con impresora 192.168.18.79
+2025-02-07 15:31:34,278 - DEBUG - [printer_monitor_service.py:312] - 🔍 Consultando SNMP 192.168.18.79 - OID: 1.3.6.1.2.1.1.1.0
+2025-02-07 15:31:34,532 - DEBUG - [printer_monitor_service.py:337] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.2.1.1.1.0: RICOH MP C307 1.25 / RICOH Network Printer C model / RICOH Network Scanner C model / RICOH Network Facsimile C model
+2025-02-07 15:31:34,533 - INFO - [printer_monitor_service.py:523] - ✅ Impresora 192.168.18.79 responde correctamente
+2025-02-07 15:31:34,533 - DEBUG - [printer_monitor_service.py:181] - 📎 Usando OIDs cacheados para Ricoh
+2025-02-07 15:31:34,534 - DEBUG - [printer_monitor_service.py:223] - 📊 Obteniendo contadores para 192.168.18.79
+2025-02-07 15:31:34,534 - DEBUG - [printer_monitor_service.py:224] - 🔧 OIDs configurados: [
+  {
+    "brand": "Ricoh",
+    "model_family": "Color",
+    "description": "",
+    "oid_total_pages": "1.3.6.1.2.1.43.10.2.1.4.1.1",
+    "oid_total_color_pages": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_total_bw_pages": null,
+    "oid_black_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_cyan_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_magenta_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_yellow_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "id": 5
+  }
+]
+2025-02-07 15:31:34,535 - DEBUG - [printer_monitor_service.py:312] - 🔍 Consultando SNMP 192.168.18.79 - OID: 1.3.6.1.2.1.43.10.2.1.4.1.1
+2025-02-07 15:31:34,827 - DEBUG - [printer_monitor_service.py:337] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.2.1.43.10.2.1.4.1.1: 138872
+2025-02-07 15:31:34,828 - DEBUG - [printer_monitor_service.py:312] - 🔍 Consultando SNMP 192.168.18.79 - OID: 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11
+2025-02-07 15:31:35,061 - DEBUG - [printer_monitor_service.py:337] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11: 111081
+2025-02-07 15:31:35,062 - WARNING - [printer_monitor_service.py:309] - ⚠️ OID nulo para 192.168.18.79
+2025-02-07 15:31:35,062 - DEBUG - [printer_monitor_service.py:238] - 📊 Contadores obtenidos para 192.168.18.79: {'total_pages': 138872, 'color_pages': 111081, 'bw_pages': None}
+2025-02-07 15:31:35,063 - DEBUG - [printer_monitor_service.py:257] - 🔋 Obteniendo suministros para 192.168.18.79
+2025-02-07 15:31:35,063 - DEBUG - [printer_monitor_service.py:258] - 🔧 OIDs configurados: [
+  {
+    "brand": "Ricoh",
+    "model_family": "Color",
+    "description": "",
+    "oid_total_pages": "1.3.6.1.2.1.43.10.2.1.4.1.1",
+    "oid_total_color_pages": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_total_bw_pages": null,
+    "oid_black_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_cyan_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_magenta_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_yellow_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "id": 5
+  }
+]
+2025-02-07 15:31:35,063 - DEBUG - [printer_monitor_service.py:312] - 🔍 Consultando SNMP 192.168.18.79 - OID: 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11
+2025-02-07 15:31:35,284 - DEBUG - [printer_monitor_service.py:337] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11: 111081
+2025-02-07 15:31:35,284 - DEBUG - [printer_monitor_service.py:312] - 🔍 Consultando SNMP 192.168.18.79 - OID: 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11
+2025-02-07 15:31:35,553 - DEBUG - [printer_monitor_service.py:337] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11: 111081
+2025-02-07 15:31:35,553 - DEBUG - [printer_monitor_service.py:312] - 🔍 Consultando SNMP 192.168.18.79 - OID: 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11
+2025-02-07 15:31:35,777 - DEBUG - [printer_monitor_service.py:337] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11: 111081
+2025-02-07 15:31:35,777 - DEBUG - [printer_monitor_service.py:312] - 🔍 Consultando SNMP 192.168.18.79 - OID: 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11
+2025-02-07 15:31:35,999 - DEBUG - [printer_monitor_service.py:337] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11: 111081
+2025-02-07 15:31:36,000 - DEBUG - [printer_monitor_service.py:289] - 🔋 Suministros obtenidos para 192.168.18.79: {'toners': {'black': {'level': 111081, 'max': 100}, 'cyan': {'level': 111081, 'max': 100}, 'magenta': {'level': 111081, 'max': 100}, 'yellow': {'level': 111081, 'max': 100}}}
+2025-02-07 15:31:36,000 - INFO - [printer_monitor_service.py:544] - 🔍 Obteniendo estado de impresora 192.168.18.79
+2025-02-07 15:31:36,001 - DEBUG - [printer_monitor_service.py:312] - 🔍 Consultando SNMP 192.168.18.79 - OID: 1.3.6.1.2.1.25.3.5.1.1.1
+2025-02-07 15:31:36,214 - DEBUG - [printer_monitor_service.py:337] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.2.1.25.3.5.1.1.1: 3
+2025-02-07 15:31:36,214 - INFO - [printer_monitor_service.py:575] - 📊 Estado obtenido para 192.168.18.79: {'status': 'idle', 'details': 'Status code: 3', 'raw_status': 3}
+2025-02-07 15:31:36,215 - INFO - [printer_monitor_service.py:154] - ✅ Datos recolectados exitosamente para 192.168.18.79
+2025-02-07 15:31:36,216 - DEBUG - [printer_monitor_service.py:155] - 📊 Datos recolectados: {
+  "ip_address": "192.168.18.79",
+  "brand": "Ricoh",
+  "last_check": "2025-02-07T20:31:36.215274",
+  "status": "idle",
+  "counters": {
+    "total_pages": 138872,
+    "color_pages": 111081,
+    "bw_pages": null
+  },
+  "supplies": {
+    "toners": {
+      "black": {
+        "level": 111081,
+        "max": 100
+      },
+      "cyan": {
+        "level": 111081,
+        "max": 100
+      },
+      "magenta": {
+        "level": 111081,
+        "max": 100
+      },
+      "yellow": {
+        "level": 111081,
+        "max": 100
+      }
+    }
+  },
+  "error": null
+}
+2025-02-07 15:31:36,216 - INFO - [printer_monitor_service.py:423] - Preparando actualización de datos para 192.168.18.79
+2025-02-07 15:31:36,217 - INFO - [printer_monitor_service.py:69] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-07 15:31:36,217 - DEBUG - [printer_monitor_service.py:81] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-07 15:31:36,217 - DEBUG - [printer_monitor_service.py:82] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_277c92e42b554050bb83241f2f730ec5', 'Content-Type': 'application/json'}
+2025-02-07 15:31:36,248 - DEBUG - [printer_monitor_service.py:87] - 📥 Respuesta (200): [{"ip_address":"192.168.18.79","brand":"Ricoh","model":"MPC 307","name":"RRHH","status":"idle","client_id":4}]...
+2025-02-07 15:31:36,249 - INFO - [printer_monitor_service.py:91] - ✅ Se obtuvieron 1 impresoras
+2025-02-07 15:31:36,250 - DEBUG - [printer_monitor_service.py:92] - 📋 Lista de impresoras: [
+  {
+    "ip_address": "192.168.18.79",
+    "brand": "Ricoh",
+    "model": "MPC 307",
+    "name": "RRHH",
+    "status": "idle",
+    "client_id": 4
+  }
+]
+2025-02-07 15:31:36,250 - DEBUG - [printer_monitor_service.py:475] - Enviando datos a http://161.132.39.159:8000/api/v1/monitor/printers/update
+2025-02-07 15:31:36,252 - DEBUG - [printer_monitor_service.py:476] - Headers: {'Authorization': 'Bearer agt_277c92e42b554050bb83241f2f730ec5', 'Content-Type': 'application/json'}
+2025-02-07 15:31:36,252 - DEBUG - [printer_monitor_service.py:477] - Parámetros: {'agent_id': '1'}
+2025-02-07 15:31:36,253 - DEBUG - [printer_monitor_service.py:478] - Datos: {
+  "ip_address": "192.168.18.79",
+  "name": "RRHH",
+  "brand": "Ricoh",
+  "model": "MPC 307",
+  "client_id": 4,
+  "status": "idle",
+  "last_check": "2025-02-07T20:31:36.250707",
+  "printer_data": {
+    "counters": {
+      "total_pages": 138872,
+      "color_pages": 111081,
+      "bw_pages": null
+    },
+    "supplies": {
+      "toners": {
+        "black": {
+          "level": 111081,
+          "max": 100
+        },
+        "cyan": {
+          "level": 111081,
+          "max": 100
+        },
+        "magenta": {
+          "level": 111081,
+          "max": 100
+        },
+        "yellow": {
+          "level": 111081,
+          "max": 100
+        }
+      }
+    },
+    "status": "idle"
+  }
+}
+2025-02-07 15:31:36,277 - INFO - [printer_monitor_service.py:489] - Datos actualizados exitosamente para 192.168.18.79
+2025-02-07 15:31:36,277 - DEBUG - [agent_service.py:377] - Datos actualizados para 192.168.18.79
+2025-02-07 15:31:50,695 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-07 15:31:50,695 - DEBUG - [protocol.py:745] - > PING b8 87 d7 60 [binary, 4 bytes]
+2025-02-07 15:31:50,701 - DEBUG - [protocol.py:599] - < PING c2 05 c8 fb [binary, 4 bytes]
+2025-02-07 15:31:50,702 - DEBUG - [protocol.py:745] - > PONG c2 05 c8 fb [binary, 4 bytes]
+2025-02-07 15:31:50,704 - DEBUG - [protocol.py:599] - < PONG b8 87 d7 60 [binary, 4 bytes]
+2025-02-07 15:31:50,705 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-07 15:32:10,707 - DEBUG - [protocol.py:599] - < PING 76 b6 e6 36 [binary, 4 bytes]
+2025-02-07 15:32:10,709 - DEBUG - [protocol.py:745] - > PONG 76 b6 e6 36 [binary, 4 bytes]
+2025-02-07 15:32:10,711 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-07 15:32:10,714 - DEBUG - [protocol.py:745] - > PING a3 87 f2 cb [binary, 4 bytes]
+2025-02-07 15:32:10,720 - DEBUG - [protocol.py:599] - < PONG a3 87 f2 cb [binary, 4 bytes]
+2025-02-07 15:32:10,723 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-07 15:32:30,719 - DEBUG - [protocol.py:599] - < PING 13 a4 54 34 [binary, 4 bytes]
+2025-02-07 15:32:30,720 - DEBUG - [protocol.py:745] - > PONG 13 a4 54 34 [binary, 4 bytes]
+2025-02-07 15:32:30,721 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-07 15:32:30,721 - DEBUG - [protocol.py:745] - > PING be dc ca 58 [binary, 4 bytes]
+2025-02-07 15:32:30,727 - DEBUG - [protocol.py:599] - < PONG be dc ca 58 [binary, 4 bytes]
+2025-02-07 15:32:30,728 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-07 15:32:50,727 - DEBUG - [protocol.py:599] - < PING ec f3 d5 32 [binary, 4 bytes]
+2025-02-07 15:32:50,728 - DEBUG - [protocol.py:745] - > PONG ec f3 d5 32 [binary, 4 bytes]
+2025-02-07 15:32:50,729 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-07 15:32:50,729 - DEBUG - [protocol.py:745] - > PING 4b a1 59 7f [binary, 4 bytes]
+2025-02-07 15:32:50,735 - DEBUG - [protocol.py:599] - < PONG 4b a1 59 7f [binary, 4 bytes]
+2025-02-07 15:32:50,736 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-07 15:33:10,726 - DEBUG - [protocol.py:599] - < PING d7 1c ad 0d [binary, 4 bytes]
+2025-02-07 15:33:10,726 - DEBUG - [protocol.py:745] - > PONG d7 1c ad 0d [binary, 4 bytes]
+2025-02-07 15:33:10,740 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-07 15:33:10,743 - DEBUG - [protocol.py:745] - > PING 72 16 a3 6f [binary, 4 bytes]
+2025-02-07 15:33:10,749 - DEBUG - [protocol.py:599] - < PONG 72 16 a3 6f [binary, 4 bytes]
+2025-02-07 15:33:10,751 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-07 15:33:30,748 - DEBUG - [protocol.py:599] - < PING 74 1a b6 2b [binary, 4 bytes]
+2025-02-07 15:33:30,750 - DEBUG - [protocol.py:745] - > PONG 74 1a b6 2b [binary, 4 bytes]
+2025-02-07 15:33:30,778 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-07 15:33:30,779 - DEBUG - [protocol.py:745] - > PING df 72 42 7c [binary, 4 bytes]
+2025-02-07 15:33:30,786 - DEBUG - [protocol.py:599] - < PONG df 72 42 7c [binary, 4 bytes]
+2025-02-07 15:33:30,788 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-07 15:33:50,751 - DEBUG - [protocol.py:599] - < PING d3 47 08 45 [binary, 4 bytes]
+2025-02-07 15:33:50,751 - DEBUG - [protocol.py:745] - > PONG d3 47 08 45 [binary, 4 bytes]
+2025-02-07 15:33:50,785 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-07 15:33:50,785 - DEBUG - [protocol.py:745] - > PING 94 72 41 3b [binary, 4 bytes]
+2025-02-07 15:33:50,789 - DEBUG - [protocol.py:599] - < PONG 94 72 41 3b [binary, 4 bytes]
+2025-02-07 15:33:50,789 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-07 15:34:10,764 - DEBUG - [protocol.py:599] - < PING f0 3d 14 47 [binary, 4 bytes]
+2025-02-07 15:34:10,764 - DEBUG - [protocol.py:745] - > PONG f0 3d 14 47 [binary, 4 bytes]
+2025-02-07 15:34:10,797 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-07 15:34:10,800 - DEBUG - [protocol.py:745] - > PING 8d de 37 bd [binary, 4 bytes]
+2025-02-07 15:34:10,808 - DEBUG - [protocol.py:599] - < PONG 8d de 37 bd [binary, 4 bytes]
+2025-02-07 15:34:10,810 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-07 15:34:30,778 - DEBUG - [protocol.py:599] - < PING 21 ba 4b ad [binary, 4 bytes]
+2025-02-07 15:34:30,779 - DEBUG - [protocol.py:745] - > PONG 21 ba 4b ad [binary, 4 bytes]
+2025-02-07 15:34:30,803 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-07 15:34:30,803 - DEBUG - [protocol.py:745] - > PING 97 d3 16 47 [binary, 4 bytes]
+2025-02-07 15:34:30,810 - DEBUG - [protocol.py:599] - < PONG 97 d3 16 47 [binary, 4 bytes]
+2025-02-07 15:34:30,810 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-07 15:34:50,784 - DEBUG - [protocol.py:599] - < PING '~\x00ɭ' [text, 4 bytes]
+2025-02-07 15:34:50,784 - DEBUG - [protocol.py:745] - > PONG '~\x00ɭ' [text, 4 bytes]
+2025-02-07 15:34:50,816 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-07 15:34:50,819 - DEBUG - [protocol.py:745] - > PING "K|'$" [text, 4 bytes]
+2025-02-07 15:34:50,826 - DEBUG - [protocol.py:599] - < PONG "K|'$" [text, 4 bytes]
+2025-02-07 15:34:50,826 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-07 15:35:10,796 - DEBUG - [protocol.py:599] - < PING d6 78 a3 92 [binary, 4 bytes]
+2025-02-07 15:35:10,798 - DEBUG - [protocol.py:745] - > PONG d6 78 a3 92 [binary, 4 bytes]
+2025-02-07 15:35:10,843 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-07 15:35:10,845 - DEBUG - [protocol.py:745] - > PING 1a 95 c6 57 [binary, 4 bytes]
+2025-02-07 15:35:10,850 - DEBUG - [protocol.py:599] - < PONG 1a 95 c6 57 [binary, 4 bytes]
+2025-02-07 15:35:10,851 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-07 15:35:30,788 - DEBUG - [protocol.py:599] - < PING 05 93 d9 61 [binary, 4 bytes]
+2025-02-07 15:35:30,804 - DEBUG - [protocol.py:745] - > PONG 05 93 d9 61 [binary, 4 bytes]
+2025-02-07 15:35:30,848 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-07 15:35:30,851 - DEBUG - [protocol.py:745] - > PING 4f 5d c2 7e [binary, 4 bytes]
+2025-02-07 15:35:30,859 - DEBUG - [protocol.py:599] - < PONG 4f 5d c2 7e [binary, 4 bytes]
+2025-02-07 15:35:30,861 - DEBUG - [connection.py:811] - % received keepalive pong

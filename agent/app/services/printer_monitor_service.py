@@ -225,6 +225,7 @@ class PrinterMonitorService:
             
             oid_config = oids[0] if oids else {}
             
+            # Obtener cada contador con su OID específico
             total_pages = await self._get_snmp_value(ip, oid_config.get('oid_total_pages'))
             color_pages = await self._get_snmp_value(ip, oid_config.get('oid_total_color_pages'))
             bw_pages = await self._get_snmp_value(ip, oid_config.get('oid_total_bw_pages'))
@@ -241,7 +242,6 @@ class PrinterMonitorService:
         except Exception as e:
             logger.error(f"❌ Error obteniendo contadores de {ip}: {str(e)}", exc_info=True)
             return {}
-
     async def _get_supplies_data(self, ip: str, oids: List[Dict]) -> Dict[str, Any]:
         """
         Obtiene datos de suministros usando SNMP.
@@ -259,31 +259,38 @@ class PrinterMonitorService:
             
             oid_config = oids[0] if oids else {}
             
-            # Obtener niveles de toner
-            black_level = await self._get_snmp_value(ip, oid_config.get('oid_black_toner_level'))
-            cyan_level = await self._get_snmp_value(ip, oid_config.get('oid_cyan_toner_level'))
-            magenta_level = await self._get_snmp_value(ip, oid_config.get('oid_magenta_toner_level'))
-            yellow_level = await self._get_snmp_value(ip, oid_config.get('oid_yellow_toner_level'))
+            # Obtener niveles de toner usando OIDs específicos
+            toner_data = {}
+            toner_colors = ['black', 'cyan', 'magenta', 'yellow']
+            
+            for color in toner_colors:
+                level_oid = oid_config.get(f'oid_{color}_toner_level')
+                max_oid = oid_config.get(f'oid_{color}_toner_max')
+                
+                level = await self._get_snmp_value(ip, level_oid)
+                max_level = await self._get_snmp_value(ip, max_oid)
+                
+                level_value = self._convert_snmp_value(level)
+                max_value = self._convert_snmp_value(max_level) or 100
+                
+                if level_value is not None:
+                    percentage = int((level_value / max_value) * 100) if max_value > 0 else 0
+                    percentage = min(100, max(0, percentage))  # Asegurar que esté entre 0 y 100
+                    
+                    toner_data[color] = {
+                        'level': level_value,
+                        'max': max_value,
+                        'percentage': percentage
+                    }
+                else:
+                    toner_data[color] = {
+                        'level': 0,
+                        'max': max_value,
+                        'percentage': 0
+                    }
             
             supplies_data = {
-                'toners': {
-                    'black': {
-                        'level': self._convert_snmp_value(black_level),
-                        'max': 100
-                    },
-                    'cyan': {
-                        'level': self._convert_snmp_value(cyan_level),
-                        'max': 100
-                    },
-                    'magenta': {
-                        'level': self._convert_snmp_value(magenta_level),
-                        'max': 100
-                    },
-                    'yellow': {
-                        'level': self._convert_snmp_value(yellow_level),
-                        'max': 100
-                    }
-                }
+                'toners': toner_data
             }
             
             logger.debug(f"🔋 Suministros obtenidos para {ip}: {supplies_data}")
@@ -341,15 +348,15 @@ class PrinterMonitorService:
             logger.error(f"❌ Error en consulta SNMP para {ip} - {oid}: {str(e)}", exc_info=True)
             return None
 
-    def _convert_snmp_value(self, value: Any) -> Any:
+    def _convert_snmp_value(self, value: Any) -> Optional[int]:
         """
-        Convierte valores SNMP a tipos JSON serializables.
+        Convierte valores SNMP a enteros.
         
         Args:
             value (Any): Valor SNMP a convertir
             
         Returns:
-            Any: Valor convertido
+            Optional[int]: Valor convertido o None si no es válido
         """
         try:
             if value is None:
@@ -358,18 +365,17 @@ class PrinterMonitorService:
             if hasattr(value, 'prettyPrint'):
                 value_str = value.prettyPrint()
                 try:
-                    # Intentar convertir a entero primero
+                    # Si es un string numérico simple
                     return int(value_str)
                 except ValueError:
-                    # Si no es un entero, eliminar comillas si las hay
-                    return value_str.strip('"\'')
+                    # Si tiene otros caracteres, intentar extraer el número
+                    value_str = ''.join(c for c in value_str if c.isdigit())
+                    return int(value_str) if value_str else None
             
-            # Si el valor ya es un tipo básico, devolverlo tal cual
-            if isinstance(value, (int, float, str, bool)):
-                return value
+            if isinstance(value, (int, float)):
+                return int(value)
                 
-            # Para otros tipos, convertir a string
-            return str(value)
+            return None
 
         except Exception as e:
             logger.error(f"❌ Error convirtiendo valor SNMP: {str(e)}", exc_info=True)
