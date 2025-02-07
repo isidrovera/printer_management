@@ -203,6 +203,14 @@ def get_printers(
         logger.error(f"Error obteniendo impresoras: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
+from app.db.session import get_db
+from app.db.models.printer import Printer
+from typing import Dict, Any
+
+router = APIRouter()
+
 @router.get("/printers/{printer_id}/counters", response_model=Dict[str, Any])
 def get_printer_counters(
     printer_id: int, 
@@ -211,11 +219,13 @@ def get_printer_counters(
     """
     Obtiene los contadores de una impresora específica.
     """
-    # Buscar la impresora
     printer = db.query(Printer).filter(Printer.id == printer_id).first()
     
     if not printer:
-        raise HTTPException(status_code=404, detail="Impresora no encontrada")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail=f"Impresora con ID {printer_id} no encontrada"
+        )
     
     # Extraer contadores del printer_data
     printer_data = printer.printer_data or {}
@@ -224,5 +234,48 @@ def get_printer_counters(
     return {
         "printer_id": printer.id,
         "name": printer.name,
-        "counters": counters
+        "counters": {
+            "total": counters.get('total', 0),
+            "color": counters.get('color', 0),
+            "black_and_white": counters.get('black_and_white', 0)
+        }
+    }
+
+@router.get("/printers/{printer_id}/supplies", response_model=Dict[str, Any])
+def get_printer_supplies(
+    printer_id: int, 
+    db: Session = Depends(get_db)
+):
+    """
+    Obtiene los niveles de suministros de una impresora específica.
+    """
+    printer = db.query(Printer).filter(Printer.id == printer_id).first()
+    
+    if not printer:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail=f"Impresora con ID {printer_id} no encontrada"
+        )
+    
+    # Extraer suministros del printer_data
+    printer_data = printer.printer_data or {}
+    supplies = printer_data.get('supplies', {})
+    
+    return {
+        "printer_id": printer.id,
+        "name": printer.name,
+        "supplies": {
+            "toners": {
+                "black": supplies.get('toners', {}).get('black', {}).get('percentage', 0),
+                "cyan": supplies.get('toners', {}).get('cyan', {}).get('percentage', 0),
+                "magenta": supplies.get('toners', {}).get('magenta', {}).get('percentage', 0),
+                "yellow": supplies.get('toners', {}).get('yellow', {}).get('percentage', 0)
+            },
+            "drums": {
+                "black": supplies.get('drums', {}).get('black', {}).get('percentage', 0),
+                "cyan": supplies.get('drums', {}).get('cyan', {}).get('percentage', 0),
+                "magenta": supplies.get('drums', {}).get('magenta', {}).get('percentage', 0),
+                "yellow": supplies.get('drums', {}).get('yellow', {}).get('percentage', 0)
+            }
+        }
     }
