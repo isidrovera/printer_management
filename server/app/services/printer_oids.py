@@ -1,4 +1,5 @@
-from typing import List, Optional
+#server\app\services\printer_oids.py
+from typing import List, Optional, Union
 from sqlalchemy.orm import Session
 from app.db.models.printer_oids import PrinterOIDs
 from app.schemas.printer_oids import PrinterOIDsCreate, PrinterOIDsUpdate
@@ -41,26 +42,32 @@ class PrinterOIDsService:
            self.db.rollback()
            raise
 
-   async def update(self, oid_id: int, oid_data: PrinterOIDsUpdate) -> Optional[PrinterOIDs]:
-       """Actualiza un registro de OIDs existente."""
-       try:
-           logger.info(f"Actualizando registro de OIDs con ID: {oid_id}")
-           db_oids = self.get_by_id(oid_id)
-           if not db_oids:
-               logger.warning(f"Registro de OIDs con ID {oid_id} no encontrado")
-               return None
-           
-           for key, value in oid_data.dict(exclude_unset=True).items():
-               setattr(db_oids, key, value)
-               
-           self.db.commit()
-           self.db.refresh(db_oids)
-           logger.info(f"Registro de OIDs con ID {oid_id} actualizado exitosamente")
-           return db_oids
-       except Exception as e:
-           logger.error(f"Error al actualizar registro de OIDs: {str(e)}")
-           self.db.rollback()
-           raise
+   async def update(self, oid_id: int, oid_data: Union[PrinterOIDsUpdate, dict]) -> Optional[PrinterOIDs]:
+        """Actualiza un registro de OIDs existente."""
+        try:
+            logger.info(f"Actualizando registro de OIDs con ID: {oid_id}")
+            db_oids = self.get_by_id(oid_id)
+            if not db_oids:
+                logger.warning(f"Registro de OIDs con ID {oid_id} no encontrado")
+                return None
+            
+            # Manejar tanto objetos Pydantic como diccionarios
+            if hasattr(oid_data, 'dict'):
+                data_dict = oid_data.dict(exclude_unset=True)
+            else:
+                data_dict = {k: v for k, v in oid_data.items() if v is not None}
+            
+            for key, value in data_dict.items():
+                setattr(db_oids, key, value)
+                
+            self.db.commit()
+            self.db.refresh(db_oids)
+            logger.info(f"Registro de OIDs con ID {oid_id} actualizado exitosamente")
+            return db_oids
+        except Exception as e:
+            logger.error(f"Error al actualizar registro de OIDs: {str(e)}")
+            self.db.rollback()
+            raise
 
    def delete(self, oid_id: int) -> bool:
        """Elimina un registro de OIDs."""
