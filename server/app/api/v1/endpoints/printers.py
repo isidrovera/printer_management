@@ -136,3 +136,117 @@ async def get_agent_printers(
     except Exception as e:
         logger.error(f"Error obteniendo impresoras del agente {agent_id}: {e}")
         raise HTTPException(status_code=400, detail=str(e))
+
+
+
+
+@router.get("/{printer_id}/counters", response_model=Dict[str, Any])
+def get_printer_counters(
+    printer_id: int, 
+    db: Session = Depends(get_db)
+):
+    """
+    Obtiene los contadores de una impresora específica.
+    """
+    try:
+        printer = db.query(Printer).filter(Printer.id == printer_id).first()
+        
+        if not printer:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, 
+                detail=f"Impresora con ID {printer_id} no encontrada"
+            )
+        
+        # Extraer contadores del printer_data
+        printer_data = printer.printer_data or {}
+        counters = printer_data.get('counters', {})
+        
+        return {
+            "printer_id": printer.id,
+            "name": printer.name,
+            "counters": {
+                "total": counters.get('total', 0),
+                "color": counters.get('color', 0),
+                "black_and_white": counters.get('black_and_white', 0),
+                # Agregar más contadores según sea necesario
+                "copies": counters.get('copies', 0),
+                "prints": counters.get('prints', 0),
+                "scans": counters.get('scans', 0)
+            }
+        }
+    except Exception as e:
+        logger.error(f"Error obteniendo contadores de impresora {printer_id}: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error interno al obtener contadores: {str(e)}"
+        )
+
+@router.get("/{printer_id}/supplies", response_model=Dict[str, Any])
+def get_printer_supplies(
+    printer_id: int, 
+    db: Session = Depends(get_db)
+):
+    """
+    Obtiene los niveles de suministros de una impresora específica.
+    """
+    try:
+        printer = db.query(Printer).filter(Printer.id == printer_id).first()
+        
+        if not printer:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, 
+                detail=f"Impresora con ID {printer_id} no encontrada"
+            )
+        
+        # Extraer suministros del printer_data
+        printer_data = printer.printer_data or {}
+        supplies = printer_data.get('supplies', {})
+        
+        return {
+            "printer_id": printer.id,
+            "name": printer.name,
+            "supplies": {
+                "toners": {
+                    "black": {
+                        "level": supplies.get('toners', {}).get('black', {}).get('percentage', 0),
+                        "status": supplies.get('toners', {}).get('black', {}).get('status', 'unknown')
+                    },
+                    "cyan": {
+                        "level": supplies.get('toners', {}).get('cyan', {}).get('percentage', 0),
+                        "status": supplies.get('toners', {}).get('cyan', {}).get('status', 'unknown')
+                    },
+                    "magenta": {
+                        "level": supplies.get('toners', {}).get('magenta', {}).get('percentage', 0),
+                        "status": supplies.get('toners', {}).get('magenta', {}).get('status', 'unknown')
+                    },
+                    "yellow": {
+                        "level": supplies.get('toners', {}).get('yellow', {}).get('percentage', 0),
+                        "status": supplies.get('toners', {}).get('yellow', {}).get('status', 'unknown')
+                    }
+                },
+                "drums": {
+                    "black": {
+                        "level": supplies.get('drums', {}).get('black', {}).get('percentage', 0),
+                        "status": supplies.get('drums', {}).get('black', {}).get('status', 'unknown')
+                    },
+                    "cyan": {
+                        "level": supplies.get('drums', {}).get('cyan', {}).get('percentage', 0),
+                        "status": supplies.get('drums', {}).get('cyan', {}).get('status', 'unknown')
+                    },
+                    "magenta": {
+                        "level": supplies.get('drums', {}).get('magenta', {}).get('percentage', 0),
+                        "status": supplies.get('drums', {}).get('magenta', {}).get('status', 'unknown')
+                    },
+                    "yellow": {
+                        "level": supplies.get('drums', {}).get('yellow', {}).get('percentage', 0),
+                        "status": supplies.get('drums', {}).get('yellow', {}).get('status', 'unknown')
+                    }
+                }
+            }
+        }
+    except Exception as e:
+        logger.error(f"Error obteniendo suministros de impresora {printer_id}: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error interno al obtener suministros: {str(e)}"
+        )
