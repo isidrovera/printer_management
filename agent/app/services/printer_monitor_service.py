@@ -433,19 +433,22 @@ class PrinterMonitorService:
             # Convertir todos los valores SNMP
             processed_data = self._convert_nested_snmp_values(data)
             
-            # Asegurar campos requeridos usando los datos del servidor
+            # Preparar los datos según el formato requerido por el servidor
             update_data = {
                 'ip_address': ip,
-                'last_check': datetime.utcnow().isoformat(),
                 'name': printer_info.get('name'),
                 'brand': printer_info.get('brand'),
                 'model': printer_info.get('model'),
                 'client_id': printer_info.get('client_id'),
-                'printer_data': {
-                    'counters': processed_data.get('counters', {}),
-                    'supplies': processed_data.get('supplies', {}),
-                    'status': processed_data.get('status', 'unknown')
-                }
+                'status': processed_data.get('status', 'offline'),
+                'last_check': datetime.utcnow().isoformat()
+            }
+            
+            # Agregar datos de monitoreo
+            update_data['printer_data'] = {
+                'counters': processed_data.get('counters', {}),
+                'supplies': processed_data.get('supplies', {}),
+                'status': processed_data.get('status', 'offline')
             }
             
             # Validar serialización antes de enviar
@@ -464,13 +467,9 @@ class PrinterMonitorService:
                     "Content-Type": "application/json"
                 }
                 
-                # Obtener ID numérico del agente
-                agent_id = self._get_agent_id()
-                
                 # Parámetros de consulta requeridos
                 params = {
-                    'agent_id': str(agent_id),
-                    'self': 'true'
+                    'agent_id': str(self._get_agent_id())
                 }
                 
                 logger.debug(f"Enviando datos a {url}")
