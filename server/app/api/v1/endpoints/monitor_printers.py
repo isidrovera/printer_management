@@ -202,3 +202,27 @@ def get_printers(
     except Exception as e:
         logger.error(f"Error obteniendo impresoras: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/printers/{printer_id}/counters", response_model=Dict[str, Any])
+def get_printer_counters(
+    printer_id: int, 
+    db: Session = Depends(get_db)
+):
+    """
+    Obtiene los contadores de una impresora específica.
+    """
+    # Buscar la impresora
+    printer = db.query(Printer).filter(Printer.id == printer_id).first()
+    
+    if not printer:
+        raise HTTPException(status_code=404, detail="Impresora no encontrada")
+    
+    # Extraer contadores del printer_data
+    printer_data = printer.printer_data or {}
+    counters = printer_data.get('counters', {})
+    
+    return {
+        "printer_id": printer.id,
+        "name": printer.name,
+        "counters": counters
+    }
