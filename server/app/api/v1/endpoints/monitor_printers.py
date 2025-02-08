@@ -213,29 +213,48 @@ def get_printer_counters(
     """
     Obtiene los contadores de una impresora específica.
     """
-    printer = db.query(Printer).filter(Printer.id == printer_id).first()
+    logger.info(f"Obteniendo contadores para impresora con ID: {printer_id}")
     
-    if not printer:
+    try:
+        printer = db.query(Printer).filter(Printer.id == printer_id).first()
+        
+        if not printer:
+            logger.warning(f"Impresora con ID {printer_id} no encontrada")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, 
+                detail=f"Impresora con ID {printer_id} no encontrada"
+            )
+        
+        # Extraer contadores del printer_data
+        printer_data = printer.printer_data or {}
+        logger.debug(f"Datos completos de la impresora: {printer_data}")
+        
+        counters = printer_data.get('counters', {})
+        logger.debug(f"Contadores extraídos: {counters}")
+        
+        result = {
+            "printer_id": printer.id,
+            "name": printer.name,
+            "current": {
+                "total": counters.get('total_pages', 0),
+                "color": counters.get('color_pages', 0),
+                "bw": counters.get('bw_pages', 0)
+            },
+            "history": {}  # Puedes agregar lógica de historial si es necesario
+        }
+        
+        logger.info(f"Resultado de contadores: {result}")
+        
+        return result
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error inesperado al obtener contadores: {str(e)}")
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, 
-            detail=f"Impresora con ID {printer_id} no encontrada"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error interno al obtener contadores: {str(e)}"
         )
-    
-    # Extraer contadores del printer_data
-    printer_data = printer.printer_data or {}
-    counters = printer_data.get('counters', {})
-    
-    return {
-        "printer_id": printer.id,
-        "name": printer.name,
-        "current": {
-            "total": counters.get('total_pages', 0),
-            "color": counters.get('color_pages', 0),
-            "bw": counters.get('bw_pages', 0)
-        },
-        "history": {}  # Puedes agregar lógica de historial si es necesario
-    }
-
 @router.get("/printers/{printer_id}/supplies", response_model=Dict[str, Any])
 def get_printer_supplies(
     printer_id: int, 
