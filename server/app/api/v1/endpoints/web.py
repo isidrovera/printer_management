@@ -498,6 +498,14 @@ async def client_details(
         "clients/details.html",
         {"request": request, "client": client}
     )
+
+
+
+
+
+
+#Manejo de agentes
+#server/app/api/v1/endpoints/web.py
 @router.get("/agents")
 async def list_agents(request: Request, db: Session = Depends(get_db)):
     agent_service = AgentService(db)
