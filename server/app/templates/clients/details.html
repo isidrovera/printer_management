@@ -1,0 +1,222 @@
+{% extends "base.html" %}
+
+{% block title %}Detalles del Cliente{% endblock %}
+
+{% block content %}
+<div class="bg-white shadow-lg rounded-lg p-6 mx-auto max-w-7xl">
+    <!-- Encabezado con acciones -->
+    <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center space-x-3">
+            <i class="fas fa-user text-blue-600 text-2xl"></i>
+            <h2 class="text-2xl font-bold text-gray-800">{{ client.name }}</h2>
+        </div>
+        <div class="flex items-center space-x-4">
+            <div class="flex items-center space-x-2 bg-gray-100 px-3 py-1 rounded-lg">
+                <i class="fas fa-key text-gray-500"></i>
+                <span class="text-sm font-mono text-gray-600">{{ client.token }}</span>
+            </div>
+            <a href="/clients/{{ client.id }}/edit" 
+               class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center space-x-2">
+                <i class="fas fa-edit"></i>
+                <span>Editar</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Estado del Cliente -->
+    <div class="flex items-center space-x-4 mb-6">
+        <span class="px-3 py-1 rounded-full text-sm font-medium
+            {% if client.status.value == 'ACTIVO' %}
+                bg-green-100 text-green-800
+            {% elif client.status.value == 'INACTIVO' %}
+                bg-red-100 text-red-800
+            {% else %}
+                bg-yellow-100 text-yellow-800
+            {% endif %}">
+            {{ client.status.value }}
+        </span>
+        <span class="text-gray-500">•</span>
+        <span class="text-gray-600">
+            <i class="fas fa-building mr-1"></i>
+            {{ client.client_type.value|capitalize }}
+        </span>
+        <span class="text-gray-500">•</span>
+        <span class="text-gray-600">
+            <i class="fas fa-hashtag mr-1"></i>
+            {{ client.client_code }}
+        </span>
+    </div>
+
+    <!-- Información Básica -->
+    <div class="bg-white p-6 rounded-lg border border-gray-200 mb-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-4 flex items-center">
+            <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+            Información Básica
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-500">Razón Social</label>
+                <p class="mt-1 text-gray-900">{{ client.business_name }}</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-500">RFC</label>
+                <p class="mt-1 text-gray-900">{{ client.tax_id }}</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-500">Nivel de Servicio</label>
+                <p class="mt-1 text-gray-900">{{ client.service_level|capitalize }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contacto de Facturación -->
+    <div class="bg-white p-6 rounded-lg border border-gray-200 mb-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-4 flex items-center">
+            <i class="fas fa-file-invoice-dollar text-amber-500 mr-2"></i>
+            Contacto de Facturación
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-500">Nombre</label>
+                <p class="mt-1 text-gray-900">{{ client.billing_contact_name }}</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-500">Email</label>
+                <p class="mt-1 text-gray-900">
+                    <a href="mailto:{{ client.billing_contact_email }}" class="text-blue-600 hover:underline">
+                        {{ client.billing_contact_email }}
+                    </a>
+                </p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-500">Teléfono</label>
+                <p class="mt-1 text-gray-900">
+                    <a href="tel:{{ client.billing_contact_phone }}" class="text-blue-600 hover:underline">
+                        {{ client.billing_contact_phone }}
+                    </a>
+                </p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-500">Método de Facturación</label>
+                <p class="mt-1 text-gray-900">{{ client.billing_method|upper }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dirección de Facturación -->
+    <div class="bg-white p-6 rounded-lg border border-gray-200 mb-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-4 flex items-center">
+            <i class="fas fa-map-marked-alt text-red-500 mr-2"></i>
+            Dirección de Facturación
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-500">Dirección</label>
+                <p class="mt-1 text-gray-900">{{ client.billing_address }}</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-500">Ciudad</label>
+                <p class="mt-1 text-gray-900">{{ client.billing_city }}</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-500">Estado</label>
+                <p class="mt-1 text-gray-900">{{ client.billing_state }}</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-500">Código Postal</label>
+                <p class="mt-1 text-gray-900">{{ client.billing_zip_code }}</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-500">País</label>
+                <p class="mt-1 text-gray-900">{{ client.billing_country }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Información del Contrato -->
+    <div class="bg-white p-6 rounded-lg border border-gray-200 mb-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-4 flex items-center">
+            <i class="fas fa-file-contract text-indigo-500 mr-2"></i>
+            Información del Contrato
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-500">Número de Contrato</label>
+                <p class="mt-1 text-gray-900">{{ client.contract_number }}</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-500">Fecha de Inicio</label>
+                <p class="mt-1 text-gray-900">{{ client.contract_start_date.strftime('%d/%m/%Y') if client.contract_start_date }}</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-500">Fecha de Fin</label>
+                <p class="mt-1 text-gray-900">{{ client.contract_end_date.strftime('%d/%m/%Y') if client.contract_end_date }}</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-500">Términos de Pago</label>
+                <p class="mt-1 text-gray-900">
+                    {% if client.payment_terms == 'immediate' %}
+                        Inmediato
+                    {% elif client.payment_terms == '15days' %}
+                        15 días
+                    {% elif client.payment_terms == '30days' %}
+                        30 días
+                    {% elif client.payment_terms == '45days' %}
+                        45 días
+                    {% endif %}
+                </p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-500">Límite de Crédito</label>
+                <p class="mt-1 text-gray-900">${{ "%.2f"|format(client.credit_limit|float) }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Información Adicional -->
+    <div class="bg-white p-6 rounded-lg border border-gray-200">
+        <h3 class="text-lg font-medium text-gray-900 mb-4 flex items-center">
+            <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+            Información Adicional
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-500">Ejecutivo de Cuenta</label>
+                <p class="mt-1 text-gray-900">{{ client.account_manager }}</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-500">Prioridad de Soporte</label>
+                <p class="mt-1">
+                    <span class="px-2 py-1 rounded-full text-sm font-medium
+                        {% if client.support_priority == 'low' %}
+                            bg-gray-100 text-gray-800
+                        {% elif client.support_priority == 'medium' %}
+                            bg-blue-100 text-blue-800
+                        {% elif client.support_priority == 'high' %}
+                            bg-yellow-100 text-yellow-800
+                        {% else %}
+                            bg-red-100 text-red-800
+                        {% endif %}">
+                        {{ client.support_priority|capitalize }}
+                    </span>
+                </p>
+            </div>
+            {% if client.notes %}
+            <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-gray-500">Notas</label>
+                <p class="mt-1 text-gray-900 whitespace-pre-line">{{ client.notes }}</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Botones de Acción -->
+    <div class="flex justify-end space-x-4 mt-6">
+        <a href="/clients" 
+           class="px-6 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200 flex items-center space-x-2">
+            <i class="fas fa-arrow-left"></i>
+            <span>Volver</span>
+        </a>
+    </div>
+</div>
+{% endblock %}
