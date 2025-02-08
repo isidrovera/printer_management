@@ -225,7 +225,8 @@ function updateStatistics(printers) {
 async function loadCountersInfo(printerId) {
     const contentDiv = document.getElementById('countersContent');
     try {
-        const response = await fetch(`/api/v1/printers/${printerId}/counters`);
+        // Cambiar esta línea para usar la nueva ruta
+        const response = await fetch(`/api/v1/monitor/printers/${printerId}/counters`);
         
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -235,10 +236,10 @@ async function loadCountersInfo(printerId) {
         console.log("Datos de contadores recibidos:", data); // Para debug
         
         // Asegurarse de que existan los datos necesarios
-        const current = data.current || {
+        const current = data.counters || {
             total: 0,
             color: 0,
-            bw: 0
+            black_and_white: 0
         };
 
         contentDiv.innerHTML = `
@@ -253,7 +254,7 @@ async function loadCountersInfo(printerId) {
                 </div>
                 <div class="bg-gray-50 p-4 rounded-lg">
                     <h5 class="font-medium mb-2">Impresiones B/N</h5>
-                    <p class="text-2xl">${formatNumber(current.bw)}</p>
+                    <p class="text-2xl">${formatNumber(current.black_and_white)}</p>
                 </div>
             </div>
         `;
@@ -267,7 +268,6 @@ async function loadCountersInfo(printerId) {
         console.error("Error cargando contadores:", error);
     }
 }
-
 // Función para cargar historial
 async function loadHistoryInfo(printerId) {
     const contentDiv = document.getElementById('historyContent');
