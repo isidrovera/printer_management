@@ -202,7 +202,6 @@ def get_printers(
     except Exception as e:
         logger.error(f"Error obteniendo impresoras: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
-
 @router.get("/printers/{printer_id}/counters", response_model=Dict[str, Any])
 def get_printer_counters(
     printer_id: int, 
@@ -211,58 +210,37 @@ def get_printer_counters(
     """
     Obtiene los contadores de una impresora específica.
     """
-    import json
-    
     logger.info(f"Solicitando contadores para impresora ID: {printer_id}")
     
     try:
-        # Consulta directa para obtener solo printer_data
-        result = db.query(Printer.printer_data).filter(Printer.id == printer_id).first()
+        # Obtener la impresora
+        printer = db.query(Printer).filter(Printer.id == printer_id).first()
         
-        if result is None:
-            logger.error(f"No se encontró impresora con ID {printer_id}")
+        if not printer:
+            logger.error(f"Impresora con ID {printer_id} no encontrada")
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, 
                 detail=f"Impresora con ID {printer_id} no encontrada"
             )
         
-        # Desempaquetar el resultado
-        printer_data = result[0]
+        # Obtener contadores directamente
+        counters = printer.printer_data.get('counters', {})
+        logger.info(f"Contadores recuperados: {counters}")
         
-        logger.info(f"Tipo de printer_data: {type(printer_data)}")
-        logger.info(f"Contenido de printer_data: {printer_data}")
-        
-        # Convertir a diccionario si es necesario
-        if isinstance(printer_data, str):
-            try:
-                printer_data = json.loads(printer_data)
-            except json.JSONDecodeError:
-                logger.error(f"Error decodificando JSON: {printer_data}")
-                printer_data = {}
-        
-        # Extraer contadores
-        counters = printer_data.get('counters', {})
-        logger.info(f"Contadores extraídos: {counters}")
-        
-        # Preparar respuesta con valores por defecto
-        response = {
-            "printer_id": printer_id,
-            "name": "Impresora",
+        result = {
+            "printer_id": printer.id,
+            "name": printer.name,
             "current": {
-                "total": counters.get('total_pages', 
-                    counters.get('total', 
-                    counters.get('total_pages', 0))),
-                "color": counters.get('color_pages', 
-                    counters.get('color', {}).get('total', 0)),
-                "bw": counters.get('black_and_white', 
-                    counters.get('bw_pages', 0))
+                "total": counters.get('total_pages', 0),
+                "color": counters.get('color_pages', 0),
+                "bw": counters.get('bw_pages', 0)
             },
             "history": {}
         }
         
-        logger.info(f"Respuesta final: {response}")
+        logger.info(f"Resultado final de contadores: {result}")
         
-        return response
+        return result
     
     except Exception as e:
         logger.error(f"Error completo al obtener contadores: {str(e)}", exc_info=True)
@@ -270,6 +248,8 @@ def get_printer_counters(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error interno al obtener contadores: {str(e)}"
         )
+
+        
 @router.get("/printers/{printer_id}/supplies", response_model=Dict[str, Any])
 def get_printer_supplies(
     printer_id: int, 
