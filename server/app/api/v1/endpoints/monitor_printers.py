@@ -223,7 +223,10 @@ def get_printer_counters(
                 detail=f"Impresora con ID {printer_id} no encontrada"
             )
         
-        # Obtener contadores directamente
+        # Registro detallado de los datos de la impresora
+        logger.info(f"Contenido completo de printer_data: {printer.printer_data}")
+        
+        # Obtener contadores
         counters = printer.printer_data.get('counters', {})
         logger.info(f"Contadores recuperados: {counters}")
         
@@ -249,7 +252,7 @@ def get_printer_counters(
             detail=f"Error interno al obtener contadores: {str(e)}"
         )
 
-        
+
 @router.get("/printers/{printer_id}/supplies", response_model=Dict[str, Any])
 def get_printer_supplies(
     printer_id: int, 

@@ -12,7 +12,7 @@ api_router.include_router(printers.router, prefix="/printers", tags=["printers"]
 api_router.include_router(tunnels.router, prefix="/tunnels", tags=["tunnels"])
 api_router.include_router(monitor_printers.router, prefix="/monitor/printers", tags=["monitor_printers"])
 api_router.include_router(printer_oids.router, prefix="/printer-oids", tags=["printer-oids"])
-
+api_router.include_router(monitor_printers.router, prefix="/printers", tags=["printers"])
 
 
 # Router web separado
