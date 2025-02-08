@@ -203,13 +203,7 @@ def get_printers(
         logger.error(f"Error obteniendo impresoras: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
-from app.db.session import get_db
-from app.db.models.printer import Printer
-from typing import Dict, Any
 
-router = APIRouter()
 
 @router.get("/printers/{printer_id}/counters", response_model=Dict[str, Any])
 def get_printer_counters(
@@ -234,11 +228,12 @@ def get_printer_counters(
     return {
         "printer_id": printer.id,
         "name": printer.name,
-        "counters": {
-            "total": counters.get('total', 0),
-            "color": counters.get('color', 0),
-            "black_and_white": counters.get('black_and_white', 0)
-        }
+        "current": {
+            "total": counters.get('total_pages', 0),
+            "color": counters.get('color_pages', 0),
+            "bw": counters.get('bw_pages', 0)
+        },
+        "history": {}  # Puedes agregar lógica de historial si es necesario
     }
 
 @router.get("/printers/{printer_id}/supplies", response_model=Dict[str, Any])
