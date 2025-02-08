@@ -202,14 +202,10 @@ def get_printers(
     except Exception as e:
         logger.error(f"Error obteniendo impresoras: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
 @router.get("/printers/{printer_id}/counters", response_model=Dict[str, Any])
-def get_printer_counters(
-    printer_id: int, 
-    db: Session = Depends(get_db)
-):
-    """
-    Obtiene los contadores de una impresora específica.
-    """
+def get_printer_counters(printer_id: int, db: Session = Depends(get_db)):
     logger.info(f"Solicitando contadores para impresora ID: {printer_id}")
     
     try:
@@ -218,39 +214,33 @@ def get_printer_counters(
         
         if not printer:
             logger.error(f"Impresora con ID {printer_id} no encontrada")
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, 
-                detail=f"Impresora con ID {printer_id} no encontrada"
-            )
+            raise HTTPException(status_code=404, detail="Impresora no encontrada")
         
-        # Registro detallado de los datos de la impresora
-        logger.info(f"Contenido completo de printer_data: {printer.printer_data}")
+        # Extraer los contadores del printer_data
+        printer_data = printer.printer_data or {}
+        counters = printer_data.get('counters', {})
         
-        # Obtener contadores
-        counters = printer.printer_data.get('counters', {})
-        logger.info(f"Contadores recuperados: {counters}")
+        # Asegurarse de que los valores sean números
+        total_pages = int(counters.get('total_pages', 0) or 0)
+        color_pages = int(counters.get('color_pages', 0) or 0)
+        bw_pages = int(counters.get('bw_pages', 0) or 0)
         
         result = {
             "printer_id": printer.id,
             "name": printer.name,
             "current": {
-                "total": counters.get('total_pages', 0),
-                "color": counters.get('color_pages', 0),
-                "bw": counters.get('bw_pages', 0)
-            },
-            "history": {}
+                "total": total_pages,
+                "color": color_pages,
+                "bw": bw_pages
+            }
         }
         
-        logger.info(f"Resultado final de contadores: {result}")
-        
+        logger.info(f"Datos de contadores preparados: {result}")
         return result
-    
+        
     except Exception as e:
-        logger.error(f"Error completo al obtener contadores: {str(e)}", exc_info=True)
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error interno al obtener contadores: {str(e)}"
-        )
+        logger.error(f"Error obteniendo contadores: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/printers/{printer_id}/supplies", response_model=Dict[str, Any])

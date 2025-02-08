@@ -45,9 +45,7 @@ class PrinterMonitorService:
         self.snmp_timeout = 2
         self.snmp_retries = 1
         
-        if not settings.AGENT_TOKEN:
-            raise ValueError("AGENT_TOKEN no está configurado en settings")
-            
+        # Eliminar la validación estricta del token
         logger.info(f"PrinterMonitorService inicializado con URL: {server_url}")
         logger.debug("Verificando configuración inicial:")
         logger.debug(f"  SERVER_URL: {settings.SERVER_URL}")

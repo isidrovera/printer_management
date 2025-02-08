@@ -227,92 +227,36 @@ async function loadCountersInfo(printerId) {
     try {
         const response = await fetch(`/api/v1/printers/${printerId}/counters`);
         
-        // Verificar si la respuesta es válida
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         
         const data = await response.json();
+        console.log("Datos de contadores recibidos:", data); // Para debug
         
-        // Validaciones adicionales para evitar errores
-        if (!data) {
-            throw new Error('No se recibieron datos');
-        }
-
-        // Valores por defecto si no existen
+        // Asegurarse de que existan los datos necesarios
         const current = data.current || {
             total: 0,
             color: 0,
             bw: 0
         };
 
-        const history = data.history || {};
-
-        // Preparar datos para el gráfico
-        const chartData = {
-            labels: Object.keys(history).map(date => formatDate(date)),
-            datasets: [{
-                label: 'Impresiones totales',
-                data: Object.values(history).map(entry => 
-                    entry && entry.total ? entry.total : 0
-                ),
-                borderColor: 'rgb(75, 192, 192)',
-                tension: 0.1
-            }]
-        };
-
         contentDiv.innerHTML = `
-            <div class="space-y-6">
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                        <h5 class="font-medium mb-2">Total</h5>
-                        <p class="text-2xl">${formatNumber(current.total)}</p>
-                    </div>
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                        <h5 class="font-medium mb-2">Color</h5>
-                        <p class="text-2xl">${formatNumber(current.color)}</p>
-                    </div>
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                        <h5 class="font-medium mb-2">Blanco y Negro</h5>
-                        <p class="text-2xl">${formatNumber(current.bw)}</p>
-                    </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h5 class="font-medium mb-2">Total de Impresiones</h5>
+                    <p class="text-2xl">${formatNumber(current.total)}</p>
                 </div>
-                <div class="bg-white p-4 rounded-lg">
-                    <canvas id="countersChart"></canvas>
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h5 class="font-medium mb-2">Impresiones Color</h5>
+                    <p class="text-2xl">${formatNumber(current.color)}</p>
+                </div>
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h5 class="font-medium mb-2">Impresiones B/N</h5>
+                    <p class="text-2xl">${formatNumber(current.bw)}</p>
                 </div>
             </div>
         `;
-
-        // Inicializar gráfico solo si hay datos
-        if (chartData.labels.length > 0) {
-            const ctx = document.getElementById('countersChart').getContext('2d');
-            if (charts.counters) {
-                charts.counters.destroy();
-            }
-            charts.counters = new Chart(ctx, {
-                type: 'line',
-                data: chartData,
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        },
-                        title: {
-                            display: true,
-                            text: 'Histórico de impresiones'
-                        }
-                    }
-                }
-            });
-        } else {
-            // Mostrar mensaje si no hay datos históricos
-            document.getElementById('countersChart').innerHTML = `
-                <div class="text-center text-gray-500">
-                    No hay datos históricos disponibles
-                </div>
-            `;
-        }
     } catch (error) {
         contentDiv.innerHTML = `
             <div class="text-red-500 text-center">
@@ -320,6 +264,7 @@ async function loadCountersInfo(printerId) {
                 Error al cargar los contadores: ${error.message}
             </div>
         `;
+        console.error("Error cargando contadores:", error);
     }
 }
 
