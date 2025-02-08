@@ -226,40 +226,22 @@ def get_printer_counters(
                 detail=f"Impresora con ID {printer_id} no encontrada"
             )
         
-        # Registro de datos raw
-        logger.info(f"Printer data raw: {printer.printer_data}")
+        # Obtener contadores del modelo
+        counters = printer.printer_data.get('counters', {})
+        logger.info(f"Contadores recuperados: {counters}")
         
-        # Convertir a diccionario si es necesario
-        if isinstance(printer.printer_data, str):
-            import json
-            try:
-                printer_data = json.loads(printer.printer_data)
-            except json.JSONDecodeError:
-                logger.error(f"Error decodificando JSON: {printer.printer_data}")
-                printer_data = {}
-        else:
-            printer_data = printer.printer_data or {}
-        
-        # Registro de datos procesados
-        logger.info(f"Printer data procesado: {printer_data}")
-        
-        # Obtener contadores
-        counters = printer_data.get('counters', {})
-        logger.info(f"Contadores extraídos: {counters}")
-        
-        # Preparar respuesta
         result = {
             "printer_id": printer.id,
             "name": printer.name,
             "current": {
-                "total": counters.get('total_pages', 0),
-                "color": counters.get('color_pages', 0),
-                "bw": counters.get('bw_pages', 0)
+                "total": counters.get('total', 0),
+                "color": counters['color'].get('total', 0) if isinstance(counters.get('color'), dict) else 0,
+                "bw": counters.get('black_white', 0)
             },
-            "history": {}  # Puedes agregar lógica de historial si es necesario
+            "history": {}
         }
         
-        logger.info(f"Resultado final: {result}")
+        logger.info(f"Resultado final de contadores: {result}")
         
         return result
     
