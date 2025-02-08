@@ -203,8 +203,6 @@ def get_printers(
         logger.error(f"Error obteniendo impresoras: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
-
-
 @router.get("/printers/{printer_id}/counters", response_model=Dict[str, Any])
 def get_printer_counters(
     printer_id: int, 
@@ -216,7 +214,7 @@ def get_printer_counters(
     logger.info(f"Solicitando contadores para impresora ID: {printer_id}")
     
     try:
-        # Obtener la impresora
+        # Obtener la impresora con todas sus propiedades
         printer = db.query(Printer).filter(Printer.id == printer_id).first()
         
         if not printer:
@@ -226,17 +224,56 @@ def get_printer_counters(
                 detail=f"Impresora con ID {printer_id} no encontrada"
             )
         
-        # Obtener contadores del modelo
+        # Registro detallado de los datos de la impresora
+        logger.info(f"Tipo de printer_data: {type(printer.printer_data)}")
+        logger.info(f"Contenido completo de printer_data: {printer.printer_data}")
+        
+        # Verificación exhaustiva
+        if printer.printer_data is None:
+            logger.warning("printer_data es None")
+            return {
+                "printer_id": printer.id,
+                "name": printer.name,
+                "current": {
+                    "total": 0,
+                    "color": 0,
+                    "bw": 0
+                },
+                "history": {}
+            }
+        
+        # Intentar extraer contadores de manera flexible
         counters = printer.printer_data.get('counters', {})
-        logger.info(f"Contadores recuperados: {counters}")
+        
+        logger.info(f"Estructura de contadores: {counters}")
+        
+        # Extracción con múltiples estrategias
+        total_pages = (
+            counters.get('total') or 
+            counters.get('total_pages') or 
+            0
+        )
+        
+        color_pages = (
+            (counters.get('color', {}).get('total') if isinstance(counters.get('color'), dict) else None) or
+            counters.get('color_pages') or
+            0
+        )
+        
+        bw_pages = (
+            counters.get('black_white') or 
+            counters.get('bw_pages') or 
+            counters.get('black_and_white') or 
+            0
+        )
         
         result = {
             "printer_id": printer.id,
             "name": printer.name,
             "current": {
-                "total": counters.get('total', 0),
-                "color": counters['color'].get('total', 0) if isinstance(counters.get('color'), dict) else 0,
-                "bw": counters.get('black_white', 0)
+                "total": total_pages,
+                "color": color_pages,
+                "bw": bw_pages
             },
             "history": {}
         }
