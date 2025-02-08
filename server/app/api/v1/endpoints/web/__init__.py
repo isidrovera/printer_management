@@ -1,7 +1,25 @@
 #server\app\api\v1\endpoints\web\__init__.py
-from fastapi import APIRouter
+# Exportar todos los módulos
+from . import (
+    dashboard,
+    agents,
+    websocket,
+    printers,
+    drivers,
+    tunnels,
+    monitor_printers,
+    printer_oids,
+    clients
+)
 
-router = APIRouter()
-
-# Exportar el router
-__all__ = ["router"]
+__all__ = [
+    "dashboard",
+    "agents",
+    "websocket",
+    "printers",
+    "drivers",
+    "tunnels",
+    "monitor_printers",
+    "printer_oids",
+    "clients"
+]
