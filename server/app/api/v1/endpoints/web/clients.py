@@ -1,3 +1,4 @@
+#server/app/api/v1/endpoints/web/clients.py
 from fastapi import APIRouter, Request, Depends
 from typing import Optional
 from fastapi.templating import Jinja2Templates
