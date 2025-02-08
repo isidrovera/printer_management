@@ -525,108 +525,112 @@ async function showAgentInfo(agentId) {
         }
         const agent = await response.json();
 
-        // Función auxiliar para formatear JSON
-        function formatJsonSection(data, title, icon, color) {
-            if (!data) return '';
-            
-            let content = '';
-            if (typeof data === 'object') {
-                content = Object.entries(data).map(([key, value]) => {
-                    // Si el valor es un objeto o array, formatearlo recursivamente
-                    if (typeof value === 'object' && value !== null) {
-                        return `
-                            <div class="mb-2">
-                                <span class="text-sm font-medium text-gray-500">${key}:</span>
-                                <div class="ml-4">
-                                    ${formatJsonSection(value)}
-                                </div>
-                            </div>
-                        `;
-                    }
-                    return `
-                        <div class="flex justify-between items-center py-1">
-                            <span class="text-sm text-gray-600">${key}:</span>
-                            <span class="text-sm font-medium text-gray-900">${value}</span>
-                        </div>
-                    `;
-                }).join('');
-            } else {
-                content = `<div class="text-sm text-gray-600">${data}</div>`;
-            }
-
-            return `
-                <div class="bg-white p-4 rounded-lg border border-gray-200">
-                    <div class="flex items-center space-x-2 mb-4">
-                        <i class="fas ${icon} text-${color}-500"></i>
-                        <h4 class="text-lg font-medium text-gray-900">${title}</h4>
-                    </div>
-                    <div class="space-y-2">
-                        ${content}
-                    </div>
-                </div>
-            `;
+        // Procesar y mostrar la información del sistema
+        function processSystemInfo(info) {
+            if (!info || typeof info !== 'object') return {};
+            return {
+                "Nombre del SO": info.OS || info.os || info["Nombre del SO"] || "No disponible",
+                "Versión del SO": info.Version || info.version || info["Versión del SO"] || "No disponible",
+                "Arquitectura": info.Arquitectura || info.arquitectura || info.arch || "No disponible",
+                "Procesador": info.Procesador || info.CPU || info.processor || "No disponible"
+            };
         }
 
-        // Renderizar el contenido
+        const systemInfo = processSystemInfo(agent.system_info);
+
         content.innerHTML = `
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-4">
                 <!-- Información Básica -->
-                <div class="col-span-full bg-gray-50 p-4 rounded-lg">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                        <div class="flex items-center space-x-2">
-                            <i class="fas fa-desktop text-blue-500"></i>
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                    <div class="flex items-center space-x-2 mb-6">
+                        <i class="fas fa-desktop text-blue-500 text-xl"></i>
+                        <h3 class="text-lg font-semibold text-gray-800">Información del Agente</h3>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100">
+                                <i class="fas fa-laptop text-blue-500"></i>
+                            </div>
                             <div>
-                                <div class="text-sm text-gray-500">Hostname</div>
-                                <div class="font-medium">${agent.hostname || 'N/A'}</div>
+                                <p class="text-sm text-gray-500">Hostname</p>
+                                <p class="font-medium text-gray-900">${agent.hostname || 'No disponible'}</p>
                             </div>
                         </div>
-                        <div class="flex items-center space-x-2">
-                            <i class="fas fa-user text-green-500"></i>
+                        <div class="flex items-center space-x-3">
+                            <div class="flex items-center justify-center w-10 h-10 rounded-full bg-green-100">
+                                <i class="fas fa-user text-green-500"></i>
+                            </div>
                             <div>
-                                <div class="text-sm text-gray-500">Usuario</div>
-                                <div class="font-medium">${agent.username || 'N/A'}</div>
+                                <p class="text-sm text-gray-500">Usuario</p>
+                                <p class="font-medium text-gray-900">${agent.username || 'No disponible'}</p>
                             </div>
                         </div>
-                        <div class="flex items-center space-x-2">
-                            <i class="fas fa-network-wired text-purple-500"></i>
+                        <div class="flex items-center space-x-3">
+                            <div class="flex items-center justify-center w-10 h-10 rounded-full bg-purple-100">
+                                <i class="fas fa-network-wired text-purple-500"></i>
+                            </div>
                             <div>
-                                <div class="text-sm text-gray-500">IP</div>
-                                <div class="font-medium">${agent.ip_address || 'N/A'}</div>
+                                <p class="text-sm text-gray-500">IP</p>
+                                <p class="font-medium text-gray-900">${agent.ip_address || 'No disponible'}</p>
                             </div>
                         </div>
-                        <div class="flex items-center space-x-2">
-                            <i class="fas fa-circle text-${agent.status === 'online' ? 'green' : 'red'}-500"></i>
+                        <div class="flex items-center space-x-3">
+                            <div class="flex items-center justify-center w-10 h-10 rounded-full ${agent.status === 'online' ? 'bg-green-100' : 'bg-red-100'}">
+                                <i class="fas fa-circle text-${agent.status === 'online' ? 'green' : 'red'}-500"></i>
+                            </div>
                             <div>
-                                <div class="text-sm text-gray-500">Estado</div>
-                                <div class="font-medium">${agent.status || 'N/A'}</div>
+                                <p class="text-sm text-gray-500">Estado</p>
+                                <p class="font-medium text-gray-900">${agent.status || 'No disponible'}</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Sistema -->
-                ${formatJsonSection(agent.system_info, 'Información del Sistema', 'fa-microchip', 'blue')}
-                
-                <!-- CPU -->
-                ${formatJsonSection(agent.cpu_info, 'Procesador', 'fa-microchip', 'red')}
-                
-                <!-- Memoria -->
-                ${formatJsonSection(agent.memory_info, 'Memoria RAM', 'fa-memory', 'green')}
-                
-                <!-- Discos -->
-                ${formatJsonSection(agent.disk_info, 'Discos', 'fa-hdd', 'yellow')}
-                
-                <!-- Red -->
-                ${formatJsonSection(agent.network_info, 'Red', 'fa-network-wired', 'purple')}
-                
-                <!-- GPU -->
-                ${agent.gpu_info ? formatJsonSection(agent.gpu_info, 'GPU', 'fa-desktop', 'indigo') : ''}
-                
-                <!-- Batería -->
-                ${agent.battery_info ? formatJsonSection(agent.battery_info, 'Batería', 'fa-battery-three-quarters', 'green') : ''}
-                
-                <!-- Uso de Disco -->
-                ${formatJsonSection(agent.disk_usage, 'Uso de Disco', 'fa-chart-pie', 'orange')}
+                <!-- Información del Sistema -->
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                    <div class="flex items-center space-x-2 mb-6">
+                        <i class="fas fa-microchip text-indigo-500 text-xl"></i>
+                        <h3 class="text-lg font-semibold text-gray-800">Información del Sistema</h3>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="flex items-center justify-center w-10 h-10 rounded-full bg-indigo-100">
+                                <i class="fas fa-windows text-indigo-500"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Sistema Operativo</p>
+                                <p class="font-medium text-gray-900">${systemInfo["Nombre del SO"]}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <div class="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100">
+                                <i class="fas fa-code-branch text-blue-500"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Versión</p>
+                                <p class="font-medium text-gray-900">${systemInfo["Versión del SO"]}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <div class="flex items-center justify-center w-10 h-10 rounded-full bg-yellow-100">
+                                <i class="fas fa-microchip text-yellow-500"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Arquitectura</p>
+                                <p class="font-medium text-gray-900">${systemInfo["Arquitectura"]}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-100">
+                                <i class="fas fa-memory text-red-500"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Procesador</p>
+                                <p class="font-medium text-gray-900">${systemInfo["Procesador"]}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         `;
 
