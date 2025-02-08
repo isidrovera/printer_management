@@ -225,8 +225,16 @@ def get_printer_counters(
                 detail=f"Impresora con ID {printer_id} no encontrada"
             )
         
-        # Extraer contadores del printer_data
-        printer_data = printer.printer_data or {}
+        # Imprimir el tipo de printer_data
+        logger.info(f"Tipo de printer_data: {type(printer.printer_data)}")
+        
+        # Convertir printer_data a diccionario si es necesario
+        if isinstance(printer.printer_data, str):
+            import json
+            printer_data = json.loads(printer.printer_data)
+        else:
+            printer_data = printer.printer_data or {}
+        
         logger.debug(f"Datos completos de la impresora: {printer_data}")
         
         counters = printer_data.get('counters', {})
