@@ -209,33 +209,36 @@ def get_printer_counters(printer_id: int, db: Session = Depends(get_db)):
     logger.info(f"Solicitando contadores para impresora ID: {printer_id}")
     
     try:
-        # Obtener la impresora
         printer = db.query(Printer).filter(Printer.id == printer_id).first()
         
         if not printer:
             logger.error(f"Impresora con ID {printer_id} no encontrada")
             raise HTTPException(status_code=404, detail="Impresora no encontrada")
         
-        # Extraer los contadores del printer_data
         printer_data = printer.printer_data or {}
         counters = printer_data.get('counters', {})
         
-        # Asegurarse de que los valores sean números
-        total_pages = int(counters.get('total_pages', 0) or 0)
-        color_pages = int(counters.get('color_pages', 0) or 0)
-        bw_pages = int(counters.get('bw_pages', 0) or 0)
-        
+        # Extraer los valores usando las claves exactas que vemos en la base de datos
         result = {
             "printer_id": printer.id,
             "name": printer.name,
-            "current": {
-                "total": total_pages,
-                "color": color_pages,
-                "bw": bw_pages
+            "counters": {
+                "total": counters.get('total_pages', 0),
+                "color": counters.get('color_pages', 0),
+                "black_and_white": counters.get('bw_pages', 0),
+                # Estos no están en la base de datos, pero mantenemos consistencia en la API
+                "copies": 0,
+                "prints": 0,
+                "scans": 0
             }
         }
         
-        logger.info(f"Datos de contadores preparados: {result}")
+        # Convertir valores None a 0
+        for key in result['counters']:
+            if result['counters'][key] is None:
+                result['counters'][key] = 0
+                
+        logger.info(f"Datos de contadores procesados: {result}")
         return result
         
     except Exception as e:
