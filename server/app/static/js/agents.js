@@ -509,7 +509,6 @@ async function showAgentInfo(agentId) {
     const modal = document.getElementById("agentInfoModal");
     const content = document.getElementById("agentInfoContent");
 
-    // Mostrar el modal con loading
     modal.classList.remove("hidden");
     content.innerHTML = `
         <div class="flex justify-center items-center p-8">
@@ -525,110 +524,83 @@ async function showAgentInfo(agentId) {
         }
         const agent = await response.json();
 
-        // Procesar y mostrar la información del sistema
-        function processSystemInfo(info) {
-            if (!info || typeof info !== 'object') return {};
-            return {
-                "Nombre del SO": info.OS || info.os || info["Nombre del SO"] || "No disponible",
-                "Versión del SO": info.Version || info.version || info["Versión del SO"] || "No disponible",
-                "Arquitectura": info.Arquitectura || info.arquitectura || info.arch || "No disponible",
-                "Procesador": info.Procesador || info.CPU || info.processor || "No disponible"
-            };
+        // Función para mostrar un campo de información
+        function infoField(icon, label, value, bgColor = 'blue') {
+            return `
+                <div class="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50">
+                    <div class="flex items-center justify-center w-10 h-10 rounded-full bg-${bgColor}-100 flex-shrink-0">
+                        <i class="fas ${icon} text-${bgColor}-500"></i>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <p class="text-sm text-gray-500">${label}</p>
+                        <p class="font-medium text-gray-900 truncate">${value || 'No disponible'}</p>
+                    </div>
+                </div>
+            `;
         }
-
-        const systemInfo = processSystemInfo(agent.system_info);
 
         content.innerHTML = `
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-4">
-                <!-- Información Básica -->
+                <!-- Información del Agente -->
                 <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                    <div class="flex items-center space-x-2 mb-6">
-                        <i class="fas fa-desktop text-blue-500 text-xl"></i>
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-desktop text-blue-500 text-xl mr-2"></i>
                         <h3 class="text-lg font-semibold text-gray-800">Información del Agente</h3>
                     </div>
-                    <div class="space-y-4">
-                        <div class="flex items-center space-x-3">
-                            <div class="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100">
-                                <i class="fas fa-laptop text-blue-500"></i>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-500">Hostname</p>
-                                <p class="font-medium text-gray-900">${agent.hostname || 'No disponible'}</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center space-x-3">
-                            <div class="flex items-center justify-center w-10 h-10 rounded-full bg-green-100">
-                                <i class="fas fa-user text-green-500"></i>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-500">Usuario</p>
-                                <p class="font-medium text-gray-900">${agent.username || 'No disponible'}</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center space-x-3">
-                            <div class="flex items-center justify-center w-10 h-10 rounded-full bg-purple-100">
-                                <i class="fas fa-network-wired text-purple-500"></i>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-500">IP</p>
-                                <p class="font-medium text-gray-900">${agent.ip_address || 'No disponible'}</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center space-x-3">
-                            <div class="flex items-center justify-center w-10 h-10 rounded-full ${agent.status === 'online' ? 'bg-green-100' : 'bg-red-100'}">
-                                <i class="fas fa-circle text-${agent.status === 'online' ? 'green' : 'red'}-500"></i>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-500">Estado</p>
-                                <p class="font-medium text-gray-900">${agent.status || 'No disponible'}</p>
-                            </div>
-                        </div>
+                    <div class="space-y-2">
+                        ${infoField('fa-laptop', 'Hostname', agent.hostname, 'blue')}
+                        ${infoField('fa-user', 'Usuario', agent.username, 'green')}
+                        ${infoField('fa-network-wired', 'IP', agent.ip_address, 'purple')}
+                        ${infoField('fa-circle', 'Estado', agent.status, agent.status === 'online' ? 'green' : 'red')}
+                        ${infoField('fa-building', 'Cliente', agent.client?.name, 'indigo')}
+                        ${infoField('fa-clock', 'Última actualización', new Date(agent.updated_at).toLocaleString(), 'orange')}
                     </div>
                 </div>
 
                 <!-- Información del Sistema -->
                 <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                    <div class="flex items-center space-x-2 mb-6">
-                        <i class="fas fa-microchip text-indigo-500 text-xl"></i>
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-microchip text-indigo-500 text-xl mr-2"></i>
                         <h3 class="text-lg font-semibold text-gray-800">Información del Sistema</h3>
                     </div>
-                    <div class="space-y-4">
-                        <div class="flex items-center space-x-3">
-                            <div class="flex items-center justify-center w-10 h-10 rounded-full bg-indigo-100">
-                                <i class="fas fa-windows text-indigo-500"></i>
+                    <div class="space-y-2">
+                        ${infoField('fa-windows', 'Sistema Operativo', agent.system_info?.OS || agent.system_info?.["Nombre del SO"], 'blue')}
+                        ${infoField('fa-code-branch', 'Versión', agent.system_info?.Version || agent.system_info?.["Versión del SO"], 'green')}
+                        ${infoField('fa-microchip', 'Arquitectura', agent.system_info?.Arquitectura || agent.system_info?.arch, 'yellow')}
+                        ${infoField('fa-memory', 'Procesador', agent.system_info?.Procesador || agent.cpu_info?.["Nombre"], 'red')}
+                    </div>
+                </div>
+
+                <!-- Información de Hardware -->
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-memory text-green-500 text-xl mr-2"></i>
+                        <h3 class="text-lg font-semibold text-gray-800">Información de Hardware</h3>
+                    </div>
+                    <div class="space-y-2">
+                        ${infoField('fa-microchip', 'CPU', agent.cpu_info?.["Modelo"] || agent.cpu_info?.["CPU"], 'red')}
+                        ${infoField('fa-tachometer-alt', 'Frecuencia', agent.cpu_info?.["Frecuencia (MHz)"] ? agent.cpu_info["Frecuencia (MHz)"] + ' MHz' : null, 'purple')}
+                        ${infoField('fa-memory', 'RAM Total', agent.memory_info?.["Total RAM (GB)"] ? agent.memory_info["Total RAM (GB)"] + ' GB' : null, 'blue')}
+                        ${infoField('fa-memory', 'RAM Disponible', agent.memory_info?.["Disponible RAM (GB)"] ? agent.memory_info["Disponible RAM (GB)"] + ' GB' : null, 'green')}
+                    </div>
+                </div>
+
+                <!-- Información de Almacenamiento -->
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-hdd text-purple-500 text-xl mr-2"></i>
+                        <h3 class="text-lg font-semibold text-gray-800">Información de Almacenamiento</h3>
+                    </div>
+                    <div class="space-y-2">
+                        ${agent.disk_info ? Object.entries(agent.disk_info).map(([disk, info]) => `
+                            <div class="border-b border-gray-200 last:border-0 pb-2 last:pb-0">
+                                <div class="font-medium text-gray-900 mb-1">${disk}</div>
+                                <div class="grid grid-cols-2 gap-2 text-sm">
+                                    <div class="text-gray-500">Total: <span class="text-gray-900">${info["Total (GB)"]} GB</span></div>
+                                    <div class="text-gray-500">Usado: <span class="text-gray-900">${info["Usado (GB)"]} GB</span></div>
+                                </div>
                             </div>
-                            <div>
-                                <p class="text-sm text-gray-500">Sistema Operativo</p>
-                                <p class="font-medium text-gray-900">${systemInfo["Nombre del SO"]}</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center space-x-3">
-                            <div class="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100">
-                                <i class="fas fa-code-branch text-blue-500"></i>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-500">Versión</p>
-                                <p class="font-medium text-gray-900">${systemInfo["Versión del SO"]}</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center space-x-3">
-                            <div class="flex items-center justify-center w-10 h-10 rounded-full bg-yellow-100">
-                                <i class="fas fa-microchip text-yellow-500"></i>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-500">Arquitectura</p>
-                                <p class="font-medium text-gray-900">${systemInfo["Arquitectura"]}</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center space-x-3">
-                            <div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-100">
-                                <i class="fas fa-memory text-red-500"></i>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-500">Procesador</p>
-                                <p class="font-medium text-gray-900">${systemInfo["Procesador"]}</p>
-                            </div>
-                        </div>
+                        `).join('') : 'No hay información de discos disponible'}
                     </div>
                 </div>
             </div>
