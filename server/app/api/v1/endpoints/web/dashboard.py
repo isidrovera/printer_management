@@ -7,23 +7,21 @@ from sqlalchemy.exc import SQLAlchemyError
 from app.services.client_service import ClientService
 from app.services.agent_service import AgentService
 from app.services.tunnel_service import TunnelService
+from app.services.printer_service import PrinterService  # Agregada esta importación
 from datetime import datetime
-
 import logging
 
 logger = logging.getLogger(__name__)
-router = APIRouter()
+router = APIRouter(tags=["dashboard"])  # Agregado el tag
 templates = Jinja2Templates(directory="app/templates")
 
-# Mantener los mismos filtros que en el archivo original
+# Mantener los filtros
 templates.env.filters['numberformat'] = lambda value: "{:,}".format(value)
 templates.env.filters['default'] = lambda value, default_value: value if value is not None else default_value
 
 @router.get("/")
 async def index(request: Request, db: Session = Depends(get_db)):
-    """
-    Endpoint principal que muestra el dashboard con estadísticas.
-    """
+    # El resto del código se mantiene igual que en tu archivo original
     start_time = datetime.now()
     logger.info("Iniciando carga del dashboard")
     
@@ -41,7 +39,7 @@ async def index(request: Request, db: Session = Depends(get_db)):
             logger.debug("Servicio de impresoras inicializado correctamente")
         except NameError:
             has_printer_service = False
-            logger.warning("PrinterService no está disponible, omitiendo estadísticas de impresoras")
+            logger.warning("PrinterService no está disponible")
 
         # Obtener estadísticas de clientes
         logger.debug("Obteniendo estadísticas de clientes")
