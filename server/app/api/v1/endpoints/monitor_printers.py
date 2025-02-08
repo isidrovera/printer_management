@@ -204,7 +204,7 @@ def get_printers(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/printers/{printer_id}/counters", response_model=Dict[str, Any])
+@router.get("/{printer_id}/counters", response_model=Dict[str, Any])
 def get_printer_counters(printer_id: int, db: Session = Depends(get_db)):
     logger.info(f"Solicitando contadores para impresora ID: {printer_id}")
     
@@ -218,33 +218,25 @@ def get_printer_counters(printer_id: int, db: Session = Depends(get_db)):
         printer_data = printer.printer_data or {}
         counters = printer_data.get('counters', {})
         
-        # Extraer los valores usando las claves exactas que vemos en la base de datos
         result = {
             "printer_id": printer.id,
             "name": printer.name,
             "counters": {
-                "total": counters.get('total_pages', 0),
-                "color": counters.get('color_pages', 0),
-                "black_and_white": counters.get('bw_pages', 0),
-                # Estos no están en la base de datos, pero mantenemos consistencia en la API
+                "total": int(counters.get('total_pages', 0) or 0),
+                "color": int(counters.get('color_pages', 0) or 0),
+                "black_and_white": int(counters.get('bw_pages', 0) or 0),
                 "copies": 0,
                 "prints": 0,
                 "scans": 0
             }
         }
         
-        # Convertir valores None a 0
-        for key in result['counters']:
-            if result['counters'][key] is None:
-                result['counters'][key] = 0
-                
         logger.info(f"Datos de contadores procesados: {result}")
         return result
         
     except Exception as e:
         logger.error(f"Error obteniendo contadores: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
-
 
 @router.get("/printers/{printer_id}/supplies", response_model=Dict[str, Any])
 def get_printer_supplies(
