@@ -525,55 +525,23 @@ async function showAgentInfo(agentId) {
         const agent = await response.json();
         console.log('Datos del agente:', agent);
 
-        function formatJsonSection(data, title, icon, color = 'blue') {
-            if (!data) return '';
-            
-            let content = '';
-            if (typeof data === 'object') {
-                content = Object.entries(data).map(([key, value]) => {
-                    if (typeof value === 'object' && value !== null) {
-                        return `
-                            <div class="mb-4 last:mb-0 p-3 bg-gray-50 rounded-lg">
-                                <div class="flex items-center mb-2">
-                                    <i class="fas fa-angle-right text-${color}-500 mr-2"></i>
-                                    <span class="text-sm font-medium text-gray-700">${key}</span>
-                                </div>
-                                <div class="ml-4">
-                                    ${formatJsonSection(value)}
-                                </div>
-                            </div>
-                        `;
-                    }
-                    return `
-                        <div class="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
-                            <span class="text-sm text-gray-600 flex items-center">
-                                <i class="fas fa-caret-right text-${color}-400 mr-2 text-xs"></i>
-                                ${key}
-                            </span>
-                            <span class="text-sm font-medium text-gray-900 bg-${color}-50 px-2 py-1 rounded">
-                                ${value}
-                            </span>
-                        </div>
-                    `;
-                }).join('');
-            } else {
-                content = `
-                    <div class="text-sm text-gray-600 bg-${color}-50 p-2 rounded">
-                        ${data}
-                    </div>
-                `;
-            }
+        // Función para procesar los valores y evitar undefined
+        function processValue(value) {
+            if (value === undefined || value === null) return 'No disponible';
+            if (typeof value === 'object') return JSON.stringify(value);
+            return value;
+        }
 
+        // Función para crear un campo de información
+        function createInfoField(icon, label, value, bgColor = 'blue') {
             return `
-                <div class="bg-white p-5 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200">
-                    <div class="flex items-center space-x-3 mb-4 pb-3 border-b border-gray-100">
-                        <div class="flex-shrink-0 w-10 h-10 rounded-full bg-${color}-100 flex items-center justify-center">
-                            <i class="fas ${icon} text-${color}-500 text-lg"></i>
-                        </div>
-                        <h4 class="text-lg font-semibold text-gray-800">${title}</h4>
+                <div class="flex items-center space-x-3">
+                    <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-${bgColor}-100 flex items-center justify-center">
+                        <i class="fas ${icon} text-${bgColor}-600"></i>
                     </div>
-                    <div class="space-y-2">
-                        ${content}
+                    <div class="min-w-0 flex-1">
+                        <div class="text-sm font-medium text-gray-500">${label}</div>
+                        <div class="text-sm text-gray-900">${processValue(value)}</div>
                     </div>
                 </div>
             `;
@@ -581,82 +549,78 @@ async function showAgentInfo(agentId) {
 
         content.innerHTML = `
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-4">
-                <!-- Header con Información Básica -->
-                <div class="col-span-full bg-gradient-to-r from-blue-500 to-blue-600 p-6 rounded-lg shadow-lg">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-                        <div class="bg-white/10 backdrop-blur-sm p-4 rounded-lg">
-                            <div class="flex items-center space-x-3">
-                                <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-                                    <i class="fas fa-desktop text-white"></i>
-                                </div>
-                                <div>
-                                    <div class="text-white/60 text-sm">Hostname</div>
-                                    <div class="text-white font-medium">${agent.hostname || 'N/A'}</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="bg-white/10 backdrop-blur-sm p-4 rounded-lg">
-                            <div class="flex items-center space-x-3">
-                                <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-                                    <i class="fas fa-user text-white"></i>
-                                </div>
-                                <div>
-                                    <div class="text-white/60 text-sm">Usuario</div>
-                                    <div class="text-white font-medium">${agent.username || 'N/A'}</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="bg-white/10 backdrop-blur-sm p-4 rounded-lg">
-                            <div class="flex items-center space-x-3">
-                                <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-                                    <i class="fas fa-network-wired text-white"></i>
-                                </div>
-                                <div>
-                                    <div class="text-white/60 text-sm">IP</div>
-                                    <div class="text-white font-medium">${agent.ip_address || 'N/A'}</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="bg-white/10 backdrop-blur-sm p-4 rounded-lg">
-                            <div class="flex items-center space-x-3">
-                                <div class="w-10 h-10 rounded-full ${agent.status === 'online' ? 'bg-green-500' : 'bg-red-500'} flex items-center justify-center">
-                                    <i class="fas fa-circle text-white"></i>
-                                </div>
-                                <div>
-                                    <div class="text-white/60 text-sm">Estado</div>
-                                    <div class="text-white font-medium">${agent.status || 'N/A'}</div>
-                                </div>
-                            </div>
-                        </div>
+                <!-- Información del Agente -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                        <i class="fas fa-desktop text-blue-500 mr-2"></i>
+                        Información del Agente
+                    </h3>
+                    <div class="space-y-4">
+                        ${createInfoField('fa-laptop', 'Hostname', agent.hostname)}
+                        ${createInfoField('fa-user', 'Usuario', agent.username, 'green')}
+                        ${createInfoField('fa-network-wired', 'IP', agent.ip_address, 'purple')}
+                        ${createInfoField('fa-circle', 'Estado', agent.status, agent.status === 'online' ? 'green' : 'red')}
                     </div>
                 </div>
 
-                <!-- Secciones de Información -->
-                ${formatJsonSection(agent.system_info, 'Información del Sistema', 'fa-microchip', 'blue')}
-                ${formatJsonSection(agent.cpu_info, 'Procesador', 'fa-microchip', 'red')}
-                ${formatJsonSection(agent.memory_info, 'Memoria RAM', 'fa-memory', 'green')}
-                ${formatJsonSection(agent.disk_info, 'Discos', 'fa-hdd', 'yellow')}
-                ${formatJsonSection(agent.network_info, 'Red', 'fa-network-wired', 'purple')}
-                ${agent.gpu_info ? formatJsonSection(agent.gpu_info, 'GPU', 'fa-desktop', 'indigo') : ''}
-                ${agent.battery_info ? formatJsonSection(agent.battery_info, 'Batería', 'fa-battery-three-quarters', 'teal') : ''}
-                ${formatJsonSection(agent.disk_usage, 'Uso de Disco', 'fa-chart-pie', 'orange')}
+                <!-- Información del Sistema -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                        <i class="fas fa-microchip text-indigo-500 mr-2"></i>
+                        Información del Sistema
+                    </h3>
+                    <div class="space-y-4">
+                        ${createInfoField('fa-windows', 'Sistema Operativo', agent.system_info?.["Nombre del SO"], 'indigo')}
+                        ${createInfoField('fa-code-branch', 'Versión', agent.system_info?.["Versión del SO"], 'blue')}
+                        ${createInfoField('fa-microchip', 'Arquitectura', agent.system_info?.Arquitectura, 'purple')}
+                        ${createInfoField('fa-memory', 'Procesador', agent.system_info?.Procesador, 'red')}
+                    </div>
+                </div>
+
+                <!-- Información de Hardware -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                        <i class="fas fa-memory text-green-500 mr-2"></i>
+                        Información de Hardware
+                    </h3>
+                    <div class="space-y-4">
+                        ${createInfoField('fa-microchip', 'CPU', agent.cpu_info?.["Modelo"], 'red')}
+                        ${createInfoField('fa-tachometer-alt', 'Frecuencia CPU', agent.cpu_info?.["Frecuencia (MHz)"] ? agent.cpu_info["Frecuencia (MHz)"] + ' MHz' : null, 'yellow')}
+                        ${createInfoField('fa-memory', 'RAM Total', agent.memory_info?.["Total RAM (GB)"] ? agent.memory_info["Total RAM (GB)"] + ' GB' : null, 'green')}
+                        ${createInfoField('fa-memory', 'RAM Disponible', agent.memory_info?.["Disponible RAM (GB)"] ? agent.memory_info["Disponible RAM (GB)"] + ' GB' : null, 'blue')}
+                    </div>
+                </div>
+
+                <!-- Información de Almacenamiento -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                        <i class="fas fa-hdd text-yellow-500 mr-2"></i>
+                        Información de Almacenamiento
+                    </h3>
+                    <div class="space-y-4">
+                        ${Object.entries(agent.disk_info || {}).map(([disk, info]) => `
+                            <div class="border-b pb-3 last:border-0 last:pb-0">
+                                <div class="font-medium text-gray-700 mb-2">${disk}</div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    ${createInfoField('fa-database', 'Total', info["Total (GB)"] + ' GB', 'blue')}
+                                    ${createInfoField('fa-chart-pie', 'Usado', info["Usado (GB)"] + ' GB', 'orange')}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
             </div>
         `;
 
     } catch (error) {
         console.error('Error:', error);
         content.innerHTML = `
-            <div class="flex flex-col items-center justify-center py-12">
-                <div class="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mb-4">
+            <div class="text-center py-8">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-100 mb-4">
                     <i class="fas fa-exclamation-circle text-red-500 text-2xl"></i>
                 </div>
-                <h3 class="text-lg font-semibold text-gray-900 mb-2">Error al cargar la información</h3>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">Error al cargar la información</h3>
                 <p class="text-sm text-gray-500">${error.message}</p>
-                <button onclick="closeModal('agentInfoModal')" 
-                        class="mt-6 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center">
-                    <i class="fas fa-times mr-2"></i>
-                    Cerrar
-                </button>
             </div>
         `;
     }
