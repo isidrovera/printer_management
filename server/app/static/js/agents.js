@@ -523,13 +523,17 @@ async function showAgentInfo(agentId) {
             throw new Error(`Error al cargar los datos: ${response.status}`);
         }
         const agent = await response.json();
-        console.log('Datos del agente:', agent);
+        
+        // Depurar la estructura de los datos
+        console.log('Datos completos del agente:', agent);
+        console.log('System Info:', agent.system_info);
+        console.log('CPU Info:', agent.cpu_info);
+        console.log('Memory Info:', agent.memory_info);
+        console.log('Disk Info:', agent.disk_info);
 
-        // Función para procesar los valores y evitar undefined
-        function processValue(value) {
-            if (value === undefined || value === null) return 'No disponible';
-            if (typeof value === 'object') return JSON.stringify(value);
-            return value;
+        // Función para acceder de forma segura a los datos anidados
+        function getNestedValue(obj, path, defaultValue = 'No disponible') {
+            return path.split('.').reduce((acc, part) => acc && acc[part], obj) ?? defaultValue;
         }
 
         // Función para crear un campo de información
@@ -541,7 +545,7 @@ async function showAgentInfo(agentId) {
                     </div>
                     <div class="min-w-0 flex-1">
                         <div class="text-sm font-medium text-gray-500">${label}</div>
-                        <div class="text-sm text-gray-900">${processValue(value)}</div>
+                        <div class="text-sm text-gray-900">${value}</div>
                     </div>
                 </div>
             `;
@@ -570,10 +574,10 @@ async function showAgentInfo(agentId) {
                         Información del Sistema
                     </h3>
                     <div class="space-y-4">
-                        ${createInfoField('fa-windows', 'Sistema Operativo', agent.system_info?.["Nombre del SO"], 'indigo')}
-                        ${createInfoField('fa-code-branch', 'Versión', agent.system_info?.["Versión del SO"], 'blue')}
-                        ${createInfoField('fa-microchip', 'Arquitectura', agent.system_info?.Arquitectura, 'purple')}
-                        ${createInfoField('fa-memory', 'Procesador', agent.system_info?.Procesador, 'red')}
+                        ${createInfoField('fa-windows', 'Sistema Operativo', getNestedValue(agent, 'system_info.OS') || getNestedValue(agent, 'system_info.Nombre del SO'), 'indigo')}
+                        ${createInfoField('fa-code-branch', 'Versión', getNestedValue(agent, 'system_info.Version') || getNestedValue(agent, 'system_info.Versión del SO'), 'blue')}
+                        ${createInfoField('fa-microchip', 'Arquitectura', getNestedValue(agent, 'system_info.Arquitectura') || getNestedValue(agent, 'system_info.arch'), 'purple')}
+                        ${createInfoField('fa-memory', 'Procesador', getNestedValue(agent, 'system_info.Procesador') || getNestedValue(agent, 'cpu_info.Modelo'), 'red')}
                     </div>
                 </div>
 
@@ -584,10 +588,25 @@ async function showAgentInfo(agentId) {
                         Información de Hardware
                     </h3>
                     <div class="space-y-4">
-                        ${createInfoField('fa-microchip', 'CPU', agent.cpu_info?.["Modelo"], 'red')}
-                        ${createInfoField('fa-tachometer-alt', 'Frecuencia CPU', agent.cpu_info?.["Frecuencia (MHz)"] ? agent.cpu_info["Frecuencia (MHz)"] + ' MHz' : null, 'yellow')}
-                        ${createInfoField('fa-memory', 'RAM Total', agent.memory_info?.["Total RAM (GB)"] ? agent.memory_info["Total RAM (GB)"] + ' GB' : null, 'green')}
-                        ${createInfoField('fa-memory', 'RAM Disponible', agent.memory_info?.["Disponible RAM (GB)"] ? agent.memory_info["Disponible RAM (GB)"] + ' GB' : null, 'blue')}
+                        ${createInfoField('fa-microchip', 'CPU', getNestedValue(agent, 'cpu_info.Modelo'), 'red')}
+                        ${createInfoField('fa-tachometer-alt', 'Frecuencia CPU', 
+                            getNestedValue(agent, 'cpu_info.Frecuencia (MHz)') ? 
+                            `${getNestedValue(agent, 'cpu_info.Frecuencia (MHz)')} MHz` : 
+                            'No disponible', 
+                            'yellow'
+                        )}
+                        ${createInfoField('fa-memory', 'RAM Total', 
+                            getNestedValue(agent, 'memory_info.Total RAM (GB)') ? 
+                            `${getNestedValue(agent, 'memory_info.Total RAM (GB)')} GB` : 
+                            'No disponible', 
+                            'green'
+                        )}
+                        ${createInfoField('fa-memory', 'RAM Disponible', 
+                            getNestedValue(agent, 'memory_info.Disponible RAM (GB)') ? 
+                            `${getNestedValue(agent, 'memory_info.Disponible RAM (GB)')} GB` : 
+                            'No disponible', 
+                            'blue'
+                        )}
                     </div>
                 </div>
 
@@ -602,8 +621,8 @@ async function showAgentInfo(agentId) {
                             <div class="border-b pb-3 last:border-0 last:pb-0">
                                 <div class="font-medium text-gray-700 mb-2">${disk}</div>
                                 <div class="grid grid-cols-2 gap-4">
-                                    ${createInfoField('fa-database', 'Total', info["Total (GB)"] + ' GB', 'blue')}
-                                    ${createInfoField('fa-chart-pie', 'Usado', info["Usado (GB)"] + ' GB', 'orange')}
+                                    ${createInfoField('fa-database', 'Total', `${info["Total (GB)"]} GB`, 'blue')}
+                                    ${createInfoField('fa-chart-pie', 'Usado', `${info["Usado (GB)"]} GB`, 'orange')}
                                 </div>
                             </div>
                         `).join('')}
