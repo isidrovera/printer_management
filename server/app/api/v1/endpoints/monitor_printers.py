@@ -211,76 +211,58 @@ def get_printer_counters(
     """
     Obtiene los contadores de una impresora específica.
     """
+    import json
+    
     logger.info(f"Solicitando contadores para impresora ID: {printer_id}")
     
     try:
-        # Obtener la impresora con todas sus propiedades
-        printer = db.query(Printer).filter(Printer.id == printer_id).first()
+        # Consulta directa para obtener solo printer_data
+        result = db.query(Printer.printer_data).filter(Printer.id == printer_id).first()
         
-        if not printer:
-            logger.error(f"Impresora con ID {printer_id} no encontrada")
+        if result is None:
+            logger.error(f"No se encontró impresora con ID {printer_id}")
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, 
                 detail=f"Impresora con ID {printer_id} no encontrada"
             )
         
-        # Registro detallado de los datos de la impresora
-        logger.info(f"Tipo de printer_data: {type(printer.printer_data)}")
-        logger.info(f"Contenido completo de printer_data: {printer.printer_data}")
+        # Desempaquetar el resultado
+        printer_data = result[0]
         
-        # Verificación exhaustiva
-        if printer.printer_data is None:
-            logger.warning("printer_data es None")
-            return {
-                "printer_id": printer.id,
-                "name": printer.name,
-                "current": {
-                    "total": 0,
-                    "color": 0,
-                    "bw": 0
-                },
-                "history": {}
-            }
+        logger.info(f"Tipo de printer_data: {type(printer_data)}")
+        logger.info(f"Contenido de printer_data: {printer_data}")
         
-        # Intentar extraer contadores de manera flexible
-        counters = printer.printer_data.get('counters', {})
+        # Convertir a diccionario si es necesario
+        if isinstance(printer_data, str):
+            try:
+                printer_data = json.loads(printer_data)
+            except json.JSONDecodeError:
+                logger.error(f"Error decodificando JSON: {printer_data}")
+                printer_data = {}
         
-        logger.info(f"Estructura de contadores: {counters}")
+        # Extraer contadores
+        counters = printer_data.get('counters', {})
+        logger.info(f"Contadores extraídos: {counters}")
         
-        # Extracción con múltiples estrategias
-        total_pages = (
-            counters.get('total') or 
-            counters.get('total_pages') or 
-            0
-        )
-        
-        color_pages = (
-            (counters.get('color', {}).get('total') if isinstance(counters.get('color'), dict) else None) or
-            counters.get('color_pages') or
-            0
-        )
-        
-        bw_pages = (
-            counters.get('black_white') or 
-            counters.get('bw_pages') or 
-            counters.get('black_and_white') or 
-            0
-        )
-        
-        result = {
-            "printer_id": printer.id,
-            "name": printer.name,
+        # Preparar respuesta con valores por defecto
+        response = {
+            "printer_id": printer_id,
+            "name": "Impresora",
             "current": {
-                "total": total_pages,
-                "color": color_pages,
-                "bw": bw_pages
+                "total": counters.get('total_pages', 
+                    counters.get('total', 
+                    counters.get('total_pages', 0))),
+                "color": counters.get('color_pages', 
+                    counters.get('color', {}).get('total', 0)),
+                "bw": counters.get('black_and_white', 
+                    counters.get('bw_pages', 0))
             },
             "history": {}
         }
         
-        logger.info(f"Resultado final de contadores: {result}")
+        logger.info(f"Respuesta final: {response}")
         
-        return result
+        return response
     
     except Exception as e:
         logger.error(f"Error completo al obtener contadores: {str(e)}", exc_info=True)
