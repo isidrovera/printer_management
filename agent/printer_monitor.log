@@ -27808,3 +27808,15 @@ Manufacturer : Microsoft
 2025-02-08 12:32:11,102 - DEBUG - [protocol.py:599] - < PING '<\x1d{\x05' [text, 4 bytes]
 2025-02-08 12:32:11,104 - DEBUG - [protocol.py:745] - > PONG '<\x1d{\x05' [text, 4 bytes]
 2025-02-08 12:32:11,104 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-08 12:32:31,099 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-08 12:32:31,100 - DEBUG - [protocol.py:745] - > PING 43 a5 28 f7 [binary, 4 bytes]
+2025-02-08 12:32:31,109 - DEBUG - [protocol.py:599] - < PONG 43 a5 28 f7 [binary, 4 bytes]
+2025-02-08 12:32:31,110 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-08 12:32:31,112 - DEBUG - [protocol.py:599] - < PING 81 0e 87 47 [binary, 4 bytes]
+2025-02-08 12:32:31,113 - DEBUG - [protocol.py:745] - > PONG 81 0e 87 47 [binary, 4 bytes]
+2025-02-08 12:32:51,100 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-08 12:32:51,100 - DEBUG - [protocol.py:745] - > PING 99 7b 1f 3a [binary, 4 bytes]
+2025-02-08 12:32:51,109 - DEBUG - [protocol.py:599] - < PONG 99 7b 1f 3a [binary, 4 bytes]
+2025-02-08 12:32:51,109 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-08 12:32:51,120 - DEBUG - [protocol.py:599] - < PING 00 d0 56 70 [binary, 4 bytes]
+2025-02-08 12:32:51,120 - DEBUG - [protocol.py:745] - > PONG 00 d0 56 70 [binary, 4 bytes]
