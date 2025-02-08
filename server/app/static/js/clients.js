@@ -174,10 +174,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Sistema de detalles del cliente
     const ClientSystem = {
+        // En tu ClientSystem.loadDetails
         loadDetails: async function(clientId) {
             try {
-                const response = await fetch(`/clients/${clientId}/details`);
-                if (!response.ok) throw new Error('Error al cargar los detalles');
+                const response = await fetch(`/clients/${clientId}/details`, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        throw new Error('Cliente no encontrado');
+                    }
+                    throw new Error('Error al cargar los detalles');
+                }
                 
                 const client = await response.json();
                 
@@ -188,9 +199,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     taxId: client.tax_id,
                     clientType: client.client_type,
                     clientStatus: client.status,
-                    activeAgents: client.active_agents || '0',
-                    totalPrinters: client.total_printers || '0',
-                    lastContact: client.last_contact_date || 'Sin contacto',
                     mainAddress: client.service_address,
                     mainCity: client.service_city,
                     mainState: client.service_state,
@@ -216,7 +224,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 TabSystem.initialize();
 
             } catch (error) {
-                NotificationSystem.show('Error al cargar los detalles del cliente', 'error');
+                NotificationSystem.show(error.message, 'error');
             }
         },
 

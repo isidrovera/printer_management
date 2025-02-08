@@ -435,7 +435,11 @@ async def delete_client(client_id: int, db: Session = Depends(get_db)):
 
 # Rutas adicionales útiles
 @router.get("/clients/{client_id}/details")
-async def client_details(request: Request, client_id: int, db: Session = Depends(get_db)):
+async def client_details(
+    request: Request, 
+    client_id: int, 
+    db: Session = Depends(get_db)
+):
     """Vista detallada de un cliente"""
     client_service = ClientService(db)
     client = await client_service.get_by_id(client_id)
@@ -443,11 +447,57 @@ async def client_details(request: Request, client_id: int, db: Session = Depends
     if not client:
         return RedirectResponse("/clients", status_code=303)
         
+    # Verificar si la petición espera JSON (es una petición AJAX)
+    if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+        return JSONResponse({
+            "id": client.id,
+            "name": client.name,
+            "business_name": client.business_name,
+            "tax_id": client.tax_id,
+            "client_type": client.client_type.value if hasattr(client.client_type, 'value') else client.client_type,
+            "status": client.status.value if hasattr(client.status, 'value') else client.status,
+            "client_code": client.client_code,
+            
+            # Contactos
+            "contact_info": {
+                "name": client.contact_name,
+                "email": client.contact_email,
+                "phone": client.contact_phone
+            },
+            "technical_contact_info": {
+                "name": client.technical_contact_name,
+                "email": client.technical_contact_email,
+                "phone": client.technical_contact_phone
+            },
+            "billing_contact_info": {
+                "name": client.billing_contact_name,
+                "email": client.billing_contact_email,
+                "phone": client.billing_contact_phone
+            },
+
+            # Dirección
+            "service_address": client.billing_address,
+            "service_city": client.billing_city,
+            "service_state": client.billing_state,
+            "service_zip_code": client.billing_zip_code,
+            "service_country": client.billing_country,
+
+            # Contrato
+            "contract_info": {
+                "number": client.contract_number,
+                "start_date": client.contract_start_date.strftime('%d/%m/%Y') if client.contract_start_date else None,
+                "end_date": client.contract_end_date.strftime('%d/%m/%Y') if client.contract_end_date else None,
+                "service_level": client.service_level,
+                "payment_terms": client.payment_terms,
+                "credit_limit": float(client.credit_limit) if client.credit_limit else 0.0
+            }
+        })
+        
+    # Si no es AJAX, devolver la vista HTML
     return templates.TemplateResponse(
         "clients/details.html",
         {"request": request, "client": client}
     )
-
 @router.get("/agents")
 async def list_agents(request: Request, db: Session = Depends(get_db)):
     agent_service = AgentService(db)
