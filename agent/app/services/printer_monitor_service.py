@@ -40,12 +40,13 @@ class PrinterMonitorService:
         self.oids_cache = {}
         self.monitored_printers = set()
         self.last_check = datetime.now()
-        self.snmp_community = 'public'
+        self.snmp_community = 'public'  # Valor inicial, se actualizará automáticamente
         self.snmp_port = 161
-        self.snmp_timeout = 2
-        self.snmp_retries = 1
+        self.snmp_timeout = 3  # Aumentado a 3 segundos
+        self.snmp_retries = 2  # Aumentado a 2 reintentos
+        self.last_successful_config = None
         
-        # Eliminar la validación estricta del token
+        # Logging de la configuración inicial
         logger.info(f"PrinterMonitorService inicializado con URL: {server_url}")
         logger.debug("Verificando configuración inicial:")
         logger.debug(f"  SERVER_URL: {settings.SERVER_URL}")
@@ -300,7 +301,7 @@ class PrinterMonitorService:
 
     async def _get_snmp_value(self, ip: str, oid: str) -> Any:
         """
-        Obtiene un valor SNMP específico.
+        Obtiene un valor SNMP específico intentando diferentes versiones (v1, v2c, v3) y credenciales.
         
         Args:
             ip (str): IP de la impresora
@@ -314,36 +315,89 @@ class PrinterMonitorService:
                 logger.warning(f"⚠️ OID nulo para {ip}")
                 return None
 
-            logger.debug(f"🔍 Consultando SNMP {ip} - OID: {oid}")
-            
-            errorIndication, errorStatus, errorIndex, varBinds = next(
-                getCmd(SnmpEngine(),
-                    CommunityData(self.snmp_community),
-                    UdpTransportTarget((ip, self.snmp_port), 
-                                     timeout=self.snmp_timeout, 
-                                     retries=self.snmp_retries),
-                    ContextData(),
-                    ObjectType(ObjectIdentity(oid)))
-            )
-            
-            if errorIndication:
-                logger.error(f"❌ Error SNMP para {ip}: {errorIndication}")
-                return None
+            # Lista de configuraciones a probar
+            snmp_configs = [
+                # SNMPv1 configs
+                lambda: CommunityData('public', mpModel=0),
+                lambda: CommunityData('private', mpModel=0),
                 
-            if errorStatus:
-                logger.error(f"❌ Error status SNMP para {ip}: {errorStatus}")
-                return None
+                # SNMPv2c configs
+                lambda: CommunityData('public', mpModel=1),
+                lambda: CommunityData('private', mpModel=1),
+                
+                # SNMPv3 configs - Sin autenticación ni privacidad
+                lambda: UsmUserData('initial'),
+                
+                # SNMPv3 - Con autenticación MD5
+                lambda: UsmUserData('md5_user', 'authentication123',
+                                  authProtocol=usmHMACMD5AuthProtocol),
+                
+                # SNMPv3 - Con autenticación SHA
+                lambda: UsmUserData('sha_user', 'authentication123',
+                                  authProtocol=usmHMACSHAAuthProtocol),
+                
+                # SNMPv3 - Con autenticación y privacidad (MD5 + DES)
+                lambda: UsmUserData('md5_des_user', 'authentication123', 'privacy123',
+                                  authProtocol=usmHMACMD5AuthProtocol,
+                                  privProtocol=usmDESPrivProtocol),
+                
+                # SNMPv3 - Con autenticación y privacidad (SHA + AES)
+                lambda: UsmUserData('sha_aes_user', 'authentication123', 'privacy123',
+                                  authProtocol=usmHMACSHAAuthProtocol,
+                                  privProtocol=usmAesCfb128Protocol),
+                
+                # Credenciales comunes de impresoras
+                lambda: UsmUserData('admin', 'admin123', 'admin123',
+                                  authProtocol=usmHMACSHAAuthProtocol,
+                                  privProtocol=usmAesCfb128Protocol),
+            ]
 
-            if not varBinds or len(varBinds) == 0:
-                logger.warning(f"⚠️ No se recibieron datos SNMP para {ip} - {oid}")
-                return None
+            logger.debug(f"🔍 Intentando conexión SNMP con {ip} - OID: {oid}")
 
-            value = varBinds[0][1]
-            logger.debug(f"📥 Valor SNMP obtenido para {ip} - {oid}: {value}")
-            return value
+            for config_generator in snmp_configs:
+                try:
+                    auth_data = config_generator()
+                    logger.debug(f"Probando configuración SNMP: {auth_data.__class__.__name__}")
+                    
+                    errorIndication, errorStatus, errorIndex, varBinds = next(
+                        getCmd(SnmpEngine(),
+                              auth_data,
+                              UdpTransportTarget((ip, self.snmp_port),
+                                               timeout=self.snmp_timeout,
+                                               retries=self.snmp_retries),
+                              ContextData(),
+                              ObjectType(ObjectIdentity(oid)))
+                    )
+
+                    if errorIndication:
+                        logger.debug(f"Intento fallido: {errorIndication}")
+                        continue
+
+                    if errorStatus:
+                        logger.debug(f"Error status: {errorStatus}")
+                        continue
+
+                    if not varBinds or len(varBinds) == 0:
+                        logger.debug("Sin datos")
+                        continue
+
+                    value = varBinds[0][1]
+                    logger.info(f"✅ Conexión exitosa con {auth_data.__class__.__name__}")
+                    logger.debug(f"📥 Valor SNMP obtenido para {ip} - {oid}: {value}")
+                    
+                    # Guardar la configuración exitosa
+                    self.last_successful_config = auth_data
+                    return value
+
+                except Exception as e:
+                    logger.debug(f"Error en intento: {str(e)}")
+                    continue
+
+            logger.error(f"❌ No se pudo obtener valor SNMP para {ip} después de probar todas las configuraciones")
+            return None
 
         except Exception as e:
-            logger.error(f"❌ Error en consulta SNMP para {ip} - {oid}: {str(e)}", exc_info=True)
+            logger.error(f"❌ Error general en consulta SNMP para {ip} - {oid}: {str(e)}", exc_info=True)
             return None
 
     def _convert_snmp_value(self, value: Any) -> Optional[int]:
