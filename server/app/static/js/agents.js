@@ -523,107 +523,123 @@ async function showAgentInfo(agentId) {
             throw new Error(`Error al cargar los datos: ${response.status}`);
         }
         const agent = await response.json();
-        
-        // Depurar la estructura de los datos
-        console.log('Datos completos del agente:', agent);
-        console.log('System Info:', agent.system_info);
-        console.log('CPU Info:', agent.cpu_info);
-        console.log('Memory Info:', agent.memory_info);
-        console.log('Disk Info:', agent.disk_info);
 
-        // Función para acceder de forma segura a los datos anidados
-        function getNestedValue(obj, path, defaultValue = 'No disponible') {
-            return path.split('.').reduce((acc, part) => acc && acc[part], obj) ?? defaultValue;
-        }
+        // Información del sistema estructurada
+        const sysInfo = agent.system_info?.Sistema || {};
+        const cpuInfo = agent.system_info?.CPU || {};
+        const memInfo = agent.system_info?.Memoria || {};
+        const diskInfo = agent.system_info?.Discos || [];
+        const networkInfo = agent.system_info?.Red || {};
 
-        // Función para crear un campo de información
-        function createInfoField(icon, label, value, bgColor = 'blue') {
-            return `
-                <div class="flex items-center space-x-3">
-                    <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-${bgColor}-100 flex items-center justify-center">
-                        <i class="fas ${icon} text-${bgColor}-600"></i>
-                    </div>
-                    <div class="min-w-0 flex-1">
-                        <div class="text-sm font-medium text-gray-500">${label}</div>
-                        <div class="text-sm text-gray-900">${value}</div>
-                    </div>
-                </div>
-            `;
-        }
-
+        // Crear la estructura del contenido
         content.innerHTML = `
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-4">
-                <!-- Información del Agente -->
-                <div class="bg-white rounded-lg shadow p-6">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                        <i class="fas fa-desktop text-blue-500 mr-2"></i>
+            <div class="grid grid-cols-2 gap-4">
+                <!-- Columna 1: Información del Agente -->
+                <div class="bg-white p-4 rounded-lg border border-gray-200">
+                    <h2 class="text-lg font-semibold mb-4 flex items-center">
+                        <i class="fas fa-desktop text-blue-600 mr-2"></i>
                         Información del Agente
-                    </h3>
-                    <div class="space-y-4">
-                        ${createInfoField('fa-laptop', 'Hostname', agent.hostname)}
-                        ${createInfoField('fa-user', 'Usuario', agent.username, 'green')}
-                        ${createInfoField('fa-network-wired', 'IP', agent.ip_address, 'purple')}
-                        ${createInfoField('fa-circle', 'Estado', agent.status, agent.status === 'online' ? 'green' : 'red')}
+                    </h2>
+                    <div class="grid gap-3">
+                        <div class="flex items-center">
+                            <i class="fas fa-laptop text-gray-400 w-6"></i>
+                            <span class="text-sm text-gray-600 w-24">Hostname:</span>
+                            <span class="font-medium">${agent.hostname}</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-user text-gray-400 w-6"></i>
+                            <span class="text-sm text-gray-600 w-24">Usuario:</span>
+                            <span class="font-medium">${agent.username}</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-network-wired text-gray-400 w-6"></i>
+                            <span class="text-sm text-gray-600 w-24">IP:</span>
+                            <span class="font-medium">${agent.ip_address}</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-circle text-${agent.status === 'online' ? 'green' : 'red'}-500 w-6"></i>
+                            <span class="text-sm text-gray-600 w-24">Estado:</span>
+                            <span class="font-medium">${agent.status}</span>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Información del Sistema -->
-                <div class="bg-white rounded-lg shadow p-6">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                        <i class="fas fa-microchip text-indigo-500 mr-2"></i>
+                <!-- Columna 2: Información del Sistema -->
+                <div class="bg-white p-4 rounded-lg border border-gray-200">
+                    <h2 class="text-lg font-semibold mb-4 flex items-center">
+                        <i class="fas fa-microchip text-purple-600 mr-2"></i>
                         Información del Sistema
-                    </h3>
-                    <div class="space-y-4">
-                        ${createInfoField('fa-windows', 'Sistema Operativo', getNestedValue(agent, 'system_info.OS') || getNestedValue(agent, 'system_info.Nombre del SO'), 'indigo')}
-                        ${createInfoField('fa-code-branch', 'Versión', getNestedValue(agent, 'system_info.Version') || getNestedValue(agent, 'system_info.Versión del SO'), 'blue')}
-                        ${createInfoField('fa-microchip', 'Arquitectura', getNestedValue(agent, 'system_info.Arquitectura') || getNestedValue(agent, 'system_info.arch'), 'purple')}
-                        ${createInfoField('fa-memory', 'Procesador', getNestedValue(agent, 'system_info.Procesador') || getNestedValue(agent, 'cpu_info.Modelo'), 'red')}
+                    </h2>
+                    <div class="grid gap-3">
+                        <div class="flex items-center">
+                            <i class="fas fa-laptop text-gray-400 w-6"></i>
+                            <span class="text-sm text-gray-600 w-24">Sistema:</span>
+                            <span class="font-medium">${sysInfo.Nombre || 'No disponible'}</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-code-branch text-gray-400 w-6"></i>
+                            <span class="text-sm text-gray-600 w-24">Versión:</span>
+                            <span class="font-medium">${sysInfo.Version || 'No disponible'}</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-microchip text-gray-400 w-6"></i>
+                            <span class="text-sm text-gray-600 w-24">CPU:</span>
+                            <span class="font-medium">${cpuInfo.Modelo || 'No disponible'}</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-memory text-gray-400 w-6"></i>
+                            <span class="text-sm text-gray-600 w-24">RAM:</span>
+                            <span class="font-medium">${memInfo.Total ? memInfo.Total + ' GB' : 'No disponible'}</span>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Información de Hardware -->
-                <div class="bg-white rounded-lg shadow p-6">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                        <i class="fas fa-memory text-green-500 mr-2"></i>
-                        Información de Hardware
-                    </h3>
-                    <div class="space-y-4">
-                        ${createInfoField('fa-microchip', 'CPU', getNestedValue(agent, 'cpu_info.Modelo'), 'red')}
-                        ${createInfoField('fa-tachometer-alt', 'Frecuencia CPU', 
-                            getNestedValue(agent, 'cpu_info.Frecuencia (MHz)') ? 
-                            `${getNestedValue(agent, 'cpu_info.Frecuencia (MHz)')} MHz` : 
-                            'No disponible', 
-                            'yellow'
-                        )}
-                        ${createInfoField('fa-memory', 'RAM Total', 
-                            getNestedValue(agent, 'memory_info.Total RAM (GB)') ? 
-                            `${getNestedValue(agent, 'memory_info.Total RAM (GB)')} GB` : 
-                            'No disponible', 
-                            'green'
-                        )}
-                        ${createInfoField('fa-memory', 'RAM Disponible', 
-                            getNestedValue(agent, 'memory_info.Disponible RAM (GB)') ? 
-                            `${getNestedValue(agent, 'memory_info.Disponible RAM (GB)')} GB` : 
-                            'No disponible', 
-                            'blue'
-                        )}
-                    </div>
-                </div>
-
-                <!-- Información de Almacenamiento -->
-                <div class="bg-white rounded-lg shadow p-6">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                        <i class="fas fa-hdd text-yellow-500 mr-2"></i>
-                        Información de Almacenamiento
-                    </h3>
-                    <div class="space-y-4">
-                        ${Object.entries(agent.disk_info || {}).map(([disk, info]) => `
-                            <div class="border-b pb-3 last:border-0 last:pb-0">
-                                <div class="font-medium text-gray-700 mb-2">${disk}</div>
-                                <div class="grid grid-cols-2 gap-4">
-                                    ${createInfoField('fa-database', 'Total', `${info["Total (GB)"]} GB`, 'blue')}
-                                    ${createInfoField('fa-chart-pie', 'Usado', `${info["Usado (GB)"]} GB`, 'orange')}
+                ${diskInfo.length > 0 ? `
+                    <!-- Columna 3: Información de Discos -->
+                    <div class="bg-white p-4 rounded-lg border border-gray-200">
+                        <h2 class="text-lg font-semibold mb-4 flex items-center">
+                            <i class="fas fa-hdd text-yellow-600 mr-2"></i>
+                            Información de Discos
+                        </h2>
+                        <div class="grid gap-3">
+                            ${diskInfo.map(disk => `
+                                <div class="border-b pb-2 last:border-0 last:pb-0">
+                                    <div class="font-medium text-gray-700 mb-1">${disk.Dispositivo}</div>
+                                    <div class="grid grid-cols-2 gap-2 text-sm">
+                                        <div class="flex items-center">
+                                            <i class="fas fa-database text-gray-400 w-6"></i>
+                                            <span class="text-gray-600 mr-2">Total:</span>
+                                            <span class="font-medium">${disk.Total} GB</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <i class="fas fa-chart-pie text-gray-400 w-6"></i>
+                                            <span class="text-gray-600 mr-2">Usado:</span>
+                                            <span class="font-medium">${disk.Usado} GB</span>
+                                        </div>
+                                    </div>
                                 </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+
+                <!-- Columna 4: Información de Red -->
+                <div class="bg-white p-4 rounded-lg border border-gray-200">
+                    <h2 class="text-lg font-semibold mb-4 flex items-center">
+                        <i class="fas fa-network-wired text-green-600 mr-2"></i>
+                        Información de Red
+                    </h2>
+                    <div class="grid gap-3">
+                        ${Object.entries(networkInfo).map(([interfaz, config]) => `
+                            <div class="mb-2">
+                                <div class="font-medium text-gray-700 mb-1">${interfaz}</div>
+                                ${Array.isArray(config) ? config.map(addr => `
+                                    <div class="flex items-center text-sm">
+                                        <i class="fas fa-network-wired text-gray-400 w-6"></i>
+                                        <span class="text-gray-600 w-24">${addr.Tipo}:</span>
+                                        <span class="font-medium">${addr.Dirección}</span>
+                                    </div>
+                                `).join('') : ''}
                             </div>
                         `).join('')}
                     </div>
@@ -635,11 +651,9 @@ async function showAgentInfo(agentId) {
         console.error('Error:', error);
         content.innerHTML = `
             <div class="text-center py-8">
-                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-100 mb-4">
-                    <i class="fas fa-exclamation-circle text-red-500 text-2xl"></i>
-                </div>
-                <h3 class="text-lg font-medium text-gray-900 mb-2">Error al cargar la información</h3>
-                <p class="text-sm text-gray-500">${error.message}</p>
+                <i class="fas fa-exclamation-circle text-red-500 text-4xl mb-4"></i>
+                <p class="text-lg text-gray-700">Error al cargar la información</p>
+                <p class="text-sm text-gray-500 mt-2">${error.message}</p>
             </div>
         `;
     }
