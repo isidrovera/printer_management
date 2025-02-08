@@ -213,33 +213,41 @@ def get_printer_counters(
     """
     Obtiene los contadores de una impresora específica.
     """
-    logger.info(f"Obteniendo contadores para impresora con ID: {printer_id}")
+    logger.info(f"Solicitando contadores para impresora ID: {printer_id}")
     
     try:
+        # Obtener la impresora
         printer = db.query(Printer).filter(Printer.id == printer_id).first()
         
         if not printer:
-            logger.warning(f"Impresora con ID {printer_id} no encontrada")
+            logger.error(f"Impresora con ID {printer_id} no encontrada")
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, 
                 detail=f"Impresora con ID {printer_id} no encontrada"
             )
         
-        # Imprimir el tipo de printer_data
-        logger.info(f"Tipo de printer_data: {type(printer.printer_data)}")
+        # Registro de datos raw
+        logger.info(f"Printer data raw: {printer.printer_data}")
         
-        # Convertir printer_data a diccionario si es necesario
+        # Convertir a diccionario si es necesario
         if isinstance(printer.printer_data, str):
             import json
-            printer_data = json.loads(printer.printer_data)
+            try:
+                printer_data = json.loads(printer.printer_data)
+            except json.JSONDecodeError:
+                logger.error(f"Error decodificando JSON: {printer.printer_data}")
+                printer_data = {}
         else:
             printer_data = printer.printer_data or {}
         
-        logger.debug(f"Datos completos de la impresora: {printer_data}")
+        # Registro de datos procesados
+        logger.info(f"Printer data procesado: {printer_data}")
         
+        # Obtener contadores
         counters = printer_data.get('counters', {})
-        logger.debug(f"Contadores extraídos: {counters}")
+        logger.info(f"Contadores extraídos: {counters}")
         
+        # Preparar respuesta
         result = {
             "printer_id": printer.id,
             "name": printer.name,
@@ -251,14 +259,12 @@ def get_printer_counters(
             "history": {}  # Puedes agregar lógica de historial si es necesario
         }
         
-        logger.info(f"Resultado de contadores: {result}")
+        logger.info(f"Resultado final: {result}")
         
         return result
     
-    except HTTPException:
-        raise
     except Exception as e:
-        logger.error(f"Error inesperado al obtener contadores: {str(e)}")
+        logger.error(f"Error completo al obtener contadores: {str(e)}", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error interno al obtener contadores: {str(e)}"
