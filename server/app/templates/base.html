@@ -8,6 +8,9 @@
     <!-- Tailwind CSS -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     
+    <!-- FontAwesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
     <!-- Estilos Personalizados -->
     <link href="/static/css/style.css" rel="stylesheet">
     
@@ -15,16 +18,72 @@
 </head>
 <body class="bg-gray-100 min-h-screen">
     <!-- Barra de Navegación -->
+    {% if request.state.user %}
     <nav class="bg-gray-800 text-white">
-        <div class="container mx-auto flex items-center justify-between px-4 py-2">
-            <a class="text-lg font-semibold" href="/">Printer Management</a>
-            <ul class="flex space-x-4">
-                <li><a class="hover:text-blue-400" href="/clients">Clientes</a></li>
-                <li><a class="hover:text-blue-400" href="/agents">Agentes</a></li>
-                <li><a class="hover:text-blue-400" href="/drivers">Drivers</a></li>
-            </ul>
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between h-16">
+                <!-- Logo y Menú Principal -->
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <a class="text-lg font-semibold" href="/">Printer Management</a>
+                    </div>
+                    <div class="hidden md:ml-6 md:flex space-x-4 items-center">
+                        <a class="hover:text-blue-400" href="/clients">
+                            <i class="fas fa-users mr-1"></i> Clientes
+                        </a>
+                        <a class="hover:text-blue-400" href="/agents">
+                            <i class="fas fa-desktop mr-1"></i> Agentes
+                        </a>
+                        <a class="hover:text-blue-400" href="/drivers">
+                            <i class="fas fa-hdd mr-1"></i> Drivers
+                        </a>
+                        <a class="hover:text-blue-400" href="/monitor/printers">
+                            <i class="fas fa-print mr-1"></i> Impresoras
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Menú de Usuario -->
+                <div class="flex items-center">
+                    <div class="ml-3 relative">
+                        <div class="flex items-center space-x-4">
+                            <span class="text-sm">
+                                <i class="fas fa-user mr-1"></i>
+                                {{ request.state.user.full_name }}
+                            </span>
+                            <div class="flex space-x-2">
+                                <a href="/auth/change-password" class="text-sm hover:text-blue-400" title="Cambiar contraseña">
+                                    <i class="fas fa-key"></i>
+                                </a>
+                                <a href="/auth/logout" class="text-sm hover:text-blue-400" title="Cerrar sesión">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Menú móvil -->
+            <div class="md:hidden">
+                <div class="px-2 pt-2 pb-3 space-y-1">
+                    <a class="block hover:text-blue-400 py-2" href="/clients">
+                        <i class="fas fa-users mr-1"></i> Clientes
+                    </a>
+                    <a class="block hover:text-blue-400 py-2" href="/agents">
+                        <i class="fas fa-desktop mr-1"></i> Agentes
+                    </a>
+                    <a class="block hover:text-blue-400 py-2" href="/drivers">
+                        <i class="fas fa-hdd mr-1"></i> Drivers
+                    </a>
+                    <a class="block hover:text-blue-400 py-2" href="/monitor/printers">
+                        <i class="fas fa-print mr-1"></i> Impresoras
+                    </a>
+                </div>
+            </div>
         </div>
     </nav>
+    {% endif %}
 
     <!-- Contenido Principal -->
     <main class="container mx-auto mt-6 px-4">
@@ -32,6 +91,7 @@
     </main>
 
     <!-- Scripts Básicos -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.259.0/lucide.min.js"></script>
     
     <!-- Scripts Personalizados -->

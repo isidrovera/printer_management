@@ -13,6 +13,8 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
+from app.middleware.auth_middleware import auth_middleware
+from starlette.middleware.base import BaseHTTPMiddleware
 from app.core.config import settings
 from app.api.v1.api import api_router, web_router
 from app.db.session import engine
@@ -21,6 +23,9 @@ from app.db.base import Base
 logger.info("Starting application...")
 
 app = FastAPI(title=settings.PROJECT_NAME)
+
+# Agregar el middleware de autenticación ANTES del CORS middleware
+app.add_middleware(BaseHTTPMiddleware, dispatch=auth_middleware)
 
 app.add_middleware(
     CORSMiddleware,
