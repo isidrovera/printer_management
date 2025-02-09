@@ -523,123 +523,149 @@ async function showAgentInfo(agentId) {
             throw new Error(`Error al cargar los datos: ${response.status}`);
         }
         const agent = await response.json();
+        console.log('Datos del agente:', agent);
 
-        // Información del sistema estructurada
-        const sysInfo = agent.system_info?.Sistema || {};
-        const cpuInfo = agent.system_info?.CPU || {};
-        const memInfo = agent.system_info?.Memoria || {};
-        const diskInfo = agent.system_info?.Discos || [];
-        const networkInfo = agent.system_info?.Red || {};
-
-        // Crear la estructura del contenido
         content.innerHTML = `
             <div class="grid grid-cols-2 gap-4">
-                <!-- Columna 1: Información del Agente -->
+                <!-- Información del Agente -->
                 <div class="bg-white p-4 rounded-lg border border-gray-200">
                     <h2 class="text-lg font-semibold mb-4 flex items-center">
                         <i class="fas fa-desktop text-blue-600 mr-2"></i>
                         Información del Agente
                     </h2>
                     <div class="grid gap-3">
-                        <div class="flex items-center">
-                            <i class="fas fa-laptop text-gray-400 w-6"></i>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
+                                <i class="fas fa-laptop text-blue-600"></i>
+                            </div>
                             <span class="text-sm text-gray-600 w-24">Hostname:</span>
                             <span class="font-medium">${agent.hostname}</span>
                         </div>
-                        <div class="flex items-center">
-                            <i class="fas fa-user text-gray-400 w-6"></i>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center">
+                                <i class="fas fa-user text-green-600"></i>
+                            </div>
                             <span class="text-sm text-gray-600 w-24">Usuario:</span>
                             <span class="font-medium">${agent.username}</span>
                         </div>
-                        <div class="flex items-center">
-                            <i class="fas fa-network-wired text-gray-400 w-6"></i>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center">
+                                <i class="fas fa-network-wired text-purple-600"></i>
+                            </div>
                             <span class="text-sm text-gray-600 w-24">IP:</span>
                             <span class="font-medium">${agent.ip_address}</span>
                         </div>
-                        <div class="flex items-center">
-                            <i class="fas fa-circle text-${agent.status === 'online' ? 'green' : 'red'}-500 w-6"></i>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-8 h-8 rounded-lg bg-${agent.status === 'online' ? 'green' : 'red'}-100 flex items-center justify-center">
+                                <i class="fas fa-circle text-${agent.status === 'online' ? 'green' : 'red'}-600"></i>
+                            </div>
                             <span class="text-sm text-gray-600 w-24">Estado:</span>
                             <span class="font-medium">${agent.status}</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Columna 2: Información del Sistema -->
+                <!-- Información del Sistema -->
                 <div class="bg-white p-4 rounded-lg border border-gray-200">
                     <h2 class="text-lg font-semibold mb-4 flex items-center">
                         <i class="fas fa-microchip text-purple-600 mr-2"></i>
                         Información del Sistema
                     </h2>
                     <div class="grid gap-3">
-                        <div class="flex items-center">
-                            <i class="fas fa-laptop text-gray-400 w-6"></i>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
+                                <i class="fas fa-window-maximize text-blue-600"></i>
+                            </div>
                             <span class="text-sm text-gray-600 w-24">Sistema:</span>
-                            <span class="font-medium">${sysInfo.Nombre || 'No disponible'}</span>
+                            <span class="font-medium">${agent.system_info.Sistema["Nombre del SO"]}</span>
                         </div>
-                        <div class="flex items-center">
-                            <i class="fas fa-code-branch text-gray-400 w-6"></i>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center">
+                                <i class="fas fa-code-branch text-indigo-600"></i>
+                            </div>
                             <span class="text-sm text-gray-600 w-24">Versión:</span>
-                            <span class="font-medium">${sysInfo.Version || 'No disponible'}</span>
+                            <span class="font-medium">${agent.system_info.Sistema["Versión del SO"]}</span>
                         </div>
-                        <div class="flex items-center">
-                            <i class="fas fa-microchip text-gray-400 w-6"></i>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center">
+                                <i class="fas fa-microchip text-red-600"></i>
+                            </div>
                             <span class="text-sm text-gray-600 w-24">CPU:</span>
-                            <span class="font-medium">${cpuInfo.Modelo || 'No disponible'}</span>
+                            <span class="font-medium">${agent.system_info.CPU.Modelo.split(',')[0]}</span>
                         </div>
-                        <div class="flex items-center">
-                            <i class="fas fa-memory text-gray-400 w-6"></i>
-                            <span class="text-sm text-gray-600 w-24">RAM:</span>
-                            <span class="font-medium">${memInfo.Total ? memInfo.Total + ' GB' : 'No disponible'}</span>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center">
+                                <i class="fas fa-memory text-green-600"></i>
+                            </div>
+                            <span class="text-sm text-gray-600 w-24">Memoria:</span>
+                            <span class="font-medium">${agent.system_info.Memoria["Total RAM (GB"]} GB</span>
                         </div>
                     </div>
                 </div>
 
-                ${diskInfo.length > 0 ? `
-                    <!-- Columna 3: Información de Discos -->
-                    <div class="bg-white p-4 rounded-lg border border-gray-200">
-                        <h2 class="text-lg font-semibold mb-4 flex items-center">
-                            <i class="fas fa-hdd text-yellow-600 mr-2"></i>
-                            Información de Discos
-                        </h2>
-                        <div class="grid gap-3">
-                            ${diskInfo.map(disk => `
-                                <div class="border-b pb-2 last:border-0 last:pb-0">
-                                    <div class="font-medium text-gray-700 mb-1">${disk.Dispositivo}</div>
-                                    <div class="grid grid-cols-2 gap-2 text-sm">
-                                        <div class="flex items-center">
-                                            <i class="fas fa-database text-gray-400 w-6"></i>
-                                            <span class="text-gray-600 mr-2">Total:</span>
-                                            <span class="font-medium">${disk.Total} GB</span>
-                                        </div>
-                                        <div class="flex items-center">
-                                            <i class="fas fa-chart-pie text-gray-400 w-6"></i>
-                                            <span class="text-gray-600 mr-2">Usado:</span>
-                                            <span class="font-medium">${disk.Usado} GB</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                ` : ''}
-
-                <!-- Columna 4: Información de Red -->
+                <!-- Información de Hardware -->
                 <div class="bg-white p-4 rounded-lg border border-gray-200">
                     <h2 class="text-lg font-semibold mb-4 flex items-center">
-                        <i class="fas fa-network-wired text-green-600 mr-2"></i>
-                        Información de Red
+                        <i class="fas fa-memory text-green-600 mr-2"></i>
+                        Información de Hardware
                     </h2>
                     <div class="grid gap-3">
-                        ${Object.entries(networkInfo).map(([interfaz, config]) => `
-                            <div class="mb-2">
-                                <div class="font-medium text-gray-700 mb-1">${interfaz}</div>
-                                ${Array.isArray(config) ? config.map(addr => `
-                                    <div class="flex items-center text-sm">
-                                        <i class="fas fa-network-wired text-gray-400 w-6"></i>
-                                        <span class="text-gray-600 w-24">${addr.Tipo}:</span>
-                                        <span class="font-medium">${addr.Dirección}</span>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center">
+                                <i class="fas fa-microchip text-red-600"></i>
+                            </div>
+                            <span class="text-sm text-gray-600 w-24">Núcleos:</span>
+                            <span class="font-medium">${agent.system_info.CPU["Núcleos físicos"]} físicos / ${agent.system_info.CPU["Núcleos lógicos"]} lógicos</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-8 h-8 rounded-lg bg-yellow-100 flex items-center justify-center">
+                                <i class="fas fa-tachometer-alt text-yellow-600"></i>
+                            </div>
+                            <span class="text-sm text-gray-600 w-24">Uso CPU:</span>
+                            <span class="font-medium">${agent.system_info.CPU["Uso actual (%)"]}%</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
+                                <i class="fas fa-memory text-blue-600"></i>
+                            </div>
+                            <span class="text-sm text-gray-600 w-24">RAM Libre:</span>
+                            <span class="font-medium">${agent.system_info.Memoria["Disponible RAM (GB)"]} GB</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center">
+                                <i class="fas fa-chart-pie text-purple-600"></i>
+                            </div>
+                            <span class="text-sm text-gray-600 w-24">Uso RAM:</span>
+                            <span class="font-medium">${agent.system_info.Memoria["Uso de RAM (%)"].toFixed(1)}%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Información de Almacenamiento -->
+                <div class="bg-white p-4 rounded-lg border border-gray-200">
+                    <h2 class="text-lg font-semibold mb-4 flex items-center">
+                        <i class="fas fa-hdd text-yellow-600 mr-2"></i>
+                        Información de Almacenamiento
+                    </h2>
+                    <div class="space-y-4">
+                        ${agent.system_info.Discos.map(disk => `
+                            <div class="border-b pb-3 last:border-0 last:pb-0">
+                                <div class="flex items-center mb-2">
+                                    <div class="w-8 h-8 rounded-lg bg-orange-100 flex items-center justify-center">
+                                        <i class="fas fa-hdd text-orange-600"></i>
                                     </div>
-                                `).join('') : ''}
+                                    <span class="ml-2 font-medium">${disk.Dispositivo}</span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-2 pl-10">
+                                    <div class="text-sm">
+                                        <span class="text-gray-600">Total:</span>
+                                        <span class="font-medium ml-2">${disk.Total} GB</span>
+                                    </div>
+                                    <div class="text-sm">
+                                        <span class="text-gray-600">Usado:</span>
+                                        <span class="font-medium ml-2">${disk.Usado} GB</span>
+                                    </div>
+                                </div>
                             </div>
                         `).join('')}
                     </div>
