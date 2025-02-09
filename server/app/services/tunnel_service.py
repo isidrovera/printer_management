@@ -242,7 +242,7 @@ class TunnelService:
                 detail=f"Error obteniendo información del túnel: {str(e)}"
             )
 
-    async def get_count(self) -> int:
+   async def get_count(self) -> int:
         """
         Obtiene el número total de túneles
         """
@@ -253,7 +253,7 @@ class TunnelService:
             logger.error(f"Error al obtener el conteo de túneles: {e}")
             return 0
 
-    async def get_count_by_status(self, status: str) -> int:
+   async def get_count_by_status(self, status: str) -> int:
         """
         Obtiene el número de túneles por estado
         """
@@ -266,7 +266,7 @@ class TunnelService:
             logger.error(f"Error al obtener el conteo de túneles por estado: {e}")
             return 0
 
-    async def list_tunnels(self):
+   async def list_tunnels(self):
         """
         Lista todos los túneles
         """
@@ -277,7 +277,7 @@ class TunnelService:
             logger.error(f"Error al listar túneles: {e}")
             return []
 
-    async def get_all(self):
+   async def get_all(self):
         """
         Obtiene todos los túneles (método usado por el dashboard)
         """
