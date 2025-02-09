@@ -85,10 +85,50 @@ document.addEventListener('DOMContentLoaded', function() {
         observer.observe(card);
     });
 
-    // Función para modo oscuro (opcional)
-    function toggleDarkMode() {
-        document.body.classList.toggle('dark-mode');
+    // Función para cargar y actualizar estadísticas
+    async function loadDashboardStats() {
+        try {
+            const response = await fetch('/api/v1/dashboard/stats');
+            const data = await response.json();
+            
+            // Actualizar contadores
+            updateCounter('total-clients', data.clients?.total || 0);
+            updateCounter('total-agents', data.agents?.total || 0);
+            updateCounter('online-agents', data.agents?.online || 0);
+            updateCounter('total-printers', data.printers?.total || 0);
+            updateCounter('total-tunnels', data.tunnels?.total || 0);
+            
+        } catch (error) {
+            console.error('Error al cargar estadísticas:', error);
+        }
     }
+
+    // Función para animar contadores
+    function updateCounter(elementId, value) {
+        const element = document.getElementById(elementId);
+        if (element) {
+            const startValue = parseInt(element.textContent) || 0;
+            const increment = (value - startValue) / 20;
+            let currentValue = startValue;
+
+            const animation = setInterval(() => {
+                currentValue += increment;
+                if (
+                    (increment > 0 && currentValue >= value) || 
+                    (increment < 0 && currentValue <= value)
+                ) {
+                    element.textContent = value;
+                    clearInterval(animation);
+                } else {
+                    element.textContent = Math.round(currentValue);
+                }
+            }, 50);
+        }
+    }
+
+    // Cargar estadísticas iniciales y configurar actualización automática
+    loadDashboardStats();
+    setInterval(loadDashboardStats, 30000); // Actualizar cada 30 segundos
 
     // Event listeners para elementos interactivos
     document.querySelectorAll('.nav-icons i').forEach(icon => {
