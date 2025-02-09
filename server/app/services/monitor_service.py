@@ -204,3 +204,38 @@ class PrinterMonitorService:
                 critical_printers.append(printer)
                 
         return critical_printers
+    async def get_count(self) -> int:
+        """
+        Obtiene el número total de impresoras.
+        """
+        try:
+            count = self.db.query(Printer).count()
+            logger.info(f"Total de impresoras encontradas: {count}")
+            return count
+        except Exception as e:
+            logger.error(f"Error obteniendo conteo de impresoras: {str(e)}")
+            return 0
+
+    async def get_count_by_status(self, status: str) -> int:
+        """
+        Obtiene el número de impresoras por estado específico.
+        """
+        try:
+            count = self.db.query(Printer).filter(Printer.status == status).count()
+            logger.info(f"Total de impresoras con estado {status}: {count}")
+            return count
+        except Exception as e:
+            logger.error(f"Error obteniendo conteo de impresoras por estado: {str(e)}")
+            return 0
+
+    async def get_all(self):
+        """
+        Obtiene todas las impresoras.
+        """
+        try:
+            printers = self.db.query(Printer).all()
+            logger.info(f"Total de impresoras recuperadas: {len(printers)}")
+            return printers
+        except Exception as e:
+            logger.error(f"Error obteniendo todas las impresoras: {str(e)}")
+            return []

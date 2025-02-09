@@ -49,14 +49,14 @@ async def index(request: Request, db: Session = Depends(get_db)):
         tunnel_service = TunnelService(db)
         
         # Si no existe PrinterService, podemos omitir esas estadísticas
+        # Inicializar servicio de impresoras
         try:
-            printer_service = PrinterService(db)
+            printer_service = PrinterMonitorService(db)
             has_printer_service = True
             logger.debug("Servicio de impresoras inicializado correctamente")
-        except NameError:
+        except Exception as e:
             has_printer_service = False
-            logger.warning("PrinterService no está disponible, omitiendo estadísticas de impresoras")
-
+            logger.warning(f"Error al inicializar el servicio de impresoras: {str(e)}")
         # Obtener estadísticas de clientes
         logger.debug("Obteniendo estadísticas de clientes")
         total_clients = await client_service.get_count()
