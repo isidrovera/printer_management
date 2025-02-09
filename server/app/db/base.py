@@ -3,6 +3,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, DateTime, event, MetaData, text, func
 from sqlalchemy import inspect as sa_inspect
 
+
 metadata = MetaData()
 Base = declarative_base(metadata=metadata)
 
