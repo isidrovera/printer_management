@@ -518,152 +518,163 @@ async function showAgentInfo(agentId) {
     `;
 
     try {
+        // Endpoint correcto
         const response = await fetch(`/api/v1/agents/${agentId}`);
         if (!response.ok) {
             throw new Error(`Error al cargar los datos: ${response.status}`);
         }
         const agent = await response.json();
-        console.log('Datos del agente:', agent);
+
+        const sysInfo = agent.system_info || {};
+        const sistema = sysInfo.Sistema || {};
+        const cpu = sysInfo.CPU || {};
+        const memoria = sysInfo.Memoria || {};
+        const discos = sysInfo.Discos || [];
+        const bateria = sysInfo.Batería || {};
 
         content.innerHTML = `
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-2 gap-6 p-4">
                 <!-- Información del Agente -->
-                <div class="bg-white p-4 rounded-lg border border-gray-200">
-                    <h2 class="text-lg font-semibold mb-4 flex items-center">
-                        <i class="fas fa-desktop text-blue-600 mr-2"></i>
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                        <i class="fas fa-desktop text-blue-500 mr-2"></i>
                         Información del Agente
                     </h2>
-                    <div class="grid gap-3">
-                        <div class="flex items-center space-x-2">
-                            <div class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
-                                <i class="fas fa-laptop text-blue-600"></i>
+                    <div class="space-y-4">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
+                                <i class="fas fa-laptop text-blue-500"></i>
                             </div>
-                            <span class="text-sm text-gray-600 w-24">Hostname:</span>
-                            <span class="font-medium">${agent.hostname}</span>
+                            <div class="ml-3">
+                                <span class="text-sm text-gray-500">Hostname</span>
+                                <p class="font-medium">${agent.hostname}</p>
+                            </div>
                         </div>
-                        <div class="flex items-center space-x-2">
-                            <div class="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center">
-                                <i class="fas fa-user text-green-600"></i>
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center">
+                                <i class="fas fa-user text-green-500"></i>
                             </div>
-                            <span class="text-sm text-gray-600 w-24">Usuario:</span>
-                            <span class="font-medium">${agent.username}</span>
+                            <div class="ml-3">
+                                <span class="text-sm text-gray-500">Usuario</span>
+                                <p class="font-medium">${agent.username}</p>
+                            </div>
                         </div>
-                        <div class="flex items-center space-x-2">
-                            <div class="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center">
-                                <i class="fas fa-network-wired text-purple-600"></i>
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center">
+                                <i class="fas fa-network-wired text-purple-500"></i>
                             </div>
-                            <span class="text-sm text-gray-600 w-24">IP:</span>
-                            <span class="font-medium">${agent.ip_address}</span>
+                            <div class="ml-3">
+                                <span class="text-sm text-gray-500">IP</span>
+                                <p class="font-medium">${agent.ip_address}</p>
+                            </div>
                         </div>
-                        <div class="flex items-center space-x-2">
-                            <div class="w-8 h-8 rounded-lg bg-${agent.status === 'online' ? 'green' : 'red'}-100 flex items-center justify-center">
-                                <i class="fas fa-circle text-${agent.status === 'online' ? 'green' : 'red'}-600"></i>
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-lg bg-${agent.status === 'online' ? 'green' : 'red'}-50 flex items-center justify-center">
+                                <i class="fas fa-circle text-${agent.status === 'online' ? 'green' : 'red'}-500"></i>
                             </div>
-                            <span class="text-sm text-gray-600 w-24">Estado:</span>
-                            <span class="font-medium">${agent.status}</span>
+                            <div class="ml-3">
+                                <span class="text-sm text-gray-500">Estado</span>
+                                <p class="font-medium capitalize">${agent.status}</p>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Información del Sistema -->
-                <div class="bg-white p-4 rounded-lg border border-gray-200">
-                    <h2 class="text-lg font-semibold mb-4 flex items-center">
-                        <i class="fas fa-microchip text-purple-600 mr-2"></i>
-                        Información del Sistema
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                        <i class="fas fa-microchip text-indigo-500 mr-2"></i>
+                        Sistema
                     </h2>
-                    <div class="grid gap-3">
-                        <div class="flex items-center space-x-2">
-                            <div class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
-                                <i class="fas fa-window-maximize text-blue-600"></i>
+                    <div class="space-y-4">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center">
+                                <i class="fas fa-windows text-indigo-500"></i>
                             </div>
-                            <span class="text-sm text-gray-600 w-24">Sistema:</span>
-                            <span class="font-medium">${agent.system_info.Sistema["Nombre del SO"]}</span>
+                            <div class="ml-3">
+                                <span class="text-sm text-gray-500">Sistema Operativo</span>
+                                <p class="font-medium">${sistema["Nombre del SO"]} ${sistema["Versión del SO"]}</p>
+                            </div>
                         </div>
-                        <div class="flex items-center space-x-2">
-                            <div class="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center">
-                                <i class="fas fa-code-branch text-indigo-600"></i>
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
+                                <i class="fas fa-microchip text-blue-500"></i>
                             </div>
-                            <span class="text-sm text-gray-600 w-24">Versión:</span>
-                            <span class="font-medium">${agent.system_info.Sistema["Versión del SO"]}</span>
+                            <div class="ml-3">
+                                <span class="text-sm text-gray-500">Procesador</span>
+                                <p class="font-medium">${cpu.Modelo.split(',')[0]}</p>
+                            </div>
                         </div>
-                        <div class="flex items-center space-x-2">
-                            <div class="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center">
-                                <i class="fas fa-microchip text-red-600"></i>
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-lg bg-yellow-50 flex items-center justify-center">
+                                <i class="fas fa-memory text-yellow-500"></i>
                             </div>
-                            <span class="text-sm text-gray-600 w-24">CPU:</span>
-                            <span class="font-medium">${agent.system_info.CPU.Modelo.split(',')[0]}</span>
+                            <div class="ml-3">
+                                <span class="text-sm text-gray-500">Memoria RAM</span>
+                                <p class="font-medium">${memoria["Total RAM (GB)"]} GB (${memoria["Uso de RAM (%)"]}% en uso)</p>
+                            </div>
                         </div>
-                        <div class="flex items-center space-x-2">
-                            <div class="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center">
-                                <i class="fas fa-memory text-green-600"></i>
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-lg bg-orange-50 flex items-center justify-center">
+                                <i class="fas fa-battery-full text-orange-500"></i>
                             </div>
-                            <span class="text-sm text-gray-600 w-24">Memoria:</span>
-                            <span class="font-medium">${agent.system_info.Memoria["Total RAM (GB"]} GB</span>
+                            <div class="ml-3">
+                                <span class="text-sm text-gray-500">Batería</span>
+                                <p class="font-medium">${bateria.Porcentaje}% ${bateria.Enchufado ? '(Conectado)' : ''}</p>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Información de Hardware -->
-                <div class="bg-white p-4 rounded-lg border border-gray-200">
-                    <h2 class="text-lg font-semibold mb-4 flex items-center">
-                        <i class="fas fa-memory text-green-600 mr-2"></i>
-                        Información de Hardware
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                        <i class="fas fa-memory text-red-500 mr-2"></i>
+                        Hardware
                     </h2>
-                    <div class="grid gap-3">
-                        <div class="flex items-center space-x-2">
-                            <div class="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center">
-                                <i class="fas fa-microchip text-red-600"></i>
+                    <div class="space-y-4">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-lg bg-red-50 flex items-center justify-center">
+                                <i class="fas fa-microchip text-red-500"></i>
                             </div>
-                            <span class="text-sm text-gray-600 w-24">Núcleos:</span>
-                            <span class="font-medium">${agent.system_info.CPU["Núcleos físicos"]} físicos / ${agent.system_info.CPU["Núcleos lógicos"]} lógicos</span>
+                            <div class="ml-3">
+                                <span class="text-sm text-gray-500">CPU</span>
+                                <p class="font-medium">${cpu["Núcleos físicos"]} núcleos (${cpu["Núcleos lógicos"]} hilos)</p>
+                                <p class="text-sm text-gray-500">Uso: ${cpu["Uso actual (%)"]}%</p>
+                            </div>
                         </div>
-                        <div class="flex items-center space-x-2">
-                            <div class="w-8 h-8 rounded-lg bg-yellow-100 flex items-center justify-center">
-                                <i class="fas fa-tachometer-alt text-yellow-600"></i>
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
+                                <i class="fas fa-memory text-blue-500"></i>
                             </div>
-                            <span class="text-sm text-gray-600 w-24">Uso CPU:</span>
-                            <span class="font-medium">${agent.system_info.CPU["Uso actual (%)"]}%</span>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <div class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
-                                <i class="fas fa-memory text-blue-600"></i>
+                            <div class="ml-3">
+                                <span class="text-sm text-gray-500">Memoria</span>
+                                <p class="font-medium">Disponible: ${memoria["Disponible RAM (GB)"]} GB</p>
+                                <p class="text-sm text-gray-500">Total: ${memoria["Total RAM (GB)"]} GB</p>
                             </div>
-                            <span class="text-sm text-gray-600 w-24">RAM Libre:</span>
-                            <span class="font-medium">${agent.system_info.Memoria["Disponible RAM (GB)"]} GB</span>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <div class="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center">
-                                <i class="fas fa-chart-pie text-purple-600"></i>
-                            </div>
-                            <span class="text-sm text-gray-600 w-24">Uso RAM:</span>
-                            <span class="font-medium">${agent.system_info.Memoria["Uso de RAM (%)"].toFixed(1)}%</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Información de Almacenamiento -->
-                <div class="bg-white p-4 rounded-lg border border-gray-200">
-                    <h2 class="text-lg font-semibold mb-4 flex items-center">
-                        <i class="fas fa-hdd text-yellow-600 mr-2"></i>
-                        Información de Almacenamiento
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                        <i class="fas fa-hdd text-purple-500 mr-2"></i>
+                        Almacenamiento
                     </h2>
                     <div class="space-y-4">
-                        ${agent.system_info.Discos.map(disk => `
-                            <div class="border-b pb-3 last:border-0 last:pb-0">
-                                <div class="flex items-center mb-2">
-                                    <div class="w-8 h-8 rounded-lg bg-orange-100 flex items-center justify-center">
-                                        <i class="fas fa-hdd text-orange-600"></i>
+                        ${discos.map(disco => `
+                            <div class="border-b border-gray-100 last:border-0 pb-3 last:pb-0">
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center">
+                                        <i class="fas fa-hdd text-purple-500"></i>
                                     </div>
-                                    <span class="ml-2 font-medium">${disk.Dispositivo}</span>
-                                </div>
-                                <div class="grid grid-cols-2 gap-2 pl-10">
-                                    <div class="text-sm">
-                                        <span class="text-gray-600">Total:</span>
-                                        <span class="font-medium ml-2">${disk.Total} GB</span>
-                                    </div>
-                                    <div class="text-sm">
-                                        <span class="text-gray-600">Usado:</span>
-                                        <span class="font-medium ml-2">${disk.Usado} GB</span>
+                                    <div class="ml-3">
+                                        <span class="text-sm text-gray-500">Disco ${disco.Dispositivo}</span>
+                                        <p class="font-medium">${disco["Total (GB)"]} GB Total</p>
+                                        <p class="text-sm text-gray-500">
+                                            ${disco["Usado (GB)"]} GB Usado (${disco["Porcentaje de uso (%)"]}%)
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -677,9 +688,11 @@ async function showAgentInfo(agentId) {
         console.error('Error:', error);
         content.innerHTML = `
             <div class="text-center py-8">
-                <i class="fas fa-exclamation-circle text-red-500 text-4xl mb-4"></i>
-                <p class="text-lg text-gray-700">Error al cargar la información</p>
-                <p class="text-sm text-gray-500 mt-2">${error.message}</p>
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-100 mb-4">
+                    <i class="fas fa-exclamation-circle text-red-500 text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">Error al cargar la información</h3>
+                <p class="text-sm text-gray-500">${error.message}</p>
             </div>
         `;
     }
