@@ -157,3 +157,64 @@ class ClientService:
     async def get_clients_by_account_manager(self, account_manager: str) -> List[Client]:
         """Obtiene clientes por ejecutivo de cuenta."""
         return self.db.query(Client).filter(Client.account_manager == account_manager).all()
+
+
+    async def get_dashboard_stats(self) -> Dict[str, Any]:
+        """
+        Obtiene todas las estadísticas necesarias para el dashboard en una sola consulta.
+        """
+        try:
+            total_clients = await self.get_count()
+            
+            # Obtener conteos por estado
+            active_clients = self.db.query(Client).filter(
+                Client.is_active == True
+            ).count()
+            
+            # Obtener conteos por tipo de cliente
+            client_types_count = {
+                client_type.value: self.db.query(Client).filter(
+                    Client.client_type == client_type
+                ).count()
+                for client_type in ClientType
+            }
+            
+            # Obtener contratos activos
+            current_date = datetime.utcnow()
+            active_contracts = self.db.query(Client).filter(
+                Client.contract_end_date > current_date,
+                Client.is_active == True
+            ).count()
+
+            stats = {
+                "total": total_clients,
+                "active": active_clients,
+                "inactive": total_clients - active_clients,
+                "by_type": client_types_count,
+                "active_contracts": active_contracts,
+                "last_updated": datetime.utcnow().isoformat()
+            }
+            
+            logger.info(f"Estadísticas del dashboard obtenidas exitosamente - Total clientes: {total_clients}")
+            return stats
+            
+        except Exception as e:
+            logger.error(f"Error obteniendo estadísticas del dashboard: {str(e)}")
+            return {
+                "total": 0,
+                "active": 0,
+                "inactive": 0,
+                "by_type": {},
+                "active_contracts": 0,
+                "error": str(e)
+            }
+
+    async def get_count_by_status(self, status: ClientStatus) -> int:
+        """
+        Obtiene el número de clientes por estado.
+        """
+        try:
+            return self.db.query(Client).filter(Client.status == status).count()
+        except Exception as e:
+            logger.error(f"Error obteniendo conteo de clientes por estado {status}: {str(e)}")
+            return 0

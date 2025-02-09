@@ -61,6 +61,11 @@ async def index(request: Request, db: Session = Depends(get_db)):
         logger.debug("Obteniendo estadísticas de clientes")
         total_clients = await client_service.get_count()
         logger.info(f"Total de clientes obtenidos: {total_clients}")
+        # Obtener estadísticas de clientes
+        logger.debug("Obteniendo estadísticas de clientes")
+        client_stats = await client_service.get_dashboard_stats()
+        logger.info(f"Total de clientes obtenidos: {client_stats['total']}")
+
 
         # Obtener estadísticas de agentes
         logger.debug("Obteniendo estadísticas de agentes")
@@ -77,6 +82,7 @@ async def index(request: Request, db: Session = Depends(get_db)):
 
         # Construir diccionario base de estadísticas
         stats = {
+            "clients": client_stats,
             "total_clients": total_clients,
             "agents": {
                 "total": agents_total,
