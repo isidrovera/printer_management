@@ -85,50 +85,108 @@ document.addEventListener('DOMContentLoaded', function() {
         observer.observe(card);
     });
 
-    // Función para cargar y actualizar estadísticas
+    // Funciones para obtener estadísticas
+    async function getClientStats() {
+        try {
+            const response = await fetch('/api/v1/clients/stats');
+            return await response.json();
+        } catch (error) {
+            console.error('Error obteniendo estadísticas de clientes:', error);
+            return { total: 0 };
+        }
+    }
+
+    async function getAgentStats() {
+        try {
+            const response = await fetch('/api/v1/agents/stats');
+            return await response.json();
+        } catch (error) {
+            console.error('Error obteniendo estadísticas de agentes:', error);
+            return { total: 0, online: 0 };
+        }
+    }
+
+    async function getTunnelStats() {
+        try {
+            const response = await fetch('/api/v1/tunnels/stats');
+            return await response.json();
+        } catch (error) {
+            console.error('Error obteniendo estadísticas de túneles:', error);
+            return { total: 0, active: 0 };
+        }
+    }
+
+    async function getPrinterStats() {
+        try {
+            const response = await fetch('/api/v1/printers/stats');
+            return await response.json();
+        } catch (error) {
+            console.error('Error obteniendo estadísticas de impresoras:', error);
+            return { total: 0, online: 0 };
+        }
+    }
+
+    // Función para actualizar todas las estadísticas
+    function updateCardValue(cardTitle, value) {
+        document.querySelectorAll('.card').forEach(card => {
+            if (card.textContent.includes(cardTitle)) {
+                const valueElement = card.querySelector('h2, .counter, [data-value]');
+                if (valueElement) {
+                    if (typeof value === 'number') {
+                        updateCounter(valueElement, value);
+                    } else {
+                        valueElement.textContent = value;
+                    }
+                }
+            }
+        });
+    }
+
+    // Función para animar contador
+    function updateCounter(element, newValue) {
+        const currentValue = parseInt(element.textContent) || 0;
+        if (currentValue === newValue) return;
+
+        const increment = (newValue - currentValue) / 20;
+        let current = currentValue;
+
+        const animation = setInterval(() => {
+            current += increment;
+            if ((increment > 0 && current >= newValue) || (increment < 0 && current <= newValue)) {
+                element.textContent = newValue;
+                clearInterval(animation);
+            } else {
+                element.textContent = Math.round(current);
+            }
+        }, 50);
+    }
+
+    // Función principal para cargar y actualizar estadísticas
     async function loadDashboardStats() {
         try {
-            const response = await fetch('/api/v1/dashboard/stats');
-            const data = await response.json();
-            
-            // Actualizar contadores
-            updateCounter('total-clients', data.clients?.total || 0);
-            updateCounter('total-agents', data.agents?.total || 0);
-            updateCounter('online-agents', data.agents?.online || 0);
-            updateCounter('total-printers', data.printers?.total || 0);
-            updateCounter('total-tunnels', data.tunnels?.total || 0);
-            
+            const [clientStats, agentStats, tunnelStats, printerStats] = await Promise.all([
+                getClientStats(),
+                getAgentStats(),
+                getTunnelStats(),
+                getPrinterStats()
+            ]);
+
+            // Actualizar cada sección
+            updateCardValue('Total Clientes', clientStats.total || 0);
+            updateCardValue('Agentes Online', `${agentStats.online || 0} / ${agentStats.total || 0}`);
+            updateCardValue('Túneles Activos', `${tunnelStats.active || 0} / ${tunnelStats.total || 0}`);
+            updateCardValue('Impresoras', `${printerStats.online || 0} / ${printerStats.total || 0}`);
+
         } catch (error) {
             console.error('Error al cargar estadísticas:', error);
         }
     }
 
-    // Función para animar contadores
-    function updateCounter(elementId, value) {
-        const element = document.getElementById(elementId);
-        if (element) {
-            const startValue = parseInt(element.textContent) || 0;
-            const increment = (value - startValue) / 20;
-            let currentValue = startValue;
-
-            const animation = setInterval(() => {
-                currentValue += increment;
-                if (
-                    (increment > 0 && currentValue >= value) || 
-                    (increment < 0 && currentValue <= value)
-                ) {
-                    element.textContent = value;
-                    clearInterval(animation);
-                } else {
-                    element.textContent = Math.round(currentValue);
-                }
-            }, 50);
-        }
-    }
-
-    // Cargar estadísticas iniciales y configurar actualización automática
+    // Cargar estadísticas iniciales
     loadDashboardStats();
-    setInterval(loadDashboardStats, 30000); // Actualizar cada 30 segundos
+
+    // Actualizar cada 30 segundos
+    setInterval(loadDashboardStats, 30000);
 
     // Event listeners para elementos interactivos
     document.querySelectorAll('.nav-icons i').forEach(icon => {
@@ -139,4 +197,9 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 200);
         });
     });
+
+    // Función para modo oscuro (opcional)
+    function toggleDarkMode() {
+        document.body.classList.toggle('dark-mode');
+    }
 });
