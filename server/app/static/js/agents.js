@@ -518,23 +518,26 @@ async function showAgentInfo(agentId) {
     `;
 
     try {
-        // Endpoint correcto
         const response = await fetch(`/api/v1/agents/${agentId}`);
         if (!response.ok) {
             throw new Error(`Error al cargar los datos: ${response.status}`);
         }
         const agent = await response.json();
+        console.log('Datos del agente:', agent);
 
-        const sysInfo = agent.system_info || {};
-        const sistema = sysInfo.Sistema || {};
-        const cpu = sysInfo.CPU || {};
-        const memoria = sysInfo.Memoria || {};
-        const discos = sysInfo.Discos || [];
-        const bateria = sysInfo.Batería || {};
+        // Extraer todas las secciones de información
+        const sistema = agent.system_info?.Sistema || {};
+        const cpu = agent.system_info?.CPU || {};
+        const memoria = agent.system_info?.Memoria || {};
+        const discos = agent.system_info?.Discos || [];
+        const red = agent.system_info?.Red || {};
+        const bateria = agent.system_info?.Batería || {};
+        const gpu = agent.system_info?.["Tarjetas Gráficas"] || "No disponible";
+        const espacioDisco = agent.system_info?.["Espacio en Disco"] || {};
 
         content.innerHTML = `
             <div class="grid grid-cols-2 gap-6 p-4">
-                <!-- Información del Agente -->
+                <!-- Información Básica del Agente -->
                 <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                     <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                         <i class="fas fa-desktop text-blue-500 mr-2"></i>
@@ -545,7 +548,7 @@ async function showAgentInfo(agentId) {
                             <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
                                 <i class="fas fa-laptop text-blue-500"></i>
                             </div>
-                            <div class="ml-3">
+                            <div class="ml-3 flex-1">
                                 <span class="text-sm text-gray-500">Hostname</span>
                                 <p class="font-medium">${agent.hostname}</p>
                             </div>
@@ -554,7 +557,7 @@ async function showAgentInfo(agentId) {
                             <div class="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center">
                                 <i class="fas fa-user text-green-500"></i>
                             </div>
-                            <div class="ml-3">
+                            <div class="ml-3 flex-1">
                                 <span class="text-sm text-gray-500">Usuario</span>
                                 <p class="font-medium">${agent.username}</p>
                             </div>
@@ -563,7 +566,7 @@ async function showAgentInfo(agentId) {
                             <div class="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center">
                                 <i class="fas fa-network-wired text-purple-500"></i>
                             </div>
-                            <div class="ml-3">
+                            <div class="ml-3 flex-1">
                                 <span class="text-sm text-gray-500">IP</span>
                                 <p class="font-medium">${agent.ip_address}</p>
                             </div>
@@ -572,9 +575,18 @@ async function showAgentInfo(agentId) {
                             <div class="w-10 h-10 rounded-lg bg-${agent.status === 'online' ? 'green' : 'red'}-50 flex items-center justify-center">
                                 <i class="fas fa-circle text-${agent.status === 'online' ? 'green' : 'red'}-500"></i>
                             </div>
-                            <div class="ml-3">
+                            <div class="ml-3 flex-1">
                                 <span class="text-sm text-gray-500">Estado</span>
                                 <p class="font-medium capitalize">${agent.status}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center">
+                                <i class="fas fa-key text-indigo-500"></i>
+                            </div>
+                            <div class="ml-3 flex-1">
+                                <span class="text-sm text-gray-500">Token</span>
+                                <p class="font-mono text-sm">${agent.token}</p>
                             </div>
                         </div>
                     </div>
@@ -584,98 +596,76 @@ async function showAgentInfo(agentId) {
                 <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                     <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                         <i class="fas fa-microchip text-indigo-500 mr-2"></i>
-                        Sistema
+                        Sistema Operativo
                     </h2>
                     <div class="space-y-4">
                         <div class="flex items-center">
                             <div class="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center">
                                 <i class="fas fa-windows text-indigo-500"></i>
                             </div>
-                            <div class="ml-3">
+                            <div class="ml-3 flex-1">
                                 <span class="text-sm text-gray-500">Sistema Operativo</span>
-                                <p class="font-medium">${sistema["Nombre del SO"]} ${sistema["Versión del SO"]}</p>
+                                <p class="font-medium">${sistema["Nombre del SO"]}</p>
+                                <p class="text-sm text-gray-500">Versión ${sistema["Versión del SO"]}</p>
                             </div>
                         </div>
                         <div class="flex items-center">
                             <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
                                 <i class="fas fa-microchip text-blue-500"></i>
                             </div>
-                            <div class="ml-3">
-                                <span class="text-sm text-gray-500">Procesador</span>
-                                <p class="font-medium">${cpu.Modelo.split(',')[0]}</p>
+                            <div class="ml-3 flex-1">
+                                <span class="text-sm text-gray-500">Arquitectura</span>
+                                <p class="font-medium">${sistema.Arquitectura}</p>
                             </div>
                         </div>
                         <div class="flex items-center">
-                            <div class="w-10 h-10 rounded-lg bg-yellow-50 flex items-center justify-center">
-                                <i class="fas fa-memory text-yellow-500"></i>
+                            <div class="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center">
+                                <i class="fas fa-laptop text-purple-500"></i>
                             </div>
-                            <div class="ml-3">
-                                <span class="text-sm text-gray-500">Memoria RAM</span>
-                                <p class="font-medium">${memoria["Total RAM (GB)"]} GB (${memoria["Uso de RAM (%)"]}% en uso)</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center">
-                            <div class="w-10 h-10 rounded-lg bg-orange-50 flex items-center justify-center">
-                                <i class="fas fa-battery-full text-orange-500"></i>
-                            </div>
-                            <div class="ml-3">
-                                <span class="text-sm text-gray-500">Batería</span>
-                                <p class="font-medium">${bateria.Porcentaje}% ${bateria.Enchufado ? '(Conectado)' : ''}</p>
+                            <div class="ml-3 flex-1">
+                                <span class="text-sm text-gray-500">Nombre del dispositivo</span>
+                                <p class="font-medium">${sistema["Nombre del dispositivo"]}</p>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <!-- Información de Hardware -->
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <!-- Información de Red -->
+                <div class="col-span-2 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                     <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                        <i class="fas fa-memory text-red-500 mr-2"></i>
-                        Hardware
+                        <i class="fas fa-network-wired text-blue-500 mr-2"></i>
+                        Interfaces de Red
                     </h2>
-                    <div class="space-y-4">
-                        <div class="flex items-center">
-                            <div class="w-10 h-10 rounded-lg bg-red-50 flex items-center justify-center">
-                                <i class="fas fa-microchip text-red-500"></i>
-                            </div>
-                            <div class="ml-3">
-                                <span class="text-sm text-gray-500">CPU</span>
-                                <p class="font-medium">${cpu["Núcleos físicos"]} núcleos (${cpu["Núcleos lógicos"]} hilos)</p>
-                                <p class="text-sm text-gray-500">Uso: ${cpu["Uso actual (%)"]}%</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center">
-                            <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
-                                <i class="fas fa-memory text-blue-500"></i>
-                            </div>
-                            <div class="ml-3">
-                                <span class="text-sm text-gray-500">Memoria</span>
-                                <p class="font-medium">Disponible: ${memoria["Disponible RAM (GB)"]} GB</p>
-                                <p class="text-sm text-gray-500">Total: ${memoria["Total RAM (GB)"]} GB</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Información de Almacenamiento -->
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                        <i class="fas fa-hdd text-purple-500 mr-2"></i>
-                        Almacenamiento
-                    </h2>
-                    <div class="space-y-4">
-                        ${discos.map(disco => `
-                            <div class="border-b border-gray-100 last:border-0 pb-3 last:pb-0">
-                                <div class="flex items-center">
-                                    <div class="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center">
-                                        <i class="fas fa-hdd text-purple-500"></i>
+                    <div class="grid grid-cols-2 gap-4">
+                        ${Object.entries(red).map(([interfaceName, configs]) => `
+                            <div class="bg-gray-50 rounded-lg p-4">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
+                                        <i class="fas fa-${
+                                            interfaceName.toLowerCase().includes('wi-fi') ? 'wifi' : 
+                                            interfaceName.toLowerCase().includes('ethernet') ? 'ethernet' : 
+                                            interfaceName.toLowerCase().includes('bluetooth') ? 'bluetooth' : 
+                                            'network-wired'
+                                        } text-blue-500"></i>
                                     </div>
                                     <div class="ml-3">
-                                        <span class="text-sm text-gray-500">Disco ${disco.Dispositivo}</span>
-                                        <p class="font-medium">${disco["Total (GB)"]} GB Total</p>
-                                        <p class="text-sm text-gray-500">
-                                            ${disco["Usado (GB)"]} GB Usado (${disco["Porcentaje de uso (%)"]}%)
-                                        </p>
+                                        <span class="font-medium text-gray-900">${interfaceName}</span>
                                     </div>
+                                </div>
+                                <div class="space-y-2">
+                                    ${configs.map(config => `
+                                        <div class="bg-white rounded p-2">
+                                            <div class="flex justify-between items-center">
+                                                <span class="text-sm text-gray-500">${config.Tipo}:</span>
+                                                <span class="text-sm font-medium">${config.Dirección}</span>
+                                            </div>
+                                            ${config["Máscara de red"] ? `
+                                                <div class="flex justify-between items-center mt-1">
+                                                    <span class="text-sm text-gray-500">Máscara:</span>
+                                                    <span class="text-sm font-medium">${config["Máscara de red"]}</span>
+                                                </div>
+                                            ` : ''}
+                                        </div>
+                                    `).join('')}
                                 </div>
                             </div>
                         `).join('')}
