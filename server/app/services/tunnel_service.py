@@ -243,28 +243,26 @@ class TunnelService:
             )
 
    async def get_count(self) -> int:
-        """
-        Obtiene el número total de túneles
-        """
-        try:
-            result = await self.db.execute(select(func.count(Tunnel.id)))
-            return result.scalar() or 0
-        except Exception as e:
-            logger.error(f"Error al obtener el conteo de túneles: {e}")
-            return 0
+       """Obtiene el número total de túneles."""
+       try:
+           logger.debug("Contando total de túneles")
+           count = self.db.query(Tunnel).count()
+           logger.info(f"Total de túneles encontrados: {count}")
+           return count
+       except Exception as e:
+           logger.error(f"Error obteniendo conteo de túneles: {str(e)}")
+           return 0
 
    async def get_count_by_status(self, status: str) -> int:
-        """
-        Obtiene el número de túneles por estado
-        """
-        try:
-            result = await self.db.execute(
-                select(func.count(Tunnel.id)).where(Tunnel.status == status)
-            )
-            return result.scalar() or 0
-        except Exception as e:
-            logger.error(f"Error al obtener el conteo de túneles por estado: {e}")
-            return 0
+       """Obtiene el número de túneles por estado específico."""
+       try:
+           logger.debug(f"Contando túneles con estado: {status}")
+           count = self.db.query(Tunnel).filter(Tunnel.status == status).count()
+           logger.info(f"Total de túneles con estado {status}: {count}")
+           return count
+       except Exception as e:
+           logger.error(f"Error obteniendo conteo de túneles por estado: {str(e)}")
+           return 0
 
    async def list_tunnels(self):
         """
