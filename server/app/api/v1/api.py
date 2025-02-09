@@ -1,9 +1,14 @@
 # server/app/api/v1/api.py
 from fastapi import APIRouter
-from app.api.v1.endpoints import agents, websocket, web, printers, drivers, tunnels, monitor_printers, printer_oids
+from app.api.v1.endpoints import agents, websocket, web, printers, drivers, tunnels, monitor_printers, printer_oids, dashboard
 
 # Router para APIs
 api_router = APIRouter()
+api_router.include_router(
+    dashboard.router,
+    prefix="/dashboard",
+    tags=["dashboard"]
+)
 
 # Rutas para drivers
 api_router.include_router(
