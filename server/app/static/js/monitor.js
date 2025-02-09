@@ -92,7 +92,7 @@ function showHistory(printerId) {
     loadHistoryInfo(printerId);
 }
 
-// Función para cargar información de la impresora
+// Función para cargar información de la impresora contadores
 async function loadPrinterInfo(printerId) {
     const contentDiv = document.getElementById('printerInfoContent');
     try {
@@ -138,34 +138,115 @@ async function loadPrinterInfo(printerId) {
 // Función para cargar información de suministros
 async function loadSuppliesInfo(printerId) {
     const contentDiv = document.getElementById('suppliesContent');
+    
+    // Función auxiliar para obtener el color del suministro
+    const getSupplyColor = (color) => {
+        const colors = {
+            black: '#000000',
+            cyan: '#00BCD4',
+            magenta: '#E91E63',
+            yellow: '#FFC107'
+        };
+        return colors[color.toLowerCase()] || '#666666';
+    };
+
+    // Función para obtener el ícono según el tipo y estado
+    const getSupplyIcon = (type, level, status) => {
+        if (status === 'unknown') {
+            return `<svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M9 9h.01M15 9h.01M9.5 15.5c.5.5 2.5 1 5 0"></path>
+            </svg>`;
+        }
+        
+        const iconColor = level <= 10 ? 'text-red-500' : 
+                         level <= 25 ? 'text-orange-500' : 
+                         'text-green-500';
+        
+        return `<svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 ${iconColor}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2v6m0 12v2M4.93 4.93l4.24 4.24m5.66 5.66l4.24 4.24M2 12h6m12 0h2M4.93 19.07l4.24-4.24m5.66-5.66l4.24-4.24"></path>
+        </svg>`;
+    };
+
     try {
         const response = await fetch(`/api/v1/printers/${printerId}/supplies`);
         const data = await response.json();
-        
-        contentDiv.innerHTML = `
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                ${Object.entries(data.supplies).map(([color, info]) => `
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="font-medium">${capitalize(color)}</span>
-                            <span class="text-sm ${getSupplyLevelClass(info.level)}">
-                                ${info.level}%
-                            </span>
-                        </div>
-                        <div class="w-full bg-gray-200 rounded-full h-2.5">
-                            <div class="bg-${getSupplyColor(color)} h-2.5 rounded-full" 
-                                 style="width: ${info.level}%">
-                            </div>
-                        </div>
+
+        const tonerHtml = Object.entries(data.supplies.toners || {}).map(([color, info]) => `
+            <div class="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow duration-200">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center space-x-3">
+                        ${getSupplyIcon('toner', info.level, info.status)}
+                        <span class="font-medium text-gray-700 capitalize">${color}</span>
                     </div>
-                `).join('')}
+                    <span class="text-sm font-semibold ${info.level <= 10 ? 'text-red-500' : 
+                                                        info.level <= 25 ? 'text-orange-500' : 
+                                                        'text-green-500'}">
+                        ${info.level}%
+                    </span>
+                </div>
+                <div class="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
+                    <div class="h-full rounded-full transition-all duration-300"
+                         style="width: ${info.level}%; background-color: ${getSupplyColor(color)}">
+                    </div>
+                </div>
+                <div class="mt-2 text-xs text-gray-500">
+                    Estado: ${info.status === 'unknown' ? 'Desconocido' : 'Normal'}
+                </div>
+            </div>
+        `).join('');
+
+        const drumHtml = Object.entries(data.supplies.drums || {}).map(([color, info]) => `
+            <div class="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow duration-200">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center space-x-3">
+                        ${getSupplyIcon('drum', info.level, info.status)}
+                        <span class="font-medium text-gray-700">Tambor ${color}</span>
+                    </div>
+                    <span class="text-sm font-semibold ${info.level <= 10 ? 'text-red-500' : 
+                                                        info.level <= 25 ? 'text-orange-500' : 
+                                                        'text-green-500'}">
+                        ${info.level}%
+                    </span>
+                </div>
+                <div class="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
+                    <div class="h-full rounded-full transition-all duration-300"
+                         style="width: ${info.level}%; background-color: ${getSupplyColor(color)}">
+                    </div>
+                </div>
+                <div class="mt-2 text-xs text-gray-500">
+                    Estado: ${info.status === 'unknown' ? 'Desconocido' : 'Normal'}
+                </div>
+            </div>
+        `).join('');
+
+        contentDiv.innerHTML = `
+            <div class="space-y-6">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-700 mb-4">Tóners</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        ${tonerHtml}
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-700 mb-4">Tambores</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        ${drumHtml}
+                    </div>
+                </div>
             </div>
         `;
     } catch (error) {
         contentDiv.innerHTML = `
-            <div class="text-red-500 text-center">
-                <i class="fas fa-exclamation-circle mr-2"></i>
-                Error al cargar los suministros: ${error.message}
+            <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-md">
+                <div class="flex items-center">
+                    <svg class="w-6 h-6 text-red-500 mr-3" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12" y2="16"></line>
+                    </svg>
+                    <p class="text-red-700">Error al cargar los suministros: ${error.message}</p>
+                </div>
             </div>
         `;
     }
