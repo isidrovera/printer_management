@@ -6,7 +6,6 @@ from sqlalchemy.exc import SQLAlchemyError
 from app.services.client_service import ClientService
 from app.services.agent_service import AgentService
 from app.services.tunnel_service import TunnelService
-from app.services.printer_oids import PrinterOIDsService
 from app.services.monitor_service import PrinterMonitorService
 from datetime import datetime
 import logging
@@ -15,7 +14,7 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 @router.get("/stats")
-async def get_dashboard_stats(
+def get_dashboard_stats(
     request: Request,
     db: Session = Depends(get_db)
 ):
@@ -33,19 +32,19 @@ async def get_dashboard_stats(
         
         # Estadísticas de clientes
         logger.debug("Obteniendo estadísticas de clientes")
-        clients_total = await client_service.get_count()
+        clients_total = client_service.get_count()
         logger.info(f"Total de clientes: {clients_total}")
 
         # Estadísticas de agentes
         logger.debug("Obteniendo estadísticas de agentes")
-        agents_total = await agent_service.get_count()
-        agents_online = await agent_service.get_count_by_status("online")
+        agents_total = agent_service.get_count()
+        agents_online = agent_service.get_count_by_status("online")
         logger.info(f"Agentes - Total: {agents_total}, Online: {agents_online}")
 
         # Estadísticas de túneles
         logger.debug("Obteniendo estadísticas de túneles")
-        tunnels_total = await tunnel_service.get_count()
-        tunnels_active = await tunnel_service.get_count_by_status("active")
+        tunnels_total = tunnel_service.get_count()
+        tunnels_active = tunnel_service.get_count_by_status("active")
         logger.info(f"Túneles - Total: {tunnels_total}, Activos: {tunnels_active}")
 
         stats = {
@@ -69,8 +68,8 @@ async def get_dashboard_stats(
         # Intentar obtener estadísticas de impresoras si el servicio está disponible
         try:
             printer_service = PrinterMonitorService(db)
-            printers_total = await printer_service.get_count()
-            printers_online = await printer_service.get_count_by_status("online")
+            printers_total = printer_service.get_count()
+            printers_online = printer_service.get_count_by_status("online")
             
             stats["printers"] = {
                 "total": printers_total,
