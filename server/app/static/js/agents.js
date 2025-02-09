@@ -525,16 +525,6 @@ async function showAgentInfo(agentId) {
         const agent = await response.json();
         console.log('Datos del agente:', agent);
 
-        // Extraer todas las secciones de información
-        const sistema = agent.system_info?.Sistema || {};
-        const cpu = agent.system_info?.CPU || {};
-        const memoria = agent.system_info?.Memoria || {};
-        const discos = agent.system_info?.Discos || [];
-        const red = agent.system_info?.Red || {};
-        const bateria = agent.system_info?.Batería || {};
-        const gpu = agent.system_info?.["Tarjetas Gráficas"] || "No disponible";
-        const espacioDisco = agent.system_info?.["Espacio en Disco"] || {};
-
         content.innerHTML = `
             <div class="grid grid-cols-2 gap-6 p-4">
                 <!-- Información Básica del Agente -->
@@ -572,6 +562,15 @@ async function showAgentInfo(agentId) {
                             </div>
                         </div>
                         <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center">
+                                <i class="fas fa-cog text-indigo-500"></i>
+                            </div>
+                            <div class="ml-3 flex-1">
+                                <span class="text-sm text-gray-500">Tipo de Dispositivo</span>
+                                <p class="font-medium">${agent.device_type}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
                             <div class="w-10 h-10 rounded-lg bg-${agent.status === 'online' ? 'green' : 'red'}-50 flex items-center justify-center">
                                 <i class="fas fa-circle text-${agent.status === 'online' ? 'green' : 'red'}-500"></i>
                             </div>
@@ -581,8 +580,8 @@ async function showAgentInfo(agentId) {
                             </div>
                         </div>
                         <div class="flex items-center">
-                            <div class="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center">
-                                <i class="fas fa-key text-indigo-500"></i>
+                            <div class="w-10 h-10 rounded-lg bg-yellow-50 flex items-center justify-center">
+                                <i class="fas fa-key text-yellow-500"></i>
                             </div>
                             <div class="ml-3 flex-1">
                                 <span class="text-sm text-gray-500">Token</span>
@@ -605,8 +604,8 @@ async function showAgentInfo(agentId) {
                             </div>
                             <div class="ml-3 flex-1">
                                 <span class="text-sm text-gray-500">Sistema Operativo</span>
-                                <p class="font-medium">${sistema["Nombre del SO"]}</p>
-                                <p class="text-sm text-gray-500">Versión ${sistema["Versión del SO"]}</p>
+                                <p class="font-medium">${agent.system_info.Sistema["Nombre del SO"]}</p>
+                                <p class="text-sm text-gray-500">Versión ${agent.system_info.Sistema["Versión del SO"]}</p>
                             </div>
                         </div>
                         <div class="flex items-center">
@@ -615,20 +614,180 @@ async function showAgentInfo(agentId) {
                             </div>
                             <div class="ml-3 flex-1">
                                 <span class="text-sm text-gray-500">Arquitectura</span>
-                                <p class="font-medium">${sistema.Arquitectura}</p>
+                                <p class="font-medium">${agent.system_info.Sistema.Arquitectura}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center">
+                                <i class="fas fa-laptop text-green-500"></i>
+                            </div>
+                            <div class="ml-3 flex-1">
+                                <span class="text-sm text-gray-500">Nombre del dispositivo</span>
+                                <p class="font-medium">${agent.system_info.Sistema["Nombre del dispositivo"]}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-lg bg-red-50 flex items-center justify-center">
+                                <i class="fas fa-user text-red-500"></i>
+                            </div>
+                            <div class="ml-3 flex-1">
+                                <span class="text-sm text-gray-500">Nombre del usuario</span>
+                                <p class="font-medium">${agent.system_info.Sistema["Nombre del usuario"]}</p>
                             </div>
                         </div>
                         <div class="flex items-center">
                             <div class="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center">
-                                <i class="fas fa-laptop text-purple-500"></i>
+                                <i class="fas fa-microchip text-purple-500"></i>
                             </div>
                             <div class="ml-3 flex-1">
-                                <span class="text-sm text-gray-500">Nombre del dispositivo</span>
-                                <p class="font-medium">${sistema["Nombre del dispositivo"]}</p>
+                                <span class="text-sm text-gray-500">Procesador</span>
+                                <p class="font-medium">${agent.system_info.Sistema.Procesador}</p>
                             </div>
                         </div>
                     </div>
                 </div>
+                <!-- Información de Hardware -->
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                        <i class="fas fa-memory text-red-500 mr-2"></i>
+                        Hardware
+                    </h2>
+                    <div class="space-y-4">
+                        <!-- CPU -->
+                        <div class="border-b pb-4">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 rounded-lg bg-red-50 flex items-center justify-center">
+                                    <i class="fas fa-microchip text-red-500"></i>
+                                </div>
+                                <div class="ml-3 flex-1">
+                                    <span class="text-sm text-gray-500">Procesador</span>
+                                    <p class="font-medium">${agent.system_info.CPU.Modelo}</p>
+                                    <div class="grid grid-cols-2 gap-2 mt-1">
+                                        <p class="text-sm text-gray-500">
+                                            Núcleos físicos: ${agent.system_info.CPU["Núcleos físicos"]}
+                                        </p>
+                                        <p class="text-sm text-gray-500">
+                                            Núcleos lógicos: ${agent.system_info.CPU["Núcleos lógicos"]}
+                                        </p>
+                                        <p class="text-sm text-gray-500">
+                                            Frecuencia: ${agent.system_info.CPU["Frecuencia (MHz)"]} MHz
+                                        </p>
+                                        <p class="text-sm text-gray-500">
+                                            Uso actual: ${agent.system_info.CPU["Uso actual (%)"]}%
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- RAM -->
+                        <div class="border-b pb-4">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
+                                    <i class="fas fa-memory text-blue-500"></i>
+                                </div>
+                                <div class="ml-3 flex-1">
+                                    <span class="text-sm text-gray-500">Memoria RAM</span>
+                                    <p class="font-medium">${agent.system_info.Memoria["Total RAM (GB)"]} GB Total</p>
+                                    <div class="grid grid-cols-2 gap-2 mt-1">
+                                        <p class="text-sm text-gray-500">
+                                            Disponible: ${agent.system_info.Memoria["Disponible RAM (GB)"]} GB
+                                        </p>
+                                        <p class="text-sm text-gray-500">
+                                            Uso: ${agent.system_info.Memoria["Uso de RAM (%)"]}%
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Batería -->
+                        <div class="border-b pb-4">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 rounded-lg bg-yellow-50 flex items-center justify-center">
+                                    <i class="fas fa-battery-full text-yellow-500"></i>
+                                </div>
+                                <div class="ml-3 flex-1">
+                                    <span class="text-sm text-gray-500">Batería</span>
+                                    <p class="font-medium">${agent.system_info.Batería.Porcentaje}% ${agent.system_info.Batería.Enchufado ? '(Conectado)' : '(Desconectado)'}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- GPU -->
+                        <div class="">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center">
+                                    <i class="fas fa-desktop text-green-500"></i>
+                                </div>
+                                <div class="ml-3 flex-1">
+                                    <span class="text-sm text-gray-500">Tarjeta Gráfica</span>
+                                    <p class="font-medium">${agent.system_info["Tarjetas Gráficas"]}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Información de Almacenamiento -->
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                        <i class="fas fa-hdd text-purple-500 mr-2"></i>
+                        Almacenamiento
+                    </h2>
+                    <div class="space-y-4">
+                        <!-- Resumen de Espacio -->
+                        <div class="border-b pb-4">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center">
+                                    <i class="fas fa-chart-pie text-purple-500"></i>
+                                </div>
+                                <div class="ml-3 flex-1">
+                                    <span class="text-sm text-gray-500">Espacio Total</span>
+                                    <p class="font-medium">${agent.system_info["Espacio en Disco"]["Total (GB)"]} GB</p>
+                                    <div class="grid grid-cols-2 gap-2 mt-1">
+                                        <p class="text-sm text-gray-500">
+                                            Usado: ${agent.system_info["Espacio en Disco"]["Usado (GB)"]} GB
+                                        </p>
+                                        <p class="text-sm text-gray-500">
+                                            Libre: ${agent.system_info["Espacio en Disco"]["Libre (GB)"]} GB
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Detalles de Discos -->
+                        ${agent.system_info.Discos.map((disco, index) => `
+                            <div class="border-b last:border-0 pb-4 last:pb-0">
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center">
+                                        <i class="fas fa-hdd text-purple-500"></i>
+                                    </div>
+                                    <div class="ml-3 flex-1">
+                                        <span class="text-sm text-gray-500">Disco ${disco.Dispositivo}</span>
+                                        <p class="font-medium">${disco["Total (GB)"]} GB (${disco["Tipo de sistema de archivos"]})</p>
+                                        <div class="grid grid-cols-2 gap-2 mt-1">
+                                            <p class="text-sm text-gray-500">
+                                                Punto de montaje: ${disco["Punto de montaje"]}
+                                            </p>
+                                            <p class="text-sm text-gray-500">
+                                                Usado: ${disco["Usado (GB)"]} GB
+                                            </p>
+                                            <p class="text-sm text-gray-500">
+                                                Disponible: ${disco["Disponible (GB)"]} GB
+                                            </p>
+                                            <p class="text-sm text-gray-500">
+                                                Uso: ${disco["Porcentaje de uso (%)"]}%
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
                 <!-- Información de Red -->
                 <div class="col-span-2 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                     <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
@@ -636,7 +795,7 @@ async function showAgentInfo(agentId) {
                         Interfaces de Red
                     </h2>
                     <div class="grid grid-cols-2 gap-4">
-                        ${Object.entries(red).map(([interfaceName, configs]) => `
+                        ${Object.entries(agent.system_info.Red).map(([interfaceName, configs]) => `
                             <div class="bg-gray-50 rounded-lg p-4">
                                 <div class="flex items-center mb-3">
                                     <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
