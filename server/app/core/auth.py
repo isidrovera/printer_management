@@ -101,22 +101,27 @@ def create_refresh_token(data: Dict[str, Any]) -> str:
        expires_delta=timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
    )
 
-def get_current_user(request: Request) -> Optional[User]:
+async def get_current_user(request: Request) -> Optional[User]:
     token = request.cookies.get("auth_token")
-    if not token and "Authorization" in request.headers:
-        auth = request.headers["Authorization"]
-        if auth.startswith("Bearer "):
-            token = auth.split(" ")[1]
-    
     if not token:
         raise HTTPException(status_code=401, detail="Not authenticated")
-        
+
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
-        return verify_token(payload)
-    except JWTError:
-        raise HTTPException(status_code=401, detail="Invalid token")
+        username = payload.get("sub")
+        if not username:
+            raise HTTPException(status_code=401)
 
+        db = SessionLocal()
+        try:
+            user = db.query(User).filter(User.username == username).first()
+            if not user:
+                raise HTTPException(status_code=401)
+            return user
+        finally:
+            db.close()
+    except JWTError:
+        raise HTTPException(status_code=401)
 async def get_current_active_user(
    current_user: Dict[str, Any] = Depends(get_current_user)
 ) -> Dict[str, Any]:
