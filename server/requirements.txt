@@ -4,3 +4,4 @@ authlib
 cryptography
 httpx
 jwt
+pyotp
