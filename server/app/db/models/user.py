@@ -62,6 +62,9 @@ class User(BaseModel):
     # Configuración de cuenta
     status = Column(Enum(UserStatus), default=UserStatus.ACTIVE)
     email_verified = Column(Boolean, default=False)
+    two_factor_enabled = Column(Boolean, default=False)
+    two_factor_secret = Column(String(32))
+    two_factor_backup_codes = Column(Text) 
     must_change_password = Column(Boolean, default=False)
     
     # Control de acceso
@@ -71,6 +74,10 @@ class User(BaseModel):
     last_login = Column(TIMESTAMP)
     last_active = Column(TIMESTAMP)
     auth_token = Column(String(255), unique=True)
+    oauth_provider = Column(String(20))
+    oauth_id = Column(String(100))
+    refresh_token = Column(String(255))
+    refresh_token_expires_at = Column(TIMESTAMP)
     
     # Auditoría
     created_at = Column(TIMESTAMP, default=datetime.utcnow)
