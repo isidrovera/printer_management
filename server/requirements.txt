@@ -12,3 +12,4 @@ passlib
 pydantic[email]
 email-validator
 psycopg2
+jinja2
