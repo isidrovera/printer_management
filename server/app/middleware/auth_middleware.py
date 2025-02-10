@@ -7,39 +7,34 @@ from app.db.session import SessionLocal
 
 logger = logging.getLogger(__name__)
 
-async def auth_middleware(request: Request, call_next):
-    logger.debug(f"[AUTH] Inicio procesamiento: {request.url.path}")
-    
-    public_paths = ["/auth/login", "/static/", "/favicon.ico"]
-    if any(request.url.path.startswith(path) for path in public_paths):
-        logger.debug(f"[AUTH] Permitiendo acceso a ruta pública: {request.url.path}")
-        return await call_next(request)
-
+async def get_current_user(request: Request) -> User:
+    logger.debug("[AUTH] Iniciando verificación de usuario")
     token = request.cookies.get("access_token")
-    logger.debug(f"[AUTH] Token encontrado en cookies: {bool(token)}")
     
     if not token:
-        logger.error("[AUTH] No hay token, redirigiendo a login")
-        return RedirectResponse(url="/auth/login", status_code=303)
+        logger.error("[AUTH] Token no encontrado")
+        raise HTTPException(status_code=401)
 
     try:
+        token = token.replace("Bearer ", "")
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
+        username = payload.get("sub")
+        logger.debug(f"[AUTH] Token decodificado para usuario: {username}")
+
+        if not username:
+            logger.error("[AUTH] Username no encontrado en token")
+            raise HTTPException(status_code=401)
+
         db = SessionLocal()
         try:
-            logger.debug("[AUTH] Verificando usuario")
-            user = await get_current_user(request)
-            request.state.user = user
-            logger.info(f"[AUTH] Usuario autenticado: {user.username}")
-
-            if user.must_change_password:
-                logger.info(f"[AUTH] Usuario debe cambiar contraseña: {user.username}")
-                if not request.url.path.startswith("/auth/change-password"):
-                    logger.info("[AUTH] Redirigiendo a cambio de contraseña")
-                    return RedirectResponse(url="/auth/change-password", status_code=303)
+            user = db.query(User).filter(User.username == username).first()
+            if not user:
+                logger.error(f"[AUTH] Usuario no encontrado: {username}")
+                raise HTTPException(status_code=401)
+            logger.info(f"[AUTH] Usuario verificado: {username}")
+            return user
         finally:
             db.close()
-    except Exception as e:
-        logger.error(f"[AUTH] Error autenticando: {str(e)}")
-        return RedirectResponse(url="/auth/login", status_code=303)
-
-    logger.debug("[AUTH] Procesamiento completado")
-    return await call_next(request)
+    except JWTError as e:
+        logger.error(f"[AUTH] Error JWT: {e}")
+        raise HTTPException(status_code=401)
