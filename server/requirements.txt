@@ -14,3 +14,4 @@ email-validator
 psycopg2
 jinja2
 python-multipart
+pyjwt
