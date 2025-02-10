@@ -15,7 +15,7 @@ import base64
 from io import BytesIO
 from app.core.config import settings
 from app.services.user_service import UserService
-from app.db.session import get_db
+from app.db.session import get_db, SessionLocal
 from sqlalchemy.orm import Session
 import logging
 
