@@ -8,6 +8,7 @@ from authlib.integrations.starlette_client import OAuth
 from starlette.config import Config
 from app.db.models.user import User
 import jwt
+import JWTError
 import pyotp
 import qrcode
 import base64
@@ -101,17 +102,25 @@ def create_refresh_token(data: Dict[str, Any]) -> str:
        expires_delta=timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
    )
 
-async def get_current_user(request: Request) -> Optional[User]:
-    token = request.cookies.get("auth_token")
+async def get_current_user(request: Request) -> User:
+    token = request.cookies.get("access_token")
+    
     if not token:
+        logger.error("Token no encontrado")
         raise HTTPException(status_code=401, detail="Not authenticated")
-
+        
     try:
-        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
+        token = token.replace("Bearer ", "")
+        payload = jwt.decode(
+            token, 
+            settings.SECRET_KEY, 
+            algorithms=[settings.JWT_ALGORITHM]
+        )
         username = payload.get("sub")
+        
         if not username:
             raise HTTPException(status_code=401)
-
+            
         db = SessionLocal()
         try:
             user = db.query(User).filter(User.username == username).first()
@@ -120,7 +129,9 @@ async def get_current_user(request: Request) -> Optional[User]:
             return user
         finally:
             db.close()
-    except JWTError:
+            
+    except JWTError as e:
+        logger.error(f"Error JWT: {str(e)}")
         raise HTTPException(status_code=401)
 async def get_current_active_user(
    current_user: Dict[str, Any] = Depends(get_current_user)
