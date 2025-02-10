@@ -6,3 +6,4 @@ httpx
 jwt
 pyotp
 qrcode
+pydantic_settings
