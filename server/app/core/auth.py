@@ -8,6 +8,7 @@ from authlib.integrations.starlette_client import OAuth
 from starlette.config import Config
 from app.db.models.user import User
 import jwt
+from jose import JWTError
 import pyotp
 import qrcode
 import base64
