@@ -1,7 +1,7 @@
 # server/app/db/models/user.py
 from app.db.base import BaseModel
 from sqlalchemy import Column, String, Boolean, DateTime, Text, Enum, Integer, TIMESTAMP, ForeignKey, Table
-from sqlalchemy.orm import relationship, foreign, remote
+from sqlalchemy.orm import relationship, foreign, remote, backref
 from datetime import datetime
 import enum
 import uuid
@@ -88,14 +88,12 @@ class User(BaseModel):
     # Relaciones
     permissions = relationship("Permission", secondary=user_permissions, back_populates="users")
     created_by = relationship("User", 
-        backref="created_users", 
         foreign_keys=[created_by_id], 
-        primaryjoin="User.created_by_id == User.id")
+        backref=backref("created_users", uselist=True))
     updated_by = relationship("User", 
-        backref="updated_users", 
         foreign_keys=[updated_by_id], 
-        primaryjoin="User.updated_by_id == User.id")
-            
+        backref=backref("updated_users", uselist=True))
+                
     @staticmethod
     def generate_auth_token():
         return f"usr_{uuid.uuid4().hex}"
