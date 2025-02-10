@@ -8,6 +8,7 @@ from app.db.session import SessionLocal
 
 logger = logging.getLogger(__name__)
 
+
 async def get_current_user(request: Request) -> User:
     logger.debug("[AUTH] Iniciando verificación de usuario")
     token = request.cookies.get("access_token")
