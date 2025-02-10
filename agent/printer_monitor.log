@@ -36562,3 +36562,86 @@ json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
 2025-02-10 14:59:02,173 - DEBUG - [protocol.py:745] - > PONG 92 0f 6c 9e [binary, 4 bytes]
 2025-02-10 14:59:02,179 - DEBUG - [protocol.py:599] - < PONG 5c 79 a7 a5 [binary, 4 bytes]
 2025-02-10 14:59:02,179 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 14:59:22,170 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 14:59:22,173 - DEBUG - [protocol.py:745] - > PING 9d ef 64 a3 [binary, 4 bytes]
+2025-02-10 14:59:22,180 - DEBUG - [protocol.py:599] - < PING bd 51 ae 64 [binary, 4 bytes]
+2025-02-10 14:59:22,192 - DEBUG - [protocol.py:745] - > PONG bd 51 ae 64 [binary, 4 bytes]
+2025-02-10 14:59:22,192 - DEBUG - [protocol.py:599] - < PONG 9d ef 64 a3 [binary, 4 bytes]
+2025-02-10 14:59:22,194 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 14:59:38,287 - DEBUG - [protocol.py:599] - < CLOSE 1012 (service restart) [2 bytes]
+2025-02-10 14:59:38,287 - DEBUG - [protocol.py:745] - > CLOSE 1012 (service restart) [2 bytes]
+2025-02-10 14:59:38,295 - DEBUG - [protocol.py:175] - = connection is CLOSING
+2025-02-10 14:59:38,295 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:59:38,298 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:59:38,298 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:59:38,300 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:59:38,303 - INFO - [agent_service.py:166] - Conexión cerrada por el servidor
+2025-02-10 14:59:56,110 - DEBUG - [proactor_events.py:625] - Using proactor: IocpProactor
+2025-02-10 14:59:56,111 - INFO - [printer_monitor_service.py:50] - PrinterMonitorService inicializado con URL: ws://161.132.39.159:8000
+2025-02-10 14:59:56,111 - DEBUG - [printer_monitor_service.py:51] - Verificando configuración inicial:
+2025-02-10 14:59:56,111 - DEBUG - [printer_monitor_service.py:52] -   SERVER_URL: ws://161.132.39.159:8000
+2025-02-10 14:59:56,111 - DEBUG - [printer_monitor_service.py:53] -   CLIENT_TOKEN presente: Sí
+2025-02-10 14:59:56,111 - DEBUG - [printer_monitor_service.py:54] -   AGENT_TOKEN presente: Sí
+2025-02-10 14:59:56,111 - DEBUG - [printer_monitor_service.py:55] -   SNMP Community: public
+2025-02-10 14:59:56,113 - DEBUG - [printer_monitor_service.py:56] -   SNMP Port: 161
+2025-02-10 14:59:56,113 - DEBUG - [printer_monitor_service.py:57] -   SNMP Timeout: 3s
+2025-02-10 14:59:56,113 - DEBUG - [printer_monitor_service.py:58] -   SNMP Retries: 2
+2025-02-10 14:59:56,113 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6
+2025-02-10 14:59:56,159 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:59:56,159 - DEBUG - [client.py:307] - > GET /api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6 HTTP/1.1
+2025-02-10 14:59:56,159 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:59:56,159 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:59:56,159 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:59:56,159 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: UzJoCX/Qrc6plHsAOc4b7A==
+2025-02-10 14:59:56,159 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:59:56,162 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:59:56,162 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:59:56,190 - DEBUG - [client.py:333] - < HTTP/1.1 101 Switching Protocols
+2025-02-10 14:59:56,190 - DEBUG - [client.py:335] - < Upgrade: websocket
+2025-02-10 14:59:56,190 - DEBUG - [client.py:335] - < Connection: Upgrade
+2025-02-10 14:59:56,190 - DEBUG - [client.py:335] - < Sec-WebSocket-Accept: Y/10VUKvW83bZWYeqy60YBX2k1c=
+2025-02-10 14:59:56,190 - DEBUG - [client.py:335] - < Sec-WebSocket-Extensions: permessage-deflate
+2025-02-10 14:59:56,190 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:59:54 GMT
+2025-02-10 14:59:56,190 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:59:56,190 - DEBUG - [protocol.py:175] - = connection is OPEN
+2025-02-10 14:59:56,190 - INFO - [agent_service.py:131] - ✅ Conectado al servidor WebSocket correctamente.
+2025-02-10 14:59:57,301 - ERROR - [agent_service.py:428] - 🚨 Error en la actualización del agente: 200, message='Attempt to decode JSON with unexpected mimetype: text/html; charset=utf-8', url='ws://161.132.39.159:8000/auth/login'
+2025-02-10 14:59:57,301 - INFO - [printer_monitor_service.py:68] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-10 14:59:57,301 - DEBUG - [printer_monitor_service.py:80] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-10 14:59:57,311 - DEBUG - [printer_monitor_service.py:81] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_32499ebe03d94fee8d8e5dd9446f46a6', 'Content-Type': 'application/json'}
+2025-02-10 14:59:57,338 - DEBUG - [printer_monitor_service.py:86] - 📥 Respuesta (200): <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Printer Management</title>
+   ...
+2025-02-10 14:59:57,338 - ERROR - [printer_monitor_service.py:98] - ❌ Error decodificando JSON: Expecting value: line 1 column 1 (char 0)
+Traceback (most recent call last):
+  File "C:\Users\pc\Desktop\printer_management\agent\app\services\printer_monitor_service.py", line 89, in get_monitored_printers
+    printers = json.loads(response_text)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-02-10 15:00:16,192 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 15:00:16,192 - DEBUG - [protocol.py:745] - > PING '\x7fsw3' [text, 4 bytes]
+2025-02-10 15:00:16,198 - DEBUG - [protocol.py:599] - < PING be e0 c1 c8 [binary, 4 bytes]
+2025-02-10 15:00:16,200 - DEBUG - [protocol.py:745] - > PONG be e0 c1 c8 [binary, 4 bytes]
+2025-02-10 15:00:16,205 - DEBUG - [protocol.py:599] - < PONG '\x7fsw3' [text, 4 bytes]
+2025-02-10 15:00:16,205 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 15:00:36,211 - DEBUG - [protocol.py:599] - < PING c4 2d 1c 14 [binary, 4 bytes]
+2025-02-10 15:00:36,212 - DEBUG - [protocol.py:745] - > PONG c4 2d 1c 14 [binary, 4 bytes]
+2025-02-10 15:00:36,217 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 15:00:36,218 - DEBUG - [protocol.py:745] - > PING e1 f1 13 33 [binary, 4 bytes]
+2025-02-10 15:00:36,225 - DEBUG - [protocol.py:599] - < PONG e1 f1 13 33 [binary, 4 bytes]
+2025-02-10 15:00:36,226 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 15:00:56,217 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 15:00:56,219 - DEBUG - [protocol.py:745] - > PING 32 20 b5 69 [binary, 4 bytes]
+2025-02-10 15:00:56,223 - DEBUG - [protocol.py:599] - < PING c4 34 ed 05 [binary, 4 bytes]
+2025-02-10 15:00:56,224 - DEBUG - [protocol.py:745] - > PONG c4 34 ed 05 [binary, 4 bytes]
+2025-02-10 15:00:56,230 - DEBUG - [protocol.py:599] - < PONG 32 20 b5 69 [binary, 4 bytes]
+2025-02-10 15:00:56,232 - DEBUG - [connection.py:811] - % received keepalive pong
