@@ -55,66 +55,73 @@ class AgentService:
         device_type: str,
         system_info: dict
     ) -> Agent:
-        """Registra un nuevo agente en la base de datos"""
-        client = self.db.query(Client).filter(Client.token == client_token).first()
-        if not client:
-            raise HTTPException(status_code=401, detail="Invalid client token")
-        
-        # Verificar si ya existe un agente con el mismo hostname para ese cliente
-        existing_agent = self.db.query(Agent).filter(
-            Agent.hostname == hostname,
-            Agent.client_id == client.id,
-            Agent.is_active == True
-        ).first()
+        """Registra un nuevo agente o actualiza uno existente"""
+        try:
+            client = self.db.query(Client).filter(Client.token == client_token).first()
+            if not client:
+                raise HTTPException(status_code=401, detail="Invalid client token")
+            
+            # Buscar agente existente
+            existing_agent = self.db.query(Agent).filter(
+                Agent.hostname == hostname,
+                Agent.client_id == client.id,
+                Agent.is_active == True
+            ).first()
 
-        if existing_agent:
-            # Actualizar el agente existente
-            existing_agent.username = username
-            existing_agent.ip_address = ip_address
-            existing_agent.device_type = device_type
-            existing_agent.system_info = system_info
-            existing_agent.cpu_info = system_info.get("CPU")
-            existing_agent.memory_info = system_info.get("Memoria")
-            existing_agent.disk_info = system_info.get("Discos")
-            existing_agent.network_info = system_info.get("Red")
-            existing_agent.gpu_info = system_info.get("Tarjetas Gráficas")
-            existing_agent.battery_info = system_info.get("Batería")
-            existing_agent.disk_usage = system_info.get("Espacio en Disco")
-            existing_agent.status = 'online'
-            existing_agent.updated_at = datetime.utcnow()
-            existing_agent.last_heartbeat = datetime.utcnow()
+            current_time = datetime.utcnow()
+
+            if existing_agent:
+                # Actualizar agente existente
+                existing_agent.username = username
+                existing_agent.ip_address = ip_address
+                existing_agent.device_type = device_type
+                existing_agent.system_info = system_info
+                existing_agent.cpu_info = system_info.get("CPU")
+                existing_agent.memory_info = system_info.get("Memoria")
+                existing_agent.disk_info = system_info.get("Discos")
+                existing_agent.network_info = system_info.get("Red")
+                existing_agent.gpu_info = system_info.get("Tarjetas Gráficas")
+                existing_agent.battery_info = system_info.get("Batería")
+                existing_agent.disk_usage = system_info.get("Espacio en Disco")
+                existing_agent.status = 'online'  # Asegurar estado online
+                existing_agent.updated_at = current_time
+                existing_agent.last_heartbeat = current_time
+                
+                agent = existing_agent
+            else:
+                # Crear nuevo agente
+                agent = Agent(
+                    client_id=client.id,
+                    token=Agent.generate_token(),
+                    hostname=hostname,
+                    username=username,
+                    ip_address=ip_address,
+                    device_type=device_type,
+                    system_info=system_info,
+                    cpu_info=system_info.get("CPU"),
+                    memory_info=system_info.get("Memoria"),
+                    disk_info=system_info.get("Discos"),
+                    network_info=system_info.get("Red"),
+                    gpu_info=system_info.get("Tarjetas Gráficas"),
+                    battery_info=system_info.get("Batería"),
+                    disk_usage=system_info.get("Espacio en Disco"),
+                    status='online',
+                    is_active=True,
+                    created_at=current_time,
+                    updated_at=current_time,
+                    last_heartbeat=current_time
+                )
+                self.db.add(agent)
 
             self.db.commit()
-            self.db.refresh(existing_agent)
-            return existing_agent
+            self.db.refresh(agent)
+            logger.info(f"Agente {'actualizado' if existing_agent else 'registrado'} exitosamente: {agent.hostname}")
+            return agent
 
-        # Crear nuevo agente si no existe
-        agent = Agent(
-            client_id=client.id,
-            token=Agent.generate_token(),
-            hostname=hostname,
-            username=username,
-            ip_address=ip_address,
-            device_type=device_type,
-            system_info=system_info,
-            cpu_info=system_info.get("CPU"),
-            memory_info=system_info.get("Memoria"),
-            disk_info=system_info.get("Discos"),
-            network_info=system_info.get("Red"),
-            gpu_info=system_info.get("Tarjetas Gráficas"),
-            battery_info=system_info.get("Batería"),
-            disk_usage=system_info.get("Espacio en Disco"),
-            status='online',
-            is_active=True,
-            created_at=datetime.utcnow(),
-            updated_at=datetime.utcnow(),
-            last_heartbeat=datetime.utcnow()
-        )
-
-        self.db.add(agent)
-        self.db.commit()
-        self.db.refresh(agent)
-        return agent
+        except Exception as e:
+            logger.error(f"Error en register_agent: {str(e)}")
+            self.db.rollback()
+            raise
 
     async def validate_agent(self, agent_token: str) -> Optional[Agent]:
         """Valida si un agente existe y está activo en la base de datos"""
@@ -124,10 +131,13 @@ class AgentService:
         ).first()
         
         if agent:
-            # Actualizar estado basado en último heartbeat
-            agent.status = await self.check_agent_status(agent)
+            # Actualizar estado y timestamps al validar el agente
+            current_time = datetime.utcnow()
+            agent.last_heartbeat = current_time
+            agent.updated_at = current_time
+            agent.status = 'online'  # Forzar estado online al validar
             self.db.commit()
-            
+                
         return agent
 
     async def update_status(self, agent_token: str, status: str) -> Optional[Agent]:
@@ -222,18 +232,20 @@ class AgentService:
         return agent
 
     async def heartbeat(self, agent_token: str) -> bool:
-        """Actualiza el heartbeat del agente"""
+        """Actualiza el heartbeat del agente y su estado"""
         try:
             agent = await self.get_agent_by_token(agent_token)
             if not agent:
                 return False
 
+            # Actualizar heartbeat y estado
             current_time = datetime.utcnow()
             agent.last_heartbeat = current_time
             agent.updated_at = current_time
-            agent.status = 'online'
+            agent.status = 'online'  # Asegurar que el estado sea online
             
             self.db.commit()
+            logger.info(f"Heartbeat recibido y estado actualizado para agente {agent_token}")
             return True
         except Exception as e:
             logger.error(f"Error en heartbeat del agente: {str(e)}")
