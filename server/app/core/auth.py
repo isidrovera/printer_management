@@ -6,6 +6,7 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.responses import JSONResponse
 from authlib.integrations.starlette_client import OAuth
 from starlette.config import Config
+from app.db.models.user import User
 import jwt
 import pyotp
 import qrcode
