@@ -11,4 +11,4 @@ sqlalchemy
 passlib
 pydantic[email]
 email-validator
-sycopg2
+psycopg2
