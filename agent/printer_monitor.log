@@ -34242,3 +34242,1105 @@ json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
 2025-02-10 14:36:51,444 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: server rejected WebSocket connection: HTTP 200
 2025-02-10 14:36:51,445 - DEBUG - [protocol.py:649] - < EOF
 2025-02-10 14:36:51,445 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:37:01,449 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6
+2025-02-10 14:37:01,455 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:37:01,455 - DEBUG - [client.py:307] - > GET /api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6 HTTP/1.1
+2025-02-10 14:37:01,455 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:37:01,457 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:37:01,457 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:37:01,457 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: KGrCr+RZd1IiS1FK2Dfxow==
+2025-02-10 14:37:01,457 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:37:01,457 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:37:01,457 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:37:01,467 - DEBUG - [client.py:333] - < HTTP/1.1 303 See Other
+2025-02-10 14:37:01,469 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:36:59 GMT
+2025-02-10 14:37:01,469 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:37:01,469 - DEBUG - [client.py:335] - < content-length: 0
+2025-02-10 14:37:01,469 - DEBUG - [client.py:335] - < location: /auth/login
+2025-02-10 14:37:01,469 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:37:01,469 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:37:01,470 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:37:01,470 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:37:01,476 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:37:01,476 - DEBUG - [client.py:307] - > GET /auth/login HTTP/1.1
+2025-02-10 14:37:01,476 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:37:01,476 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:37:01,477 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:37:01,477 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: vrSBSMH6+pduqdr8iAtpTQ==
+2025-02-10 14:37:01,477 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:37:01,477 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:37:01,477 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:37:01,490 - DEBUG - [client.py:333] - < HTTP/1.1 200 OK
+2025-02-10 14:37:01,492 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:36:59 GMT
+2025-02-10 14:37:01,492 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:37:01,492 - DEBUG - [client.py:335] - < content-length: 3340
+2025-02-10 14:37:01,492 - DEBUG - [client.py:335] - < content-type: text/html; charset=utf-8
+2025-02-10 14:37:01,493 - DEBUG - [client.py:337] - < [body] (3340 bytes)
+2025-02-10 14:37:01,493 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:37:01,493 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:37:01,493 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: server rejected WebSocket connection: HTTP 200
+2025-02-10 14:37:01,493 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:37:01,495 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:37:11,507 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6
+2025-02-10 14:37:11,508 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:37:11,508 - DEBUG - [client.py:307] - > GET /api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6 HTTP/1.1
+2025-02-10 14:37:11,508 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:37:11,508 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:37:11,508 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:37:11,508 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: NW2h2+X1TO0IIpDZdqHVsQ==
+2025-02-10 14:37:11,508 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:37:11,517 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:37:11,517 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:37:11,523 - DEBUG - [client.py:333] - < HTTP/1.1 303 See Other
+2025-02-10 14:37:11,523 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:37:09 GMT
+2025-02-10 14:37:11,531 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:37:11,531 - DEBUG - [client.py:335] - < content-length: 0
+2025-02-10 14:37:11,531 - DEBUG - [client.py:335] - < location: /auth/login
+2025-02-10 14:37:11,531 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:37:11,533 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:37:11,533 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:37:11,533 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:37:11,540 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:37:11,541 - DEBUG - [client.py:307] - > GET /auth/login HTTP/1.1
+2025-02-10 14:37:11,541 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:37:11,541 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:37:11,541 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:37:11,541 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: SEDt9EO55nBXFdhpN6pa5A==
+2025-02-10 14:37:11,543 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:37:11,543 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:37:11,543 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:37:11,557 - DEBUG - [client.py:333] - < HTTP/1.1 200 OK
+2025-02-10 14:37:11,557 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:37:09 GMT
+2025-02-10 14:37:11,557 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:37:11,557 - DEBUG - [client.py:335] - < content-length: 3340
+2025-02-10 14:37:11,557 - DEBUG - [client.py:335] - < content-type: text/html; charset=utf-8
+2025-02-10 14:37:11,557 - DEBUG - [client.py:337] - < [body] (3340 bytes)
+2025-02-10 14:37:11,557 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:37:11,557 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:37:11,560 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: server rejected WebSocket connection: HTTP 200
+2025-02-10 14:37:11,560 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:37:11,560 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:37:21,571 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6
+2025-02-10 14:37:21,573 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:37:21,573 - DEBUG - [client.py:307] - > GET /api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6 HTTP/1.1
+2025-02-10 14:37:21,573 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:37:21,573 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:37:21,573 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:37:21,573 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: 2w7JGc9s9KJRwqh2GBCVLg==
+2025-02-10 14:37:21,573 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:37:21,573 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:37:21,573 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:37:21,587 - DEBUG - [client.py:333] - < HTTP/1.1 303 See Other
+2025-02-10 14:37:21,587 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:37:19 GMT
+2025-02-10 14:37:21,587 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:37:21,587 - DEBUG - [client.py:335] - < content-length: 0
+2025-02-10 14:37:21,587 - DEBUG - [client.py:335] - < location: /auth/login
+2025-02-10 14:37:21,587 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:37:21,587 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:37:21,587 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:37:21,587 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:37:21,597 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:37:21,597 - DEBUG - [client.py:307] - > GET /auth/login HTTP/1.1
+2025-02-10 14:37:21,602 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:37:21,602 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:37:21,602 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:37:21,602 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: 6teIT89vnbSA07Vif1LU+g==
+2025-02-10 14:37:21,603 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:37:21,605 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:37:21,605 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:37:21,619 - DEBUG - [client.py:333] - < HTTP/1.1 200 OK
+2025-02-10 14:37:21,619 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:37:19 GMT
+2025-02-10 14:37:21,619 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:37:21,619 - DEBUG - [client.py:335] - < content-length: 3340
+2025-02-10 14:37:21,619 - DEBUG - [client.py:335] - < content-type: text/html; charset=utf-8
+2025-02-10 14:37:21,621 - DEBUG - [client.py:337] - < [body] (3340 bytes)
+2025-02-10 14:37:21,621 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:37:21,621 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:37:21,621 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: server rejected WebSocket connection: HTTP 200
+2025-02-10 14:37:21,622 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:37:21,622 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:37:31,631 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6
+2025-02-10 14:37:31,639 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:37:31,641 - DEBUG - [client.py:307] - > GET /api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6 HTTP/1.1
+2025-02-10 14:37:31,641 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:37:31,644 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:37:31,644 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:37:31,645 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: L3gOcE0AOmTcVcFLykELzw==
+2025-02-10 14:37:31,645 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:37:31,645 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:37:31,645 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:37:31,657 - DEBUG - [client.py:333] - < HTTP/1.1 303 See Other
+2025-02-10 14:37:31,657 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:37:29 GMT
+2025-02-10 14:37:31,657 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:37:31,657 - DEBUG - [client.py:335] - < content-length: 0
+2025-02-10 14:37:31,657 - DEBUG - [client.py:335] - < location: /auth/login
+2025-02-10 14:37:31,663 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:37:31,664 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:37:31,664 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:37:31,664 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:37:31,669 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:37:31,674 - DEBUG - [client.py:307] - > GET /auth/login HTTP/1.1
+2025-02-10 14:37:31,674 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:37:31,674 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:37:31,674 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:37:31,674 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: 3NVAtMdh8VFe3jxhLTW/uA==
+2025-02-10 14:37:31,674 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:37:31,674 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:37:31,674 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:37:31,690 - DEBUG - [client.py:333] - < HTTP/1.1 200 OK
+2025-02-10 14:37:31,690 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:37:29 GMT
+2025-02-10 14:37:31,695 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:37:31,696 - DEBUG - [client.py:335] - < content-length: 3340
+2025-02-10 14:37:31,696 - DEBUG - [client.py:335] - < content-type: text/html; charset=utf-8
+2025-02-10 14:37:31,696 - DEBUG - [client.py:337] - < [body] (3340 bytes)
+2025-02-10 14:37:31,696 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:37:31,696 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:37:31,696 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: server rejected WebSocket connection: HTTP 200
+2025-02-10 14:37:31,701 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:37:31,701 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:37:41,710 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6
+2025-02-10 14:37:41,723 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:37:41,725 - DEBUG - [client.py:307] - > GET /api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6 HTTP/1.1
+2025-02-10 14:37:41,726 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:37:41,726 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:37:41,726 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:37:41,728 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: uYMqwh6QoRone73TfW2Npg==
+2025-02-10 14:37:41,728 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:37:41,728 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:37:41,731 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:37:41,742 - DEBUG - [client.py:333] - < HTTP/1.1 303 See Other
+2025-02-10 14:37:41,742 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:37:39 GMT
+2025-02-10 14:37:41,742 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:37:41,749 - DEBUG - [client.py:335] - < content-length: 0
+2025-02-10 14:37:41,749 - DEBUG - [client.py:335] - < location: /auth/login
+2025-02-10 14:37:41,751 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:37:41,751 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:37:41,754 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:37:41,755 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:37:41,759 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:37:41,762 - DEBUG - [client.py:307] - > GET /auth/login HTTP/1.1
+2025-02-10 14:37:41,762 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:37:41,762 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:37:41,762 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:37:41,762 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: qQP7aFKW2Tb9mhQfOTRPdQ==
+2025-02-10 14:37:41,762 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:37:41,762 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:37:41,762 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:37:41,779 - DEBUG - [client.py:333] - < HTTP/1.1 200 OK
+2025-02-10 14:37:41,779 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:37:39 GMT
+2025-02-10 14:37:41,781 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:37:41,781 - DEBUG - [client.py:335] - < content-length: 3340
+2025-02-10 14:37:41,781 - DEBUG - [client.py:335] - < content-type: text/html; charset=utf-8
+2025-02-10 14:37:41,781 - DEBUG - [client.py:337] - < [body] (3340 bytes)
+2025-02-10 14:37:41,781 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:37:41,781 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:37:41,781 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: server rejected WebSocket connection: HTTP 200
+2025-02-10 14:37:41,781 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:37:41,781 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:37:51,773 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6
+2025-02-10 14:37:51,777 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:37:51,777 - DEBUG - [client.py:307] - > GET /api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6 HTTP/1.1
+2025-02-10 14:37:51,781 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:37:51,781 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:37:51,781 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:37:51,781 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: l+DIOfLBuVsEIjppyLRyGA==
+2025-02-10 14:37:51,781 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:37:51,781 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:37:51,781 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:37:51,790 - DEBUG - [client.py:333] - < HTTP/1.1 303 See Other
+2025-02-10 14:37:51,790 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:37:49 GMT
+2025-02-10 14:37:51,790 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:37:51,790 - DEBUG - [client.py:335] - < content-length: 0
+2025-02-10 14:37:51,790 - DEBUG - [client.py:335] - < location: /auth/login
+2025-02-10 14:37:51,790 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:37:51,790 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:37:51,790 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:37:51,790 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:37:51,797 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:37:51,797 - DEBUG - [client.py:307] - > GET /auth/login HTTP/1.1
+2025-02-10 14:37:51,804 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:37:51,806 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:37:51,806 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:37:51,807 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: EBHrvx/7AqkqgWYHMyMUvA==
+2025-02-10 14:37:51,807 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:37:51,807 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:37:51,807 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:37:51,820 - DEBUG - [client.py:333] - < HTTP/1.1 200 OK
+2025-02-10 14:37:51,822 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:37:49 GMT
+2025-02-10 14:37:51,822 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:37:51,822 - DEBUG - [client.py:335] - < content-length: 3340
+2025-02-10 14:37:51,822 - DEBUG - [client.py:335] - < content-type: text/html; charset=utf-8
+2025-02-10 14:37:51,822 - DEBUG - [client.py:337] - < [body] (3340 bytes)
+2025-02-10 14:37:51,822 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:37:51,824 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:37:51,824 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: server rejected WebSocket connection: HTTP 200
+2025-02-10 14:37:51,824 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:37:51,825 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:38:01,838 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6
+2025-02-10 14:38:01,839 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:38:01,847 - DEBUG - [client.py:307] - > GET /api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6 HTTP/1.1
+2025-02-10 14:38:01,847 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:38:01,847 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:38:01,847 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:38:01,847 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: f9HBaZN/skksWDO20mDOgw==
+2025-02-10 14:38:01,847 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:38:01,847 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:38:01,847 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:38:01,856 - DEBUG - [client.py:333] - < HTTP/1.1 303 See Other
+2025-02-10 14:38:01,856 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:37:59 GMT
+2025-02-10 14:38:01,856 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:38:01,856 - DEBUG - [client.py:335] - < content-length: 0
+2025-02-10 14:38:01,856 - DEBUG - [client.py:335] - < location: /auth/login
+2025-02-10 14:38:01,856 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:38:01,856 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:38:01,862 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:38:01,862 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:38:01,864 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:38:01,864 - DEBUG - [client.py:307] - > GET /auth/login HTTP/1.1
+2025-02-10 14:38:01,864 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:38:01,870 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:38:01,870 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:38:01,870 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: m3UumfF7QxpimYM9XpDIGQ==
+2025-02-10 14:38:01,870 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:38:01,872 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:38:01,873 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:38:01,884 - DEBUG - [client.py:333] - < HTTP/1.1 200 OK
+2025-02-10 14:38:01,885 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:37:59 GMT
+2025-02-10 14:38:01,885 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:38:01,885 - DEBUG - [client.py:335] - < content-length: 3340
+2025-02-10 14:38:01,885 - DEBUG - [client.py:335] - < content-type: text/html; charset=utf-8
+2025-02-10 14:38:01,885 - DEBUG - [client.py:337] - < [body] (3340 bytes)
+2025-02-10 14:38:01,885 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:38:01,885 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:38:01,885 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: server rejected WebSocket connection: HTTP 200
+2025-02-10 14:38:01,889 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:38:01,889 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:38:11,892 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6
+2025-02-10 14:38:11,898 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:38:11,898 - DEBUG - [client.py:307] - > GET /api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6 HTTP/1.1
+2025-02-10 14:38:11,898 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:38:11,906 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:38:11,906 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:38:11,908 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: ExJsHprgxU84yzBYJ60USg==
+2025-02-10 14:38:11,911 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:38:11,911 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:38:11,911 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:38:11,924 - DEBUG - [client.py:333] - < HTTP/1.1 303 See Other
+2025-02-10 14:38:11,924 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:38:09 GMT
+2025-02-10 14:38:11,924 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:38:11,924 - DEBUG - [client.py:335] - < content-length: 0
+2025-02-10 14:38:11,924 - DEBUG - [client.py:335] - < location: /auth/login
+2025-02-10 14:38:11,924 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:38:11,924 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:38:11,924 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:38:11,930 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:38:11,930 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:38:11,930 - DEBUG - [client.py:307] - > GET /auth/login HTTP/1.1
+2025-02-10 14:38:11,938 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:38:11,938 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:38:11,938 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:38:11,939 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: Os3bMjYzB3LAXtAnivta5w==
+2025-02-10 14:38:11,941 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:38:11,941 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:38:11,941 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:38:11,959 - DEBUG - [client.py:333] - < HTTP/1.1 200 OK
+2025-02-10 14:38:11,959 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:38:09 GMT
+2025-02-10 14:38:11,961 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:38:11,961 - DEBUG - [client.py:335] - < content-length: 3340
+2025-02-10 14:38:11,961 - DEBUG - [client.py:335] - < content-type: text/html; charset=utf-8
+2025-02-10 14:38:11,961 - DEBUG - [client.py:337] - < [body] (3340 bytes)
+2025-02-10 14:38:11,963 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:38:11,963 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:38:11,963 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: server rejected WebSocket connection: HTTP 200
+2025-02-10 14:38:11,964 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:38:11,964 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:38:21,966 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6
+2025-02-10 14:38:21,968 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:38:21,968 - DEBUG - [client.py:307] - > GET /api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6 HTTP/1.1
+2025-02-10 14:38:21,978 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:38:21,978 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:38:21,980 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:38:21,980 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: SidpoqcxlgJiNB+46QXV5g==
+2025-02-10 14:38:21,980 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:38:21,982 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:38:21,982 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:38:21,998 - DEBUG - [client.py:333] - < HTTP/1.1 303 See Other
+2025-02-10 14:38:21,998 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:38:20 GMT
+2025-02-10 14:38:21,998 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:38:21,998 - DEBUG - [client.py:335] - < content-length: 0
+2025-02-10 14:38:21,998 - DEBUG - [client.py:335] - < location: /auth/login
+2025-02-10 14:38:21,998 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:38:21,998 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:38:21,998 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:38:21,998 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:38:22,018 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:38:22,020 - DEBUG - [client.py:307] - > GET /auth/login HTTP/1.1
+2025-02-10 14:38:22,022 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:38:22,022 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:38:22,022 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:38:22,022 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: ekP9qHpx7smtJzrpUd9rkQ==
+2025-02-10 14:38:22,022 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:38:22,024 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:38:22,024 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:38:22,043 - DEBUG - [client.py:333] - < HTTP/1.1 200 OK
+2025-02-10 14:38:22,043 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:38:20 GMT
+2025-02-10 14:38:22,043 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:38:22,043 - DEBUG - [client.py:335] - < content-length: 3340
+2025-02-10 14:38:22,044 - DEBUG - [client.py:335] - < content-type: text/html; charset=utf-8
+2025-02-10 14:38:22,044 - DEBUG - [client.py:337] - < [body] (3340 bytes)
+2025-02-10 14:38:22,044 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:38:22,044 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:38:22,044 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: server rejected WebSocket connection: HTTP 200
+2025-02-10 14:38:22,046 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:38:22,047 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:38:32,057 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6
+2025-02-10 14:38:32,062 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:38:32,062 - DEBUG - [client.py:307] - > GET /api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6 HTTP/1.1
+2025-02-10 14:38:32,062 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:38:32,062 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:38:32,062 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:38:32,072 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: rWxV4cz24cUevWSPyhhOSA==
+2025-02-10 14:38:32,076 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:38:32,076 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:38:32,076 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:38:32,094 - DEBUG - [client.py:333] - < HTTP/1.1 303 See Other
+2025-02-10 14:38:32,096 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:38:30 GMT
+2025-02-10 14:38:32,096 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:38:32,096 - DEBUG - [client.py:335] - < content-length: 0
+2025-02-10 14:38:32,096 - DEBUG - [client.py:335] - < location: /auth/login
+2025-02-10 14:38:32,096 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:38:32,096 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:38:32,104 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:38:32,112 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:38:32,114 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:38:32,114 - DEBUG - [client.py:307] - > GET /auth/login HTTP/1.1
+2025-02-10 14:38:32,114 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:38:32,114 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:38:32,114 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:38:32,119 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: KEKb73idvEP9pYWmMLibuA==
+2025-02-10 14:38:32,119 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:38:32,119 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:38:32,120 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:38:32,137 - DEBUG - [client.py:333] - < HTTP/1.1 200 OK
+2025-02-10 14:38:32,137 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:38:30 GMT
+2025-02-10 14:38:32,137 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:38:32,137 - DEBUG - [client.py:335] - < content-length: 3340
+2025-02-10 14:38:32,137 - DEBUG - [client.py:335] - < content-type: text/html; charset=utf-8
+2025-02-10 14:38:32,137 - DEBUG - [client.py:337] - < [body] (3340 bytes)
+2025-02-10 14:38:32,137 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:38:32,137 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:38:32,137 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: server rejected WebSocket connection: HTTP 200
+2025-02-10 14:38:32,137 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:38:32,144 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:38:42,142 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6
+2025-02-10 14:38:42,145 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:38:42,150 - DEBUG - [client.py:307] - > GET /api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6 HTTP/1.1
+2025-02-10 14:38:42,150 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:38:42,150 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:38:42,150 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:38:42,150 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: Xnciv6LPQzs8HWnAcLWaiA==
+2025-02-10 14:38:42,150 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:38:42,150 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:38:42,150 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:38:42,161 - DEBUG - [client.py:333] - < HTTP/1.1 303 See Other
+2025-02-10 14:38:42,163 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:38:40 GMT
+2025-02-10 14:38:42,164 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:38:42,164 - DEBUG - [client.py:335] - < content-length: 0
+2025-02-10 14:38:42,164 - DEBUG - [client.py:335] - < location: /auth/login
+2025-02-10 14:38:42,164 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:38:42,164 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:38:42,164 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:38:42,166 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:38:42,171 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:38:42,172 - DEBUG - [client.py:307] - > GET /auth/login HTTP/1.1
+2025-02-10 14:38:42,174 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:38:42,177 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:38:42,179 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:38:42,180 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: weSr+SnQqntrEOiMAZV6IQ==
+2025-02-10 14:38:42,180 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:38:42,180 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:38:42,180 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:38:42,197 - DEBUG - [client.py:333] - < HTTP/1.1 200 OK
+2025-02-10 14:38:42,197 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:38:40 GMT
+2025-02-10 14:38:42,197 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:38:42,197 - DEBUG - [client.py:335] - < content-length: 3340
+2025-02-10 14:38:42,198 - DEBUG - [client.py:335] - < content-type: text/html; charset=utf-8
+2025-02-10 14:38:42,198 - DEBUG - [client.py:337] - < [body] (3340 bytes)
+2025-02-10 14:38:42,198 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:38:42,198 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:38:42,198 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: server rejected WebSocket connection: HTTP 200
+2025-02-10 14:38:42,200 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:38:42,200 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:38:52,203 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6
+2025-02-10 14:38:52,212 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:38:52,216 - DEBUG - [client.py:307] - > GET /api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6 HTTP/1.1
+2025-02-10 14:38:52,216 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:38:52,216 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:38:52,218 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:38:52,218 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: OI0wjz12NALshfsIff2zgw==
+2025-02-10 14:38:52,218 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:38:52,218 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:38:52,218 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:38:52,241 - DEBUG - [client.py:333] - < HTTP/1.1 303 See Other
+2025-02-10 14:38:52,241 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:38:50 GMT
+2025-02-10 14:38:52,241 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:38:52,241 - DEBUG - [client.py:335] - < content-length: 0
+2025-02-10 14:38:52,241 - DEBUG - [client.py:335] - < location: /auth/login
+2025-02-10 14:38:52,246 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:38:52,246 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:38:52,248 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:38:52,250 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:38:52,254 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:38:52,256 - DEBUG - [client.py:307] - > GET /auth/login HTTP/1.1
+2025-02-10 14:38:52,256 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:38:52,256 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:38:52,256 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:38:52,256 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: oWm3E5D1zEyQISnhZQ6A/w==
+2025-02-10 14:38:52,256 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:38:52,256 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:38:52,256 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:38:52,279 - DEBUG - [client.py:333] - < HTTP/1.1 200 OK
+2025-02-10 14:38:52,279 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:38:50 GMT
+2025-02-10 14:38:52,281 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:38:52,281 - DEBUG - [client.py:335] - < content-length: 3340
+2025-02-10 14:38:52,282 - DEBUG - [client.py:335] - < content-type: text/html; charset=utf-8
+2025-02-10 14:38:52,283 - DEBUG - [client.py:337] - < [body] (3340 bytes)
+2025-02-10 14:38:52,283 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:38:52,283 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:38:52,283 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: server rejected WebSocket connection: HTTP 200
+2025-02-10 14:38:52,283 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:38:52,283 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:39:02,283 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6
+2025-02-10 14:39:02,287 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:39:02,297 - DEBUG - [client.py:307] - > GET /api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6 HTTP/1.1
+2025-02-10 14:39:02,299 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:39:02,300 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:39:02,300 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:39:02,300 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: oNufESgMWXoWK1lXDz5MpQ==
+2025-02-10 14:39:02,305 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:39:02,305 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:39:02,305 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:39:02,316 - DEBUG - [client.py:333] - < HTTP/1.1 303 See Other
+2025-02-10 14:39:02,316 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:39:00 GMT
+2025-02-10 14:39:02,316 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:39:02,316 - DEBUG - [client.py:335] - < content-length: 0
+2025-02-10 14:39:02,316 - DEBUG - [client.py:335] - < location: /auth/login
+2025-02-10 14:39:02,316 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:39:02,316 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:39:02,332 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:39:02,332 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:39:02,332 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:39:02,338 - DEBUG - [client.py:307] - > GET /auth/login HTTP/1.1
+2025-02-10 14:39:02,338 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:39:02,338 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:39:02,338 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:39:02,338 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: wgI/t8l/Grsfo7L+366Ndw==
+2025-02-10 14:39:02,338 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:39:02,338 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:39:02,338 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:39:02,358 - DEBUG - [client.py:333] - < HTTP/1.1 200 OK
+2025-02-10 14:39:02,358 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:39:00 GMT
+2025-02-10 14:39:02,358 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:39:02,358 - DEBUG - [client.py:335] - < content-length: 3340
+2025-02-10 14:39:02,358 - DEBUG - [client.py:335] - < content-type: text/html; charset=utf-8
+2025-02-10 14:39:02,358 - DEBUG - [client.py:337] - < [body] (3340 bytes)
+2025-02-10 14:39:02,358 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:39:02,358 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:39:02,362 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: server rejected WebSocket connection: HTTP 200
+2025-02-10 14:39:02,363 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:39:02,363 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:39:15,041 - DEBUG - [proactor_events.py:625] - Using proactor: IocpProactor
+2025-02-10 14:39:15,047 - INFO - [printer_monitor_service.py:50] - PrinterMonitorService inicializado con URL: ws://161.132.39.159:8000
+2025-02-10 14:39:15,047 - DEBUG - [printer_monitor_service.py:51] - Verificando configuración inicial:
+2025-02-10 14:39:15,047 - DEBUG - [printer_monitor_service.py:52] -   SERVER_URL: ws://161.132.39.159:8000
+2025-02-10 14:39:15,047 - DEBUG - [printer_monitor_service.py:53] -   CLIENT_TOKEN presente: Sí
+2025-02-10 14:39:15,047 - DEBUG - [printer_monitor_service.py:54] -   AGENT_TOKEN presente: Sí
+2025-02-10 14:39:15,047 - DEBUG - [printer_monitor_service.py:55] -   SNMP Community: public
+2025-02-10 14:39:15,047 - DEBUG - [printer_monitor_service.py:56] -   SNMP Port: 161
+2025-02-10 14:39:15,047 - DEBUG - [printer_monitor_service.py:57] -   SNMP Timeout: 3s
+2025-02-10 14:39:15,047 - DEBUG - [printer_monitor_service.py:58] -   SNMP Retries: 2
+2025-02-10 14:39:15,047 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6
+2025-02-10 14:39:15,086 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:39:15,086 - DEBUG - [client.py:307] - > GET /api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6 HTTP/1.1
+2025-02-10 14:39:15,095 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:39:15,095 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:39:15,095 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:39:15,095 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: TwvboZDzarLx91hOonJMXg==
+2025-02-10 14:39:15,095 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:39:15,095 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:39:15,095 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:39:15,095 - DEBUG - [client.py:333] - < HTTP/1.1 303 See Other
+2025-02-10 14:39:15,095 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:39:13 GMT
+2025-02-10 14:39:15,095 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:39:15,095 - DEBUG - [client.py:335] - < content-length: 0
+2025-02-10 14:39:15,095 - DEBUG - [client.py:335] - < location: /auth/login
+2025-02-10 14:39:15,095 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:39:15,111 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:39:15,113 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:39:15,113 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:39:15,114 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:39:15,114 - DEBUG - [client.py:307] - > GET /auth/login HTTP/1.1
+2025-02-10 14:39:15,114 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:39:15,114 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:39:15,114 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:39:15,114 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: k2Vr3Aud28Vqg0QeDan0Zw==
+2025-02-10 14:39:15,114 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:39:15,114 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:39:15,114 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:39:15,128 - DEBUG - [client.py:333] - < HTTP/1.1 200 OK
+2025-02-10 14:39:15,128 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:39:13 GMT
+2025-02-10 14:39:15,128 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:39:15,128 - DEBUG - [client.py:335] - < content-length: 3340
+2025-02-10 14:39:15,128 - DEBUG - [client.py:335] - < content-type: text/html; charset=utf-8
+2025-02-10 14:39:15,128 - DEBUG - [client.py:337] - < [body] (3340 bytes)
+2025-02-10 14:39:15,128 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:39:15,128 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:39:15,128 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: server rejected WebSocket connection: HTTP 200
+2025-02-10 14:39:15,128 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:39:15,128 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:39:25,130 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6
+2025-02-10 14:39:25,132 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:39:25,132 - DEBUG - [client.py:307] - > GET /api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6 HTTP/1.1
+2025-02-10 14:39:25,140 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:39:25,140 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:39:25,140 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:39:25,140 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: 293VJUy6f8V93GIU8dFR5w==
+2025-02-10 14:39:25,142 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:39:25,142 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:39:25,142 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:39:25,150 - DEBUG - [client.py:333] - < HTTP/1.1 303 See Other
+2025-02-10 14:39:25,150 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:39:23 GMT
+2025-02-10 14:39:25,150 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:39:25,150 - DEBUG - [client.py:335] - < content-length: 0
+2025-02-10 14:39:25,150 - DEBUG - [client.py:335] - < location: /auth/login
+2025-02-10 14:39:25,150 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:39:25,158 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:39:25,158 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:39:25,158 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:39:25,165 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:39:25,165 - DEBUG - [client.py:307] - > GET /auth/login HTTP/1.1
+2025-02-10 14:39:25,165 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:39:25,165 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:39:25,168 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:39:25,168 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: OTuql/qrMj2wYJ1vqK4NFg==
+2025-02-10 14:39:25,168 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:39:25,168 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:39:25,169 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:39:25,185 - DEBUG - [client.py:333] - < HTTP/1.1 200 OK
+2025-02-10 14:39:25,185 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:39:23 GMT
+2025-02-10 14:39:25,185 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:39:25,185 - DEBUG - [client.py:335] - < content-length: 3340
+2025-02-10 14:39:25,185 - DEBUG - [client.py:335] - < content-type: text/html; charset=utf-8
+2025-02-10 14:39:25,185 - DEBUG - [client.py:337] - < [body] (3340 bytes)
+2025-02-10 14:39:25,185 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:39:25,185 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:39:25,189 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: server rejected WebSocket connection: HTTP 200
+2025-02-10 14:39:25,189 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:39:25,189 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:39:35,190 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6
+2025-02-10 14:39:35,194 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:39:35,202 - DEBUG - [client.py:307] - > GET /api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6 HTTP/1.1
+2025-02-10 14:39:35,202 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:39:35,202 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:39:35,206 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:39:35,209 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: 8bZvAzz0CokOdnQ64dso5g==
+2025-02-10 14:39:35,209 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:39:35,209 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:39:35,209 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:39:35,226 - DEBUG - [client.py:333] - < HTTP/1.1 303 See Other
+2025-02-10 14:39:35,226 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:39:33 GMT
+2025-02-10 14:39:35,231 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:39:35,231 - DEBUG - [client.py:335] - < content-length: 0
+2025-02-10 14:39:35,231 - DEBUG - [client.py:335] - < location: /auth/login
+2025-02-10 14:39:35,231 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:39:35,231 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:39:35,238 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:39:35,242 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:39:35,244 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:39:35,244 - DEBUG - [client.py:307] - > GET /auth/login HTTP/1.1
+2025-02-10 14:39:35,248 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:39:35,248 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:39:35,248 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:39:35,248 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: 0M9pCJgnrz2yL42LGF1GNA==
+2025-02-10 14:39:35,248 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:39:35,248 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:39:35,253 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:39:35,271 - DEBUG - [client.py:333] - < HTTP/1.1 200 OK
+2025-02-10 14:39:35,271 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:39:33 GMT
+2025-02-10 14:39:35,271 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:39:35,271 - DEBUG - [client.py:335] - < content-length: 3340
+2025-02-10 14:39:35,271 - DEBUG - [client.py:335] - < content-type: text/html; charset=utf-8
+2025-02-10 14:39:35,271 - DEBUG - [client.py:337] - < [body] (3340 bytes)
+2025-02-10 14:39:35,271 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:39:35,285 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:39:35,288 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: server rejected WebSocket connection: HTTP 200
+2025-02-10 14:39:35,288 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:39:35,288 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:39:45,294 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6
+2025-02-10 14:39:45,303 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:39:45,304 - DEBUG - [client.py:307] - > GET /api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6 HTTP/1.1
+2025-02-10 14:39:45,305 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:39:45,305 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:39:45,306 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:39:45,306 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: 35bV6aEitLRAA5fZgRnUzQ==
+2025-02-10 14:39:45,306 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:39:45,308 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:39:45,308 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:39:45,319 - DEBUG - [client.py:333] - < HTTP/1.1 303 See Other
+2025-02-10 14:39:45,320 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:39:43 GMT
+2025-02-10 14:39:45,321 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:39:45,321 - DEBUG - [client.py:335] - < content-length: 0
+2025-02-10 14:39:45,321 - DEBUG - [client.py:335] - < location: /auth/login
+2025-02-10 14:39:45,321 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:39:45,322 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:39:45,323 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:39:45,323 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:39:45,327 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:39:45,328 - DEBUG - [client.py:307] - > GET /auth/login HTTP/1.1
+2025-02-10 14:39:45,328 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:39:45,328 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:39:45,328 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:39:45,328 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: OLmoWYc0HuaKE7+JXaeQxg==
+2025-02-10 14:39:45,329 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:39:45,329 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:39:45,329 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:39:45,342 - DEBUG - [client.py:333] - < HTTP/1.1 200 OK
+2025-02-10 14:39:45,342 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:39:43 GMT
+2025-02-10 14:39:45,343 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:39:45,343 - DEBUG - [client.py:335] - < content-length: 3340
+2025-02-10 14:39:45,343 - DEBUG - [client.py:335] - < content-type: text/html; charset=utf-8
+2025-02-10 14:39:45,343 - DEBUG - [client.py:337] - < [body] (3340 bytes)
+2025-02-10 14:39:45,343 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:39:45,344 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:39:45,344 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: server rejected WebSocket connection: HTTP 200
+2025-02-10 14:39:45,344 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:39:45,345 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:39:55,358 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6
+2025-02-10 14:39:55,365 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:39:55,366 - DEBUG - [client.py:307] - > GET /api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6 HTTP/1.1
+2025-02-10 14:39:55,367 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:39:55,367 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:39:55,367 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:39:55,368 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: bpkEAmyyEkRcJ/zOc5LiAg==
+2025-02-10 14:39:55,368 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:39:55,368 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:39:55,368 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:39:55,378 - DEBUG - [client.py:333] - < HTTP/1.1 303 See Other
+2025-02-10 14:39:55,379 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:39:53 GMT
+2025-02-10 14:39:55,380 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:39:55,381 - DEBUG - [client.py:335] - < content-length: 0
+2025-02-10 14:39:55,381 - DEBUG - [client.py:335] - < location: /auth/login
+2025-02-10 14:39:55,383 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:39:55,383 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:39:55,388 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:39:55,389 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:39:55,392 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:39:55,394 - DEBUG - [client.py:307] - > GET /auth/login HTTP/1.1
+2025-02-10 14:39:55,394 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:39:55,395 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:39:55,395 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:39:55,395 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: V6XzrGMN6nSF5AGxHOJvXw==
+2025-02-10 14:39:55,396 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:39:55,396 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:39:55,397 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:39:55,411 - DEBUG - [client.py:333] - < HTTP/1.1 200 OK
+2025-02-10 14:39:55,412 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:39:53 GMT
+2025-02-10 14:39:55,412 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:39:55,412 - DEBUG - [client.py:335] - < content-length: 3340
+2025-02-10 14:39:55,412 - DEBUG - [client.py:335] - < content-type: text/html; charset=utf-8
+2025-02-10 14:39:55,413 - DEBUG - [client.py:337] - < [body] (3340 bytes)
+2025-02-10 14:39:55,413 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:39:55,413 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:39:55,414 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: server rejected WebSocket connection: HTTP 200
+2025-02-10 14:39:55,414 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:39:55,414 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:40:05,428 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6
+2025-02-10 14:40:05,436 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:40:05,438 - DEBUG - [client.py:307] - > GET /api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6 HTTP/1.1
+2025-02-10 14:40:05,438 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:40:05,439 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:40:05,439 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:40:05,439 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: ylaLNHOrU+pf76v4o8emAg==
+2025-02-10 14:40:05,440 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:40:05,440 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:40:05,445 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:40:05,462 - DEBUG - [client.py:333] - < HTTP/1.1 303 See Other
+2025-02-10 14:40:05,463 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:40:03 GMT
+2025-02-10 14:40:05,463 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:40:05,463 - DEBUG - [client.py:335] - < content-length: 0
+2025-02-10 14:40:05,464 - DEBUG - [client.py:335] - < location: /auth/login
+2025-02-10 14:40:05,464 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:40:05,464 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:40:05,467 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:40:05,467 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:40:05,473 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:40:05,476 - DEBUG - [client.py:307] - > GET /auth/login HTTP/1.1
+2025-02-10 14:40:05,476 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:40:05,477 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:40:05,477 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:40:05,477 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: c6VwS9z32CANOmdbK1iUBQ==
+2025-02-10 14:40:05,478 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:40:05,478 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:40:05,479 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:40:05,508 - DEBUG - [client.py:333] - < HTTP/1.1 200 OK
+2025-02-10 14:40:05,508 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:40:03 GMT
+2025-02-10 14:40:05,509 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:40:05,510 - DEBUG - [client.py:335] - < content-length: 3340
+2025-02-10 14:40:05,510 - DEBUG - [client.py:335] - < content-type: text/html; charset=utf-8
+2025-02-10 14:40:05,511 - DEBUG - [client.py:337] - < [body] (3340 bytes)
+2025-02-10 14:40:05,511 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:40:05,511 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:40:05,512 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: server rejected WebSocket connection: HTTP 200
+2025-02-10 14:40:05,512 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:40:05,513 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:40:15,520 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6
+2025-02-10 14:40:15,528 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:40:15,529 - DEBUG - [client.py:307] - > GET /api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6 HTTP/1.1
+2025-02-10 14:40:15,530 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:40:15,530 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:40:15,531 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:40:15,531 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: UhOL/7Oq0C6T+c7RpwEL4A==
+2025-02-10 14:40:15,532 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:40:15,533 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:40:15,533 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:40:15,549 - DEBUG - [client.py:333] - < HTTP/1.1 303 See Other
+2025-02-10 14:40:15,549 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:40:13 GMT
+2025-02-10 14:40:15,550 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:40:15,550 - DEBUG - [client.py:335] - < content-length: 0
+2025-02-10 14:40:15,550 - DEBUG - [client.py:335] - < location: /auth/login
+2025-02-10 14:40:15,550 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:40:15,550 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:40:15,553 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:40:15,554 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:40:15,558 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:40:15,558 - DEBUG - [client.py:307] - > GET /auth/login HTTP/1.1
+2025-02-10 14:40:15,558 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:40:15,558 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:40:15,561 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:40:15,561 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: hxiD4sw79kfit5lhmBfTiA==
+2025-02-10 14:40:15,561 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:40:15,561 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:40:15,561 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:40:15,591 - DEBUG - [client.py:333] - < HTTP/1.1 200 OK
+2025-02-10 14:40:15,591 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:40:13 GMT
+2025-02-10 14:40:15,592 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:40:15,592 - DEBUG - [client.py:335] - < content-length: 3340
+2025-02-10 14:40:15,592 - DEBUG - [client.py:335] - < content-type: text/html; charset=utf-8
+2025-02-10 14:40:15,592 - DEBUG - [client.py:337] - < [body] (3340 bytes)
+2025-02-10 14:40:15,592 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:40:15,592 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:40:15,593 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: server rejected WebSocket connection: HTTP 200
+2025-02-10 14:40:15,593 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:40:15,593 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:40:25,603 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6
+2025-02-10 14:40:25,610 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:40:25,611 - DEBUG - [client.py:307] - > GET /api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6 HTTP/1.1
+2025-02-10 14:40:25,611 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:40:25,611 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:40:25,612 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:40:25,612 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: ba53nV+X/ZFIeI/ZY0Rnpg==
+2025-02-10 14:40:25,612 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:40:25,612 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:40:25,612 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:40:25,622 - DEBUG - [client.py:333] - < HTTP/1.1 303 See Other
+2025-02-10 14:40:25,622 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:40:23 GMT
+2025-02-10 14:40:25,623 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:40:25,623 - DEBUG - [client.py:335] - < content-length: 0
+2025-02-10 14:40:25,623 - DEBUG - [client.py:335] - < location: /auth/login
+2025-02-10 14:40:25,623 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:40:25,623 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:40:25,624 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:40:25,625 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:40:25,628 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:40:25,628 - DEBUG - [client.py:307] - > GET /auth/login HTTP/1.1
+2025-02-10 14:40:25,629 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:40:25,629 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:40:25,629 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:40:25,629 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: 3hiDl21bQ96yJHrT49ynHA==
+2025-02-10 14:40:25,629 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:40:25,630 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:40:25,630 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:40:25,643 - DEBUG - [client.py:333] - < HTTP/1.1 200 OK
+2025-02-10 14:40:25,643 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:40:23 GMT
+2025-02-10 14:40:25,643 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:40:25,643 - DEBUG - [client.py:335] - < content-length: 3340
+2025-02-10 14:40:25,644 - DEBUG - [client.py:335] - < content-type: text/html; charset=utf-8
+2025-02-10 14:40:25,644 - DEBUG - [client.py:337] - < [body] (3340 bytes)
+2025-02-10 14:40:25,644 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:40:25,644 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:40:25,645 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: server rejected WebSocket connection: HTTP 200
+2025-02-10 14:40:25,645 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:40:25,645 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:40:35,659 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6
+2025-02-10 14:40:35,668 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:40:35,670 - DEBUG - [client.py:307] - > GET /api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6 HTTP/1.1
+2025-02-10 14:40:35,670 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:40:35,671 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:40:35,671 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:40:35,672 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: FaMQSF+NMGRE6kIW+CkBvA==
+2025-02-10 14:40:35,673 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:40:35,673 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:40:35,674 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:40:35,689 - DEBUG - [client.py:333] - < HTTP/1.1 303 See Other
+2025-02-10 14:40:35,691 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:40:33 GMT
+2025-02-10 14:40:35,692 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:40:35,693 - DEBUG - [client.py:335] - < content-length: 0
+2025-02-10 14:40:35,693 - DEBUG - [client.py:335] - < location: /auth/login
+2025-02-10 14:40:35,694 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:40:35,694 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:40:35,695 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:40:35,696 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:40:35,702 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:40:35,703 - DEBUG - [client.py:307] - > GET /auth/login HTTP/1.1
+2025-02-10 14:40:35,703 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:40:35,703 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:40:35,703 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:40:35,704 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: gfnagsC5eAtQ8LCo3DWGng==
+2025-02-10 14:40:35,704 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:40:35,704 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:40:35,704 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:40:35,719 - DEBUG - [client.py:333] - < HTTP/1.1 200 OK
+2025-02-10 14:40:35,719 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:40:33 GMT
+2025-02-10 14:40:35,720 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:40:35,720 - DEBUG - [client.py:335] - < content-length: 3340
+2025-02-10 14:40:35,720 - DEBUG - [client.py:335] - < content-type: text/html; charset=utf-8
+2025-02-10 14:40:35,720 - DEBUG - [client.py:337] - < [body] (3340 bytes)
+2025-02-10 14:40:35,721 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:40:35,721 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:40:35,721 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: server rejected WebSocket connection: HTTP 200
+2025-02-10 14:40:35,722 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:40:35,722 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:40:45,732 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6
+2025-02-10 14:40:45,739 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:40:45,740 - DEBUG - [client.py:307] - > GET /api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6 HTTP/1.1
+2025-02-10 14:40:45,740 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:40:45,741 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:40:45,741 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:40:45,741 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: OxPdLcwStZqkpFMK4zoyWw==
+2025-02-10 14:40:45,742 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:40:45,742 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:40:45,742 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:40:45,752 - DEBUG - [client.py:333] - < HTTP/1.1 303 See Other
+2025-02-10 14:40:45,752 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:40:43 GMT
+2025-02-10 14:40:45,752 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:40:45,752 - DEBUG - [client.py:335] - < content-length: 0
+2025-02-10 14:40:45,753 - DEBUG - [client.py:335] - < location: /auth/login
+2025-02-10 14:40:45,753 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:40:45,753 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:40:45,754 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:40:45,755 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:40:45,757 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:40:45,758 - DEBUG - [client.py:307] - > GET /auth/login HTTP/1.1
+2025-02-10 14:40:45,758 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:40:45,758 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:40:45,759 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:40:45,759 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: MAq/QiwGB4RfupkHSvZKCg==
+2025-02-10 14:40:45,759 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:40:45,759 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:40:45,759 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:40:45,804 - DEBUG - [client.py:333] - < HTTP/1.1 200 OK
+2025-02-10 14:40:45,805 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:40:43 GMT
+2025-02-10 14:40:45,805 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:40:45,807 - DEBUG - [client.py:335] - < content-length: 3340
+2025-02-10 14:40:45,807 - DEBUG - [client.py:335] - < content-type: text/html; charset=utf-8
+2025-02-10 14:40:45,807 - DEBUG - [client.py:337] - < [body] (3340 bytes)
+2025-02-10 14:40:45,807 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:40:45,807 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:40:45,807 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: server rejected WebSocket connection: HTTP 200
+2025-02-10 14:40:45,808 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:40:45,808 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:40:55,822 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6
+2025-02-10 14:40:55,831 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:40:55,832 - DEBUG - [client.py:307] - > GET /api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6 HTTP/1.1
+2025-02-10 14:40:55,832 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:40:55,833 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:40:55,833 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:40:55,833 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: QR+hoxiHX7faL/RL9IVAZA==
+2025-02-10 14:40:55,835 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:40:55,835 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:40:55,835 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:40:55,848 - DEBUG - [client.py:333] - < HTTP/1.1 303 See Other
+2025-02-10 14:40:55,849 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:40:53 GMT
+2025-02-10 14:40:55,849 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:40:55,849 - DEBUG - [client.py:335] - < content-length: 0
+2025-02-10 14:40:55,849 - DEBUG - [client.py:335] - < location: /auth/login
+2025-02-10 14:40:55,850 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:40:55,850 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:40:55,851 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:40:55,851 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:40:55,857 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:40:55,858 - DEBUG - [client.py:307] - > GET /auth/login HTTP/1.1
+2025-02-10 14:40:55,858 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:40:55,858 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:40:55,859 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:40:55,862 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: gmWeGMCh70n+4iu3Iy5r2w==
+2025-02-10 14:40:55,863 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:40:55,863 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:40:55,863 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:40:55,880 - DEBUG - [client.py:333] - < HTTP/1.1 200 OK
+2025-02-10 14:40:55,880 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:40:53 GMT
+2025-02-10 14:40:55,880 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:40:55,882 - DEBUG - [client.py:335] - < content-length: 3340
+2025-02-10 14:40:55,882 - DEBUG - [client.py:335] - < content-type: text/html; charset=utf-8
+2025-02-10 14:40:55,882 - DEBUG - [client.py:337] - < [body] (3340 bytes)
+2025-02-10 14:40:55,882 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:40:55,882 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:40:55,882 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: server rejected WebSocket connection: HTTP 200
+2025-02-10 14:40:55,883 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:40:55,883 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:41:05,887 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6
+2025-02-10 14:41:05,897 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:41:05,899 - DEBUG - [client.py:307] - > GET /api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6 HTTP/1.1
+2025-02-10 14:41:05,900 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:41:05,900 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:41:05,901 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:41:05,902 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: PKyBV9JmaH0mK9VfJSb7sw==
+2025-02-10 14:41:05,907 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:41:05,907 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:41:05,908 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:41:05,925 - DEBUG - [client.py:333] - < HTTP/1.1 303 See Other
+2025-02-10 14:41:05,926 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:41:04 GMT
+2025-02-10 14:41:05,927 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:41:05,928 - DEBUG - [client.py:335] - < content-length: 0
+2025-02-10 14:41:05,929 - DEBUG - [client.py:335] - < location: /auth/login
+2025-02-10 14:41:05,930 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:41:05,930 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:41:05,931 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:41:05,933 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:41:05,938 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:41:05,939 - DEBUG - [client.py:307] - > GET /auth/login HTTP/1.1
+2025-02-10 14:41:05,939 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:41:05,939 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:41:05,941 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:41:05,941 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: o+mYTBBKRBrPIIvTiYl9TQ==
+2025-02-10 14:41:05,942 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:41:05,942 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:41:05,942 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:41:05,961 - DEBUG - [client.py:333] - < HTTP/1.1 200 OK
+2025-02-10 14:41:05,961 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:41:04 GMT
+2025-02-10 14:41:05,961 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:41:05,963 - DEBUG - [client.py:335] - < content-length: 3340
+2025-02-10 14:41:05,963 - DEBUG - [client.py:335] - < content-type: text/html; charset=utf-8
+2025-02-10 14:41:05,964 - DEBUG - [client.py:337] - < [body] (3340 bytes)
+2025-02-10 14:41:05,964 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:41:05,964 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:41:05,965 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: server rejected WebSocket connection: HTTP 200
+2025-02-10 14:41:05,968 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:41:05,968 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:41:15,971 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6
+2025-02-10 14:41:15,977 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:41:15,980 - DEBUG - [client.py:307] - > GET /api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6 HTTP/1.1
+2025-02-10 14:41:15,980 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:41:15,981 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:41:15,981 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:41:15,981 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: Gc+KT1n0+I46IYeu26AWQQ==
+2025-02-10 14:41:15,981 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:41:15,981 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:41:15,981 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:41:15,992 - DEBUG - [client.py:333] - < HTTP/1.1 303 See Other
+2025-02-10 14:41:15,993 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:41:14 GMT
+2025-02-10 14:41:15,993 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:41:15,993 - DEBUG - [client.py:335] - < content-length: 0
+2025-02-10 14:41:15,994 - DEBUG - [client.py:335] - < location: /auth/login
+2025-02-10 14:41:15,994 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:41:15,994 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:41:15,995 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:41:15,996 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:41:16,001 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:41:16,002 - DEBUG - [client.py:307] - > GET /auth/login HTTP/1.1
+2025-02-10 14:41:16,003 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:41:16,003 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:41:16,003 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:41:16,004 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: m9BBcHHF2DPJ6iqxp0VlnA==
+2025-02-10 14:41:16,004 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:41:16,004 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:41:16,004 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:41:16,017 - DEBUG - [client.py:333] - < HTTP/1.1 200 OK
+2025-02-10 14:41:16,017 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:41:14 GMT
+2025-02-10 14:41:16,018 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:41:16,018 - DEBUG - [client.py:335] - < content-length: 3340
+2025-02-10 14:41:16,018 - DEBUG - [client.py:335] - < content-type: text/html; charset=utf-8
+2025-02-10 14:41:16,018 - DEBUG - [client.py:337] - < [body] (3340 bytes)
+2025-02-10 14:41:16,018 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:41:16,019 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:41:16,019 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: server rejected WebSocket connection: HTTP 200
+2025-02-10 14:41:16,019 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:41:16,019 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:41:26,023 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6
+2025-02-10 14:41:26,031 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:41:26,033 - DEBUG - [client.py:307] - > GET /api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6 HTTP/1.1
+2025-02-10 14:41:26,034 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:41:26,035 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:41:26,036 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:41:26,036 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: q75ZCxjpbzrREJeV9+SLTQ==
+2025-02-10 14:41:26,037 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:41:26,038 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:41:26,039 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:41:26,055 - DEBUG - [client.py:333] - < HTTP/1.1 303 See Other
+2025-02-10 14:41:26,055 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:41:24 GMT
+2025-02-10 14:41:26,055 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:41:26,056 - DEBUG - [client.py:335] - < content-length: 0
+2025-02-10 14:41:26,057 - DEBUG - [client.py:335] - < location: /auth/login
+2025-02-10 14:41:26,057 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:41:26,058 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:41:26,062 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:41:26,063 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:41:26,067 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:41:26,067 - DEBUG - [client.py:307] - > GET /auth/login HTTP/1.1
+2025-02-10 14:41:26,067 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:41:26,069 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:41:26,069 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:41:26,070 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: dyQI7Hq2IUrMbf8R+TpCnQ==
+2025-02-10 14:41:26,070 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:41:26,070 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:41:26,071 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:41:26,085 - DEBUG - [client.py:333] - < HTTP/1.1 200 OK
+2025-02-10 14:41:26,086 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:41:24 GMT
+2025-02-10 14:41:26,086 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:41:26,086 - DEBUG - [client.py:335] - < content-length: 3340
+2025-02-10 14:41:26,087 - DEBUG - [client.py:335] - < content-type: text/html; charset=utf-8
+2025-02-10 14:41:26,087 - DEBUG - [client.py:337] - < [body] (3340 bytes)
+2025-02-10 14:41:26,087 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:41:26,087 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:41:26,088 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: server rejected WebSocket connection: HTTP 200
+2025-02-10 14:41:26,088 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:41:26,088 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:41:36,095 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6
+2025-02-10 14:41:36,104 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:41:36,107 - DEBUG - [client.py:307] - > GET /api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6 HTTP/1.1
+2025-02-10 14:41:36,108 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:41:36,108 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:41:36,110 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:41:36,113 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: wW7FBI2+5dPdRhTveuPNfQ==
+2025-02-10 14:41:36,113 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:41:36,114 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:41:36,115 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:41:36,130 - DEBUG - [client.py:333] - < HTTP/1.1 303 See Other
+2025-02-10 14:41:36,131 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:41:34 GMT
+2025-02-10 14:41:36,132 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:41:36,133 - DEBUG - [client.py:335] - < content-length: 0
+2025-02-10 14:41:36,135 - DEBUG - [client.py:335] - < location: /auth/login
+2025-02-10 14:41:36,136 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:41:36,136 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:41:36,139 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:41:36,139 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:41:36,145 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:41:36,146 - DEBUG - [client.py:307] - > GET /auth/login HTTP/1.1
+2025-02-10 14:41:36,146 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:41:36,147 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:41:36,147 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:41:36,147 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: zSO9i+KlDtb+PlDxv3Tw/w==
+2025-02-10 14:41:36,147 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:41:36,147 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:41:36,149 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:41:36,167 - DEBUG - [client.py:333] - < HTTP/1.1 200 OK
+2025-02-10 14:41:36,168 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:41:34 GMT
+2025-02-10 14:41:36,168 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:41:36,169 - DEBUG - [client.py:335] - < content-length: 3340
+2025-02-10 14:41:36,169 - DEBUG - [client.py:335] - < content-type: text/html; charset=utf-8
+2025-02-10 14:41:36,169 - DEBUG - [client.py:337] - < [body] (3340 bytes)
+2025-02-10 14:41:36,169 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:41:36,169 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:41:36,170 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: server rejected WebSocket connection: HTTP 200
+2025-02-10 14:41:36,171 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:41:36,173 - DEBUG - [protocol.py:175] - = connection is CLOSED
