@@ -1,6 +1,6 @@
 # server/app/api/v1/api.py
 from fastapi import APIRouter
-from app.api.v1.endpoints import agents, websocket, web, printers, drivers, tunnels, monitor_printers, printer_oids, dashboard
+from app.api.v1.endpoints import agents, websocket, web, printers, drivers, tunnels, monitor_printers, printer_oids, dashboard, auth
 
 # Router para APIs
 api_router = APIRouter()
@@ -58,7 +58,18 @@ api_router.include_router(
     prefix="/printer-oids", 
     tags=["printer-oids"]
 )
+# Añade las rutas de autenticación
+api_router.include_router(
+    auth.router,
+    prefix="/auth",
+    tags=["auth"]
+)
 
+web_router.include_router(
+    auth.router,
+    prefix="/auth",
+    tags=["auth"]
+)
 # Router web separado
 web_router = APIRouter()
 web_router.include_router(
