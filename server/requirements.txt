@@ -3,3 +3,4 @@ uvicorn
 authlib
 cryptography
 httpx
+jwt
