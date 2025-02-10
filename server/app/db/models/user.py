@@ -87,8 +87,15 @@ class User(BaseModel):
     
     # Relaciones
     permissions = relationship("Permission", secondary=user_permissions, back_populates="users")
-    created_by = relationship("User", backref="created_users", remote_side=[id], foreign_keys=[created_by_id])
-    updated_by = relationship("User", backref="updated_users", remote_side=[id], foreign_keys=[updated_by_id])
+       
+    created_by = relationship("User", 
+        backref="created_users", 
+        foreign_keys=[created_by_id], 
+        remote_side=[id])
+    updated_by = relationship("User", 
+        backref="updated_users", 
+        foreign_keys=[updated_by_id], 
+        remote_side=[id])
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
