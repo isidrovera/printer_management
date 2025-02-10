@@ -86,8 +86,8 @@ class User(BaseModel):
     updated_by_id = Column(Integer, ForeignKey('users.id'))
     
     # Relaciones
+    
     permissions = relationship("Permission", secondary=user_permissions, back_populates="users")
-       
     created_by = relationship("User", 
         backref="created_users", 
         foreign_keys=[created_by_id], 
