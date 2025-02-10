@@ -1,0 +1,4 @@
+fastapi
+uvicorn
+authlib
+cryptography
