@@ -36645,3 +36645,428 @@ json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
 2025-02-10 15:00:56,224 - DEBUG - [protocol.py:745] - > PONG c4 34 ed 05 [binary, 4 bytes]
 2025-02-10 15:00:56,230 - DEBUG - [protocol.py:599] - < PONG 32 20 b5 69 [binary, 4 bytes]
 2025-02-10 15:00:56,232 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 15:01:16,228 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 15:01:16,230 - DEBUG - [protocol.py:745] - > PING 'oϙ)' [text, 4 bytes]
+2025-02-10 15:01:16,232 - DEBUG - [protocol.py:599] - < PING c4 8f fe 2d [binary, 4 bytes]
+2025-02-10 15:01:16,232 - DEBUG - [protocol.py:745] - > PONG c4 8f fe 2d [binary, 4 bytes]
+2025-02-10 15:01:16,232 - DEBUG - [protocol.py:599] - < PONG 'oϙ)' [text, 4 bytes]
+2025-02-10 15:01:16,232 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 15:01:24,429 - DEBUG - [protocol.py:599] - < CLOSE 1012 (service restart) [2 bytes]
+2025-02-10 15:01:24,435 - DEBUG - [protocol.py:745] - > CLOSE 1012 (service restart) [2 bytes]
+2025-02-10 15:01:24,437 - DEBUG - [protocol.py:175] - = connection is CLOSING
+2025-02-10 15:01:24,440 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 15:01:24,440 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 15:01:24,440 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 15:01:24,443 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 15:01:24,443 - INFO - [agent_service.py:166] - Conexión cerrada por el servidor
+2025-02-10 15:01:40,102 - DEBUG - [proactor_events.py:625] - Using proactor: IocpProactor
+2025-02-10 15:01:40,102 - INFO - [printer_monitor_service.py:50] - PrinterMonitorService inicializado con URL: ws://161.132.39.159:8000
+2025-02-10 15:01:40,102 - DEBUG - [printer_monitor_service.py:51] - Verificando configuración inicial:
+2025-02-10 15:01:40,102 - DEBUG - [printer_monitor_service.py:52] -   SERVER_URL: ws://161.132.39.159:8000
+2025-02-10 15:01:40,102 - DEBUG - [printer_monitor_service.py:53] -   CLIENT_TOKEN presente: Sí
+2025-02-10 15:01:40,102 - DEBUG - [printer_monitor_service.py:54] -   AGENT_TOKEN presente: Sí
+2025-02-10 15:01:40,102 - DEBUG - [printer_monitor_service.py:55] -   SNMP Community: public
+2025-02-10 15:01:40,102 - DEBUG - [printer_monitor_service.py:56] -   SNMP Port: 161
+2025-02-10 15:01:40,102 - DEBUG - [printer_monitor_service.py:57] -   SNMP Timeout: 3s
+2025-02-10 15:01:40,102 - DEBUG - [printer_monitor_service.py:58] -   SNMP Retries: 2
+2025-02-10 15:01:40,102 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6
+2025-02-10 15:01:40,146 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 15:01:40,146 - DEBUG - [client.py:307] - > GET /api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6 HTTP/1.1
+2025-02-10 15:01:40,146 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 15:01:40,146 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 15:01:40,153 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 15:01:40,153 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: /S5uJNhLMcNpBpqfy5DAEw==
+2025-02-10 15:01:40,153 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 15:01:40,153 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 15:01:40,155 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 15:01:40,178 - DEBUG - [client.py:333] - < HTTP/1.1 101 Switching Protocols
+2025-02-10 15:01:40,178 - DEBUG - [client.py:335] - < Upgrade: websocket
+2025-02-10 15:01:40,178 - DEBUG - [client.py:335] - < Connection: Upgrade
+2025-02-10 15:01:40,178 - DEBUG - [client.py:335] - < Sec-WebSocket-Accept: ipu+bxZl3FJbNVaVnYR5S1j+Y+k=
+2025-02-10 15:01:40,178 - DEBUG - [client.py:335] - < Sec-WebSocket-Extensions: permessage-deflate
+2025-02-10 15:01:40,178 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 20:01:37 GMT
+2025-02-10 15:01:40,178 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 15:01:40,189 - DEBUG - [protocol.py:175] - = connection is OPEN
+2025-02-10 15:01:40,189 - INFO - [agent_service.py:131] - ✅ Conectado al servidor WebSocket correctamente.
+2025-02-10 15:01:41,291 - ERROR - [agent_service.py:428] - 🚨 Error en la actualización del agente: 200, message='Attempt to decode JSON with unexpected mimetype: text/html; charset=utf-8', url='ws://161.132.39.159:8000/auth/login'
+2025-02-10 15:01:41,291 - INFO - [printer_monitor_service.py:68] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-10 15:01:41,293 - DEBUG - [printer_monitor_service.py:80] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-10 15:01:41,293 - DEBUG - [printer_monitor_service.py:81] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_32499ebe03d94fee8d8e5dd9446f46a6', 'Content-Type': 'application/json'}
+2025-02-10 15:01:41,355 - DEBUG - [printer_monitor_service.py:86] - 📥 Respuesta (200): [{"ip_address":"192.168.18.41","brand":"Ricoh","model":"MPC 3004","name":"RRhh","status":null,"client_id":4},{"ip_address":"192.168.18.27","brand":"Canon","model":"iR-ADV C3525 III","name":"RRRR","sta...
+2025-02-10 15:01:41,355 - INFO - [printer_monitor_service.py:90] - ✅ Se obtuvieron 2 impresoras
+2025-02-10 15:01:41,360 - DEBUG - [printer_monitor_service.py:91] - 📋 Lista de impresoras: [
+  {
+    "ip_address": "192.168.18.41",
+    "brand": "Ricoh",
+    "model": "MPC 3004",
+    "name": "RRhh",
+    "status": null,
+    "client_id": 4
+  },
+  {
+    "ip_address": "192.168.18.27",
+    "brand": "Canon",
+    "model": "iR-ADV C3525 III",
+    "name": "RRRR",
+    "status": null,
+    "client_id": 4
+  }
+]
+2025-02-10 15:01:41,361 - INFO - [printer_monitor_service.py:119] - 🔄 Iniciando recolección de datos - IP: 192.168.18.41, Marca: Ricoh
+2025-02-10 15:01:41,361 - INFO - [printer_monitor_service.py:572] - 🔌 Verificando conexión con impresora 192.168.18.41
+2025-02-10 15:01:41,361 - DEBUG - [printer_monitor_service.py:355] - 🔍 Intentando conexión SNMP con 192.168.18.41 - OID: 1.3.6.1.2.1.1.1.0
+2025-02-10 15:01:41,361 - DEBUG - [printer_monitor_service.py:360] - Probando configuración SNMP: CommunityData
+2025-02-10 15:01:50,896 - DEBUG - [printer_monitor_service.py:373] - Intento fallido: No SNMP response received before timeout
+2025-02-10 15:01:50,896 - DEBUG - [printer_monitor_service.py:360] - Probando configuración SNMP: CommunityData
+2025-02-10 15:02:00,194 - DEBUG - [printer_monitor_service.py:373] - Intento fallido: No SNMP response received before timeout
+2025-02-10 15:02:00,195 - DEBUG - [printer_monitor_service.py:360] - Probando configuración SNMP: CommunityData
+2025-02-10 15:02:09,528 - DEBUG - [printer_monitor_service.py:373] - Intento fallido: No SNMP response received before timeout
+2025-02-10 15:02:09,529 - DEBUG - [printer_monitor_service.py:360] - Probando configuración SNMP: CommunityData
+2025-02-10 15:02:18,835 - DEBUG - [printer_monitor_service.py:373] - Intento fallido: No SNMP response received before timeout
+2025-02-10 15:02:18,838 - DEBUG - [printer_monitor_service.py:360] - Probando configuración SNMP: UsmUserData
+2025-02-10 15:02:28,220 - DEBUG - [printer_monitor_service.py:373] - Intento fallido: No SNMP response received before timeout
+2025-02-10 15:02:28,221 - DEBUG - [printer_monitor_service.py:360] - Probando configuración SNMP: UsmUserData
+2025-02-10 15:02:37,583 - DEBUG - [printer_monitor_service.py:373] - Intento fallido: No SNMP response received before timeout
+2025-02-10 15:02:37,584 - DEBUG - [printer_monitor_service.py:360] - Probando configuración SNMP: UsmUserData
+2025-02-10 15:02:46,915 - DEBUG - [printer_monitor_service.py:373] - Intento fallido: No SNMP response received before timeout
+2025-02-10 15:02:46,917 - DEBUG - [printer_monitor_service.py:360] - Probando configuración SNMP: UsmUserData
+2025-02-10 15:02:56,268 - DEBUG - [printer_monitor_service.py:373] - Intento fallido: No SNMP response received before timeout
+2025-02-10 15:02:56,269 - DEBUG - [printer_monitor_service.py:360] - Probando configuración SNMP: UsmUserData
+2025-02-10 15:03:05,601 - DEBUG - [printer_monitor_service.py:373] - Intento fallido: No SNMP response received before timeout
+2025-02-10 15:03:05,603 - DEBUG - [printer_monitor_service.py:360] - Probando configuración SNMP: UsmUserData
+2025-02-10 15:03:06,867 - DEBUG - [protocol.py:599] - < PING 7a 77 14 87 [binary, 4 bytes]
+2025-02-10 15:03:06,868 - DEBUG - [protocol.py:745] - > PONG 7a 77 14 87 [binary, 4 bytes]
+2025-02-10 15:03:06,872 - DEBUG - [protocol.py:599] - < CLOSE 1011 (internal error) keepalive ping timeout [24 bytes]
+2025-02-10 15:03:06,874 - DEBUG - [protocol.py:745] - > CLOSE 1011 (internal error) keepalive ping timeout [24 bytes]
+2025-02-10 15:03:06,875 - DEBUG - [protocol.py:175] - = connection is CLOSING
+2025-02-10 15:03:06,876 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 15:03:06,880 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 15:03:06,883 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 15:03:06,884 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 15:03:10,839 - DEBUG - [proactor_events.py:625] - Using proactor: IocpProactor
+2025-02-10 15:03:10,841 - INFO - [printer_monitor_service.py:50] - PrinterMonitorService inicializado con URL: ws://161.132.39.159:8000
+2025-02-10 15:03:10,842 - DEBUG - [printer_monitor_service.py:51] - Verificando configuración inicial:
+2025-02-10 15:03:10,842 - DEBUG - [printer_monitor_service.py:52] -   SERVER_URL: ws://161.132.39.159:8000
+2025-02-10 15:03:10,842 - DEBUG - [printer_monitor_service.py:53] -   CLIENT_TOKEN presente: Sí
+2025-02-10 15:03:10,842 - DEBUG - [printer_monitor_service.py:54] -   AGENT_TOKEN presente: Sí
+2025-02-10 15:03:10,842 - DEBUG - [printer_monitor_service.py:55] -   SNMP Community: public
+2025-02-10 15:03:10,842 - DEBUG - [printer_monitor_service.py:56] -   SNMP Port: 161
+2025-02-10 15:03:10,842 - DEBUG - [printer_monitor_service.py:57] -   SNMP Timeout: 3s
+2025-02-10 15:03:10,842 - DEBUG - [printer_monitor_service.py:58] -   SNMP Retries: 2
+2025-02-10 15:03:10,843 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6
+2025-02-10 15:03:10,884 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 15:03:10,885 - DEBUG - [client.py:307] - > GET /api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6 HTTP/1.1
+2025-02-10 15:03:10,885 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 15:03:10,885 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 15:03:10,886 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 15:03:10,886 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: 7Ma6l8GmWPrmMLNi60j8fw==
+2025-02-10 15:03:10,886 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 15:03:10,886 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 15:03:10,886 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 15:03:10,909 - DEBUG - [client.py:333] - < HTTP/1.1 101 Switching Protocols
+2025-02-10 15:03:10,910 - DEBUG - [client.py:335] - < Upgrade: websocket
+2025-02-10 15:03:10,912 - DEBUG - [client.py:335] - < Connection: Upgrade
+2025-02-10 15:03:10,912 - DEBUG - [client.py:335] - < Sec-WebSocket-Accept: jVmqxiqIOJrmH2gTYla+z6pXTfQ=
+2025-02-10 15:03:10,914 - DEBUG - [client.py:335] - < Sec-WebSocket-Extensions: permessage-deflate
+2025-02-10 15:03:10,914 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 20:03:08 GMT
+2025-02-10 15:03:10,915 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 15:03:10,916 - DEBUG - [protocol.py:175] - = connection is OPEN
+2025-02-10 15:03:10,916 - INFO - [agent_service.py:131] - ✅ Conectado al servidor WebSocket correctamente.
+2025-02-10 15:03:12,025 - ERROR - [agent_service.py:428] - 🚨 Error en la actualización del agente: 200, message='Attempt to decode JSON with unexpected mimetype: text/html; charset=utf-8', url='ws://161.132.39.159:8000/auth/login'
+2025-02-10 15:03:12,025 - INFO - [printer_monitor_service.py:68] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-10 15:03:12,026 - DEBUG - [printer_monitor_service.py:80] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-10 15:03:12,026 - DEBUG - [printer_monitor_service.py:81] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_32499ebe03d94fee8d8e5dd9446f46a6', 'Content-Type': 'application/json'}
+2025-02-10 15:03:12,069 - DEBUG - [printer_monitor_service.py:86] - 📥 Respuesta (200): [{"ip_address":"192.168.18.79","brand":"Ricoh","model":"MPC 307","name":"Taller","status":"offline","client_id":4}]...
+2025-02-10 15:03:12,069 - INFO - [printer_monitor_service.py:90] - ✅ Se obtuvieron 1 impresoras
+2025-02-10 15:03:12,070 - DEBUG - [printer_monitor_service.py:91] - 📋 Lista de impresoras: [
+  {
+    "ip_address": "192.168.18.79",
+    "brand": "Ricoh",
+    "model": "MPC 307",
+    "name": "Taller",
+    "status": "offline",
+    "client_id": 4
+  }
+]
+2025-02-10 15:03:12,071 - INFO - [printer_monitor_service.py:119] - 🔄 Iniciando recolección de datos - IP: 192.168.18.79, Marca: Ricoh
+2025-02-10 15:03:12,072 - INFO - [printer_monitor_service.py:572] - 🔌 Verificando conexión con impresora 192.168.18.79
+2025-02-10 15:03:12,072 - DEBUG - [printer_monitor_service.py:355] - 🔍 Intentando conexión SNMP con 192.168.18.79 - OID: 1.3.6.1.2.1.1.1.0
+2025-02-10 15:03:12,072 - DEBUG - [printer_monitor_service.py:360] - Probando configuración SNMP: CommunityData
+2025-02-10 15:03:12,259 - INFO - [printer_monitor_service.py:385] - ✅ Conexión exitosa con CommunityData
+2025-02-10 15:03:12,259 - DEBUG - [printer_monitor_service.py:386] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.2.1.1.1.0: RICOH MP C307 1.25 / RICOH Network Printer C model / RICOH Network Scanner C model / RICOH Network Facsimile C model
+2025-02-10 15:03:12,261 - INFO - [printer_monitor_service.py:581] - ✅ Impresora 192.168.18.79 responde correctamente
+2025-02-10 15:03:12,261 - INFO - [printer_monitor_service.py:183] - 🔍 Obteniendo OIDs para marca Ricoh
+2025-02-10 15:03:12,261 - DEBUG - [printer_monitor_service.py:190] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/printer-oids/brands/Ricoh
+2025-02-10 15:03:12,293 - DEBUG - [printer_monitor_service.py:195] - 📥 Respuesta OIDs (200): <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Printer Management</title>
+    
+    <!-- Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    
+    <!-- FontAwesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Estilos Personalizados -->
+    <link href="/static/css/style.css" rel="stylesheet">
+    
+    
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <!-- Barra de Navegación -->
+    
+
+    <!-- Contenido Principal -->
+    <main class="container mx-auto mt-6 px-4">
+        
+<div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8">
+        <div>
+            <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                Iniciar Sesión
+            </h2>
+            <p class="mt-2 text-center text-sm text-gray-600">
+                Sistema de Gestión de Impresoras
+            </p>
+        </div>
+
+        
+
+        <form class="mt-8 space-y-6" action="/auth/login" method="POST">
+            <div class="rounded-md shadow-sm -space-y-px">
+                <div>
+                    <label for="username" class="sr-only">Usuario</label>
+                    <input id="username" name="username" type="text" required
+                        class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                        placeholder="Usuario">
+                </div>
+                <div>
+                    <label for="password" class="sr-only">Contraseña</label>
+                    <input id="password" name="password" type="password" required
+                        class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                        placeholder="Contraseña">
+                </div>
+            </div>
+
+            <div>
+                <button type="submit"
+                    class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                        <i class="fas fa-lock"></i>
+                    </span>
+                    Iniciar Sesión
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+    </main>
+
+    <!-- Scripts Básicos -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.259.0/lucide.min.js"></script>
+    
+    <!-- Scripts Personalizados -->
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+
+    
+    
+</body>
+</html>
+2025-02-10 15:03:12,294 - ERROR - [printer_monitor_service.py:208] - ❌ Error en _get_printer_oids: Expecting value: line 1 column 1 (char 0)
+Traceback (most recent call last):
+  File "C:\Users\pc\Desktop\printer_management\agent\app\services\printer_monitor_service.py", line 198, in _get_printer_oids
+    oids = json.loads(response_text)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-02-10 15:03:12,297 - ERROR - [printer_monitor_service.py:135] - ❌ No se encontraron OIDs para la marca Ricoh
+2025-02-10 15:03:12,297 - WARNING - [agent_service.py:379] - No se pudieron obtener datos de 192.168.18.79
+2025-02-10 15:03:30,909 - DEBUG - [protocol.py:599] - < PING d4 2d bc 85 [binary, 4 bytes]
+2025-02-10 15:03:30,911 - DEBUG - [protocol.py:745] - > PONG d4 2d bc 85 [binary, 4 bytes]
+2025-02-10 15:03:30,916 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 15:03:30,917 - DEBUG - [protocol.py:745] - > PING d4 11 7e 54 [binary, 4 bytes]
+2025-02-10 15:03:30,923 - DEBUG - [protocol.py:599] - < PONG d4 11 7e 54 [binary, 4 bytes]
+2025-02-10 15:03:30,925 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 15:03:50,921 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 15:03:50,922 - DEBUG - [protocol.py:745] - > PING 92 5a 92 4f [binary, 4 bytes]
+2025-02-10 15:03:50,926 - DEBUG - [protocol.py:599] - < PING 04 1e 99 ce [binary, 4 bytes]
+2025-02-10 15:03:50,926 - DEBUG - [protocol.py:745] - > PONG 04 1e 99 ce [binary, 4 bytes]
+2025-02-10 15:03:50,931 - DEBUG - [protocol.py:599] - < PONG 92 5a 92 4f [binary, 4 bytes]
+2025-02-10 15:03:50,932 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 15:04:05,830 - DEBUG - [protocol.py:745] - > CLOSE 1000 (OK) [2 bytes]
+2025-02-10 15:04:05,831 - DEBUG - [protocol.py:175] - = connection is CLOSING
+2025-02-10 15:04:05,839 - DEBUG - [protocol.py:599] - < CLOSE 1000 (OK) [2 bytes]
+2025-02-10 15:04:05,841 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 15:04:05,842 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 15:04:05,843 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 15:04:05,843 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 15:04:12,027 - DEBUG - [proactor_events.py:625] - Using proactor: IocpProactor
+2025-02-10 15:04:12,028 - INFO - [printer_monitor_service.py:50] - PrinterMonitorService inicializado con URL: ws://161.132.39.159:8000
+2025-02-10 15:04:12,029 - DEBUG - [printer_monitor_service.py:51] - Verificando configuración inicial:
+2025-02-10 15:04:12,029 - DEBUG - [printer_monitor_service.py:52] -   SERVER_URL: ws://161.132.39.159:8000
+2025-02-10 15:04:12,029 - DEBUG - [printer_monitor_service.py:53] -   CLIENT_TOKEN presente: Sí
+2025-02-10 15:04:12,029 - DEBUG - [printer_monitor_service.py:54] -   AGENT_TOKEN presente: Sí
+2025-02-10 15:04:12,029 - DEBUG - [printer_monitor_service.py:55] -   SNMP Community: public
+2025-02-10 15:04:12,029 - DEBUG - [printer_monitor_service.py:56] -   SNMP Port: 161
+2025-02-10 15:04:12,029 - DEBUG - [printer_monitor_service.py:57] -   SNMP Timeout: 3s
+2025-02-10 15:04:12,029 - DEBUG - [printer_monitor_service.py:58] -   SNMP Retries: 2
+2025-02-10 15:04:12,030 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6
+2025-02-10 15:04:12,074 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 15:04:12,076 - DEBUG - [client.py:307] - > GET /api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6 HTTP/1.1
+2025-02-10 15:04:12,077 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 15:04:12,077 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 15:04:12,078 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 15:04:12,078 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: 2/9U5UZaI7wuSTR78sGNTg==
+2025-02-10 15:04:12,079 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 15:04:12,079 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 15:04:12,080 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 15:04:12,101 - DEBUG - [client.py:333] - < HTTP/1.1 101 Switching Protocols
+2025-02-10 15:04:12,103 - DEBUG - [client.py:335] - < Upgrade: websocket
+2025-02-10 15:04:12,104 - DEBUG - [client.py:335] - < Connection: Upgrade
+2025-02-10 15:04:12,104 - DEBUG - [client.py:335] - < Sec-WebSocket-Accept: UaoVCNLJ+8yKdLgZZ0IYAFyG35g=
+2025-02-10 15:04:12,105 - DEBUG - [client.py:335] - < Sec-WebSocket-Extensions: permessage-deflate
+2025-02-10 15:04:12,105 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 20:04:09 GMT
+2025-02-10 15:04:12,105 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 15:04:12,106 - DEBUG - [protocol.py:175] - = connection is OPEN
+2025-02-10 15:04:12,107 - INFO - [agent_service.py:131] - ✅ Conectado al servidor WebSocket correctamente.
+2025-02-10 15:04:13,204 - ERROR - [agent_service.py:428] - 🚨 Error en la actualización del agente: 200, message='Attempt to decode JSON with unexpected mimetype: text/html; charset=utf-8', url='ws://161.132.39.159:8000/auth/login'
+2025-02-10 15:04:13,204 - INFO - [printer_monitor_service.py:68] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-10 15:04:13,206 - DEBUG - [printer_monitor_service.py:80] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-10 15:04:13,206 - DEBUG - [printer_monitor_service.py:81] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_32499ebe03d94fee8d8e5dd9446f46a6', 'Content-Type': 'application/json'}
+2025-02-10 15:04:13,243 - DEBUG - [printer_monitor_service.py:86] - 📥 Respuesta (200): [{"ip_address":"192.168.18.79","brand":"Ricoh","model":"MPC 307","name":"Taller","status":"offline","client_id":4}]...
+2025-02-10 15:04:13,244 - INFO - [printer_monitor_service.py:90] - ✅ Se obtuvieron 1 impresoras
+2025-02-10 15:04:13,245 - DEBUG - [printer_monitor_service.py:91] - 📋 Lista de impresoras: [
+  {
+    "ip_address": "192.168.18.79",
+    "brand": "Ricoh",
+    "model": "MPC 307",
+    "name": "Taller",
+    "status": "offline",
+    "client_id": 4
+  }
+]
+2025-02-10 15:04:13,246 - INFO - [printer_monitor_service.py:119] - 🔄 Iniciando recolección de datos - IP: 192.168.18.79, Marca: Ricoh
+2025-02-10 15:04:13,246 - INFO - [printer_monitor_service.py:572] - 🔌 Verificando conexión con impresora 192.168.18.79
+2025-02-10 15:04:13,247 - DEBUG - [printer_monitor_service.py:355] - 🔍 Intentando conexión SNMP con 192.168.18.79 - OID: 1.3.6.1.2.1.1.1.0
+2025-02-10 15:04:13,247 - DEBUG - [printer_monitor_service.py:360] - Probando configuración SNMP: CommunityData
+2025-02-10 15:04:13,417 - INFO - [printer_monitor_service.py:385] - ✅ Conexión exitosa con CommunityData
+2025-02-10 15:04:13,417 - DEBUG - [printer_monitor_service.py:386] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.2.1.1.1.0: RICOH MP C307 1.25 / RICOH Network Printer C model / RICOH Network Scanner C model / RICOH Network Facsimile C model
+2025-02-10 15:04:13,419 - INFO - [printer_monitor_service.py:581] - ✅ Impresora 192.168.18.79 responde correctamente
+2025-02-10 15:04:13,420 - INFO - [printer_monitor_service.py:183] - 🔍 Obteniendo OIDs para marca Ricoh
+2025-02-10 15:04:13,420 - DEBUG - [printer_monitor_service.py:190] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/printer-oids/brands/Ricoh
+2025-02-10 15:04:13,453 - DEBUG - [printer_monitor_service.py:195] - 📥 Respuesta OIDs (200): <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Printer Management</title>
+    
+    <!-- Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    
+    <!-- FontAwesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Estilos Personalizados -->
+    <link href="/static/css/style.css" rel="stylesheet">
+    
+    
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <!-- Barra de Navegación -->
+    
+
+    <!-- Contenido Principal -->
+    <main class="container mx-auto mt-6 px-4">
+        
+<div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8">
+        <div>
+            <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                Iniciar Sesión
+            </h2>
+            <p class="mt-2 text-center text-sm text-gray-600">
+                Sistema de Gestión de Impresoras
+            </p>
+        </div>
+
+        
+
+        <form class="mt-8 space-y-6" action="/auth/login" method="POST">
+            <div class="rounded-md shadow-sm -space-y-px">
+                <div>
+                    <label for="username" class="sr-only">Usuario</label>
+                    <input id="username" name="username" type="text" required
+                        class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                        placeholder="Usuario">
+                </div>
+                <div>
+                    <label for="password" class="sr-only">Contraseña</label>
+                    <input id="password" name="password" type="password" required
+                        class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                        placeholder="Contraseña">
+                </div>
+            </div>
+
+            <div>
+                <button type="submit"
+                    class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                        <i class="fas fa-lock"></i>
+                    </span>
+                    Iniciar Sesión
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+    </main>
+
+    <!-- Scripts Básicos -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.259.0/lucide.min.js"></script>
+    
+    <!-- Scripts Personalizados -->
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+
+    
+    
+</body>
+</html>
+2025-02-10 15:04:13,454 - ERROR - [printer_monitor_service.py:208] - ❌ Error en _get_printer_oids: Expecting value: line 1 column 1 (char 0)
+Traceback (most recent call last):
+  File "C:\Users\pc\Desktop\printer_management\agent\app\services\printer_monitor_service.py", line 198, in _get_printer_oids
+    oids = json.loads(response_text)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-02-10 15:04:13,457 - ERROR - [printer_monitor_service.py:135] - ❌ No se encontraron OIDs para la marca Ricoh
+2025-02-10 15:04:13,457 - WARNING - [agent_service.py:379] - No se pudieron obtener datos de 192.168.18.79
+2025-02-10 15:04:32,100 - DEBUG - [protocol.py:599] - < PING da 5d 24 01 [binary, 4 bytes]
+2025-02-10 15:04:32,102 - DEBUG - [protocol.py:745] - > PONG da 5d 24 01 [binary, 4 bytes]
+2025-02-10 15:04:32,114 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 15:04:32,115 - DEBUG - [protocol.py:745] - > PING fc 52 3a 46 [binary, 4 bytes]
+2025-02-10 15:04:32,125 - DEBUG - [protocol.py:599] - < PONG fc 52 3a 46 [binary, 4 bytes]
+2025-02-10 15:04:32,126 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 15:04:52,121 - DEBUG - [protocol.py:599] - < PING 3c d5 73 f2 [binary, 4 bytes]
+2025-02-10 15:04:52,128 - DEBUG - [protocol.py:745] - > PONG 3c d5 73 f2 [binary, 4 bytes]
+2025-02-10 15:04:52,130 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 15:04:52,136 - DEBUG - [protocol.py:745] - > PING '\x0cxGu' [text, 4 bytes]
+2025-02-10 15:04:52,144 - DEBUG - [protocol.py:599] - < PONG '\x0cxGu' [text, 4 bytes]
+2025-02-10 15:04:52,147 - DEBUG - [connection.py:811] - % received keepalive pong

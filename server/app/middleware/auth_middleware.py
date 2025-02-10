@@ -19,7 +19,7 @@ async def auth_middleware(request: Request, call_next):
     # Excluir rutas específicas para agentes
     if request.url.path.startswith((
         "/auth/login", "/static/", "/favicon.ico", 
-        "/api/v1/ws/agent/", "/api/v1/monitor/printers"
+        "/api/v1/ws/agent/", "/api/v1/monitor/printers", "/api/v1/printer-oids/"
     )):
         return await call_next(request)
 
