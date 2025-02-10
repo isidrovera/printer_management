@@ -17,22 +17,3 @@ async def first_login_middleware(request: Request, call_next):
             return RedirectResponse(url="/auth/change-password", status_code=303)
     
     return response
-
-# En el main.py o archivo de configuración de la aplicación
-from fastapi import FastAPI
-from app.middleware.first_login_middleware import first_login_middleware
-from app.services.initial_setup import InitialSetupService
-
-def setup_application():
-    app = FastAPI()
-    
-    # Middleware
-    app.middleware("http")(first_login_middleware)
-    
-    # Crear admin inicial al iniciar la aplicación
-    @app.on_event("startup")
-    def startup_event():
-        db = next(get_db())
-        InitialSetupService.check_and_create_initial_admin(db)
-    
-    return app

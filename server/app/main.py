@@ -14,6 +14,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 from app.middleware.auth_middleware import auth_middleware
+from app.services.initial_setup import InitialSetupService
 from starlette.middleware.base import BaseHTTPMiddleware
 from app.core.config import settings
 from app.api.v1.api import api_router, web_router
@@ -63,5 +64,17 @@ app.include_router(api_router, prefix="/api/v1")
 
 logger.info("Creating database tables...")
 Base.metadata.create_all(bind=engine)
+# Agregar al final del archivo, antes de "Application startup completed"
+@app.on_event("startup")
+def startup_event():
+    # Crear sesión de base de datos
+    db = SessionLocal()
+    try:
+        logger.info("Verificando configuración inicial de administrador...")
+        InitialSetupService.check_and_create_initial_admin(db)
+    except Exception as e:
+        logger.error(f"Error en configuración inicial de admin: {e}")
+    finally:
+        db.close()
 
 logger.info("Application startup completed")

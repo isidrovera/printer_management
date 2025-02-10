@@ -15,7 +15,7 @@ class InitialSetupService:
         """
         # Verificar si ya existe un admin
         existing_admin = db.query(User).filter(
-            User.role == UserRole.ADMIN,
+            User.role == UserRole.ADMIN, 
             User.username == "admin"
         ).first()
         
@@ -23,8 +23,8 @@ class InitialSetupService:
             logger.info("Usuario admin ya existe")
             return existing_admin
         
-        # Generar contraseña temporal
-        temp_password = secrets.token_urlsafe(12)
+        # Generar contraseña temporal con un formato más predecible
+        temp_password = "Admin123!"
         
         # Crear usuario admin
         admin_user = User(
@@ -46,7 +46,14 @@ class InitialSetupService:
         db.commit()
         db.refresh(admin_user)
         
-        logger.info(f"Usuario admin creado. Contraseña temporal: {temp_password}")
+        # Imprimir por consola para mayor visibilidad
+        print("\n" + "=" * 50)
+        print("CREDENCIALES INICIALES DE ADMINISTRADOR:")
+        print(f"Usuario: admin")
+        print(f"Contraseña temporal: {temp_password}")
+        print("=" * 50 + "\n")
+        
+        logger.info(f"Usuario admin creado con contraseña temporal")
         return admin_user
 
     @staticmethod
