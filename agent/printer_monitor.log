@@ -30624,3 +30624,453 @@ Traceback (most recent call last):
   File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1130, in _wrap_create_connection
     raise client_error(req.connection_key, exc) from exc
 aiohttp.client_exceptions.ClientConnectorError: Cannot connect to host 161.132.39.159:8000 ssl:default [El equipo remoto rechazó la conexión de red]
+2025-02-10 09:39:08,672 - ERROR - [agent_service.py:428] - 🚨 Error en la actualización del agente: Cannot connect to host 161.132.39.159:8000 ssl:default [El equipo remoto rechazó la conexión de red]
+2025-02-10 09:39:08,672 - INFO - [printer_monitor_service.py:68] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-10 09:39:08,672 - DEBUG - [printer_monitor_service.py:80] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-10 09:39:08,686 - DEBUG - [printer_monitor_service.py:81] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_32499ebe03d94fee8d8e5dd9446f46a6', 'Content-Type': 'application/json'}
+2025-02-10 09:39:10,750 - ERROR - [printer_monitor_service.py:101] - ❌ Error de conexión: Cannot connect to host 161.132.39.159:8000 ssl:default [El equipo remoto rechazó la conexión de red]
+Traceback (most recent call last):
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1115, in _wrap_create_connection
+    sock = await aiohappyeyeballs.start_connection(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohappyeyeballs\impl.py", line 104, in start_connection
+    raise first_exception
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohappyeyeballs\impl.py", line 82, in start_connection
+    sock = await _connect_sock(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohappyeyeballs\impl.py", line 174, in _connect_sock
+    await loop.sock_connect(sock, address)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\asyncio\proactor_events.py", line 704, in sock_connect
+    return await self._proactor.connect(sock, address)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\asyncio\windows_events.py", line 812, in _poll
+    value = callback(transferred, key, ov)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\asyncio\windows_events.py", line 599, in finish_connect
+    ov.getresult()
+ConnectionRefusedError: [WinError 1225] El equipo remoto rechazó la conexión de red
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\pc\Desktop\printer_management\agent\app\services\printer_monitor_service.py", line 84, in get_monitored_printers
+    async with session.get(url, headers=headers) as response:
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\client.py", line 1425, in __aenter__
+    self._resp: _RetType = await self._coro
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\client.py", line 703, in _request
+    conn = await self._connector.connect(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 548, in connect
+    proto = await self._create_connection(req, traces, timeout)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1056, in _create_connection
+    _, proto = await self._create_direct_connection(req, traces, timeout)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1400, in _create_direct_connection
+    raise last_exc
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1369, in _create_direct_connection
+    transp, proto = await self._wrap_create_connection(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1130, in _wrap_create_connection
+    raise client_error(req.connection_key, exc) from exc
+aiohttp.client_exceptions.ClientConnectorError: Cannot connect to host 161.132.39.159:8000 ssl:default [El equipo remoto rechazó la conexión de red]
+2025-02-10 09:44:13,867 - ERROR - [agent_service.py:428] - 🚨 Error en la actualización del agente: Cannot connect to host 161.132.39.159:8000 ssl:default [El equipo remoto rechazó la conexión de red]
+2025-02-10 09:44:13,868 - INFO - [printer_monitor_service.py:68] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-10 09:44:13,873 - DEBUG - [printer_monitor_service.py:80] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-10 09:44:13,873 - DEBUG - [printer_monitor_service.py:81] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_32499ebe03d94fee8d8e5dd9446f46a6', 'Content-Type': 'application/json'}
+2025-02-10 09:44:15,948 - ERROR - [printer_monitor_service.py:101] - ❌ Error de conexión: Cannot connect to host 161.132.39.159:8000 ssl:default [El equipo remoto rechazó la conexión de red]
+Traceback (most recent call last):
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1115, in _wrap_create_connection
+    sock = await aiohappyeyeballs.start_connection(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohappyeyeballs\impl.py", line 104, in start_connection
+    raise first_exception
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohappyeyeballs\impl.py", line 82, in start_connection
+    sock = await _connect_sock(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohappyeyeballs\impl.py", line 174, in _connect_sock
+    await loop.sock_connect(sock, address)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\asyncio\proactor_events.py", line 704, in sock_connect
+    return await self._proactor.connect(sock, address)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\asyncio\windows_events.py", line 812, in _poll
+    value = callback(transferred, key, ov)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\asyncio\windows_events.py", line 599, in finish_connect
+    ov.getresult()
+ConnectionRefusedError: [WinError 1225] El equipo remoto rechazó la conexión de red
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\pc\Desktop\printer_management\agent\app\services\printer_monitor_service.py", line 84, in get_monitored_printers
+    async with session.get(url, headers=headers) as response:
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\client.py", line 1425, in __aenter__
+    self._resp: _RetType = await self._coro
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\client.py", line 703, in _request
+    conn = await self._connector.connect(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 548, in connect
+    proto = await self._create_connection(req, traces, timeout)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1056, in _create_connection
+    _, proto = await self._create_direct_connection(req, traces, timeout)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1400, in _create_direct_connection
+    raise last_exc
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1369, in _create_direct_connection
+    transp, proto = await self._wrap_create_connection(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1130, in _wrap_create_connection
+    raise client_error(req.connection_key, exc) from exc
+aiohttp.client_exceptions.ClientConnectorError: Cannot connect to host 161.132.39.159:8000 ssl:default [El equipo remoto rechazó la conexión de red]
+2025-02-10 09:49:19,101 - ERROR - [agent_service.py:428] - 🚨 Error en la actualización del agente: Cannot connect to host 161.132.39.159:8000 ssl:default [El equipo remoto rechazó la conexión de red]
+2025-02-10 09:49:19,102 - INFO - [printer_monitor_service.py:68] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-10 09:49:19,107 - DEBUG - [printer_monitor_service.py:80] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-10 09:49:19,108 - DEBUG - [printer_monitor_service.py:81] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_32499ebe03d94fee8d8e5dd9446f46a6', 'Content-Type': 'application/json'}
+2025-02-10 09:49:21,162 - ERROR - [printer_monitor_service.py:101] - ❌ Error de conexión: Cannot connect to host 161.132.39.159:8000 ssl:default [El equipo remoto rechazó la conexión de red]
+Traceback (most recent call last):
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1115, in _wrap_create_connection
+    sock = await aiohappyeyeballs.start_connection(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohappyeyeballs\impl.py", line 104, in start_connection
+    raise first_exception
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohappyeyeballs\impl.py", line 82, in start_connection
+    sock = await _connect_sock(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohappyeyeballs\impl.py", line 174, in _connect_sock
+    await loop.sock_connect(sock, address)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\asyncio\proactor_events.py", line 704, in sock_connect
+    return await self._proactor.connect(sock, address)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\asyncio\windows_events.py", line 812, in _poll
+    value = callback(transferred, key, ov)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\asyncio\windows_events.py", line 599, in finish_connect
+    ov.getresult()
+ConnectionRefusedError: [WinError 1225] El equipo remoto rechazó la conexión de red
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\pc\Desktop\printer_management\agent\app\services\printer_monitor_service.py", line 84, in get_monitored_printers
+    async with session.get(url, headers=headers) as response:
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\client.py", line 1425, in __aenter__
+    self._resp: _RetType = await self._coro
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\client.py", line 703, in _request
+    conn = await self._connector.connect(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 548, in connect
+    proto = await self._create_connection(req, traces, timeout)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1056, in _create_connection
+    _, proto = await self._create_direct_connection(req, traces, timeout)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1400, in _create_direct_connection
+    raise last_exc
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1369, in _create_direct_connection
+    transp, proto = await self._wrap_create_connection(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1130, in _wrap_create_connection
+    raise client_error(req.connection_key, exc) from exc
+aiohttp.client_exceptions.ClientConnectorError: Cannot connect to host 161.132.39.159:8000 ssl:default [El equipo remoto rechazó la conexión de red]
+2025-02-10 09:54:24,358 - ERROR - [agent_service.py:428] - 🚨 Error en la actualización del agente: Cannot connect to host 161.132.39.159:8000 ssl:default [El equipo remoto rechazó la conexión de red]
+2025-02-10 09:54:24,360 - INFO - [printer_monitor_service.py:68] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-10 09:54:24,365 - DEBUG - [printer_monitor_service.py:80] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-10 09:54:24,366 - DEBUG - [printer_monitor_service.py:81] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_32499ebe03d94fee8d8e5dd9446f46a6', 'Content-Type': 'application/json'}
+2025-02-10 09:54:26,430 - ERROR - [printer_monitor_service.py:101] - ❌ Error de conexión: Cannot connect to host 161.132.39.159:8000 ssl:default [El equipo remoto rechazó la conexión de red]
+Traceback (most recent call last):
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1115, in _wrap_create_connection
+    sock = await aiohappyeyeballs.start_connection(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohappyeyeballs\impl.py", line 104, in start_connection
+    raise first_exception
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohappyeyeballs\impl.py", line 82, in start_connection
+    sock = await _connect_sock(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohappyeyeballs\impl.py", line 174, in _connect_sock
+    await loop.sock_connect(sock, address)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\asyncio\proactor_events.py", line 704, in sock_connect
+    return await self._proactor.connect(sock, address)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\asyncio\windows_events.py", line 812, in _poll
+    value = callback(transferred, key, ov)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\asyncio\windows_events.py", line 599, in finish_connect
+    ov.getresult()
+ConnectionRefusedError: [WinError 1225] El equipo remoto rechazó la conexión de red
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\pc\Desktop\printer_management\agent\app\services\printer_monitor_service.py", line 84, in get_monitored_printers
+    async with session.get(url, headers=headers) as response:
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\client.py", line 1425, in __aenter__
+    self._resp: _RetType = await self._coro
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\client.py", line 703, in _request
+    conn = await self._connector.connect(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 548, in connect
+    proto = await self._create_connection(req, traces, timeout)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1056, in _create_connection
+    _, proto = await self._create_direct_connection(req, traces, timeout)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1400, in _create_direct_connection
+    raise last_exc
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1369, in _create_direct_connection
+    transp, proto = await self._wrap_create_connection(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1130, in _wrap_create_connection
+    raise client_error(req.connection_key, exc) from exc
+aiohttp.client_exceptions.ClientConnectorError: Cannot connect to host 161.132.39.159:8000 ssl:default [El equipo remoto rechazó la conexión de red]
+2025-02-10 09:59:29,596 - ERROR - [agent_service.py:428] - 🚨 Error en la actualización del agente: Cannot connect to host 161.132.39.159:8000 ssl:default [El equipo remoto rechazó la conexión de red]
+2025-02-10 09:59:29,598 - INFO - [printer_monitor_service.py:68] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-10 09:59:29,602 - DEBUG - [printer_monitor_service.py:80] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-10 09:59:29,603 - DEBUG - [printer_monitor_service.py:81] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_32499ebe03d94fee8d8e5dd9446f46a6', 'Content-Type': 'application/json'}
+2025-02-10 09:59:31,665 - ERROR - [printer_monitor_service.py:101] - ❌ Error de conexión: Cannot connect to host 161.132.39.159:8000 ssl:default [El equipo remoto rechazó la conexión de red]
+Traceback (most recent call last):
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1115, in _wrap_create_connection
+    sock = await aiohappyeyeballs.start_connection(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohappyeyeballs\impl.py", line 104, in start_connection
+    raise first_exception
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohappyeyeballs\impl.py", line 82, in start_connection
+    sock = await _connect_sock(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohappyeyeballs\impl.py", line 174, in _connect_sock
+    await loop.sock_connect(sock, address)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\asyncio\proactor_events.py", line 704, in sock_connect
+    return await self._proactor.connect(sock, address)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\asyncio\windows_events.py", line 812, in _poll
+    value = callback(transferred, key, ov)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\asyncio\windows_events.py", line 599, in finish_connect
+    ov.getresult()
+ConnectionRefusedError: [WinError 1225] El equipo remoto rechazó la conexión de red
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\pc\Desktop\printer_management\agent\app\services\printer_monitor_service.py", line 84, in get_monitored_printers
+    async with session.get(url, headers=headers) as response:
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\client.py", line 1425, in __aenter__
+    self._resp: _RetType = await self._coro
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\client.py", line 703, in _request
+    conn = await self._connector.connect(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 548, in connect
+    proto = await self._create_connection(req, traces, timeout)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1056, in _create_connection
+    _, proto = await self._create_direct_connection(req, traces, timeout)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1400, in _create_direct_connection
+    raise last_exc
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1369, in _create_direct_connection
+    transp, proto = await self._wrap_create_connection(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1130, in _wrap_create_connection
+    raise client_error(req.connection_key, exc) from exc
+aiohttp.client_exceptions.ClientConnectorError: Cannot connect to host 161.132.39.159:8000 ssl:default [El equipo remoto rechazó la conexión de red]
+2025-02-10 10:04:32,747 - ERROR - [agent_service.py:425] - ❌ Error en la actualización: {'detail': 'Not Found'}
+2025-02-10 10:04:32,748 - INFO - [printer_monitor_service.py:68] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-10 10:04:32,749 - DEBUG - [printer_monitor_service.py:80] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-10 10:04:32,749 - DEBUG - [printer_monitor_service.py:81] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_32499ebe03d94fee8d8e5dd9446f46a6', 'Content-Type': 'application/json'}
+2025-02-10 10:04:32,770 - DEBUG - [printer_monitor_service.py:86] - 📥 Respuesta (404): {"detail":"Not Found"}...
+2025-02-10 10:04:32,771 - ERROR - [printer_monitor_service.py:94] - ❌ Error 404: {"detail":"Not Found"}
+2025-02-10 10:09:35,881 - ERROR - [agent_service.py:428] - 🚨 Error en la actualización del agente: Cannot connect to host 161.132.39.159:8000 ssl:default [El equipo remoto rechazó la conexión de red]
+2025-02-10 10:09:35,887 - INFO - [printer_monitor_service.py:68] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-10 10:09:35,890 - DEBUG - [printer_monitor_service.py:80] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-10 10:09:35,890 - DEBUG - [printer_monitor_service.py:81] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_32499ebe03d94fee8d8e5dd9446f46a6', 'Content-Type': 'application/json'}
+2025-02-10 10:09:37,954 - ERROR - [printer_monitor_service.py:101] - ❌ Error de conexión: Cannot connect to host 161.132.39.159:8000 ssl:default [El equipo remoto rechazó la conexión de red]
+Traceback (most recent call last):
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1115, in _wrap_create_connection
+    sock = await aiohappyeyeballs.start_connection(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohappyeyeballs\impl.py", line 104, in start_connection
+    raise first_exception
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohappyeyeballs\impl.py", line 82, in start_connection
+    sock = await _connect_sock(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohappyeyeballs\impl.py", line 174, in _connect_sock
+    await loop.sock_connect(sock, address)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\asyncio\proactor_events.py", line 704, in sock_connect
+    return await self._proactor.connect(sock, address)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\asyncio\windows_events.py", line 812, in _poll
+    value = callback(transferred, key, ov)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\asyncio\windows_events.py", line 599, in finish_connect
+    ov.getresult()
+ConnectionRefusedError: [WinError 1225] El equipo remoto rechazó la conexión de red
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\pc\Desktop\printer_management\agent\app\services\printer_monitor_service.py", line 84, in get_monitored_printers
+    async with session.get(url, headers=headers) as response:
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\client.py", line 1425, in __aenter__
+    self._resp: _RetType = await self._coro
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\client.py", line 703, in _request
+    conn = await self._connector.connect(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 548, in connect
+    proto = await self._create_connection(req, traces, timeout)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1056, in _create_connection
+    _, proto = await self._create_direct_connection(req, traces, timeout)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1400, in _create_direct_connection
+    raise last_exc
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1369, in _create_direct_connection
+    transp, proto = await self._wrap_create_connection(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1130, in _wrap_create_connection
+    raise client_error(req.connection_key, exc) from exc
+aiohttp.client_exceptions.ClientConnectorError: Cannot connect to host 161.132.39.159:8000 ssl:default [El equipo remoto rechazó la conexión de red]
+2025-02-10 10:14:41,098 - ERROR - [agent_service.py:428] - 🚨 Error en la actualización del agente: Cannot connect to host 161.132.39.159:8000 ssl:default [El equipo remoto rechazó la conexión de red]
+2025-02-10 10:14:41,098 - INFO - [printer_monitor_service.py:68] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-10 10:14:41,101 - DEBUG - [printer_monitor_service.py:80] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-10 10:14:41,101 - DEBUG - [printer_monitor_service.py:81] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_32499ebe03d94fee8d8e5dd9446f46a6', 'Content-Type': 'application/json'}
+2025-02-10 10:14:43,164 - ERROR - [printer_monitor_service.py:101] - ❌ Error de conexión: Cannot connect to host 161.132.39.159:8000 ssl:default [El equipo remoto rechazó la conexión de red]
+Traceback (most recent call last):
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1115, in _wrap_create_connection
+    sock = await aiohappyeyeballs.start_connection(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohappyeyeballs\impl.py", line 104, in start_connection
+    raise first_exception
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohappyeyeballs\impl.py", line 82, in start_connection
+    sock = await _connect_sock(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohappyeyeballs\impl.py", line 174, in _connect_sock
+    await loop.sock_connect(sock, address)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\asyncio\proactor_events.py", line 704, in sock_connect
+    return await self._proactor.connect(sock, address)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\asyncio\windows_events.py", line 812, in _poll
+    value = callback(transferred, key, ov)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\asyncio\windows_events.py", line 599, in finish_connect
+    ov.getresult()
+ConnectionRefusedError: [WinError 1225] El equipo remoto rechazó la conexión de red
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\pc\Desktop\printer_management\agent\app\services\printer_monitor_service.py", line 84, in get_monitored_printers
+    async with session.get(url, headers=headers) as response:
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\client.py", line 1425, in __aenter__
+    self._resp: _RetType = await self._coro
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\client.py", line 703, in _request
+    conn = await self._connector.connect(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 548, in connect
+    proto = await self._create_connection(req, traces, timeout)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1056, in _create_connection
+    _, proto = await self._create_direct_connection(req, traces, timeout)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1400, in _create_direct_connection
+    raise last_exc
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1369, in _create_direct_connection
+    transp, proto = await self._wrap_create_connection(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1130, in _wrap_create_connection
+    raise client_error(req.connection_key, exc) from exc
+aiohttp.client_exceptions.ClientConnectorError: Cannot connect to host 161.132.39.159:8000 ssl:default [El equipo remoto rechazó la conexión de red]
+2025-02-10 10:19:46,287 - ERROR - [agent_service.py:428] - 🚨 Error en la actualización del agente: Cannot connect to host 161.132.39.159:8000 ssl:default [El equipo remoto rechazó la conexión de red]
+2025-02-10 10:19:46,288 - INFO - [printer_monitor_service.py:68] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-10 10:19:46,293 - DEBUG - [printer_monitor_service.py:80] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-10 10:19:46,295 - DEBUG - [printer_monitor_service.py:81] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_32499ebe03d94fee8d8e5dd9446f46a6', 'Content-Type': 'application/json'}
+2025-02-10 10:19:48,373 - ERROR - [printer_monitor_service.py:101] - ❌ Error de conexión: Cannot connect to host 161.132.39.159:8000 ssl:default [El equipo remoto rechazó la conexión de red]
+Traceback (most recent call last):
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1115, in _wrap_create_connection
+    sock = await aiohappyeyeballs.start_connection(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohappyeyeballs\impl.py", line 104, in start_connection
+    raise first_exception
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohappyeyeballs\impl.py", line 82, in start_connection
+    sock = await _connect_sock(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohappyeyeballs\impl.py", line 174, in _connect_sock
+    await loop.sock_connect(sock, address)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\asyncio\proactor_events.py", line 704, in sock_connect
+    return await self._proactor.connect(sock, address)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\asyncio\windows_events.py", line 812, in _poll
+    value = callback(transferred, key, ov)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\asyncio\windows_events.py", line 599, in finish_connect
+    ov.getresult()
+ConnectionRefusedError: [WinError 1225] El equipo remoto rechazó la conexión de red
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\pc\Desktop\printer_management\agent\app\services\printer_monitor_service.py", line 84, in get_monitored_printers
+    async with session.get(url, headers=headers) as response:
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\client.py", line 1425, in __aenter__
+    self._resp: _RetType = await self._coro
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\client.py", line 703, in _request
+    conn = await self._connector.connect(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 548, in connect
+    proto = await self._create_connection(req, traces, timeout)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1056, in _create_connection
+    _, proto = await self._create_direct_connection(req, traces, timeout)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1400, in _create_direct_connection
+    raise last_exc
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1369, in _create_direct_connection
+    transp, proto = await self._wrap_create_connection(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1130, in _wrap_create_connection
+    raise client_error(req.connection_key, exc) from exc
+aiohttp.client_exceptions.ClientConnectorError: Cannot connect to host 161.132.39.159:8000 ssl:default [El equipo remoto rechazó la conexión de red]
+2025-02-10 10:24:51,504 - ERROR - [agent_service.py:428] - 🚨 Error en la actualización del agente: Cannot connect to host 161.132.39.159:8000 ssl:default [El equipo remoto rechazó la conexión de red]
+2025-02-10 10:24:51,515 - INFO - [printer_monitor_service.py:68] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-10 10:24:51,517 - DEBUG - [printer_monitor_service.py:80] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-10 10:24:51,517 - DEBUG - [printer_monitor_service.py:81] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_32499ebe03d94fee8d8e5dd9446f46a6', 'Content-Type': 'application/json'}
+2025-02-10 10:24:53,596 - ERROR - [printer_monitor_service.py:101] - ❌ Error de conexión: Cannot connect to host 161.132.39.159:8000 ssl:default [El equipo remoto rechazó la conexión de red]
+Traceback (most recent call last):
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1115, in _wrap_create_connection
+    sock = await aiohappyeyeballs.start_connection(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohappyeyeballs\impl.py", line 104, in start_connection
+    raise first_exception
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohappyeyeballs\impl.py", line 82, in start_connection
+    sock = await _connect_sock(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohappyeyeballs\impl.py", line 174, in _connect_sock
+    await loop.sock_connect(sock, address)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\asyncio\proactor_events.py", line 704, in sock_connect
+    return await self._proactor.connect(sock, address)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\asyncio\windows_events.py", line 812, in _poll
+    value = callback(transferred, key, ov)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\asyncio\windows_events.py", line 599, in finish_connect
+    ov.getresult()
+ConnectionRefusedError: [WinError 1225] El equipo remoto rechazó la conexión de red
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\pc\Desktop\printer_management\agent\app\services\printer_monitor_service.py", line 84, in get_monitored_printers
+    async with session.get(url, headers=headers) as response:
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\client.py", line 1425, in __aenter__
+    self._resp: _RetType = await self._coro
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\client.py", line 703, in _request
+    conn = await self._connector.connect(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 548, in connect
+    proto = await self._create_connection(req, traces, timeout)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1056, in _create_connection
+    _, proto = await self._create_direct_connection(req, traces, timeout)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1400, in _create_direct_connection
+    raise last_exc
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1369, in _create_direct_connection
+    transp, proto = await self._wrap_create_connection(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1130, in _wrap_create_connection
+    raise client_error(req.connection_key, exc) from exc
+aiohttp.client_exceptions.ClientConnectorError: Cannot connect to host 161.132.39.159:8000 ssl:default [El equipo remoto rechazó la conexión de red]
+2025-02-10 10:29:54,699 - ERROR - [agent_service.py:428] - 🚨 Error en la actualización del agente: 200, message='Attempt to decode JSON with unexpected mimetype: text/html; charset=utf-8', url='ws://161.132.39.159:8000/auth/login'
+2025-02-10 10:29:54,700 - INFO - [printer_monitor_service.py:68] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-10 10:29:54,702 - DEBUG - [printer_monitor_service.py:80] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-10 10:29:54,702 - DEBUG - [printer_monitor_service.py:81] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_32499ebe03d94fee8d8e5dd9446f46a6', 'Content-Type': 'application/json'}
+2025-02-10 10:29:54,735 - DEBUG - [printer_monitor_service.py:86] - 📥 Respuesta (200): <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Printer Management</title>
+   ...
+2025-02-10 10:29:54,739 - ERROR - [printer_monitor_service.py:98] - ❌ Error decodificando JSON: Expecting value: line 1 column 1 (char 0)
+Traceback (most recent call last):
+  File "C:\Users\pc\Desktop\printer_management\agent\app\services\printer_monitor_service.py", line 89, in get_monitored_printers
+    printers = json.loads(response_text)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-02-10 10:34:55,886 - ERROR - [agent_service.py:428] - 🚨 Error en la actualización del agente: 200, message='Attempt to decode JSON with unexpected mimetype: text/html; charset=utf-8', url='ws://161.132.39.159:8000/auth/login'
+2025-02-10 10:34:55,896 - INFO - [printer_monitor_service.py:68] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-10 10:34:55,896 - DEBUG - [printer_monitor_service.py:80] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-10 10:34:55,898 - DEBUG - [printer_monitor_service.py:81] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_32499ebe03d94fee8d8e5dd9446f46a6', 'Content-Type': 'application/json'}
+2025-02-10 10:34:55,923 - DEBUG - [printer_monitor_service.py:86] - 📥 Respuesta (200): <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Printer Management</title>
+   ...
+2025-02-10 10:34:55,923 - ERROR - [printer_monitor_service.py:98] - ❌ Error decodificando JSON: Expecting value: line 1 column 1 (char 0)
+Traceback (most recent call last):
+  File "C:\Users\pc\Desktop\printer_management\agent\app\services\printer_monitor_service.py", line 89, in get_monitored_printers
+    printers = json.loads(response_text)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-02-10 10:39:57,032 - ERROR - [agent_service.py:428] - 🚨 Error en la actualización del agente: 200, message='Attempt to decode JSON with unexpected mimetype: text/html; charset=utf-8', url='ws://161.132.39.159:8000/auth/login'
+2025-02-10 10:39:57,033 - INFO - [printer_monitor_service.py:68] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-10 10:39:57,035 - DEBUG - [printer_monitor_service.py:80] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-10 10:39:57,035 - DEBUG - [printer_monitor_service.py:81] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_32499ebe03d94fee8d8e5dd9446f46a6', 'Content-Type': 'application/json'}
+2025-02-10 10:39:57,062 - DEBUG - [printer_monitor_service.py:86] - 📥 Respuesta (200): <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Printer Management</title>
+   ...
+2025-02-10 10:39:57,062 - ERROR - [printer_monitor_service.py:98] - ❌ Error decodificando JSON: Expecting value: line 1 column 1 (char 0)
+Traceback (most recent call last):
+  File "C:\Users\pc\Desktop\printer_management\agent\app\services\printer_monitor_service.py", line 89, in get_monitored_printers
+    printers = json.loads(response_text)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
