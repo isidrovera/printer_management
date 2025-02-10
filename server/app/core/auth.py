@@ -100,84 +100,21 @@ def create_refresh_token(data: Dict[str, Any]) -> str:
        expires_delta=timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
    )
 
-async def get_current_user(
-   request: Request,
-   db: Session = Depends(get_db)
-) -> Optional[Dict[str, Any]]:
-   """
-   Obtiene el usuario actual basado en el token JWT
-   
-   Args:
-       request: Request de FastAPI
-       db: Sesión de base de datos
-       
-   Returns:
-       Dict: Datos del usuario autenticado
-       
-   Raises:
-       HTTPException: Si las credenciales son inválidas
-   """
-   credentials_exception = HTTPException(
-       status_code=status.HTTP_401_UNAUTHORIZED,
-       detail="Credenciales inválidas",
-       headers={"WWW-Authenticate": "Bearer"},
-   )
-   
-   try:
-       # Intentar obtener token
-       token = request.cookies.get("access_token")
-       if token and token.startswith("Bearer "):
-           token = token.split("Bearer ")[1]
-           
-       if not token:
-           logger.debug("Token no encontrado en cookies, buscando en header")
-           token = await oauth2_scheme(request)
-           
-       if not token:
-           logger.warning("No se encontró token de acceso")
-           raise credentials_exception
-           
-       # Decodificar token
-       try:
-           payload = jwt.decode(
-               token,
-               settings.SECRET_KEY,
-               algorithms=[settings.JWT_ALGORITHM]
-           )
-       except jwt.ExpiredSignatureError:
-           logger.warning("Token JWT expirado")
-           raise HTTPException(
-               status_code=status.HTTP_401_UNAUTHORIZED,
-               detail="Token expirado"
-           )
-       except jwt.InvalidTokenError as e:
-           logger.error(f"Token JWT inválido: {str(e)}")
-           raise credentials_exception
-           
-       username: str = payload.get("sub")
-       if not username:
-           logger.error("Token JWT no contiene username")
-           raise credentials_exception
-           
-       # Obtener usuario
-       user_service = UserService(db)
-       user = await user_service.get_user_by_username(username)
-       
-       if not user:
-           logger.error(f"Usuario no encontrado: {username}")
-           raise credentials_exception
-           
-       # Verificar token en lista negra
-       if await user_service.is_token_blacklisted(token):
-           logger.warning(f"Token en lista negra para usuario: {username}")
-           raise credentials_exception
-           
-       logger.debug(f"Usuario autenticado correctamente: {username}")
-       return user
-       
-   except Exception as e:
-       logger.error(f"Error en autenticación: {str(e)}")
-       raise credentials_exception
+def get_current_user(request: Request) -> Optional[User]:
+    token = request.cookies.get("auth_token")
+    if not token and "Authorization" in request.headers:
+        auth = request.headers["Authorization"]
+        if auth.startswith("Bearer "):
+            token = auth.split(" ")[1]
+    
+    if not token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+        
+    try:
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
+        return verify_token(payload)
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid token")
 
 async def get_current_active_user(
    current_user: Dict[str, Any] = Depends(get_current_user)
