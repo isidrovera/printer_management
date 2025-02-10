@@ -1,8 +1,9 @@
 # server/app/db/models/agent.py
 from app.db.base import BaseModel
-from sqlalchemy import Column, String, Boolean, ForeignKey, JSON, Integer, Float
+from sqlalchemy import Column, String, Boolean, ForeignKey, JSON, Integer, Float, DateTime
 from sqlalchemy.orm import relationship
 import uuid
+from datetime import datetime
 
 class Agent(BaseModel):
     __tablename__ = 'agents'
@@ -23,6 +24,7 @@ class Agent(BaseModel):
     disk_usage = Column(JSON)  # Espacio en disco usado/libre
     status = Column(String, default='offline')
     is_active = Column(Boolean, default=True)
+    last_heartbeat = Column(DateTime, default=datetime.utcnow)  # Nuevo campo para heartbeat
     
     client = relationship("Client", back_populates="agents")
     printer_jobs = relationship("PrinterJob", back_populates="agent")
