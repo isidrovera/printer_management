@@ -18,6 +18,5 @@ pyjwt
 bcrypt
 python-jose[cryptography]
 websockets
-websockets wsproto
-'uvicorn[standard]'
+uvicorn[standard]
 wsproto
