@@ -5,7 +5,8 @@ from fastapi.responses import RedirectResponse, JSONResponse
 from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.services.user_service import UserService
-from app.schemas.auth import (TwoFactorSetup, TwoFactorVerify, OAuth2Login, TokenResponse, RefreshTokenRequest, UserCreate, UserUpdate, UserInDB)
+from app.schemas.auth import (TwoFactorSetup, TwoFactorVerify, OAuth2Login, TokenResponse, RefreshTokenRequest)
+from app.schemas.user import UserCreate, UserUpdate, UserInDB
 import pyotp
 import json
 from app.core.auth import create_access_token, get_current_user, get_current_active_user

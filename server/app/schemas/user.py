@@ -1,6 +1,7 @@
 # app/schemas/user.py
 from pydantic import BaseModel, EmailStr, validator
 from typing import Optional, List
+import re
 from datetime import datetime
 
 class UserBase(BaseModel):
