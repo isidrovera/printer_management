@@ -12,6 +12,9 @@ class Settings(BaseSettings):
     DATABASE_URL: str
     SECRET_KEY: str
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
+    # 🔹 Agregar estas líneas faltantes
+    JWT_ALGORITHM: str = "HS256"
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 7  # Opcional, pero se usa en create_refresh_token()
     
     # Configuración de almacenamiento de drivers
     DRIVERS_STORAGE_PATH: str = str(BASE_DIR / "storage" / "drivers")
