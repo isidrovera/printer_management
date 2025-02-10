@@ -1,7 +1,7 @@
 # server/app/db/models/user.py
 from app.db.base import BaseModel
 from sqlalchemy import Column, String, Boolean, DateTime, Text, Enum, Integer, TIMESTAMP, ForeignKey, Table
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, foreign, remote
 from datetime import datetime
 import enum
 import uuid
@@ -90,15 +90,11 @@ class User(BaseModel):
     created_by = relationship("User", 
         backref="created_users", 
         foreign_keys=[created_by_id], 
-        remote_side=[BaseModel.id])  # Usar BaseModel.id en lugar de id
+        primaryjoin="User.created_by_id == User.id")
     updated_by = relationship("User", 
         backref="updated_users", 
         foreign_keys=[updated_by_id], 
-        remote_side=[BaseModel.id])
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        if not self.auth_token:
-            self.auth_token = self.generate_auth_token()
+        primaryjoin="User.updated_by_id == User.id")
             
     @staticmethod
     def generate_auth_token():
