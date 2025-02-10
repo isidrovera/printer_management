@@ -86,17 +86,15 @@ class User(BaseModel):
     updated_by_id = Column(Integer, ForeignKey('users.id'))
     
     # Relaciones
-    
     permissions = relationship("Permission", secondary=user_permissions, back_populates="users")
     created_by = relationship("User", 
         backref="created_users", 
         foreign_keys=[created_by_id], 
-        remote_side=[id])
+        remote_side=[BaseModel.id])  # Usar BaseModel.id en lugar de id
     updated_by = relationship("User", 
         backref="updated_users", 
         foreign_keys=[updated_by_id], 
-        remote_side=[id])
-    
+        remote_side=[BaseModel.id])
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         if not self.auth_token:
