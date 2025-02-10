@@ -62180,3 +62180,556 @@ json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
 2025-02-10 17:43:28,339 - DEBUG - [protocol.py:745] - > PING '5\x1eN\x06' [text, 4 bytes]
 2025-02-10 17:43:28,347 - DEBUG - [protocol.py:599] - < PONG '5\x1eN\x06' [text, 4 bytes]
 2025-02-10 17:43:28,351 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 17:43:43,023 - DEBUG - [protocol.py:599] - < CLOSE 1012 (service restart) [2 bytes]
+2025-02-10 17:43:43,024 - DEBUG - [protocol.py:745] - > CLOSE 1012 (service restart) [2 bytes]
+2025-02-10 17:43:43,028 - DEBUG - [protocol.py:175] - = connection is CLOSING
+2025-02-10 17:43:43,029 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 17:43:43,030 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 17:43:43,030 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 17:43:43,031 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 17:43:43,031 - INFO - [agent_service.py:166] - Conexión cerrada por el servidor
+2025-02-10 17:44:00,446 - DEBUG - [proactor_events.py:625] - Using proactor: IocpProactor
+2025-02-10 17:44:00,448 - INFO - [printer_monitor_service.py:50] - PrinterMonitorService inicializado con URL: ws://161.132.39.159:8000
+2025-02-10 17:44:00,448 - DEBUG - [printer_monitor_service.py:51] - Verificando configuración inicial:
+2025-02-10 17:44:00,449 - DEBUG - [printer_monitor_service.py:52] -   SERVER_URL: ws://161.132.39.159:8000
+2025-02-10 17:44:00,449 - DEBUG - [printer_monitor_service.py:53] -   CLIENT_TOKEN presente: Sí
+2025-02-10 17:44:00,449 - DEBUG - [printer_monitor_service.py:54] -   AGENT_TOKEN presente: Sí
+2025-02-10 17:44:00,449 - DEBUG - [printer_monitor_service.py:55] -   SNMP Community: public
+2025-02-10 17:44:00,449 - DEBUG - [printer_monitor_service.py:56] -   SNMP Port: 161
+2025-02-10 17:44:00,450 - DEBUG - [printer_monitor_service.py:57] -   SNMP Timeout: 3s
+2025-02-10 17:44:00,450 - DEBUG - [printer_monitor_service.py:58] -   SNMP Retries: 2
+2025-02-10 17:44:00,450 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_5a1bde8db10d47fdb72a4cb082c3a8b2
+2025-02-10 17:44:00,496 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 17:44:00,500 - DEBUG - [client.py:307] - > GET /api/v1/ws/agent/agt_5a1bde8db10d47fdb72a4cb082c3a8b2 HTTP/1.1
+2025-02-10 17:44:00,501 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 17:44:00,502 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 17:44:00,503 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 17:44:00,503 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: J/U1u1hTMeGQgjzvZ8fw3A==
+2025-02-10 17:44:00,504 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 17:44:00,504 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 17:44:00,504 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 17:44:00,567 - DEBUG - [client.py:333] - < HTTP/1.1 101 Switching Protocols
+2025-02-10 17:44:00,569 - DEBUG - [client.py:335] - < Upgrade: websocket
+2025-02-10 17:44:00,571 - DEBUG - [client.py:335] - < Connection: Upgrade
+2025-02-10 17:44:00,572 - DEBUG - [client.py:335] - < Sec-WebSocket-Accept: gQq0WtsHqI7SYEXJLy6b9bymFDQ=
+2025-02-10 17:44:00,572 - DEBUG - [client.py:335] - < Sec-WebSocket-Extensions: permessage-deflate
+2025-02-10 17:44:00,572 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 22:43:58 GMT
+2025-02-10 17:44:00,573 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 17:44:00,574 - DEBUG - [protocol.py:175] - = connection is OPEN
+2025-02-10 17:44:00,574 - INFO - [agent_service.py:131] - ✅ Conectado al servidor WebSocket correctamente.
+2025-02-10 17:44:01,687 - ERROR - [agent_service.py:428] - 🚨 Error en la actualización del agente: 200, message='Attempt to decode JSON with unexpected mimetype: text/html; charset=utf-8', url='ws://161.132.39.159:8000/auth/login'
+2025-02-10 17:44:01,688 - INFO - [printer_monitor_service.py:68] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-10 17:44:01,690 - DEBUG - [printer_monitor_service.py:80] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-10 17:44:01,690 - DEBUG - [printer_monitor_service.py:81] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_5a1bde8db10d47fdb72a4cb082c3a8b2', 'Content-Type': 'application/json'}
+2025-02-10 17:44:01,731 - DEBUG - [printer_monitor_service.py:86] - 📥 Respuesta (200): [{"ip_address":"192.168.18.79","brand":"Ricoh","model":"MPC 307","name":"RRhh","status":"offline","client_id":4}]...
+2025-02-10 17:44:01,732 - INFO - [printer_monitor_service.py:90] - ✅ Se obtuvieron 1 impresoras
+2025-02-10 17:44:01,734 - DEBUG - [printer_monitor_service.py:91] - 📋 Lista de impresoras: [
+  {
+    "ip_address": "192.168.18.79",
+    "brand": "Ricoh",
+    "model": "MPC 307",
+    "name": "RRhh",
+    "status": "offline",
+    "client_id": 4
+  }
+]
+2025-02-10 17:44:01,735 - INFO - [printer_monitor_service.py:119] - 🔄 Iniciando recolección de datos - IP: 192.168.18.79, Marca: Ricoh
+2025-02-10 17:44:01,737 - INFO - [printer_monitor_service.py:572] - 🔌 Verificando conexión con impresora 192.168.18.79
+2025-02-10 17:44:01,737 - DEBUG - [printer_monitor_service.py:355] - 🔍 Intentando conexión SNMP con 192.168.18.79 - OID: 1.3.6.1.2.1.1.1.0
+2025-02-10 17:44:01,737 - DEBUG - [printer_monitor_service.py:360] - Probando configuración SNMP: CommunityData
+2025-02-10 17:44:02,008 - INFO - [printer_monitor_service.py:385] - ✅ Conexión exitosa con CommunityData
+2025-02-10 17:44:02,008 - DEBUG - [printer_monitor_service.py:386] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.2.1.1.1.0: RICOH MP C307 1.25 / RICOH Network Printer C model / RICOH Network Scanner C model / RICOH Network Facsimile C model
+2025-02-10 17:44:02,009 - INFO - [printer_monitor_service.py:581] - ✅ Impresora 192.168.18.79 responde correctamente
+2025-02-10 17:44:02,009 - INFO - [printer_monitor_service.py:183] - 🔍 Obteniendo OIDs para marca Ricoh
+2025-02-10 17:44:02,010 - DEBUG - [printer_monitor_service.py:190] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/printer-oids/brands/Ricoh
+2025-02-10 17:44:02,053 - DEBUG - [printer_monitor_service.py:195] - 📥 Respuesta OIDs (200): [{"brand":"Ricoh","model_family":"Color","description":"","oid_total_pages":"1.3.6.1.2.1.43.10.2.1.4.1.1","oid_total_color_pages":"1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11","oid_total_bw_pages":null,"oid_black_toner_level":"1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11","oid_cyan_toner_level":"1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11","oid_magenta_toner_level":"1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11","oid_yellow_toner_level":"1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11","id":5}]
+2025-02-10 17:44:02,054 - INFO - [printer_monitor_service.py:200] - ✅ OIDs obtenidos y cacheados para Ricoh
+2025-02-10 17:44:02,055 - DEBUG - [printer_monitor_service.py:201] - 📋 OIDs: [
+  {
+    "brand": "Ricoh",
+    "model_family": "Color",
+    "description": "",
+    "oid_total_pages": "1.3.6.1.2.1.43.10.2.1.4.1.1",
+    "oid_total_color_pages": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_total_bw_pages": null,
+    "oid_black_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_cyan_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_magenta_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_yellow_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "id": 5
+  }
+]
+2025-02-10 17:44:02,057 - DEBUG - [printer_monitor_service.py:222] - 📊 Obteniendo contadores para 192.168.18.79
+2025-02-10 17:44:02,058 - DEBUG - [printer_monitor_service.py:223] - 🔧 OIDs configurados: [
+  {
+    "brand": "Ricoh",
+    "model_family": "Color",
+    "description": "",
+    "oid_total_pages": "1.3.6.1.2.1.43.10.2.1.4.1.1",
+    "oid_total_color_pages": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_total_bw_pages": null,
+    "oid_black_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_cyan_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_magenta_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_yellow_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "id": 5
+  }
+]
+2025-02-10 17:44:02,069 - DEBUG - [printer_monitor_service.py:355] - 🔍 Intentando conexión SNMP con 192.168.18.79 - OID: 1.3.6.1.2.1.43.10.2.1.4.1.1
+2025-02-10 17:44:02,069 - DEBUG - [printer_monitor_service.py:360] - Probando configuración SNMP: CommunityData
+2025-02-10 17:44:02,255 - INFO - [printer_monitor_service.py:385] - ✅ Conexión exitosa con CommunityData
+2025-02-10 17:44:02,256 - DEBUG - [printer_monitor_service.py:386] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.2.1.43.10.2.1.4.1.1: 139172
+2025-02-10 17:44:02,257 - DEBUG - [printer_monitor_service.py:355] - 🔍 Intentando conexión SNMP con 192.168.18.79 - OID: 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11
+2025-02-10 17:44:02,257 - DEBUG - [printer_monitor_service.py:360] - Probando configuración SNMP: CommunityData
+2025-02-10 17:44:02,459 - INFO - [printer_monitor_service.py:385] - ✅ Conexión exitosa con CommunityData
+2025-02-10 17:44:02,460 - DEBUG - [printer_monitor_service.py:386] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11: 111368
+2025-02-10 17:44:02,461 - WARNING - [printer_monitor_service.py:315] - ⚠️ OID nulo para 192.168.18.79
+2025-02-10 17:44:02,461 - DEBUG - [printer_monitor_service.py:238] - 📊 Contadores obtenidos para 192.168.18.79: {'total_pages': 139172, 'color_pages': 111368, 'bw_pages': None}
+2025-02-10 17:44:02,461 - DEBUG - [printer_monitor_service.py:256] - 🔋 Obteniendo suministros para 192.168.18.79
+2025-02-10 17:44:02,463 - DEBUG - [printer_monitor_service.py:257] - 🔧 OIDs configurados: [
+  {
+    "brand": "Ricoh",
+    "model_family": "Color",
+    "description": "",
+    "oid_total_pages": "1.3.6.1.2.1.43.10.2.1.4.1.1",
+    "oid_total_color_pages": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_total_bw_pages": null,
+    "oid_black_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_cyan_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_magenta_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_yellow_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "id": 5
+  }
+]
+2025-02-10 17:44:02,464 - DEBUG - [printer_monitor_service.py:355] - 🔍 Intentando conexión SNMP con 192.168.18.79 - OID: 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11
+2025-02-10 17:44:02,464 - DEBUG - [printer_monitor_service.py:360] - Probando configuración SNMP: CommunityData
+2025-02-10 17:44:02,640 - INFO - [printer_monitor_service.py:385] - ✅ Conexión exitosa con CommunityData
+2025-02-10 17:44:02,640 - DEBUG - [printer_monitor_service.py:386] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11: 111368
+2025-02-10 17:44:02,642 - WARNING - [printer_monitor_service.py:315] - ⚠️ OID nulo para 192.168.18.79
+2025-02-10 17:44:02,642 - DEBUG - [printer_monitor_service.py:355] - 🔍 Intentando conexión SNMP con 192.168.18.79 - OID: 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11
+2025-02-10 17:44:02,642 - DEBUG - [printer_monitor_service.py:360] - Probando configuración SNMP: CommunityData
+2025-02-10 17:44:02,824 - INFO - [printer_monitor_service.py:385] - ✅ Conexión exitosa con CommunityData
+2025-02-10 17:44:02,825 - DEBUG - [printer_monitor_service.py:386] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11: 111368
+2025-02-10 17:44:02,826 - WARNING - [printer_monitor_service.py:315] - ⚠️ OID nulo para 192.168.18.79
+2025-02-10 17:44:02,826 - DEBUG - [printer_monitor_service.py:355] - 🔍 Intentando conexión SNMP con 192.168.18.79 - OID: 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11
+2025-02-10 17:44:02,826 - DEBUG - [printer_monitor_service.py:360] - Probando configuración SNMP: CommunityData
+2025-02-10 17:44:03,070 - INFO - [printer_monitor_service.py:385] - ✅ Conexión exitosa con CommunityData
+2025-02-10 17:44:03,070 - DEBUG - [printer_monitor_service.py:386] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11: 111368
+2025-02-10 17:44:03,071 - WARNING - [printer_monitor_service.py:315] - ⚠️ OID nulo para 192.168.18.79
+2025-02-10 17:44:03,072 - DEBUG - [printer_monitor_service.py:355] - 🔍 Intentando conexión SNMP con 192.168.18.79 - OID: 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11
+2025-02-10 17:44:03,072 - DEBUG - [printer_monitor_service.py:360] - Probando configuración SNMP: CommunityData
+2025-02-10 17:44:03,302 - INFO - [printer_monitor_service.py:385] - ✅ Conexión exitosa con CommunityData
+2025-02-10 17:44:03,303 - DEBUG - [printer_monitor_service.py:386] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11: 111368
+2025-02-10 17:44:03,304 - WARNING - [printer_monitor_service.py:315] - ⚠️ OID nulo para 192.168.18.79
+2025-02-10 17:44:03,304 - DEBUG - [printer_monitor_service.py:295] - 🔋 Suministros obtenidos para 192.168.18.79: {'toners': {'black': {'level': 111368, 'max': 100, 'percentage': 100}, 'cyan': {'level': 111368, 'max': 100, 'percentage': 100}, 'magenta': {'level': 111368, 'max': 100, 'percentage': 100}, 'yellow': {'level': 111368, 'max': 100, 'percentage': 100}}}
+2025-02-10 17:44:03,304 - INFO - [printer_monitor_service.py:602] - 🔍 Obteniendo estado de impresora 192.168.18.79
+2025-02-10 17:44:03,304 - DEBUG - [printer_monitor_service.py:355] - 🔍 Intentando conexión SNMP con 192.168.18.79 - OID: 1.3.6.1.2.1.25.3.5.1.1.1
+2025-02-10 17:44:03,304 - DEBUG - [printer_monitor_service.py:360] - Probando configuración SNMP: CommunityData
+2025-02-10 17:44:03,517 - INFO - [printer_monitor_service.py:385] - ✅ Conexión exitosa con CommunityData
+2025-02-10 17:44:03,518 - DEBUG - [printer_monitor_service.py:386] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.2.1.25.3.5.1.1.1: 3
+2025-02-10 17:44:03,519 - INFO - [printer_monitor_service.py:633] - 📊 Estado obtenido para 192.168.18.79: {'status': 'idle', 'details': 'Status code: 3', 'raw_status': 3}
+2025-02-10 17:44:03,519 - INFO - [printer_monitor_service.py:153] - ✅ Datos recolectados exitosamente para 192.168.18.79
+2025-02-10 17:44:03,520 - DEBUG - [printer_monitor_service.py:154] - 📊 Datos recolectados: {
+  "ip_address": null,
+  "brand": null,
+  "last_check": null,
+  "status": null,
+  "counters": {
+    "total_pages": 139172,
+    "color_pages": 111368,
+    "bw_pages": null
+  },
+  "supplies": {
+    "toners": {
+      "black": {
+        "level": 111368,
+        "max": 100,
+        "percentage": 100
+      },
+      "cyan": {
+        "level": 111368,
+        "max": 100,
+        "percentage": 100
+      },
+      "magenta": {
+        "level": 111368,
+        "max": 100,
+        "percentage": 100
+      },
+      "yellow": {
+        "level": 111368,
+        "max": 100,
+        "percentage": 100
+      }
+    }
+  },
+  "error": null
+}
+2025-02-10 17:44:03,520 - INFO - [printer_monitor_service.py:481] - Preparando actualización de datos para 192.168.18.79
+2025-02-10 17:44:03,520 - INFO - [printer_monitor_service.py:68] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-10 17:44:03,520 - DEBUG - [printer_monitor_service.py:80] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-10 17:44:03,520 - DEBUG - [printer_monitor_service.py:81] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_5a1bde8db10d47fdb72a4cb082c3a8b2', 'Content-Type': 'application/json'}
+2025-02-10 17:44:03,568 - DEBUG - [printer_monitor_service.py:86] - 📥 Respuesta (200): [{"ip_address":"192.168.18.79","brand":"Ricoh","model":"MPC 307","name":"RRhh","status":"offline","client_id":4}]...
+2025-02-10 17:44:03,568 - INFO - [printer_monitor_service.py:90] - ✅ Se obtuvieron 1 impresoras
+2025-02-10 17:44:03,570 - DEBUG - [printer_monitor_service.py:91] - 📋 Lista de impresoras: [
+  {
+    "ip_address": "192.168.18.79",
+    "brand": "Ricoh",
+    "model": "MPC 307",
+    "name": "RRhh",
+    "status": "offline",
+    "client_id": 4
+  }
+]
+2025-02-10 17:44:03,571 - DEBUG - [printer_monitor_service.py:533] - Enviando datos a http://161.132.39.159:8000/api/v1/monitor/printers/update
+2025-02-10 17:44:03,571 - DEBUG - [printer_monitor_service.py:534] - Headers: {'Authorization': 'Bearer agt_5a1bde8db10d47fdb72a4cb082c3a8b2', 'Content-Type': 'application/json'}
+2025-02-10 17:44:03,571 - DEBUG - [printer_monitor_service.py:535] - Parámetros: {'agent_id': '1'}
+2025-02-10 17:44:03,572 - DEBUG - [printer_monitor_service.py:536] - Datos: {
+  "ip_address": "192.168.18.79",
+  "name": "RRhh",
+  "brand": "Ricoh",
+  "model": "MPC 307",
+  "client_id": 4,
+  "status": null,
+  "last_check": "2025-02-10T22:44:03.571704",
+  "printer_data": {
+    "counters": {
+      "total_pages": 139172,
+      "color_pages": 111368,
+      "bw_pages": null
+    },
+    "supplies": {
+      "toners": {
+        "black": {
+          "level": 111368,
+          "max": 100,
+          "percentage": 100
+        },
+        "cyan": {
+          "level": 111368,
+          "max": 100,
+          "percentage": 100
+        },
+        "magenta": {
+          "level": 111368,
+          "max": 100,
+          "percentage": 100
+        },
+        "yellow": {
+          "level": 111368,
+          "max": 100,
+          "percentage": 100
+        }
+      }
+    },
+    "status": null
+  }
+}
+2025-02-10 17:44:03,731 - INFO - [printer_monitor_service.py:547] - Datos actualizados exitosamente para 192.168.18.79
+2025-02-10 17:44:03,732 - DEBUG - [agent_service.py:377] - Datos actualizados para 192.168.18.79
+2025-02-10 17:44:20,568 - DEBUG - [protocol.py:599] - < PING 0f 5e e9 bd [binary, 4 bytes]
+2025-02-10 17:44:20,569 - DEBUG - [protocol.py:745] - > PONG 0f 5e e9 bd [binary, 4 bytes]
+2025-02-10 17:44:20,576 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 17:44:20,577 - DEBUG - [protocol.py:745] - > PING f6 16 9a ae [binary, 4 bytes]
+2025-02-10 17:44:20,583 - DEBUG - [protocol.py:599] - < PONG f6 16 9a ae [binary, 4 bytes]
+2025-02-10 17:44:20,584 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 17:44:40,581 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 17:44:40,582 - DEBUG - [protocol.py:745] - > PING cb e7 4c 50 [binary, 4 bytes]
+2025-02-10 17:44:40,586 - DEBUG - [protocol.py:599] - < PING 7b a6 16 7c [binary, 4 bytes]
+2025-02-10 17:44:40,587 - DEBUG - [protocol.py:745] - > PONG 7b a6 16 7c [binary, 4 bytes]
+2025-02-10 17:44:40,593 - DEBUG - [protocol.py:599] - < PONG cb e7 4c 50 [binary, 4 bytes]
+2025-02-10 17:44:40,594 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 17:45:00,594 - DEBUG - [protocol.py:599] - < PING 6a d0 03 20 [binary, 4 bytes]
+2025-02-10 17:45:00,594 - DEBUG - [protocol.py:745] - > PONG 6a d0 03 20 [binary, 4 bytes]
+2025-02-10 17:45:00,595 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 17:45:00,596 - DEBUG - [protocol.py:745] - > PING 77 ab b8 cc [binary, 4 bytes]
+2025-02-10 17:45:00,602 - DEBUG - [protocol.py:599] - < PONG 77 ab b8 cc [binary, 4 bytes]
+2025-02-10 17:45:00,603 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 17:45:20,599 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 17:45:20,601 - DEBUG - [protocol.py:745] - > PING e0 5d 3f 2c [binary, 4 bytes]
+2025-02-10 17:45:20,607 - DEBUG - [protocol.py:599] - < PING 0b a3 f5 73 [binary, 4 bytes]
+2025-02-10 17:45:20,608 - DEBUG - [protocol.py:745] - > PONG 0b a3 f5 73 [binary, 4 bytes]
+2025-02-10 17:45:20,611 - DEBUG - [protocol.py:599] - < PONG e0 5d 3f 2c [binary, 4 bytes]
+2025-02-10 17:45:20,613 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 17:45:40,608 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 17:45:40,609 - DEBUG - [protocol.py:745] - > PING f7 e2 b8 de [binary, 4 bytes]
+2025-02-10 17:45:40,614 - DEBUG - [protocol.py:599] - < PING 9f e0 2e 9b [binary, 4 bytes]
+2025-02-10 17:45:40,616 - DEBUG - [protocol.py:745] - > PONG 9f e0 2e 9b [binary, 4 bytes]
+2025-02-10 17:45:40,619 - DEBUG - [protocol.py:599] - < PONG f7 e2 b8 de [binary, 4 bytes]
+2025-02-10 17:45:40,621 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 17:46:00,615 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 17:46:00,616 - DEBUG - [protocol.py:745] - > PING e9 ee 93 ef [binary, 4 bytes]
+2025-02-10 17:46:00,625 - DEBUG - [protocol.py:599] - < PING 5d 91 a4 8c [binary, 4 bytes]
+2025-02-10 17:46:00,626 - DEBUG - [protocol.py:745] - > PONG 5d 91 a4 8c [binary, 4 bytes]
+2025-02-10 17:46:00,627 - DEBUG - [protocol.py:599] - < PONG e9 ee 93 ef [binary, 4 bytes]
+2025-02-10 17:46:00,628 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 17:46:20,614 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 17:46:20,616 - DEBUG - [protocol.py:745] - > PING 10 8a a6 44 [binary, 4 bytes]
+2025-02-10 17:46:20,627 - DEBUG - [protocol.py:599] - < PONG 10 8a a6 44 [binary, 4 bytes]
+2025-02-10 17:46:20,629 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 17:46:20,636 - DEBUG - [protocol.py:599] - < PING 18 d7 90 f3 [binary, 4 bytes]
+2025-02-10 17:46:20,637 - DEBUG - [protocol.py:745] - > PONG 18 d7 90 f3 [binary, 4 bytes]
+2025-02-10 17:46:40,645 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 17:46:40,648 - DEBUG - [protocol.py:745] - > PING 0c 52 97 14 [binary, 4 bytes]
+2025-02-10 17:46:40,653 - DEBUG - [protocol.py:599] - < PING 6f a8 9a 33 [binary, 4 bytes]
+2025-02-10 17:46:40,654 - DEBUG - [protocol.py:745] - > PONG 6f a8 9a 33 [binary, 4 bytes]
+2025-02-10 17:46:40,658 - DEBUG - [protocol.py:599] - < PONG 0c 52 97 14 [binary, 4 bytes]
+2025-02-10 17:46:40,660 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 17:47:00,664 - DEBUG - [protocol.py:599] - < PING 37 22 02 8c [binary, 4 bytes]
+2025-02-10 17:47:00,666 - DEBUG - [protocol.py:745] - > PONG 37 22 02 8c [binary, 4 bytes]
+2025-02-10 17:47:00,671 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 17:47:00,672 - DEBUG - [protocol.py:745] - > PING db 32 c0 c9 [binary, 4 bytes]
+2025-02-10 17:47:00,677 - DEBUG - [protocol.py:599] - < PONG db 32 c0 c9 [binary, 4 bytes]
+2025-02-10 17:47:00,684 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 17:47:20,679 - DEBUG - [protocol.py:599] - < PING fc 5f 28 b0 [binary, 4 bytes]
+2025-02-10 17:47:20,680 - DEBUG - [protocol.py:745] - > PONG fc 5f 28 b0 [binary, 4 bytes]
+2025-02-10 17:47:20,684 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 17:47:20,685 - DEBUG - [protocol.py:745] - > PING 31 c5 15 31 [binary, 4 bytes]
+2025-02-10 17:47:20,690 - DEBUG - [protocol.py:599] - < PONG 31 c5 15 31 [binary, 4 bytes]
+2025-02-10 17:47:20,691 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 17:47:40,683 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 17:47:40,687 - DEBUG - [protocol.py:745] - > PING 69 d6 c2 0a [binary, 4 bytes]
+2025-02-10 17:47:40,693 - DEBUG - [protocol.py:599] - < PING '\x00t*\x00' [text, 4 bytes]
+2025-02-10 17:47:40,694 - DEBUG - [protocol.py:745] - > PONG '\x00t*\x00' [text, 4 bytes]
+2025-02-10 17:47:40,694 - DEBUG - [protocol.py:599] - < PONG 69 d6 c2 0a [binary, 4 bytes]
+2025-02-10 17:47:40,694 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 17:48:00,688 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 17:48:00,689 - DEBUG - [protocol.py:745] - > PING 54 06 c7 5d [binary, 4 bytes]
+2025-02-10 17:48:00,702 - DEBUG - [protocol.py:599] - < PING 98 39 d1 0d [binary, 4 bytes]
+2025-02-10 17:48:00,709 - DEBUG - [protocol.py:745] - > PONG 98 39 d1 0d [binary, 4 bytes]
+2025-02-10 17:48:00,710 - DEBUG - [protocol.py:599] - < PONG 54 06 c7 5d [binary, 4 bytes]
+2025-02-10 17:48:00,711 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 17:48:20,694 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 17:48:20,694 - DEBUG - [protocol.py:745] - > PING 40 1d a9 21 [binary, 4 bytes]
+2025-02-10 17:48:20,700 - DEBUG - [protocol.py:599] - < PONG 40 1d a9 21 [binary, 4 bytes]
+2025-02-10 17:48:20,700 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 17:48:20,713 - DEBUG - [protocol.py:599] - < PING 93 0c d7 e8 [binary, 4 bytes]
+2025-02-10 17:48:20,713 - DEBUG - [protocol.py:745] - > PONG 93 0c d7 e8 [binary, 4 bytes]
+2025-02-10 17:48:40,709 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 17:48:40,714 - DEBUG - [protocol.py:745] - > PING 97 90 bb 3d [binary, 4 bytes]
+2025-02-10 17:48:40,723 - DEBUG - [protocol.py:599] - < PING 3a 10 59 86 [binary, 4 bytes]
+2025-02-10 17:48:40,725 - DEBUG - [protocol.py:745] - > PONG 3a 10 59 86 [binary, 4 bytes]
+2025-02-10 17:48:40,730 - DEBUG - [protocol.py:599] - < PONG 97 90 bb 3d [binary, 4 bytes]
+2025-02-10 17:48:40,731 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 17:49:00,740 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 17:49:00,748 - DEBUG - [protocol.py:745] - > PING 78 51 ab 77 [binary, 4 bytes]
+2025-02-10 17:49:00,751 - DEBUG - [protocol.py:599] - < PING 21 b1 e5 ec [binary, 4 bytes]
+2025-02-10 17:49:00,752 - DEBUG - [protocol.py:745] - > PONG 21 b1 e5 ec [binary, 4 bytes]
+2025-02-10 17:49:00,757 - DEBUG - [protocol.py:599] - < PONG 78 51 ab 77 [binary, 4 bytes]
+2025-02-10 17:49:00,757 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 17:49:04,813 - ERROR - [agent_service.py:428] - 🚨 Error en la actualización del agente: 200, message='Attempt to decode JSON with unexpected mimetype: text/html; charset=utf-8', url='ws://161.132.39.159:8000/auth/login'
+2025-02-10 17:49:04,813 - INFO - [printer_monitor_service.py:68] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-10 17:49:04,816 - DEBUG - [printer_monitor_service.py:80] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-10 17:49:04,818 - DEBUG - [printer_monitor_service.py:81] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_5a1bde8db10d47fdb72a4cb082c3a8b2', 'Content-Type': 'application/json'}
+2025-02-10 17:49:04,981 - DEBUG - [printer_monitor_service.py:86] - 📥 Respuesta (200): [{"ip_address":"192.168.18.79","brand":"Ricoh","model":"MPC 307","name":"RRhh","status":"online","client_id":4}]...
+2025-02-10 17:49:04,982 - INFO - [printer_monitor_service.py:90] - ✅ Se obtuvieron 1 impresoras
+2025-02-10 17:49:04,987 - DEBUG - [printer_monitor_service.py:91] - 📋 Lista de impresoras: [
+  {
+    "ip_address": "192.168.18.79",
+    "brand": "Ricoh",
+    "model": "MPC 307",
+    "name": "RRhh",
+    "status": "online",
+    "client_id": 4
+  }
+]
+2025-02-10 17:49:04,989 - INFO - [printer_monitor_service.py:119] - 🔄 Iniciando recolección de datos - IP: 192.168.18.79, Marca: Ricoh
+2025-02-10 17:49:04,991 - INFO - [printer_monitor_service.py:572] - 🔌 Verificando conexión con impresora 192.168.18.79
+2025-02-10 17:49:04,992 - DEBUG - [printer_monitor_service.py:355] - 🔍 Intentando conexión SNMP con 192.168.18.79 - OID: 1.3.6.1.2.1.1.1.0
+2025-02-10 17:49:04,993 - DEBUG - [printer_monitor_service.py:360] - Probando configuración SNMP: CommunityData
+2025-02-10 17:49:05,177 - INFO - [printer_monitor_service.py:385] - ✅ Conexión exitosa con CommunityData
+2025-02-10 17:49:05,178 - DEBUG - [printer_monitor_service.py:386] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.2.1.1.1.0: RICOH MP C307 1.25 / RICOH Network Printer C model / RICOH Network Scanner C model / RICOH Network Facsimile C model
+2025-02-10 17:49:05,179 - INFO - [printer_monitor_service.py:581] - ✅ Impresora 192.168.18.79 responde correctamente
+2025-02-10 17:49:05,179 - DEBUG - [printer_monitor_service.py:180] - 📎 Usando OIDs cacheados para Ricoh
+2025-02-10 17:49:05,179 - DEBUG - [printer_monitor_service.py:222] - 📊 Obteniendo contadores para 192.168.18.79
+2025-02-10 17:49:05,179 - DEBUG - [printer_monitor_service.py:223] - 🔧 OIDs configurados: [
+  {
+    "brand": "Ricoh",
+    "model_family": "Color",
+    "description": "",
+    "oid_total_pages": "1.3.6.1.2.1.43.10.2.1.4.1.1",
+    "oid_total_color_pages": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_total_bw_pages": null,
+    "oid_black_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_cyan_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_magenta_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_yellow_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "id": 5
+  }
+]
+2025-02-10 17:49:05,180 - DEBUG - [printer_monitor_service.py:355] - 🔍 Intentando conexión SNMP con 192.168.18.79 - OID: 1.3.6.1.2.1.43.10.2.1.4.1.1
+2025-02-10 17:49:05,180 - DEBUG - [printer_monitor_service.py:360] - Probando configuración SNMP: CommunityData
+2025-02-10 17:49:05,382 - INFO - [printer_monitor_service.py:385] - ✅ Conexión exitosa con CommunityData
+2025-02-10 17:49:05,383 - DEBUG - [printer_monitor_service.py:386] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.2.1.43.10.2.1.4.1.1: 139179
+2025-02-10 17:49:05,384 - DEBUG - [printer_monitor_service.py:355] - 🔍 Intentando conexión SNMP con 192.168.18.79 - OID: 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11
+2025-02-10 17:49:05,384 - DEBUG - [printer_monitor_service.py:360] - Probando configuración SNMP: CommunityData
+2025-02-10 17:49:05,551 - INFO - [printer_monitor_service.py:385] - ✅ Conexión exitosa con CommunityData
+2025-02-10 17:49:05,551 - DEBUG - [printer_monitor_service.py:386] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11: 111375
+2025-02-10 17:49:05,553 - WARNING - [printer_monitor_service.py:315] - ⚠️ OID nulo para 192.168.18.79
+2025-02-10 17:49:05,553 - DEBUG - [printer_monitor_service.py:238] - 📊 Contadores obtenidos para 192.168.18.79: {'total_pages': 139179, 'color_pages': 111375, 'bw_pages': None}
+2025-02-10 17:49:05,554 - DEBUG - [printer_monitor_service.py:256] - 🔋 Obteniendo suministros para 192.168.18.79
+2025-02-10 17:49:05,554 - DEBUG - [printer_monitor_service.py:257] - 🔧 OIDs configurados: [
+  {
+    "brand": "Ricoh",
+    "model_family": "Color",
+    "description": "",
+    "oid_total_pages": "1.3.6.1.2.1.43.10.2.1.4.1.1",
+    "oid_total_color_pages": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_total_bw_pages": null,
+    "oid_black_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_cyan_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_magenta_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "oid_yellow_toner_level": "1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11",
+    "id": 5
+  }
+]
+2025-02-10 17:49:05,554 - DEBUG - [printer_monitor_service.py:355] - 🔍 Intentando conexión SNMP con 192.168.18.79 - OID: 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11
+2025-02-10 17:49:05,554 - DEBUG - [printer_monitor_service.py:360] - Probando configuración SNMP: CommunityData
+2025-02-10 17:49:05,716 - INFO - [printer_monitor_service.py:385] - ✅ Conexión exitosa con CommunityData
+2025-02-10 17:49:05,717 - DEBUG - [printer_monitor_service.py:386] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11: 111375
+2025-02-10 17:49:05,718 - WARNING - [printer_monitor_service.py:315] - ⚠️ OID nulo para 192.168.18.79
+2025-02-10 17:49:05,718 - DEBUG - [printer_monitor_service.py:355] - 🔍 Intentando conexión SNMP con 192.168.18.79 - OID: 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11
+2025-02-10 17:49:05,718 - DEBUG - [printer_monitor_service.py:360] - Probando configuración SNMP: CommunityData
+2025-02-10 17:49:05,927 - INFO - [printer_monitor_service.py:385] - ✅ Conexión exitosa con CommunityData
+2025-02-10 17:49:05,927 - DEBUG - [printer_monitor_service.py:386] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11: 111375
+2025-02-10 17:49:05,928 - WARNING - [printer_monitor_service.py:315] - ⚠️ OID nulo para 192.168.18.79
+2025-02-10 17:49:05,928 - DEBUG - [printer_monitor_service.py:355] - 🔍 Intentando conexión SNMP con 192.168.18.79 - OID: 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11
+2025-02-10 17:49:05,929 - DEBUG - [printer_monitor_service.py:360] - Probando configuración SNMP: CommunityData
+2025-02-10 17:49:06,096 - INFO - [printer_monitor_service.py:385] - ✅ Conexión exitosa con CommunityData
+2025-02-10 17:49:06,096 - DEBUG - [printer_monitor_service.py:386] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11: 111375
+2025-02-10 17:49:06,097 - WARNING - [printer_monitor_service.py:315] - ⚠️ OID nulo para 192.168.18.79
+2025-02-10 17:49:06,097 - DEBUG - [printer_monitor_service.py:355] - 🔍 Intentando conexión SNMP con 192.168.18.79 - OID: 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11
+2025-02-10 17:49:06,098 - DEBUG - [printer_monitor_service.py:360] - Probando configuración SNMP: CommunityData
+2025-02-10 17:49:06,272 - INFO - [printer_monitor_service.py:385] - ✅ Conexión exitosa con CommunityData
+2025-02-10 17:49:06,272 - DEBUG - [printer_monitor_service.py:386] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.4.1.367.3.2.1.2.19.5.1.9.11: 111375
+2025-02-10 17:49:06,275 - WARNING - [printer_monitor_service.py:315] - ⚠️ OID nulo para 192.168.18.79
+2025-02-10 17:49:06,275 - DEBUG - [printer_monitor_service.py:295] - 🔋 Suministros obtenidos para 192.168.18.79: {'toners': {'black': {'level': 111375, 'max': 100, 'percentage': 100}, 'cyan': {'level': 111375, 'max': 100, 'percentage': 100}, 'magenta': {'level': 111375, 'max': 100, 'percentage': 100}, 'yellow': {'level': 111375, 'max': 100, 'percentage': 100}}}
+2025-02-10 17:49:06,276 - INFO - [printer_monitor_service.py:602] - 🔍 Obteniendo estado de impresora 192.168.18.79
+2025-02-10 17:49:06,276 - DEBUG - [printer_monitor_service.py:355] - 🔍 Intentando conexión SNMP con 192.168.18.79 - OID: 1.3.6.1.2.1.25.3.5.1.1.1
+2025-02-10 17:49:06,276 - DEBUG - [printer_monitor_service.py:360] - Probando configuración SNMP: CommunityData
+2025-02-10 17:49:06,442 - INFO - [printer_monitor_service.py:385] - ✅ Conexión exitosa con CommunityData
+2025-02-10 17:49:06,442 - DEBUG - [printer_monitor_service.py:386] - 📥 Valor SNMP obtenido para 192.168.18.79 - 1.3.6.1.2.1.25.3.5.1.1.1: 3
+2025-02-10 17:49:06,443 - INFO - [printer_monitor_service.py:633] - 📊 Estado obtenido para 192.168.18.79: {'status': 'idle', 'details': 'Status code: 3', 'raw_status': 3}
+2025-02-10 17:49:06,443 - INFO - [printer_monitor_service.py:153] - ✅ Datos recolectados exitosamente para 192.168.18.79
+2025-02-10 17:49:06,443 - DEBUG - [printer_monitor_service.py:154] - 📊 Datos recolectados: {
+  "ip_address": null,
+  "brand": null,
+  "last_check": null,
+  "status": null,
+  "counters": {
+    "total_pages": 139179,
+    "color_pages": 111375,
+    "bw_pages": null
+  },
+  "supplies": {
+    "toners": {
+      "black": {
+        "level": 111375,
+        "max": 100,
+        "percentage": 100
+      },
+      "cyan": {
+        "level": 111375,
+        "max": 100,
+        "percentage": 100
+      },
+      "magenta": {
+        "level": 111375,
+        "max": 100,
+        "percentage": 100
+      },
+      "yellow": {
+        "level": 111375,
+        "max": 100,
+        "percentage": 100
+      }
+    }
+  },
+  "error": null
+}
+2025-02-10 17:49:06,444 - INFO - [printer_monitor_service.py:481] - Preparando actualización de datos para 192.168.18.79
+2025-02-10 17:49:06,444 - INFO - [printer_monitor_service.py:68] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-10 17:49:06,444 - DEBUG - [printer_monitor_service.py:80] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-10 17:49:06,444 - DEBUG - [printer_monitor_service.py:81] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_5a1bde8db10d47fdb72a4cb082c3a8b2', 'Content-Type': 'application/json'}
+2025-02-10 17:49:06,485 - DEBUG - [printer_monitor_service.py:86] - 📥 Respuesta (200): [{"ip_address":"192.168.18.79","brand":"Ricoh","model":"MPC 307","name":"RRhh","status":"online","client_id":4}]...
+2025-02-10 17:49:06,485 - INFO - [printer_monitor_service.py:90] - ✅ Se obtuvieron 1 impresoras
+2025-02-10 17:49:06,487 - DEBUG - [printer_monitor_service.py:91] - 📋 Lista de impresoras: [
+  {
+    "ip_address": "192.168.18.79",
+    "brand": "Ricoh",
+    "model": "MPC 307",
+    "name": "RRhh",
+    "status": "online",
+    "client_id": 4
+  }
+]
+2025-02-10 17:49:06,488 - DEBUG - [printer_monitor_service.py:533] - Enviando datos a http://161.132.39.159:8000/api/v1/monitor/printers/update
+2025-02-10 17:49:06,488 - DEBUG - [printer_monitor_service.py:534] - Headers: {'Authorization': 'Bearer agt_5a1bde8db10d47fdb72a4cb082c3a8b2', 'Content-Type': 'application/json'}
+2025-02-10 17:49:06,488 - DEBUG - [printer_monitor_service.py:535] - Parámetros: {'agent_id': '1'}
+2025-02-10 17:49:06,489 - DEBUG - [printer_monitor_service.py:536] - Datos: {
+  "ip_address": "192.168.18.79",
+  "name": "RRhh",
+  "brand": "Ricoh",
+  "model": "MPC 307",
+  "client_id": 4,
+  "status": null,
+  "last_check": "2025-02-10T22:49:06.488362",
+  "printer_data": {
+    "counters": {
+      "total_pages": 139179,
+      "color_pages": 111375,
+      "bw_pages": null
+    },
+    "supplies": {
+      "toners": {
+        "black": {
+          "level": 111375,
+          "max": 100,
+          "percentage": 100
+        },
+        "cyan": {
+          "level": 111375,
+          "max": 100,
+          "percentage": 100
+        },
+        "magenta": {
+          "level": 111375,
+          "max": 100,
+          "percentage": 100
+        },
+        "yellow": {
+          "level": 111375,
+          "max": 100,
+          "percentage": 100
+        }
+      }
+    },
+    "status": null
+  }
+}
+2025-02-10 17:49:06,560 - INFO - [printer_monitor_service.py:547] - Datos actualizados exitosamente para 192.168.18.79
+2025-02-10 17:49:06,562 - DEBUG - [agent_service.py:377] - Datos actualizados para 192.168.18.79
+2025-02-10 17:49:20,757 - DEBUG - [protocol.py:599] - < PING 'U\ue82e' [text, 4 bytes]
+2025-02-10 17:49:20,764 - DEBUG - [protocol.py:745] - > PONG 'U\ue82e' [text, 4 bytes]
+2025-02-10 17:49:20,766 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 17:49:20,767 - DEBUG - [protocol.py:745] - > PING da 45 d0 e6 [binary, 4 bytes]
+2025-02-10 17:49:20,772 - DEBUG - [protocol.py:599] - < PONG da 45 d0 e6 [binary, 4 bytes]
+2025-02-10 17:49:20,772 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 17:49:40,760 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 17:49:40,760 - DEBUG - [protocol.py:745] - > PING '\x1d\x15\x8e' [text, 4 bytes]
+2025-02-10 17:49:40,769 - DEBUG - [protocol.py:599] - < PONG '\x1d\x15\x8e' [text, 4 bytes]
+2025-02-10 17:49:40,770 - DEBUG - [protocol.py:599] - < PING ed ce fd 60 [binary, 4 bytes]
+2025-02-10 17:49:40,771 - DEBUG - [protocol.py:745] - > PONG ed ce fd 60 [binary, 4 bytes]
+2025-02-10 17:49:40,772 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 17:50:00,765 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 17:50:00,768 - DEBUG - [protocol.py:745] - > PING 22 48 ff fc [binary, 4 bytes]
+2025-02-10 17:50:00,773 - DEBUG - [protocol.py:599] - < PONG 22 48 ff fc [binary, 4 bytes]
+2025-02-10 17:50:00,773 - DEBUG - [protocol.py:599] - < PING 'Z\x03##' [text, 4 bytes]
+2025-02-10 17:50:00,781 - DEBUG - [protocol.py:745] - > PONG 'Z\x03##' [text, 4 bytes]
+2025-02-10 17:50:00,787 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 17:50:20,766 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 17:50:20,768 - DEBUG - [protocol.py:745] - > PING e0 dc 0e 4b [binary, 4 bytes]
+2025-02-10 17:50:20,783 - DEBUG - [protocol.py:599] - < PONG e0 dc 0e 4b [binary, 4 bytes]
+2025-02-10 17:50:20,786 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 17:50:20,790 - DEBUG - [protocol.py:599] - < PING 2f 65 3b a9 [binary, 4 bytes]
+2025-02-10 17:50:20,790 - DEBUG - [protocol.py:745] - > PONG 2f 65 3b a9 [binary, 4 bytes]
