@@ -31644,3 +31644,678 @@ Traceback (most recent call last):
   File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\decoder.py", line 355, in raw_decode
     raise JSONDecodeError("Expecting value", s, err.value) from None
 json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-02-10 12:50:31,798 - ERROR - [agent_service.py:428] - 🚨 Error en la actualización del agente: 200, message='Attempt to decode JSON with unexpected mimetype: text/html; charset=utf-8', url='ws://161.132.39.159:8000/auth/login'
+2025-02-10 12:50:31,799 - INFO - [printer_monitor_service.py:68] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-10 12:50:31,800 - DEBUG - [printer_monitor_service.py:80] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-10 12:50:31,800 - DEBUG - [printer_monitor_service.py:81] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_32499ebe03d94fee8d8e5dd9446f46a6', 'Content-Type': 'application/json'}
+2025-02-10 12:50:31,824 - DEBUG - [printer_monitor_service.py:86] - 📥 Respuesta (200): <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Printer Management</title>
+   ...
+2025-02-10 12:50:31,825 - ERROR - [printer_monitor_service.py:98] - ❌ Error decodificando JSON: Expecting value: line 1 column 1 (char 0)
+Traceback (most recent call last):
+  File "C:\Users\pc\Desktop\printer_management\agent\app\services\printer_monitor_service.py", line 89, in get_monitored_printers
+    printers = json.loads(response_text)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-02-10 12:55:32,892 - ERROR - [agent_service.py:428] - 🚨 Error en la actualización del agente: 200, message='Attempt to decode JSON with unexpected mimetype: text/html; charset=utf-8', url='ws://161.132.39.159:8000/auth/login'
+2025-02-10 12:55:32,892 - INFO - [printer_monitor_service.py:68] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-10 12:55:32,892 - DEBUG - [printer_monitor_service.py:80] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-10 12:55:32,892 - DEBUG - [printer_monitor_service.py:81] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_32499ebe03d94fee8d8e5dd9446f46a6', 'Content-Type': 'application/json'}
+2025-02-10 12:55:32,921 - DEBUG - [printer_monitor_service.py:86] - 📥 Respuesta (200): <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Printer Management</title>
+   ...
+2025-02-10 12:55:32,921 - ERROR - [printer_monitor_service.py:98] - ❌ Error decodificando JSON: Expecting value: line 1 column 1 (char 0)
+Traceback (most recent call last):
+  File "C:\Users\pc\Desktop\printer_management\agent\app\services\printer_monitor_service.py", line 89, in get_monitored_printers
+    printers = json.loads(response_text)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-02-10 13:00:34,060 - ERROR - [agent_service.py:428] - 🚨 Error en la actualización del agente: 200, message='Attempt to decode JSON with unexpected mimetype: text/html; charset=utf-8', url='ws://161.132.39.159:8000/auth/login'
+2025-02-10 13:00:34,060 - INFO - [printer_monitor_service.py:68] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-10 13:00:34,063 - DEBUG - [printer_monitor_service.py:80] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-10 13:00:34,063 - DEBUG - [printer_monitor_service.py:81] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_32499ebe03d94fee8d8e5dd9446f46a6', 'Content-Type': 'application/json'}
+2025-02-10 13:00:34,096 - DEBUG - [printer_monitor_service.py:86] - 📥 Respuesta (200): <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Printer Management</title>
+   ...
+2025-02-10 13:00:34,096 - ERROR - [printer_monitor_service.py:98] - ❌ Error decodificando JSON: Expecting value: line 1 column 1 (char 0)
+Traceback (most recent call last):
+  File "C:\Users\pc\Desktop\printer_management\agent\app\services\printer_monitor_service.py", line 89, in get_monitored_printers
+    printers = json.loads(response_text)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-02-10 13:05:35,202 - ERROR - [agent_service.py:428] - 🚨 Error en la actualización del agente: 200, message='Attempt to decode JSON with unexpected mimetype: text/html; charset=utf-8', url='ws://161.132.39.159:8000/auth/login'
+2025-02-10 13:05:35,204 - INFO - [printer_monitor_service.py:68] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-10 13:05:35,205 - DEBUG - [printer_monitor_service.py:80] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-10 13:05:35,205 - DEBUG - [printer_monitor_service.py:81] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_32499ebe03d94fee8d8e5dd9446f46a6', 'Content-Type': 'application/json'}
+2025-02-10 13:05:35,236 - DEBUG - [printer_monitor_service.py:86] - 📥 Respuesta (200): <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Printer Management</title>
+   ...
+2025-02-10 13:05:35,237 - ERROR - [printer_monitor_service.py:98] - ❌ Error decodificando JSON: Expecting value: line 1 column 1 (char 0)
+Traceback (most recent call last):
+  File "C:\Users\pc\Desktop\printer_management\agent\app\services\printer_monitor_service.py", line 89, in get_monitored_printers
+    printers = json.loads(response_text)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-02-10 13:10:36,339 - ERROR - [agent_service.py:428] - 🚨 Error en la actualización del agente: 200, message='Attempt to decode JSON with unexpected mimetype: text/html; charset=utf-8', url='ws://161.132.39.159:8000/auth/login'
+2025-02-10 13:10:36,340 - INFO - [printer_monitor_service.py:68] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-10 13:10:36,341 - DEBUG - [printer_monitor_service.py:80] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-10 13:10:36,341 - DEBUG - [printer_monitor_service.py:81] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_32499ebe03d94fee8d8e5dd9446f46a6', 'Content-Type': 'application/json'}
+2025-02-10 13:10:36,372 - DEBUG - [printer_monitor_service.py:86] - 📥 Respuesta (200): <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Printer Management</title>
+   ...
+2025-02-10 13:10:36,373 - ERROR - [printer_monitor_service.py:98] - ❌ Error decodificando JSON: Expecting value: line 1 column 1 (char 0)
+Traceback (most recent call last):
+  File "C:\Users\pc\Desktop\printer_management\agent\app\services\printer_monitor_service.py", line 89, in get_monitored_printers
+    printers = json.loads(response_text)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-02-10 13:15:37,463 - ERROR - [agent_service.py:428] - 🚨 Error en la actualización del agente: 200, message='Attempt to decode JSON with unexpected mimetype: text/html; charset=utf-8', url='ws://161.132.39.159:8000/auth/login'
+2025-02-10 13:15:37,464 - INFO - [printer_monitor_service.py:68] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-10 13:15:37,465 - DEBUG - [printer_monitor_service.py:80] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-10 13:15:37,465 - DEBUG - [printer_monitor_service.py:81] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_32499ebe03d94fee8d8e5dd9446f46a6', 'Content-Type': 'application/json'}
+2025-02-10 13:15:37,493 - DEBUG - [printer_monitor_service.py:86] - 📥 Respuesta (200): <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Printer Management</title>
+   ...
+2025-02-10 13:15:37,494 - ERROR - [printer_monitor_service.py:98] - ❌ Error decodificando JSON: Expecting value: line 1 column 1 (char 0)
+Traceback (most recent call last):
+  File "C:\Users\pc\Desktop\printer_management\agent\app\services\printer_monitor_service.py", line 89, in get_monitored_printers
+    printers = json.loads(response_text)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-02-10 13:20:38,628 - ERROR - [agent_service.py:428] - 🚨 Error en la actualización del agente: 200, message='Attempt to decode JSON with unexpected mimetype: text/html; charset=utf-8', url='ws://161.132.39.159:8000/auth/login'
+2025-02-10 13:20:38,630 - INFO - [printer_monitor_service.py:68] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-10 13:20:38,633 - DEBUG - [printer_monitor_service.py:80] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-10 13:20:38,633 - DEBUG - [printer_monitor_service.py:81] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_32499ebe03d94fee8d8e5dd9446f46a6', 'Content-Type': 'application/json'}
+2025-02-10 13:20:38,665 - DEBUG - [printer_monitor_service.py:86] - 📥 Respuesta (200): <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Printer Management</title>
+   ...
+2025-02-10 13:20:38,666 - ERROR - [printer_monitor_service.py:98] - ❌ Error decodificando JSON: Expecting value: line 1 column 1 (char 0)
+Traceback (most recent call last):
+  File "C:\Users\pc\Desktop\printer_management\agent\app\services\printer_monitor_service.py", line 89, in get_monitored_printers
+    printers = json.loads(response_text)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-02-10 13:25:39,778 - ERROR - [agent_service.py:428] - 🚨 Error en la actualización del agente: 200, message='Attempt to decode JSON with unexpected mimetype: text/html; charset=utf-8', url='ws://161.132.39.159:8000/auth/login'
+2025-02-10 13:25:39,778 - INFO - [printer_monitor_service.py:68] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-10 13:25:39,778 - DEBUG - [printer_monitor_service.py:80] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-10 13:25:39,778 - DEBUG - [printer_monitor_service.py:81] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_32499ebe03d94fee8d8e5dd9446f46a6', 'Content-Type': 'application/json'}
+2025-02-10 13:25:39,808 - DEBUG - [printer_monitor_service.py:86] - 📥 Respuesta (200): <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Printer Management</title>
+   ...
+2025-02-10 13:25:39,808 - ERROR - [printer_monitor_service.py:98] - ❌ Error decodificando JSON: Expecting value: line 1 column 1 (char 0)
+Traceback (most recent call last):
+  File "C:\Users\pc\Desktop\printer_management\agent\app\services\printer_monitor_service.py", line 89, in get_monitored_printers
+    printers = json.loads(response_text)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-02-10 13:30:42,923 - ERROR - [agent_service.py:428] - 🚨 Error en la actualización del agente: Cannot connect to host 161.132.39.159:8000 ssl:default [El equipo remoto rechazó la conexión de red]
+2025-02-10 13:30:42,925 - INFO - [printer_monitor_service.py:68] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-10 13:30:42,925 - DEBUG - [printer_monitor_service.py:80] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-10 13:30:42,925 - DEBUG - [printer_monitor_service.py:81] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_32499ebe03d94fee8d8e5dd9446f46a6', 'Content-Type': 'application/json'}
+2025-02-10 13:30:44,992 - ERROR - [printer_monitor_service.py:101] - ❌ Error de conexión: Cannot connect to host 161.132.39.159:8000 ssl:default [El equipo remoto rechazó la conexión de red]
+Traceback (most recent call last):
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1115, in _wrap_create_connection
+    sock = await aiohappyeyeballs.start_connection(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohappyeyeballs\impl.py", line 104, in start_connection
+    raise first_exception
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohappyeyeballs\impl.py", line 82, in start_connection
+    sock = await _connect_sock(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohappyeyeballs\impl.py", line 174, in _connect_sock
+    await loop.sock_connect(sock, address)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\asyncio\proactor_events.py", line 704, in sock_connect
+    return await self._proactor.connect(sock, address)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\asyncio\windows_events.py", line 812, in _poll
+    value = callback(transferred, key, ov)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\asyncio\windows_events.py", line 599, in finish_connect
+    ov.getresult()
+ConnectionRefusedError: [WinError 1225] El equipo remoto rechazó la conexión de red
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\pc\Desktop\printer_management\agent\app\services\printer_monitor_service.py", line 84, in get_monitored_printers
+    async with session.get(url, headers=headers) as response:
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\client.py", line 1425, in __aenter__
+    self._resp: _RetType = await self._coro
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\client.py", line 703, in _request
+    conn = await self._connector.connect(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 548, in connect
+    proto = await self._create_connection(req, traces, timeout)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1056, in _create_connection
+    _, proto = await self._create_direct_connection(req, traces, timeout)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1400, in _create_direct_connection
+    raise last_exc
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1369, in _create_direct_connection
+    transp, proto = await self._wrap_create_connection(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1130, in _wrap_create_connection
+    raise client_error(req.connection_key, exc) from exc
+aiohttp.client_exceptions.ClientConnectorError: Cannot connect to host 161.132.39.159:8000 ssl:default [El equipo remoto rechazó la conexión de red]
+2025-02-10 13:35:46,119 - ERROR - [agent_service.py:428] - 🚨 Error en la actualización del agente: 200, message='Attempt to decode JSON with unexpected mimetype: text/html; charset=utf-8', url='ws://161.132.39.159:8000/auth/login'
+2025-02-10 13:35:46,119 - INFO - [printer_monitor_service.py:68] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-10 13:35:46,122 - DEBUG - [printer_monitor_service.py:80] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-10 13:35:46,122 - DEBUG - [printer_monitor_service.py:81] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_32499ebe03d94fee8d8e5dd9446f46a6', 'Content-Type': 'application/json'}
+2025-02-10 13:35:46,150 - DEBUG - [printer_monitor_service.py:86] - 📥 Respuesta (200): <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Printer Management</title>
+   ...
+2025-02-10 13:35:46,150 - ERROR - [printer_monitor_service.py:98] - ❌ Error decodificando JSON: Expecting value: line 1 column 1 (char 0)
+Traceback (most recent call last):
+  File "C:\Users\pc\Desktop\printer_management\agent\app\services\printer_monitor_service.py", line 89, in get_monitored_printers
+    printers = json.loads(response_text)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-02-10 13:40:47,279 - ERROR - [agent_service.py:428] - 🚨 Error en la actualización del agente: 200, message='Attempt to decode JSON with unexpected mimetype: text/html; charset=utf-8', url='ws://161.132.39.159:8000/auth/login'
+2025-02-10 13:40:47,280 - INFO - [printer_monitor_service.py:68] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-10 13:40:47,281 - DEBUG - [printer_monitor_service.py:80] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-10 13:40:47,282 - DEBUG - [printer_monitor_service.py:81] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_32499ebe03d94fee8d8e5dd9446f46a6', 'Content-Type': 'application/json'}
+2025-02-10 13:40:47,310 - DEBUG - [printer_monitor_service.py:86] - 📥 Respuesta (200): <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Printer Management</title>
+   ...
+2025-02-10 13:40:47,311 - ERROR - [printer_monitor_service.py:98] - ❌ Error decodificando JSON: Expecting value: line 1 column 1 (char 0)
+Traceback (most recent call last):
+  File "C:\Users\pc\Desktop\printer_management\agent\app\services\printer_monitor_service.py", line 89, in get_monitored_printers
+    printers = json.loads(response_text)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-02-10 13:45:48,432 - ERROR - [agent_service.py:428] - 🚨 Error en la actualización del agente: 200, message='Attempt to decode JSON with unexpected mimetype: text/html; charset=utf-8', url='ws://161.132.39.159:8000/auth/login'
+2025-02-10 13:45:48,432 - INFO - [printer_monitor_service.py:68] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-10 13:45:48,432 - DEBUG - [printer_monitor_service.py:80] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-10 13:45:48,432 - DEBUG - [printer_monitor_service.py:81] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_32499ebe03d94fee8d8e5dd9446f46a6', 'Content-Type': 'application/json'}
+2025-02-10 13:45:48,464 - DEBUG - [printer_monitor_service.py:86] - 📥 Respuesta (200): <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Printer Management</title>
+   ...
+2025-02-10 13:45:48,464 - ERROR - [printer_monitor_service.py:98] - ❌ Error decodificando JSON: Expecting value: line 1 column 1 (char 0)
+Traceback (most recent call last):
+  File "C:\Users\pc\Desktop\printer_management\agent\app\services\printer_monitor_service.py", line 89, in get_monitored_printers
+    printers = json.loads(response_text)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-02-10 13:50:49,565 - ERROR - [agent_service.py:428] - 🚨 Error en la actualización del agente: 200, message='Attempt to decode JSON with unexpected mimetype: text/html; charset=utf-8', url='ws://161.132.39.159:8000/auth/login'
+2025-02-10 13:50:49,566 - INFO - [printer_monitor_service.py:68] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-10 13:50:49,567 - DEBUG - [printer_monitor_service.py:80] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-10 13:50:49,567 - DEBUG - [printer_monitor_service.py:81] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_32499ebe03d94fee8d8e5dd9446f46a6', 'Content-Type': 'application/json'}
+2025-02-10 13:50:49,599 - DEBUG - [printer_monitor_service.py:86] - 📥 Respuesta (200): <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Printer Management</title>
+   ...
+2025-02-10 13:50:49,599 - ERROR - [printer_monitor_service.py:98] - ❌ Error decodificando JSON: Expecting value: line 1 column 1 (char 0)
+Traceback (most recent call last):
+  File "C:\Users\pc\Desktop\printer_management\agent\app\services\printer_monitor_service.py", line 89, in get_monitored_printers
+    printers = json.loads(response_text)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-02-10 13:55:50,698 - ERROR - [agent_service.py:428] - 🚨 Error en la actualización del agente: 200, message='Attempt to decode JSON with unexpected mimetype: text/html; charset=utf-8', url='ws://161.132.39.159:8000/auth/login'
+2025-02-10 13:55:50,701 - INFO - [printer_monitor_service.py:68] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-10 13:55:50,704 - DEBUG - [printer_monitor_service.py:80] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-10 13:55:50,704 - DEBUG - [printer_monitor_service.py:81] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_32499ebe03d94fee8d8e5dd9446f46a6', 'Content-Type': 'application/json'}
+2025-02-10 13:55:50,741 - DEBUG - [printer_monitor_service.py:86] - 📥 Respuesta (200): <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Printer Management</title>
+   ...
+2025-02-10 13:55:50,745 - ERROR - [printer_monitor_service.py:98] - ❌ Error decodificando JSON: Expecting value: line 1 column 1 (char 0)
+Traceback (most recent call last):
+  File "C:\Users\pc\Desktop\printer_management\agent\app\services\printer_monitor_service.py", line 89, in get_monitored_printers
+    printers = json.loads(response_text)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-02-10 14:00:53,886 - ERROR - [agent_service.py:428] - 🚨 Error en la actualización del agente: Cannot connect to host 161.132.39.159:8000 ssl:default [El equipo remoto rechazó la conexión de red]
+2025-02-10 14:00:53,888 - INFO - [printer_monitor_service.py:68] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-10 14:00:53,893 - DEBUG - [printer_monitor_service.py:80] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-10 14:00:53,893 - DEBUG - [printer_monitor_service.py:81] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_32499ebe03d94fee8d8e5dd9446f46a6', 'Content-Type': 'application/json'}
+2025-02-10 14:00:55,948 - ERROR - [printer_monitor_service.py:101] - ❌ Error de conexión: Cannot connect to host 161.132.39.159:8000 ssl:default [El equipo remoto rechazó la conexión de red]
+Traceback (most recent call last):
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1115, in _wrap_create_connection
+    sock = await aiohappyeyeballs.start_connection(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohappyeyeballs\impl.py", line 104, in start_connection
+    raise first_exception
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohappyeyeballs\impl.py", line 82, in start_connection
+    sock = await _connect_sock(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohappyeyeballs\impl.py", line 174, in _connect_sock
+    await loop.sock_connect(sock, address)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\asyncio\proactor_events.py", line 704, in sock_connect
+    return await self._proactor.connect(sock, address)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\asyncio\windows_events.py", line 812, in _poll
+    value = callback(transferred, key, ov)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\asyncio\windows_events.py", line 599, in finish_connect
+    ov.getresult()
+ConnectionRefusedError: [WinError 1225] El equipo remoto rechazó la conexión de red
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\pc\Desktop\printer_management\agent\app\services\printer_monitor_service.py", line 84, in get_monitored_printers
+    async with session.get(url, headers=headers) as response:
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\client.py", line 1425, in __aenter__
+    self._resp: _RetType = await self._coro
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\client.py", line 703, in _request
+    conn = await self._connector.connect(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 548, in connect
+    proto = await self._create_connection(req, traces, timeout)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1056, in _create_connection
+    _, proto = await self._create_direct_connection(req, traces, timeout)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1400, in _create_direct_connection
+    raise last_exc
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1369, in _create_direct_connection
+    transp, proto = await self._wrap_create_connection(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1130, in _wrap_create_connection
+    raise client_error(req.connection_key, exc) from exc
+aiohttp.client_exceptions.ClientConnectorError: Cannot connect to host 161.132.39.159:8000 ssl:default [El equipo remoto rechazó la conexión de red]
+2025-02-10 14:05:59,087 - ERROR - [agent_service.py:428] - 🚨 Error en la actualización del agente: Cannot connect to host 161.132.39.159:8000 ssl:default [El equipo remoto rechazó la conexión de red]
+2025-02-10 14:05:59,087 - INFO - [printer_monitor_service.py:68] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-10 14:05:59,087 - DEBUG - [printer_monitor_service.py:80] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-10 14:05:59,087 - DEBUG - [printer_monitor_service.py:81] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_32499ebe03d94fee8d8e5dd9446f46a6', 'Content-Type': 'application/json'}
+2025-02-10 14:06:01,152 - ERROR - [printer_monitor_service.py:101] - ❌ Error de conexión: Cannot connect to host 161.132.39.159:8000 ssl:default [El equipo remoto rechazó la conexión de red]
+Traceback (most recent call last):
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1115, in _wrap_create_connection
+    sock = await aiohappyeyeballs.start_connection(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohappyeyeballs\impl.py", line 104, in start_connection
+    raise first_exception
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohappyeyeballs\impl.py", line 82, in start_connection
+    sock = await _connect_sock(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohappyeyeballs\impl.py", line 174, in _connect_sock
+    await loop.sock_connect(sock, address)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\asyncio\proactor_events.py", line 704, in sock_connect
+    return await self._proactor.connect(sock, address)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\asyncio\windows_events.py", line 812, in _poll
+    value = callback(transferred, key, ov)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\asyncio\windows_events.py", line 599, in finish_connect
+    ov.getresult()
+ConnectionRefusedError: [WinError 1225] El equipo remoto rechazó la conexión de red
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\pc\Desktop\printer_management\agent\app\services\printer_monitor_service.py", line 84, in get_monitored_printers
+    async with session.get(url, headers=headers) as response:
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\client.py", line 1425, in __aenter__
+    self._resp: _RetType = await self._coro
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\client.py", line 703, in _request
+    conn = await self._connector.connect(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 548, in connect
+    proto = await self._create_connection(req, traces, timeout)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1056, in _create_connection
+    _, proto = await self._create_direct_connection(req, traces, timeout)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1400, in _create_direct_connection
+    raise last_exc
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1369, in _create_direct_connection
+    transp, proto = await self._wrap_create_connection(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1130, in _wrap_create_connection
+    raise client_error(req.connection_key, exc) from exc
+aiohttp.client_exceptions.ClientConnectorError: Cannot connect to host 161.132.39.159:8000 ssl:default [El equipo remoto rechazó la conexión de red]
+2025-02-10 14:11:04,307 - ERROR - [agent_service.py:428] - 🚨 Error en la actualización del agente: Cannot connect to host 161.132.39.159:8000 ssl:default [El equipo remoto rechazó la conexión de red]
+2025-02-10 14:11:04,308 - INFO - [printer_monitor_service.py:68] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-10 14:11:04,309 - DEBUG - [printer_monitor_service.py:80] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-10 14:11:04,310 - DEBUG - [printer_monitor_service.py:81] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_32499ebe03d94fee8d8e5dd9446f46a6', 'Content-Type': 'application/json'}
+2025-02-10 14:11:06,390 - ERROR - [printer_monitor_service.py:101] - ❌ Error de conexión: Cannot connect to host 161.132.39.159:8000 ssl:default [El equipo remoto rechazó la conexión de red]
+Traceback (most recent call last):
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1115, in _wrap_create_connection
+    sock = await aiohappyeyeballs.start_connection(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohappyeyeballs\impl.py", line 104, in start_connection
+    raise first_exception
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohappyeyeballs\impl.py", line 82, in start_connection
+    sock = await _connect_sock(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohappyeyeballs\impl.py", line 174, in _connect_sock
+    await loop.sock_connect(sock, address)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\asyncio\proactor_events.py", line 704, in sock_connect
+    return await self._proactor.connect(sock, address)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\asyncio\windows_events.py", line 812, in _poll
+    value = callback(transferred, key, ov)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\asyncio\windows_events.py", line 599, in finish_connect
+    ov.getresult()
+ConnectionRefusedError: [WinError 1225] El equipo remoto rechazó la conexión de red
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\pc\Desktop\printer_management\agent\app\services\printer_monitor_service.py", line 84, in get_monitored_printers
+    async with session.get(url, headers=headers) as response:
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\client.py", line 1425, in __aenter__
+    self._resp: _RetType = await self._coro
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\client.py", line 703, in _request
+    conn = await self._connector.connect(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 548, in connect
+    proto = await self._create_connection(req, traces, timeout)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1056, in _create_connection
+    _, proto = await self._create_direct_connection(req, traces, timeout)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1400, in _create_direct_connection
+    raise last_exc
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1369, in _create_direct_connection
+    transp, proto = await self._wrap_create_connection(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1130, in _wrap_create_connection
+    raise client_error(req.connection_key, exc) from exc
+aiohttp.client_exceptions.ClientConnectorError: Cannot connect to host 161.132.39.159:8000 ssl:default [El equipo remoto rechazó la conexión de red]
+2025-02-10 14:16:09,532 - ERROR - [agent_service.py:428] - 🚨 Error en la actualización del agente: Cannot connect to host 161.132.39.159:8000 ssl:default [El equipo remoto rechazó la conexión de red]
+2025-02-10 14:16:09,533 - INFO - [printer_monitor_service.py:68] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-10 14:16:09,534 - DEBUG - [printer_monitor_service.py:80] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-10 14:16:09,535 - DEBUG - [printer_monitor_service.py:81] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_32499ebe03d94fee8d8e5dd9446f46a6', 'Content-Type': 'application/json'}
+2025-02-10 14:16:11,608 - ERROR - [printer_monitor_service.py:101] - ❌ Error de conexión: Cannot connect to host 161.132.39.159:8000 ssl:default [El equipo remoto rechazó la conexión de red]
+Traceback (most recent call last):
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1115, in _wrap_create_connection
+    sock = await aiohappyeyeballs.start_connection(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohappyeyeballs\impl.py", line 104, in start_connection
+    raise first_exception
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohappyeyeballs\impl.py", line 82, in start_connection
+    sock = await _connect_sock(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohappyeyeballs\impl.py", line 174, in _connect_sock
+    await loop.sock_connect(sock, address)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\asyncio\proactor_events.py", line 704, in sock_connect
+    return await self._proactor.connect(sock, address)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\asyncio\windows_events.py", line 812, in _poll
+    value = callback(transferred, key, ov)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\asyncio\windows_events.py", line 599, in finish_connect
+    ov.getresult()
+ConnectionRefusedError: [WinError 1225] El equipo remoto rechazó la conexión de red
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\pc\Desktop\printer_management\agent\app\services\printer_monitor_service.py", line 84, in get_monitored_printers
+    async with session.get(url, headers=headers) as response:
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\client.py", line 1425, in __aenter__
+    self._resp: _RetType = await self._coro
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\client.py", line 703, in _request
+    conn = await self._connector.connect(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 548, in connect
+    proto = await self._create_connection(req, traces, timeout)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1056, in _create_connection
+    _, proto = await self._create_direct_connection(req, traces, timeout)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1400, in _create_direct_connection
+    raise last_exc
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1369, in _create_direct_connection
+    transp, proto = await self._wrap_create_connection(
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\site-packages\aiohttp\connector.py", line 1130, in _wrap_create_connection
+    raise client_error(req.connection_key, exc) from exc
+aiohttp.client_exceptions.ClientConnectorError: Cannot connect to host 161.132.39.159:8000 ssl:default [El equipo remoto rechazó la conexión de red]
+2025-02-10 14:21:12,712 - ERROR - [agent_service.py:428] - 🚨 Error en la actualización del agente: 200, message='Attempt to decode JSON with unexpected mimetype: text/html; charset=utf-8', url='ws://161.132.39.159:8000/auth/login'
+2025-02-10 14:21:12,713 - INFO - [printer_monitor_service.py:68] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-10 14:21:12,714 - DEBUG - [printer_monitor_service.py:80] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-10 14:21:12,714 - DEBUG - [printer_monitor_service.py:81] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_32499ebe03d94fee8d8e5dd9446f46a6', 'Content-Type': 'application/json'}
+2025-02-10 14:21:12,742 - DEBUG - [printer_monitor_service.py:86] - 📥 Respuesta (200): <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Printer Management</title>
+   ...
+2025-02-10 14:21:12,743 - ERROR - [printer_monitor_service.py:98] - ❌ Error decodificando JSON: Expecting value: line 1 column 1 (char 0)
+Traceback (most recent call last):
+  File "C:\Users\pc\Desktop\printer_management\agent\app\services\printer_monitor_service.py", line 89, in get_monitored_printers
+    printers = json.loads(response_text)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-02-10 14:26:13,845 - ERROR - [agent_service.py:428] - 🚨 Error en la actualización del agente: 200, message='Attempt to decode JSON with unexpected mimetype: text/html; charset=utf-8', url='ws://161.132.39.159:8000/auth/login'
+2025-02-10 14:26:13,845 - INFO - [printer_monitor_service.py:68] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-10 14:26:13,846 - DEBUG - [printer_monitor_service.py:80] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-10 14:26:13,847 - DEBUG - [printer_monitor_service.py:81] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_32499ebe03d94fee8d8e5dd9446f46a6', 'Content-Type': 'application/json'}
+2025-02-10 14:26:13,873 - DEBUG - [printer_monitor_service.py:86] - 📥 Respuesta (200): <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Printer Management</title>
+   ...
+2025-02-10 14:26:13,874 - ERROR - [printer_monitor_service.py:98] - ❌ Error decodificando JSON: Expecting value: line 1 column 1 (char 0)
+Traceback (most recent call last):
+  File "C:\Users\pc\Desktop\printer_management\agent\app\services\printer_monitor_service.py", line 89, in get_monitored_printers
+    printers = json.loads(response_text)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-02-10 14:27:22,216 - DEBUG - [proactor_events.py:625] - Using proactor: IocpProactor
+2025-02-10 14:27:22,218 - INFO - [printer_monitor_service.py:50] - PrinterMonitorService inicializado con URL: ws://161.132.39.159:8000
+2025-02-10 14:27:22,218 - DEBUG - [printer_monitor_service.py:51] - Verificando configuración inicial:
+2025-02-10 14:27:22,218 - DEBUG - [printer_monitor_service.py:52] -   SERVER_URL: ws://161.132.39.159:8000
+2025-02-10 14:27:22,219 - DEBUG - [printer_monitor_service.py:53] -   CLIENT_TOKEN presente: Sí
+2025-02-10 14:27:22,219 - DEBUG - [printer_monitor_service.py:54] -   AGENT_TOKEN presente: Sí
+2025-02-10 14:27:22,219 - DEBUG - [printer_monitor_service.py:55] -   SNMP Community: public
+2025-02-10 14:27:22,219 - DEBUG - [printer_monitor_service.py:56] -   SNMP Port: 161
+2025-02-10 14:27:22,219 - DEBUG - [printer_monitor_service.py:57] -   SNMP Timeout: 3s
+2025-02-10 14:27:22,219 - DEBUG - [printer_monitor_service.py:58] -   SNMP Retries: 2
+2025-02-10 14:27:22,219 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6
+2025-02-10 14:27:22,297 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:27:22,298 - DEBUG - [client.py:307] - > GET /api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6 HTTP/1.1
+2025-02-10 14:27:22,299 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:27:22,299 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:27:22,299 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:27:22,299 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: ZblXF7284azsEn1ef+ep+g==
+2025-02-10 14:27:22,299 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:27:22,299 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:27:22,300 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:27:22,314 - DEBUG - [client.py:333] - < HTTP/1.1 303 See Other
+2025-02-10 14:27:22,315 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:27:20 GMT
+2025-02-10 14:27:22,315 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:27:22,315 - DEBUG - [client.py:335] - < content-length: 0
+2025-02-10 14:27:22,315 - DEBUG - [client.py:335] - < location: /auth/login
+2025-02-10 14:27:22,316 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:27:22,317 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:27:22,317 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:27:22,318 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:27:22,323 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:27:22,324 - DEBUG - [client.py:307] - > GET /auth/login HTTP/1.1
+2025-02-10 14:27:22,324 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:27:22,324 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:27:22,324 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:27:22,326 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: Uq4qyL5WDdqQyVz5w3tE3A==
+2025-02-10 14:27:22,326 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:27:22,326 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:27:22,327 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:27:22,338 - DEBUG - [client.py:333] - < HTTP/1.1 200 OK
+2025-02-10 14:27:22,339 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:27:20 GMT
+2025-02-10 14:27:22,339 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:27:22,339 - DEBUG - [client.py:335] - < content-length: 3340
+2025-02-10 14:27:22,340 - DEBUG - [client.py:335] - < content-type: text/html; charset=utf-8
+2025-02-10 14:27:22,340 - DEBUG - [client.py:337] - < [body] (3340 bytes)
+2025-02-10 14:27:22,340 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:27:22,340 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:27:22,341 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: server rejected WebSocket connection: HTTP 200
+2025-02-10 14:27:22,341 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:27:22,342 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:27:32,345 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6
+2025-02-10 14:27:32,355 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:27:32,358 - DEBUG - [client.py:307] - > GET /api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6 HTTP/1.1
+2025-02-10 14:27:32,359 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:27:32,360 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:27:32,364 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:27:32,365 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: cSEP8QDzFcbr49YZLON4IA==
+2025-02-10 14:27:32,366 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:27:32,366 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:27:32,367 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:27:32,381 - DEBUG - [client.py:333] - < HTTP/1.1 303 See Other
+2025-02-10 14:27:32,382 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:27:30 GMT
+2025-02-10 14:27:32,383 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:27:32,383 - DEBUG - [client.py:335] - < content-length: 0
+2025-02-10 14:27:32,384 - DEBUG - [client.py:335] - < location: /auth/login
+2025-02-10 14:27:32,384 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:27:32,385 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:27:32,386 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:27:32,388 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:27:32,393 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:27:32,395 - DEBUG - [client.py:307] - > GET /auth/login HTTP/1.1
+2025-02-10 14:27:32,395 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:27:32,396 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:27:32,396 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:27:32,396 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: i/F+VwQIGcVrPNM+1bm4cg==
+2025-02-10 14:27:32,397 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:27:32,397 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:27:32,397 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:27:32,412 - DEBUG - [client.py:333] - < HTTP/1.1 200 OK
+2025-02-10 14:27:32,412 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:27:30 GMT
+2025-02-10 14:27:32,412 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:27:32,413 - DEBUG - [client.py:335] - < content-length: 3340
+2025-02-10 14:27:32,413 - DEBUG - [client.py:335] - < content-type: text/html; charset=utf-8
+2025-02-10 14:27:32,413 - DEBUG - [client.py:337] - < [body] (3340 bytes)
+2025-02-10 14:27:32,413 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:27:32,414 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:27:32,414 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: server rejected WebSocket connection: HTTP 200
+2025-02-10 14:27:32,414 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:27:32,416 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:27:42,422 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6
+2025-02-10 14:27:42,430 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:27:42,431 - DEBUG - [client.py:307] - > GET /api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6 HTTP/1.1
+2025-02-10 14:27:42,432 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:27:42,433 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:27:42,433 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:27:42,433 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: jAGGmDVKg+tXTXGoYvxUuQ==
+2025-02-10 14:27:42,433 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:27:42,435 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:27:42,436 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:27:42,448 - DEBUG - [client.py:333] - < HTTP/1.1 303 See Other
+2025-02-10 14:27:42,449 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:27:40 GMT
+2025-02-10 14:27:42,449 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:27:42,449 - DEBUG - [client.py:335] - < content-length: 0
+2025-02-10 14:27:42,450 - DEBUG - [client.py:335] - < location: /auth/login
+2025-02-10 14:27:42,450 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:27:42,450 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:27:42,450 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:27:42,452 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:27:42,454 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:27:42,456 - DEBUG - [client.py:307] - > GET /auth/login HTTP/1.1
+2025-02-10 14:27:42,457 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:27:42,457 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:27:42,457 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:27:42,457 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: U+mAyV5oP5JQbR6r0RI8WA==
+2025-02-10 14:27:42,457 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:27:42,459 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:27:42,460 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:27:42,474 - DEBUG - [client.py:333] - < HTTP/1.1 200 OK
+2025-02-10 14:27:42,474 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:27:40 GMT
+2025-02-10 14:27:42,474 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:27:42,474 - DEBUG - [client.py:335] - < content-length: 3340
+2025-02-10 14:27:42,475 - DEBUG - [client.py:335] - < content-type: text/html; charset=utf-8
+2025-02-10 14:27:42,475 - DEBUG - [client.py:337] - < [body] (3340 bytes)
+2025-02-10 14:27:42,475 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:27:42,475 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:27:42,476 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: server rejected WebSocket connection: HTTP 200
+2025-02-10 14:27:42,476 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:27:42,476 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:27:52,486 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6
+2025-02-10 14:27:54,539 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-10 14:28:04,541 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6
+2025-02-10 14:28:06,614 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-10 14:28:16,616 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6
+2025-02-10 14:28:18,660 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-10 14:28:28,676 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6
+2025-02-10 14:28:30,737 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red

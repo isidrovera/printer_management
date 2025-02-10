@@ -17,3 +17,4 @@ python-multipart
 pyjwt
 bcrypt
 python-jose[cryptography]
+websockets
