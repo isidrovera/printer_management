@@ -35900,3 +35900,665 @@ json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
 2025-02-10 14:44:00,547 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: server rejected WebSocket connection: HTTP 200
 2025-02-10 14:44:00,547 - DEBUG - [protocol.py:649] - < EOF
 2025-02-10 14:44:00,547 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:44:10,550 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6
+2025-02-10 14:44:10,555 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:44:10,557 - DEBUG - [client.py:307] - > GET /api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6 HTTP/1.1
+2025-02-10 14:44:10,558 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:44:10,559 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:44:10,559 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:44:10,561 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: uQ7kRO1a9YLyizxkZcEn4Q==
+2025-02-10 14:44:10,561 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:44:10,561 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:44:10,561 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:44:10,572 - DEBUG - [client.py:333] - < HTTP/1.1 303 See Other
+2025-02-10 14:44:10,572 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:44:08 GMT
+2025-02-10 14:44:10,572 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:44:10,572 - DEBUG - [client.py:335] - < content-length: 0
+2025-02-10 14:44:10,572 - DEBUG - [client.py:335] - < location: /auth/login
+2025-02-10 14:44:10,574 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:44:10,574 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:44:10,575 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:44:10,576 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:44:10,580 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:44:10,582 - DEBUG - [client.py:307] - > GET /auth/login HTTP/1.1
+2025-02-10 14:44:10,582 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:44:10,582 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:44:10,582 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:44:10,583 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: ejRbcPcPJs5IOGg2IZeWrQ==
+2025-02-10 14:44:10,583 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:44:10,583 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:44:10,583 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:44:10,597 - DEBUG - [client.py:333] - < HTTP/1.1 200 OK
+2025-02-10 14:44:10,598 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:44:08 GMT
+2025-02-10 14:44:10,598 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:44:10,598 - DEBUG - [client.py:335] - < content-length: 3340
+2025-02-10 14:44:10,598 - DEBUG - [client.py:335] - < content-type: text/html; charset=utf-8
+2025-02-10 14:44:10,598 - DEBUG - [client.py:337] - < [body] (3340 bytes)
+2025-02-10 14:44:10,598 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:44:10,598 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:44:10,599 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: server rejected WebSocket connection: HTTP 200
+2025-02-10 14:44:10,599 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:44:10,600 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:44:20,606 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6
+2025-02-10 14:44:20,616 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:44:20,619 - DEBUG - [client.py:307] - > GET /api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6 HTTP/1.1
+2025-02-10 14:44:20,620 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:44:20,624 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:44:20,625 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:44:20,626 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: T/NrZZrZoFwrPbOczOA1DQ==
+2025-02-10 14:44:20,627 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:44:20,628 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:44:20,628 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:44:20,642 - DEBUG - [client.py:333] - < HTTP/1.1 303 See Other
+2025-02-10 14:44:20,643 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:44:18 GMT
+2025-02-10 14:44:20,644 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:44:20,644 - DEBUG - [client.py:335] - < content-length: 0
+2025-02-10 14:44:20,645 - DEBUG - [client.py:335] - < location: /auth/login
+2025-02-10 14:44:20,645 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:44:20,646 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:44:20,648 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:44:20,649 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:44:20,655 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:44:20,656 - DEBUG - [client.py:307] - > GET /auth/login HTTP/1.1
+2025-02-10 14:44:20,657 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:44:20,657 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:44:20,657 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:44:20,658 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: Vy4IVrwqTvYLXMxSA+QREA==
+2025-02-10 14:44:20,658 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:44:20,659 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:44:20,659 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:44:20,675 - DEBUG - [client.py:333] - < HTTP/1.1 200 OK
+2025-02-10 14:44:20,675 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:44:18 GMT
+2025-02-10 14:44:20,676 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:44:20,676 - DEBUG - [client.py:335] - < content-length: 3340
+2025-02-10 14:44:20,676 - DEBUG - [client.py:335] - < content-type: text/html; charset=utf-8
+2025-02-10 14:44:20,676 - DEBUG - [client.py:337] - < [body] (3340 bytes)
+2025-02-10 14:44:20,678 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:44:20,678 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:44:20,679 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: server rejected WebSocket connection: HTTP 200
+2025-02-10 14:44:20,679 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:44:20,679 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:44:30,689 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6
+2025-02-10 14:44:30,697 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:44:30,700 - DEBUG - [client.py:307] - > GET /api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6 HTTP/1.1
+2025-02-10 14:44:30,700 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:44:30,701 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:44:30,703 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:44:30,708 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: DSL8ftHjRP1UHzy77xh2xg==
+2025-02-10 14:44:30,711 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:44:30,712 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:44:30,714 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:44:30,728 - DEBUG - [client.py:333] - < HTTP/1.1 303 See Other
+2025-02-10 14:44:30,729 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:44:28 GMT
+2025-02-10 14:44:30,729 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:44:30,730 - DEBUG - [client.py:335] - < content-length: 0
+2025-02-10 14:44:30,730 - DEBUG - [client.py:335] - < location: /auth/login
+2025-02-10 14:44:30,730 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:44:30,731 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:44:30,732 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:44:30,733 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:44:30,738 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:44:30,740 - DEBUG - [client.py:307] - > GET /auth/login HTTP/1.1
+2025-02-10 14:44:30,740 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:44:30,741 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:44:30,741 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:44:30,742 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: xQgUY0PJFjneTbwbKNO2IQ==
+2025-02-10 14:44:30,742 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:44:30,742 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:44:30,744 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:44:30,759 - DEBUG - [client.py:333] - < HTTP/1.1 200 OK
+2025-02-10 14:44:30,759 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:44:28 GMT
+2025-02-10 14:44:30,759 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:44:30,759 - DEBUG - [client.py:335] - < content-length: 3340
+2025-02-10 14:44:30,760 - DEBUG - [client.py:335] - < content-type: text/html; charset=utf-8
+2025-02-10 14:44:30,760 - DEBUG - [client.py:337] - < [body] (3340 bytes)
+2025-02-10 14:44:30,761 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:44:30,761 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:44:30,762 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: server rejected WebSocket connection: HTTP 200
+2025-02-10 14:44:30,762 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:44:30,763 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:44:40,773 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6
+2025-02-10 14:44:40,783 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:44:40,784 - DEBUG - [client.py:307] - > GET /api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6 HTTP/1.1
+2025-02-10 14:44:40,785 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:44:40,785 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:44:40,786 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:44:40,786 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: /IucKjrQaelZpqn425TMUw==
+2025-02-10 14:44:40,786 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:44:40,788 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:44:40,788 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:44:40,798 - DEBUG - [client.py:333] - < HTTP/1.1 303 See Other
+2025-02-10 14:44:40,799 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:44:38 GMT
+2025-02-10 14:44:40,799 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:44:40,800 - DEBUG - [client.py:335] - < content-length: 0
+2025-02-10 14:44:40,800 - DEBUG - [client.py:335] - < location: /auth/login
+2025-02-10 14:44:40,800 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:44:40,800 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:44:40,802 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:44:40,802 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:44:40,807 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:44:40,808 - DEBUG - [client.py:307] - > GET /auth/login HTTP/1.1
+2025-02-10 14:44:40,809 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:44:40,809 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:44:40,809 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:44:40,810 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: OGS373fGKdsegFgNnQffkA==
+2025-02-10 14:44:40,810 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:44:40,810 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:44:40,810 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:44:40,823 - DEBUG - [client.py:333] - < HTTP/1.1 200 OK
+2025-02-10 14:44:40,824 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:44:38 GMT
+2025-02-10 14:44:40,824 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:44:40,824 - DEBUG - [client.py:335] - < content-length: 3340
+2025-02-10 14:44:40,824 - DEBUG - [client.py:335] - < content-type: text/html; charset=utf-8
+2025-02-10 14:44:40,824 - DEBUG - [client.py:337] - < [body] (3340 bytes)
+2025-02-10 14:44:40,825 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:44:40,825 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:44:40,826 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: server rejected WebSocket connection: HTTP 200
+2025-02-10 14:44:40,826 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:44:40,827 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:44:50,830 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6
+2025-02-10 14:44:50,838 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:44:50,838 - DEBUG - [client.py:307] - > GET /api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6 HTTP/1.1
+2025-02-10 14:44:50,838 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:44:50,838 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:44:50,838 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:44:50,838 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: 8rya+q80KLsURW1iJ9kieg==
+2025-02-10 14:44:50,838 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:44:50,838 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:44:50,840 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:44:50,851 - DEBUG - [client.py:333] - < HTTP/1.1 303 See Other
+2025-02-10 14:44:50,851 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:44:48 GMT
+2025-02-10 14:44:50,852 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:44:50,852 - DEBUG - [client.py:335] - < content-length: 0
+2025-02-10 14:44:50,852 - DEBUG - [client.py:335] - < location: /auth/login
+2025-02-10 14:44:50,853 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:44:50,853 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:44:50,854 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:44:50,854 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:44:50,859 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:44:50,861 - DEBUG - [client.py:307] - > GET /auth/login HTTP/1.1
+2025-02-10 14:44:50,861 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:44:50,862 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:44:50,862 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:44:50,862 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: OKpEZA4O9sf6OGRprtfX8w==
+2025-02-10 14:44:50,863 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:44:50,863 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:44:50,863 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:44:50,875 - DEBUG - [client.py:333] - < HTTP/1.1 200 OK
+2025-02-10 14:44:50,876 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:44:48 GMT
+2025-02-10 14:44:50,876 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:44:50,877 - DEBUG - [client.py:335] - < content-length: 3340
+2025-02-10 14:44:50,877 - DEBUG - [client.py:335] - < content-type: text/html; charset=utf-8
+2025-02-10 14:44:50,877 - DEBUG - [client.py:337] - < [body] (3340 bytes)
+2025-02-10 14:44:50,877 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:44:50,878 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:44:50,878 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: server rejected WebSocket connection: HTTP 200
+2025-02-10 14:44:50,881 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:44:50,881 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:45:00,884 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6
+2025-02-10 14:45:00,888 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:45:00,891 - DEBUG - [client.py:307] - > GET /api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6 HTTP/1.1
+2025-02-10 14:45:00,892 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:45:00,892 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:45:00,892 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:45:00,893 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: HX8uhsgXbwnMBTsGJEExLA==
+2025-02-10 14:45:00,893 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:45:00,893 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:45:00,893 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:45:00,906 - DEBUG - [client.py:333] - < HTTP/1.1 303 See Other
+2025-02-10 14:45:00,906 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:44:58 GMT
+2025-02-10 14:45:00,906 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:45:00,906 - DEBUG - [client.py:335] - < content-length: 0
+2025-02-10 14:45:00,906 - DEBUG - [client.py:335] - < location: /auth/login
+2025-02-10 14:45:00,906 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:45:00,907 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:45:00,907 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:45:00,907 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:45:00,914 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:45:00,915 - DEBUG - [client.py:307] - > GET /auth/login HTTP/1.1
+2025-02-10 14:45:00,915 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:45:00,915 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:45:00,916 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:45:00,916 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: CSo0EpPQw/cd9FyL8q+YMg==
+2025-02-10 14:45:00,916 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:45:00,916 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:45:00,916 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:45:00,932 - DEBUG - [client.py:333] - < HTTP/1.1 200 OK
+2025-02-10 14:45:00,932 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:44:58 GMT
+2025-02-10 14:45:00,933 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:45:00,933 - DEBUG - [client.py:335] - < content-length: 3340
+2025-02-10 14:45:00,933 - DEBUG - [client.py:335] - < content-type: text/html; charset=utf-8
+2025-02-10 14:45:00,933 - DEBUG - [client.py:337] - < [body] (3340 bytes)
+2025-02-10 14:45:00,933 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:45:00,933 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:45:00,935 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: server rejected WebSocket connection: HTTP 200
+2025-02-10 14:45:00,935 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:45:00,935 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:45:10,949 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6
+2025-02-10 14:45:10,963 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:45:10,965 - DEBUG - [client.py:307] - > GET /api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6 HTTP/1.1
+2025-02-10 14:45:10,970 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:45:10,970 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:45:10,971 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:45:10,972 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: JZRpNnaOkvi3+JYxTgGinw==
+2025-02-10 14:45:10,972 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:45:10,972 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:45:10,973 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:45:11,007 - DEBUG - [client.py:333] - < HTTP/1.1 303 See Other
+2025-02-10 14:45:11,008 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:45:08 GMT
+2025-02-10 14:45:11,009 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:45:11,011 - DEBUG - [client.py:335] - < content-length: 0
+2025-02-10 14:45:11,011 - DEBUG - [client.py:335] - < location: /auth/login
+2025-02-10 14:45:11,012 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:45:11,012 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:45:11,016 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:45:11,017 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:45:11,022 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:45:11,024 - DEBUG - [client.py:307] - > GET /auth/login HTTP/1.1
+2025-02-10 14:45:11,025 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:45:11,025 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:45:11,026 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:45:11,027 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: 7Pvnq6L49rAfmmK8Wb3fzg==
+2025-02-10 14:45:11,027 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:45:11,028 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:45:11,028 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:45:11,044 - DEBUG - [client.py:333] - < HTTP/1.1 200 OK
+2025-02-10 14:45:11,044 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:45:08 GMT
+2025-02-10 14:45:11,046 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:45:11,046 - DEBUG - [client.py:335] - < content-length: 3340
+2025-02-10 14:45:11,046 - DEBUG - [client.py:335] - < content-type: text/html; charset=utf-8
+2025-02-10 14:45:11,047 - DEBUG - [client.py:337] - < [body] (3340 bytes)
+2025-02-10 14:45:11,048 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:45:11,048 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:45:11,048 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: server rejected WebSocket connection: HTTP 200
+2025-02-10 14:45:11,049 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:45:11,049 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:45:21,051 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6
+2025-02-10 14:45:23,110 - ERROR - [agent_service.py:144] - 🚨 Error en la conexión WebSocket: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-10 14:45:35,336 - DEBUG - [proactor_events.py:625] - Using proactor: IocpProactor
+2025-02-10 14:45:35,338 - INFO - [printer_monitor_service.py:50] - PrinterMonitorService inicializado con URL: ws://161.132.39.159:8000
+2025-02-10 14:45:35,338 - DEBUG - [printer_monitor_service.py:51] - Verificando configuración inicial:
+2025-02-10 14:45:35,340 - DEBUG - [printer_monitor_service.py:52] -   SERVER_URL: ws://161.132.39.159:8000
+2025-02-10 14:45:35,340 - DEBUG - [printer_monitor_service.py:53] -   CLIENT_TOKEN presente: Sí
+2025-02-10 14:45:35,340 - DEBUG - [printer_monitor_service.py:54] -   AGENT_TOKEN presente: Sí
+2025-02-10 14:45:35,341 - DEBUG - [printer_monitor_service.py:55] -   SNMP Community: public
+2025-02-10 14:45:35,341 - DEBUG - [printer_monitor_service.py:56] -   SNMP Port: 161
+2025-02-10 14:45:35,341 - DEBUG - [printer_monitor_service.py:57] -   SNMP Timeout: 3s
+2025-02-10 14:45:35,341 - DEBUG - [printer_monitor_service.py:58] -   SNMP Retries: 2
+2025-02-10 14:45:35,341 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6
+2025-02-10 14:45:35,390 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:45:35,391 - DEBUG - [client.py:307] - > GET /api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6 HTTP/1.1
+2025-02-10 14:45:35,391 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:45:35,391 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:45:35,392 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:45:35,392 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: 8OWimv4HHQTCRqMShNPmUg==
+2025-02-10 14:45:35,392 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:45:35,392 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:45:35,392 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:45:35,423 - DEBUG - [client.py:333] - < HTTP/1.1 101 Switching Protocols
+2025-02-10 14:45:35,423 - DEBUG - [client.py:335] - < Upgrade: websocket
+2025-02-10 14:45:35,423 - DEBUG - [client.py:335] - < Connection: Upgrade
+2025-02-10 14:45:35,424 - DEBUG - [client.py:335] - < Sec-WebSocket-Accept: AQd0URrSdChE+L4q5wSH5Ghrf2I=
+2025-02-10 14:45:35,424 - DEBUG - [client.py:335] - < Sec-WebSocket-Extensions: permessage-deflate
+2025-02-10 14:45:35,424 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:45:32 GMT
+2025-02-10 14:45:35,425 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:45:35,429 - DEBUG - [protocol.py:175] - = connection is OPEN
+2025-02-10 14:45:35,430 - INFO - [agent_service.py:131] - ✅ Conectado al servidor WebSocket correctamente.
+2025-02-10 14:45:36,545 - ERROR - [agent_service.py:428] - 🚨 Error en la actualización del agente: 200, message='Attempt to decode JSON with unexpected mimetype: text/html; charset=utf-8', url='ws://161.132.39.159:8000/auth/login'
+2025-02-10 14:45:36,546 - INFO - [printer_monitor_service.py:68] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-10 14:45:36,549 - DEBUG - [printer_monitor_service.py:80] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-10 14:45:36,549 - DEBUG - [printer_monitor_service.py:81] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_32499ebe03d94fee8d8e5dd9446f46a6', 'Content-Type': 'application/json'}
+2025-02-10 14:45:36,583 - DEBUG - [printer_monitor_service.py:86] - 📥 Respuesta (200): <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Printer Management</title>
+   ...
+2025-02-10 14:45:36,584 - ERROR - [printer_monitor_service.py:98] - ❌ Error decodificando JSON: Expecting value: line 1 column 1 (char 0)
+Traceback (most recent call last):
+  File "C:\Users\pc\Desktop\printer_management\agent\app\services\printer_monitor_service.py", line 89, in get_monitored_printers
+    printers = json.loads(response_text)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-02-10 14:45:55,422 - DEBUG - [protocol.py:599] - < PING b4 cf 08 a2 [binary, 4 bytes]
+2025-02-10 14:45:55,423 - DEBUG - [protocol.py:745] - > PONG b4 cf 08 a2 [binary, 4 bytes]
+2025-02-10 14:45:55,425 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 14:45:55,426 - DEBUG - [protocol.py:745] - > PING 7b 94 29 50 [binary, 4 bytes]
+2025-02-10 14:45:55,432 - DEBUG - [protocol.py:599] - < PONG 7b 94 29 50 [binary, 4 bytes]
+2025-02-10 14:45:55,432 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 14:46:14,515 - DEBUG - [protocol.py:745] - > CLOSE 1000 (OK) [2 bytes]
+2025-02-10 14:46:14,515 - DEBUG - [protocol.py:175] - = connection is CLOSING
+2025-02-10 14:46:14,524 - DEBUG - [protocol.py:599] - < CLOSE 1000 (OK) [2 bytes]
+2025-02-10 14:46:14,526 - DEBUG - [protocol.py:649] - < EOF
+2025-02-10 14:46:14,526 - DEBUG - [protocol.py:757] - > EOF
+2025-02-10 14:46:14,526 - DEBUG - [protocol.py:175] - = connection is CLOSED
+2025-02-10 14:46:14,528 - DEBUG - [connection.py:951] - x half-closing TCP connection
+2025-02-10 14:46:21,723 - DEBUG - [proactor_events.py:625] - Using proactor: IocpProactor
+2025-02-10 14:46:21,723 - INFO - [printer_monitor_service.py:50] - PrinterMonitorService inicializado con URL: ws://161.132.39.159:8000
+2025-02-10 14:46:21,723 - DEBUG - [printer_monitor_service.py:51] - Verificando configuración inicial:
+2025-02-10 14:46:21,725 - DEBUG - [printer_monitor_service.py:52] -   SERVER_URL: ws://161.132.39.159:8000
+2025-02-10 14:46:21,725 - DEBUG - [printer_monitor_service.py:53] -   CLIENT_TOKEN presente: Sí
+2025-02-10 14:46:21,725 - DEBUG - [printer_monitor_service.py:54] -   AGENT_TOKEN presente: Sí
+2025-02-10 14:46:21,725 - DEBUG - [printer_monitor_service.py:55] -   SNMP Community: public
+2025-02-10 14:46:21,725 - DEBUG - [printer_monitor_service.py:56] -   SNMP Port: 161
+2025-02-10 14:46:21,725 - DEBUG - [printer_monitor_service.py:57] -   SNMP Timeout: 3s
+2025-02-10 14:46:21,725 - DEBUG - [printer_monitor_service.py:58] -   SNMP Retries: 2
+2025-02-10 14:46:21,725 - DEBUG - [agent_service.py:128] - 🔗 Conectando al servidor WebSocket: ws://161.132.39.159:8000/api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6
+2025-02-10 14:46:21,761 - DEBUG - [protocol.py:175] - = connection is CONNECTING
+2025-02-10 14:46:21,761 - DEBUG - [client.py:307] - > GET /api/v1/ws/agent/agt_32499ebe03d94fee8d8e5dd9446f46a6 HTTP/1.1
+2025-02-10 14:46:21,761 - DEBUG - [client.py:309] - > Host: 161.132.39.159:8000
+2025-02-10 14:46:21,770 - DEBUG - [client.py:309] - > Upgrade: websocket
+2025-02-10 14:46:21,770 - DEBUG - [client.py:309] - > Connection: Upgrade
+2025-02-10 14:46:21,770 - DEBUG - [client.py:309] - > Sec-WebSocket-Key: v3Eb6pX2YRXvVwDSf6LyAg==
+2025-02-10 14:46:21,770 - DEBUG - [client.py:309] - > Sec-WebSocket-Version: 13
+2025-02-10 14:46:21,770 - DEBUG - [client.py:309] - > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+2025-02-10 14:46:21,770 - DEBUG - [client.py:309] - > User-Agent: Python/3.10 websockets/14.2
+2025-02-10 14:46:21,789 - DEBUG - [client.py:333] - < HTTP/1.1 101 Switching Protocols
+2025-02-10 14:46:21,789 - DEBUG - [client.py:335] - < Upgrade: websocket
+2025-02-10 14:46:21,789 - DEBUG - [client.py:335] - < Connection: Upgrade
+2025-02-10 14:46:21,789 - DEBUG - [client.py:335] - < Sec-WebSocket-Accept: 5QkFUnksEnnCoJjCmF8YuCl7S0w=
+2025-02-10 14:46:21,793 - DEBUG - [client.py:335] - < Sec-WebSocket-Extensions: permessage-deflate
+2025-02-10 14:46:21,796 - DEBUG - [client.py:335] - < date: Mon, 10 Feb 2025 19:46:19 GMT
+2025-02-10 14:46:21,796 - DEBUG - [client.py:335] - < server: uvicorn
+2025-02-10 14:46:21,798 - DEBUG - [protocol.py:175] - = connection is OPEN
+2025-02-10 14:46:21,798 - INFO - [agent_service.py:131] - ✅ Conectado al servidor WebSocket correctamente.
+2025-02-10 14:46:22,884 - ERROR - [agent_service.py:428] - 🚨 Error en la actualización del agente: 200, message='Attempt to decode JSON with unexpected mimetype: text/html; charset=utf-8', url='ws://161.132.39.159:8000/auth/login'
+2025-02-10 14:46:22,884 - INFO - [printer_monitor_service.py:68] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-10 14:46:22,899 - DEBUG - [printer_monitor_service.py:80] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-10 14:46:22,899 - DEBUG - [printer_monitor_service.py:81] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_32499ebe03d94fee8d8e5dd9446f46a6', 'Content-Type': 'application/json'}
+2025-02-10 14:46:22,917 - DEBUG - [printer_monitor_service.py:86] - 📥 Respuesta (200): <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Printer Management</title>
+   ...
+2025-02-10 14:46:22,917 - ERROR - [printer_monitor_service.py:98] - ❌ Error decodificando JSON: Expecting value: line 1 column 1 (char 0)
+Traceback (most recent call last):
+  File "C:\Users\pc\Desktop\printer_management\agent\app\services\printer_monitor_service.py", line 89, in get_monitored_printers
+    printers = json.loads(response_text)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-02-10 14:46:41,788 - DEBUG - [protocol.py:599] - < PING 'hޥ\x15' [text, 4 bytes]
+2025-02-10 14:46:41,791 - DEBUG - [protocol.py:745] - > PONG 'hޥ\x15' [text, 4 bytes]
+2025-02-10 14:46:41,812 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 14:46:41,814 - DEBUG - [protocol.py:745] - > PING 8f a7 dc 44 [binary, 4 bytes]
+2025-02-10 14:46:41,820 - DEBUG - [protocol.py:599] - < PONG 8f a7 dc 44 [binary, 4 bytes]
+2025-02-10 14:46:41,821 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 14:47:01,814 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 14:47:01,814 - DEBUG - [protocol.py:745] - > PING 39 4b 89 8a [binary, 4 bytes]
+2025-02-10 14:47:01,820 - DEBUG - [protocol.py:599] - < PING 3c 65 c0 bc [binary, 4 bytes]
+2025-02-10 14:47:01,821 - DEBUG - [protocol.py:745] - > PONG 3c 65 c0 bc [binary, 4 bytes]
+2025-02-10 14:47:01,822 - DEBUG - [protocol.py:599] - < PONG 39 4b 89 8a [binary, 4 bytes]
+2025-02-10 14:47:01,823 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 14:47:21,821 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 14:47:21,822 - DEBUG - [protocol.py:745] - > PING 8a f4 20 fd [binary, 4 bytes]
+2025-02-10 14:47:21,827 - DEBUG - [protocol.py:599] - < PING e2 15 f8 69 [binary, 4 bytes]
+2025-02-10 14:47:21,828 - DEBUG - [protocol.py:745] - > PONG e2 15 f8 69 [binary, 4 bytes]
+2025-02-10 14:47:21,829 - DEBUG - [protocol.py:599] - < PONG 8a f4 20 fd [binary, 4 bytes]
+2025-02-10 14:47:21,830 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 14:47:41,835 - DEBUG - [protocol.py:599] - < PING a3 16 8e 0d [binary, 4 bytes]
+2025-02-10 14:47:41,839 - DEBUG - [protocol.py:745] - > PONG a3 16 8e 0d [binary, 4 bytes]
+2025-02-10 14:47:41,841 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 14:47:41,843 - DEBUG - [protocol.py:745] - > PING e3 7f 2c 8b [binary, 4 bytes]
+2025-02-10 14:47:41,849 - DEBUG - [protocol.py:599] - < PONG e3 7f 2c 8b [binary, 4 bytes]
+2025-02-10 14:47:41,850 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 14:48:01,847 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 14:48:01,847 - DEBUG - [protocol.py:745] - > PING a6 0e 32 98 [binary, 4 bytes]
+2025-02-10 14:48:01,849 - DEBUG - [protocol.py:599] - < PING c6 55 72 f3 [binary, 4 bytes]
+2025-02-10 14:48:01,850 - DEBUG - [protocol.py:745] - > PONG c6 55 72 f3 [binary, 4 bytes]
+2025-02-10 14:48:01,854 - DEBUG - [protocol.py:599] - < PONG a6 0e 32 98 [binary, 4 bytes]
+2025-02-10 14:48:01,854 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 14:48:21,851 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 14:48:21,853 - DEBUG - [protocol.py:745] - > PING a3 bd c1 2e [binary, 4 bytes]
+2025-02-10 14:48:21,858 - DEBUG - [protocol.py:599] - < PING 0e 95 8f 86 [binary, 4 bytes]
+2025-02-10 14:48:21,861 - DEBUG - [protocol.py:745] - > PONG 0e 95 8f 86 [binary, 4 bytes]
+2025-02-10 14:48:21,862 - DEBUG - [protocol.py:599] - < PONG a3 bd c1 2e [binary, 4 bytes]
+2025-02-10 14:48:21,862 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 14:48:41,864 - DEBUG - [protocol.py:599] - < PING '\x00g=<' [text, 4 bytes]
+2025-02-10 14:48:41,866 - DEBUG - [protocol.py:745] - > PONG '\x00g=<' [text, 4 bytes]
+2025-02-10 14:48:41,870 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 14:48:41,870 - DEBUG - [protocol.py:745] - > PING ab 5c 40 41 [binary, 4 bytes]
+2025-02-10 14:48:41,876 - DEBUG - [protocol.py:599] - < PONG ab 5c 40 41 [binary, 4 bytes]
+2025-02-10 14:48:41,877 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 14:49:01,877 - DEBUG - [protocol.py:599] - < PING a3 88 7f 3d [binary, 4 bytes]
+2025-02-10 14:49:01,877 - DEBUG - [protocol.py:745] - > PONG a3 88 7f 3d [binary, 4 bytes]
+2025-02-10 14:49:01,882 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 14:49:01,883 - DEBUG - [protocol.py:745] - > PING d3 6f bf 32 [binary, 4 bytes]
+2025-02-10 14:49:01,891 - DEBUG - [protocol.py:599] - < PONG d3 6f bf 32 [binary, 4 bytes]
+2025-02-10 14:49:01,893 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 14:49:21,888 - DEBUG - [protocol.py:599] - < PING '\x0e9N&' [text, 4 bytes]
+2025-02-10 14:49:21,890 - DEBUG - [protocol.py:745] - > PONG '\x0e9N&' [text, 4 bytes]
+2025-02-10 14:49:21,893 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 14:49:21,894 - DEBUG - [protocol.py:745] - > PING d4 3d 8c 94 [binary, 4 bytes]
+2025-02-10 14:49:21,902 - DEBUG - [protocol.py:599] - < PONG d4 3d 8c 94 [binary, 4 bytes]
+2025-02-10 14:49:21,904 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 14:49:41,900 - DEBUG - [protocol.py:599] - < PING ca 61 4e f3 [binary, 4 bytes]
+2025-02-10 14:49:41,901 - DEBUG - [protocol.py:745] - > PONG ca 61 4e f3 [binary, 4 bytes]
+2025-02-10 14:49:41,904 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 14:49:41,905 - DEBUG - [protocol.py:745] - > PING 69 58 e8 3c [binary, 4 bytes]
+2025-02-10 14:49:41,911 - DEBUG - [protocol.py:599] - < PONG 69 58 e8 3c [binary, 4 bytes]
+2025-02-10 14:49:41,912 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 14:50:01,910 - DEBUG - [protocol.py:599] - < PING c2 91 3e 9e [binary, 4 bytes]
+2025-02-10 14:50:01,913 - DEBUG - [protocol.py:745] - > PONG c2 91 3e 9e [binary, 4 bytes]
+2025-02-10 14:50:01,915 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 14:50:01,916 - DEBUG - [protocol.py:745] - > PING e5 93 47 c4 [binary, 4 bytes]
+2025-02-10 14:50:01,922 - DEBUG - [protocol.py:599] - < PONG e5 93 47 c4 [binary, 4 bytes]
+2025-02-10 14:50:01,923 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 14:50:21,920 - DEBUG - [protocol.py:599] - < PING 24 5b 8e 67 [binary, 4 bytes]
+2025-02-10 14:50:21,922 - DEBUG - [protocol.py:745] - > PONG 24 5b 8e 67 [binary, 4 bytes]
+2025-02-10 14:50:21,925 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 14:50:21,926 - DEBUG - [protocol.py:745] - > PING 97 04 e1 4a [binary, 4 bytes]
+2025-02-10 14:50:21,932 - DEBUG - [protocol.py:599] - < PONG 97 04 e1 4a [binary, 4 bytes]
+2025-02-10 14:50:21,934 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 14:50:41,933 - DEBUG - [protocol.py:599] - < PING 9c 9b 0c 59 [binary, 4 bytes]
+2025-02-10 14:50:41,935 - DEBUG - [protocol.py:745] - > PONG 9c 9b 0c 59 [binary, 4 bytes]
+2025-02-10 14:50:41,938 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 14:50:41,939 - DEBUG - [protocol.py:745] - > PING 'l>/r' [text, 4 bytes]
+2025-02-10 14:50:41,944 - DEBUG - [protocol.py:599] - < PONG 'l>/r' [text, 4 bytes]
+2025-02-10 14:50:41,945 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 14:51:01,939 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 14:51:01,939 - DEBUG - [protocol.py:745] - > PING 95 97 f0 85 [binary, 4 bytes]
+2025-02-10 14:51:01,944 - DEBUG - [protocol.py:599] - < PING 68 4f e2 97 [binary, 4 bytes]
+2025-02-10 14:51:01,945 - DEBUG - [protocol.py:745] - > PONG 68 4f e2 97 [binary, 4 bytes]
+2025-02-10 14:51:01,946 - DEBUG - [protocol.py:599] - < PONG 95 97 f0 85 [binary, 4 bytes]
+2025-02-10 14:51:01,946 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 14:51:21,933 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 14:51:21,934 - DEBUG - [protocol.py:745] - > PING e5 e0 5b c0 [binary, 4 bytes]
+2025-02-10 14:51:21,944 - DEBUG - [protocol.py:599] - < PONG e5 e0 5b c0 [binary, 4 bytes]
+2025-02-10 14:51:21,946 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 14:51:21,952 - DEBUG - [protocol.py:599] - < PING 8f 50 6a 97 [binary, 4 bytes]
+2025-02-10 14:51:21,953 - DEBUG - [protocol.py:745] - > PONG 8f 50 6a 97 [binary, 4 bytes]
+2025-02-10 14:51:24,033 - ERROR - [agent_service.py:428] - 🚨 Error en la actualización del agente: 200, message='Attempt to decode JSON with unexpected mimetype: text/html; charset=utf-8', url='ws://161.132.39.159:8000/auth/login'
+2025-02-10 14:51:24,033 - INFO - [printer_monitor_service.py:68] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-10 14:51:24,035 - DEBUG - [printer_monitor_service.py:80] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-10 14:51:24,035 - DEBUG - [printer_monitor_service.py:81] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_32499ebe03d94fee8d8e5dd9446f46a6', 'Content-Type': 'application/json'}
+2025-02-10 14:51:24,063 - DEBUG - [printer_monitor_service.py:86] - 📥 Respuesta (200): <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Printer Management</title>
+   ...
+2025-02-10 14:51:24,064 - ERROR - [printer_monitor_service.py:98] - ❌ Error decodificando JSON: Expecting value: line 1 column 1 (char 0)
+Traceback (most recent call last):
+  File "C:\Users\pc\Desktop\printer_management\agent\app\services\printer_monitor_service.py", line 89, in get_monitored_printers
+    printers = json.loads(response_text)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-02-10 14:51:41,941 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 14:51:41,941 - DEBUG - [protocol.py:745] - > PING 6a 4e 67 db [binary, 4 bytes]
+2025-02-10 14:51:41,949 - DEBUG - [protocol.py:599] - < PONG 6a 4e 67 db [binary, 4 bytes]
+2025-02-10 14:51:41,950 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 14:51:41,961 - DEBUG - [protocol.py:599] - < PING 95 f0 a1 6e [binary, 4 bytes]
+2025-02-10 14:51:41,961 - DEBUG - [protocol.py:745] - > PONG 95 f0 a1 6e [binary, 4 bytes]
+2025-02-10 14:52:01,954 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 14:52:01,956 - DEBUG - [protocol.py:745] - > PING d3 6b a7 66 [binary, 4 bytes]
+2025-02-10 14:52:01,966 - DEBUG - [protocol.py:599] - < PONG d3 6b a7 66 [binary, 4 bytes]
+2025-02-10 14:52:01,967 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 14:52:01,969 - DEBUG - [protocol.py:599] - < PING 'ZԱ>' [text, 4 bytes]
+2025-02-10 14:52:01,974 - DEBUG - [protocol.py:745] - > PONG 'ZԱ>' [text, 4 bytes]
+2025-02-10 14:52:21,974 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 14:52:21,974 - DEBUG - [protocol.py:745] - > PING 43 69 0d ff [binary, 4 bytes]
+2025-02-10 14:52:21,980 - DEBUG - [protocol.py:599] - < PING de 25 24 fc [binary, 4 bytes]
+2025-02-10 14:52:21,981 - DEBUG - [protocol.py:745] - > PONG de 25 24 fc [binary, 4 bytes]
+2025-02-10 14:52:21,982 - DEBUG - [protocol.py:599] - < PONG 43 69 0d ff [binary, 4 bytes]
+2025-02-10 14:52:21,982 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 14:52:41,986 - DEBUG - [protocol.py:599] - < PING 68 1d 37 8d [binary, 4 bytes]
+2025-02-10 14:52:41,986 - DEBUG - [protocol.py:745] - > PONG 68 1d 37 8d [binary, 4 bytes]
+2025-02-10 14:52:41,988 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 14:52:41,988 - DEBUG - [protocol.py:745] - > PING a7 9d 8b 20 [binary, 4 bytes]
+2025-02-10 14:52:41,994 - DEBUG - [protocol.py:599] - < PONG a7 9d 8b 20 [binary, 4 bytes]
+2025-02-10 14:52:41,995 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 14:53:01,995 - DEBUG - [protocol.py:599] - < PING 41 5c c7 6f [binary, 4 bytes]
+2025-02-10 14:53:01,997 - DEBUG - [protocol.py:745] - > PONG 41 5c c7 6f [binary, 4 bytes]
+2025-02-10 14:53:02,002 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 14:53:02,005 - DEBUG - [protocol.py:745] - > PING 51 84 2c 2e [binary, 4 bytes]
+2025-02-10 14:53:02,012 - DEBUG - [protocol.py:599] - < PONG 51 84 2c 2e [binary, 4 bytes]
+2025-02-10 14:53:02,013 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 14:53:22,007 - DEBUG - [protocol.py:599] - < PING b0 53 2a a0 [binary, 4 bytes]
+2025-02-10 14:53:22,008 - DEBUG - [protocol.py:745] - > PONG b0 53 2a a0 [binary, 4 bytes]
+2025-02-10 14:53:22,011 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 14:53:22,012 - DEBUG - [protocol.py:745] - > PING c4 e4 a7 3c [binary, 4 bytes]
+2025-02-10 14:53:22,018 - DEBUG - [protocol.py:599] - < PONG c4 e4 a7 3c [binary, 4 bytes]
+2025-02-10 14:53:22,019 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 14:53:42,018 - DEBUG - [protocol.py:599] - < PING 3a c8 a9 bb [binary, 4 bytes]
+2025-02-10 14:53:42,020 - DEBUG - [protocol.py:745] - > PONG 3a c8 a9 bb [binary, 4 bytes]
+2025-02-10 14:53:42,023 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 14:53:42,024 - DEBUG - [protocol.py:745] - > PING f4 3d 2b ff [binary, 4 bytes]
+2025-02-10 14:53:42,032 - DEBUG - [protocol.py:599] - < PONG f4 3d 2b ff [binary, 4 bytes]
+2025-02-10 14:53:42,034 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 14:54:02,020 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 14:54:02,022 - DEBUG - [protocol.py:745] - > PING e5 05 b5 1d [binary, 4 bytes]
+2025-02-10 14:54:02,030 - DEBUG - [protocol.py:599] - < PING 'j\\U\x1b' [text, 4 bytes]
+2025-02-10 14:54:02,031 - DEBUG - [protocol.py:745] - > PONG 'j\\U\x1b' [text, 4 bytes]
+2025-02-10 14:54:02,033 - DEBUG - [protocol.py:599] - < PONG e5 05 b5 1d [binary, 4 bytes]
+2025-02-10 14:54:02,036 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 14:54:22,036 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 14:54:22,036 - DEBUG - [protocol.py:745] - > PING 78 b4 c2 d9 [binary, 4 bytes]
+2025-02-10 14:54:22,039 - DEBUG - [protocol.py:599] - < PING 6c 14 02 d5 [binary, 4 bytes]
+2025-02-10 14:54:22,039 - DEBUG - [protocol.py:745] - > PONG 6c 14 02 d5 [binary, 4 bytes]
+2025-02-10 14:54:22,041 - DEBUG - [protocol.py:599] - < PONG 78 b4 c2 d9 [binary, 4 bytes]
+2025-02-10 14:54:22,041 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 14:54:42,047 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 14:54:42,048 - DEBUG - [protocol.py:745] - > PING bb 84 5d 6d [binary, 4 bytes]
+2025-02-10 14:54:42,051 - DEBUG - [protocol.py:599] - < PING 36 d1 2b de [binary, 4 bytes]
+2025-02-10 14:54:42,053 - DEBUG - [protocol.py:745] - > PONG 36 d1 2b de [binary, 4 bytes]
+2025-02-10 14:54:42,058 - DEBUG - [protocol.py:599] - < PONG bb 84 5d 6d [binary, 4 bytes]
+2025-02-10 14:54:42,059 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 14:55:02,047 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 14:55:02,048 - DEBUG - [protocol.py:745] - > PING 2e 04 e1 4b [binary, 4 bytes]
+2025-02-10 14:55:02,058 - DEBUG - [protocol.py:599] - < PONG 2e 04 e1 4b [binary, 4 bytes]
+2025-02-10 14:55:02,059 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 14:55:02,063 - DEBUG - [protocol.py:599] - < PING 92 05 f1 32 [binary, 4 bytes]
+2025-02-10 14:55:02,065 - DEBUG - [protocol.py:745] - > PONG 92 05 f1 32 [binary, 4 bytes]
+2025-02-10 14:55:22,039 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 14:55:22,041 - DEBUG - [protocol.py:745] - > PING 98 8c 22 cc [binary, 4 bytes]
+2025-02-10 14:55:22,053 - DEBUG - [protocol.py:599] - < PONG 98 8c 22 cc [binary, 4 bytes]
+2025-02-10 14:55:22,054 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 14:55:22,073 - DEBUG - [protocol.py:599] - < PING 'Oc\x14{' [text, 4 bytes]
+2025-02-10 14:55:22,075 - DEBUG - [protocol.py:745] - > PONG 'Oc\x14{' [text, 4 bytes]
+2025-02-10 14:55:42,057 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 14:55:42,057 - DEBUG - [protocol.py:745] - > PING 77 4d 8a 43 [binary, 4 bytes]
+2025-02-10 14:55:42,064 - DEBUG - [protocol.py:599] - < PONG 77 4d 8a 43 [binary, 4 bytes]
+2025-02-10 14:55:42,064 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 14:55:42,081 - DEBUG - [protocol.py:599] - < PING 25 2a 67 e7 [binary, 4 bytes]
+2025-02-10 14:55:42,081 - DEBUG - [protocol.py:745] - > PONG 25 2a 67 e7 [binary, 4 bytes]
+2025-02-10 14:56:02,075 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 14:56:02,077 - DEBUG - [protocol.py:745] - > PING df e1 e9 2f [binary, 4 bytes]
+2025-02-10 14:56:02,086 - DEBUG - [protocol.py:599] - < PONG df e1 e9 2f [binary, 4 bytes]
+2025-02-10 14:56:02,088 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 14:56:02,089 - DEBUG - [protocol.py:599] - < PING b4 06 22 fa [binary, 4 bytes]
+2025-02-10 14:56:02,090 - DEBUG - [protocol.py:745] - > PONG b4 06 22 fa [binary, 4 bytes]
+2025-02-10 14:56:22,085 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 14:56:22,086 - DEBUG - [protocol.py:745] - > PING 52 e0 c1 52 [binary, 4 bytes]
+2025-02-10 14:56:22,094 - DEBUG - [protocol.py:599] - < PONG 52 e0 c1 52 [binary, 4 bytes]
+2025-02-10 14:56:22,096 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 14:56:22,101 - DEBUG - [protocol.py:599] - < PING 01 0a 8f 26 [binary, 4 bytes]
+2025-02-10 14:56:22,104 - DEBUG - [protocol.py:745] - > PONG 01 0a 8f 26 [binary, 4 bytes]
+2025-02-10 14:56:25,164 - ERROR - [agent_service.py:428] - 🚨 Error en la actualización del agente: 200, message='Attempt to decode JSON with unexpected mimetype: text/html; charset=utf-8', url='ws://161.132.39.159:8000/auth/login'
+2025-02-10 14:56:25,164 - INFO - [printer_monitor_service.py:68] - 📝 Obteniendo lista de impresoras del servidor
+2025-02-10 14:56:25,166 - DEBUG - [printer_monitor_service.py:80] - 🔍 Request URL: ws://161.132.39.159:8000/api/v1/monitor/printers
+2025-02-10 14:56:25,167 - DEBUG - [printer_monitor_service.py:81] - 🔑 Headers configurados: {'Authorization': 'Bearer agt_32499ebe03d94fee8d8e5dd9446f46a6', 'Content-Type': 'application/json'}
+2025-02-10 14:56:25,201 - DEBUG - [printer_monitor_service.py:86] - 📥 Respuesta (200): <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Printer Management</title>
+   ...
+2025-02-10 14:56:25,202 - ERROR - [printer_monitor_service.py:98] - ❌ Error decodificando JSON: Expecting value: line 1 column 1 (char 0)
+Traceback (most recent call last):
+  File "C:\Users\pc\Desktop\printer_management\agent\app\services\printer_monitor_service.py", line 89, in get_monitored_printers
+    printers = json.loads(response_text)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "C:\Users\pc\AppData\Local\Programs\Python\Python310\lib\json\decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-02-10 14:56:42,112 - DEBUG - [protocol.py:599] - < PING 47 c3 00 86 [binary, 4 bytes]
+2025-02-10 14:56:42,113 - DEBUG - [protocol.py:745] - > PONG 47 c3 00 86 [binary, 4 bytes]
+2025-02-10 14:56:42,113 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 14:56:42,113 - DEBUG - [protocol.py:745] - > PING 'K\x0bx{' [text, 4 bytes]
+2025-02-10 14:56:42,120 - DEBUG - [protocol.py:599] - < PONG 'K\x0bx{' [text, 4 bytes]
+2025-02-10 14:56:42,120 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 14:57:02,121 - DEBUG - [protocol.py:599] - < PING ed ba 90 b8 [binary, 4 bytes]
+2025-02-10 14:57:02,123 - DEBUG - [protocol.py:745] - > PONG ed ba 90 b8 [binary, 4 bytes]
+2025-02-10 14:57:02,127 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 14:57:02,128 - DEBUG - [protocol.py:745] - > PING 57 d8 72 05 [binary, 4 bytes]
+2025-02-10 14:57:02,134 - DEBUG - [protocol.py:599] - < PONG 57 d8 72 05 [binary, 4 bytes]
+2025-02-10 14:57:02,135 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 14:57:22,121 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 14:57:22,121 - DEBUG - [protocol.py:745] - > PING 64 08 be e6 [binary, 4 bytes]
+2025-02-10 14:57:22,127 - DEBUG - [protocol.py:599] - < PONG 64 08 be e6 [binary, 4 bytes]
+2025-02-10 14:57:22,127 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 14:57:22,133 - DEBUG - [protocol.py:599] - < PING '\x14\x06\t\x1d' [text, 4 bytes]
+2025-02-10 14:57:22,134 - DEBUG - [protocol.py:745] - > PONG '\x14\x06\t\x1d' [text, 4 bytes]
+2025-02-10 14:57:42,127 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 14:57:42,128 - DEBUG - [protocol.py:745] - > PING 35 c6 31 ac [binary, 4 bytes]
+2025-02-10 14:57:42,132 - DEBUG - [protocol.py:599] - < PONG 35 c6 31 ac [binary, 4 bytes]
+2025-02-10 14:57:42,133 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 14:57:42,140 - DEBUG - [protocol.py:599] - < PING 9b 90 6d 4e [binary, 4 bytes]
+2025-02-10 14:57:42,140 - DEBUG - [protocol.py:745] - > PONG 9b 90 6d 4e [binary, 4 bytes]
+2025-02-10 14:58:02,130 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 14:58:02,132 - DEBUG - [protocol.py:745] - > PING ca a0 c9 30 [binary, 4 bytes]
+2025-02-10 14:58:02,141 - DEBUG - [protocol.py:599] - < PONG ca a0 c9 30 [binary, 4 bytes]
+2025-02-10 14:58:02,143 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 14:58:02,147 - DEBUG - [protocol.py:599] - < PING ae 0e 28 cc [binary, 4 bytes]
+2025-02-10 14:58:02,149 - DEBUG - [protocol.py:745] - > PONG ae 0e 28 cc [binary, 4 bytes]
+2025-02-10 14:58:22,141 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 14:58:22,141 - DEBUG - [protocol.py:745] - > PING e1 9c a1 82 [binary, 4 bytes]
+2025-02-10 14:58:22,148 - DEBUG - [protocol.py:599] - < PONG e1 9c a1 82 [binary, 4 bytes]
+2025-02-10 14:58:22,148 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 14:58:22,157 - DEBUG - [protocol.py:599] - < PING ca 8a ba 8a [binary, 4 bytes]
+2025-02-10 14:58:22,159 - DEBUG - [protocol.py:745] - > PONG ca 8a ba 8a [binary, 4 bytes]
+2025-02-10 14:58:42,153 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 14:58:42,153 - DEBUG - [protocol.py:745] - > PING 96 0a 52 34 [binary, 4 bytes]
+2025-02-10 14:58:42,159 - DEBUG - [protocol.py:599] - < PONG 96 0a 52 34 [binary, 4 bytes]
+2025-02-10 14:58:42,160 - DEBUG - [connection.py:811] - % received keepalive pong
+2025-02-10 14:58:42,165 - DEBUG - [protocol.py:599] - < PING 1f 8c e5 70 [binary, 4 bytes]
+2025-02-10 14:58:42,165 - DEBUG - [protocol.py:745] - > PONG 1f 8c e5 70 [binary, 4 bytes]
+2025-02-10 14:59:02,171 - DEBUG - [connection.py:800] - % sending keepalive ping
+2025-02-10 14:59:02,171 - DEBUG - [protocol.py:745] - > PING 5c 79 a7 a5 [binary, 4 bytes]
+2025-02-10 14:59:02,172 - DEBUG - [protocol.py:599] - < PING 92 0f 6c 9e [binary, 4 bytes]
+2025-02-10 14:59:02,173 - DEBUG - [protocol.py:745] - > PONG 92 0f 6c 9e [binary, 4 bytes]
+2025-02-10 14:59:02,179 - DEBUG - [protocol.py:599] - < PONG 5c 79 a7 a5 [binary, 4 bytes]
+2025-02-10 14:59:02,179 - DEBUG - [connection.py:811] - % received keepalive pong

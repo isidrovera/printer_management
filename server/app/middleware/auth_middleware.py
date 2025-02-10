@@ -11,7 +11,12 @@ logger = logging.getLogger(__name__)
 
 async def auth_middleware(request: Request, call_next):
     logger.debug(f"[AUTH] Inicio: {request.url.path}")
-    
+
+    # Excluir WebSockets de la autenticación
+    if request.scope["type"] == "websocket":
+        return await call_next(request)
+
+    # Permitir ciertas rutas sin autenticación
     if request.url.path.startswith(("/auth/login", "/static/", "/favicon.ico")):
         return await call_next(request)
 
@@ -22,7 +27,7 @@ async def auth_middleware(request: Request, call_next):
     try:
         user = await get_current_user(request)
         request.state.user = user
-        
+
         if user.must_change_password and not request.url.path.startswith("/auth/change-password"):
             return RedirectResponse(url="/auth/change-password", status_code=303)
     except Exception as e:
