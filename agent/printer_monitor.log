@@ -55304,3 +55304,1132 @@ json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
         }
     }
 }
+2025-02-10 17:04:19,181 - ERROR - [agent_service.py:109] - 🚨 Error en el registro: Cannot connect to host 161.132.39.159:8000 ssl:default [El equipo remoto rechazó la conexión de red]
+2025-02-10 17:04:19,183 - ERROR - [agent_service.py:111] - Causa: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-10 17:04:20,264 - DEBUG - [agent_service.py:80] - 🔄 Enviando datos de registro: {
+    "client_token": "cli_a5380ce9961f463eb1df00ef1ec9c393",
+    "hostname": "Isidro",
+    "username": "Isidro",
+    "ip_address": "192.168.18.26",
+    "device_type": "Windows",
+    "system_info": {
+        "Sistema": {
+            "Nombre del SO": "Windows",
+            "Versi\u00f3n del SO": "10.0.26100",
+            "Arquitectura": "64bit",
+            "Nombre del dispositivo": "Isidro",
+            "Nombre del usuario": "Isidro",
+            "Procesador": "Intel64 Family 6 Model 142 Stepping 12, GenuineIntel"
+        },
+        "CPU": {
+            "Modelo": "Intel64 Family 6 Model 142 Stepping 12, GenuineIntel",
+            "N\u00facleos f\u00edsicos": 2,
+            "N\u00facleos l\u00f3gicos": 4,
+            "Frecuencia (MHz)": 2592.0,
+            "Uso actual (%)": 56.4
+        },
+        "Memoria": {
+            "Total RAM (GB)": 11.83,
+            "Disponible RAM (GB)": 3.4,
+            "Uso de RAM (%)": 71.3
+        },
+        "Discos": [
+            {
+                "Dispositivo": "C:\\",
+                "Punto de montaje": "C:\\",
+                "Tipo de sistema de archivos": "NTFS",
+                "Total (GB)": 231.84,
+                "Usado (GB)": 149.6,
+                "Disponible (GB)": 82.24,
+                "Porcentaje de uso (%)": 64.5
+            },
+            {
+                "Dispositivo": "D:\\",
+                "Punto de montaje": "D:\\",
+                "Tipo de sistema de archivos": "NTFS",
+                "Total (GB)": 931.51,
+                "Usado (GB)": 59.82,
+                "Disponible (GB)": 871.69,
+                "Porcentaje de uso (%)": 6.4
+            }
+        ],
+        "Red": {
+            "Wi-Fi": [
+                {
+                    "Tipo": "MAC",
+                    "Direcci\u00f3n": "00-E9-3A-66-16-4F"
+                },
+                {
+                    "Tipo": "IPv4",
+                    "Direcci\u00f3n": "169.254.226.212",
+                    "M\u00e1scara de red": "255.255.0.0",
+                    "Broadcast": null
+                },
+                {
+                    "Tipo": "IPv6",
+                    "Direcci\u00f3n": "fe80::3f4b:1eaa:2cc5:e844",
+                    "M\u00e1scara de red": null
+                }
+            ],
+            "Conexi\u00f3n de \u00e1rea local* 1": [
+                {
+                    "Tipo": "MAC",
+                    "Direcci\u00f3n": "02-E9-3A-66-16-4F"
+                },
+                {
+                    "Tipo": "IPv4",
+                    "Direcci\u00f3n": "169.254.138.12",
+                    "M\u00e1scara de red": "255.255.0.0",
+                    "Broadcast": null
+                },
+                {
+                    "Tipo": "IPv6",
+                    "Direcci\u00f3n": "fe80::8376:a87d:4560:d0af",
+                    "M\u00e1scara de red": null
+                }
+            ],
+            "Conexi\u00f3n de \u00e1rea local* 2": [
+                {
+                    "Tipo": "MAC",
+                    "Direcci\u00f3n": "82-E9-3A-66-16-4F"
+                },
+                {
+                    "Tipo": "IPv4",
+                    "Direcci\u00f3n": "169.254.91.129",
+                    "M\u00e1scara de red": "255.255.0.0",
+                    "Broadcast": null
+                },
+                {
+                    "Tipo": "IPv6",
+                    "Direcci\u00f3n": "fe80::79d6:7705:344b:9722",
+                    "M\u00e1scara de red": null
+                }
+            ],
+            "Ethernet": [
+                {
+                    "Tipo": "MAC",
+                    "Direcci\u00f3n": "14-CB-19-0C-E3-7E"
+                },
+                {
+                    "Tipo": "IPv4",
+                    "Direcci\u00f3n": "192.168.18.26",
+                    "M\u00e1scara de red": "255.255.255.0",
+                    "Broadcast": null
+                },
+                {
+                    "Tipo": "IPv6",
+                    "Direcci\u00f3n": "fe80::450:191f:4bc9:e23c",
+                    "M\u00e1scara de red": null
+                }
+            ],
+            "Conexi\u00f3n de red Bluetooth": [
+                {
+                    "Tipo": "MAC",
+                    "Direcci\u00f3n": "00-E9-3A-66-16-4E"
+                },
+                {
+                    "Tipo": "IPv4",
+                    "Direcci\u00f3n": "169.254.213.153",
+                    "M\u00e1scara de red": "255.255.0.0",
+                    "Broadcast": null
+                },
+                {
+                    "Tipo": "IPv6",
+                    "Direcci\u00f3n": "fe80::9793:9d98:46ab:c2fc",
+                    "M\u00e1scara de red": null
+                }
+            ],
+            "Loopback Pseudo-Interface 1": [
+                {
+                    "Tipo": "IPv4",
+                    "Direcci\u00f3n": "127.0.0.1",
+                    "M\u00e1scara de red": "255.0.0.0",
+                    "Broadcast": null
+                },
+                {
+                    "Tipo": "IPv6",
+                    "Direcci\u00f3n": "::1",
+                    "M\u00e1scara de red": null
+                }
+            ]
+        },
+        "Bater\u00eda": {
+            "Porcentaje": 100,
+            "Enchufado": true
+        },
+        "Tarjetas Gr\u00e1ficas": "No se encontraron GPUs.",
+        "Espacio en Disco": {
+            "Total (GB)": 231.84,
+            "Usado (GB)": 149.6,
+            "Libre (GB)": 82.24
+        }
+    }
+}
+2025-02-10 17:04:22,323 - ERROR - [agent_service.py:109] - 🚨 Error en el registro: Cannot connect to host 161.132.39.159:8000 ssl:default [El equipo remoto rechazó la conexión de red]
+2025-02-10 17:04:22,324 - ERROR - [agent_service.py:111] - Causa: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-10 17:04:23,415 - DEBUG - [agent_service.py:80] - 🔄 Enviando datos de registro: {
+    "client_token": "cli_a5380ce9961f463eb1df00ef1ec9c393",
+    "hostname": "Isidro",
+    "username": "Isidro",
+    "ip_address": "192.168.18.26",
+    "device_type": "Windows",
+    "system_info": {
+        "Sistema": {
+            "Nombre del SO": "Windows",
+            "Versi\u00f3n del SO": "10.0.26100",
+            "Arquitectura": "64bit",
+            "Nombre del dispositivo": "Isidro",
+            "Nombre del usuario": "Isidro",
+            "Procesador": "Intel64 Family 6 Model 142 Stepping 12, GenuineIntel"
+        },
+        "CPU": {
+            "Modelo": "Intel64 Family 6 Model 142 Stepping 12, GenuineIntel",
+            "N\u00facleos f\u00edsicos": 2,
+            "N\u00facleos l\u00f3gicos": 4,
+            "Frecuencia (MHz)": 2592.0,
+            "Uso actual (%)": 61.7
+        },
+        "Memoria": {
+            "Total RAM (GB)": 11.83,
+            "Disponible RAM (GB)": 3.42,
+            "Uso de RAM (%)": 71.1
+        },
+        "Discos": [
+            {
+                "Dispositivo": "C:\\",
+                "Punto de montaje": "C:\\",
+                "Tipo de sistema de archivos": "NTFS",
+                "Total (GB)": 231.84,
+                "Usado (GB)": 149.6,
+                "Disponible (GB)": 82.24,
+                "Porcentaje de uso (%)": 64.5
+            },
+            {
+                "Dispositivo": "D:\\",
+                "Punto de montaje": "D:\\",
+                "Tipo de sistema de archivos": "NTFS",
+                "Total (GB)": 931.51,
+                "Usado (GB)": 59.82,
+                "Disponible (GB)": 871.69,
+                "Porcentaje de uso (%)": 6.4
+            }
+        ],
+        "Red": {
+            "Wi-Fi": [
+                {
+                    "Tipo": "MAC",
+                    "Direcci\u00f3n": "00-E9-3A-66-16-4F"
+                },
+                {
+                    "Tipo": "IPv4",
+                    "Direcci\u00f3n": "169.254.226.212",
+                    "M\u00e1scara de red": "255.255.0.0",
+                    "Broadcast": null
+                },
+                {
+                    "Tipo": "IPv6",
+                    "Direcci\u00f3n": "fe80::3f4b:1eaa:2cc5:e844",
+                    "M\u00e1scara de red": null
+                }
+            ],
+            "Conexi\u00f3n de \u00e1rea local* 1": [
+                {
+                    "Tipo": "MAC",
+                    "Direcci\u00f3n": "02-E9-3A-66-16-4F"
+                },
+                {
+                    "Tipo": "IPv4",
+                    "Direcci\u00f3n": "169.254.138.12",
+                    "M\u00e1scara de red": "255.255.0.0",
+                    "Broadcast": null
+                },
+                {
+                    "Tipo": "IPv6",
+                    "Direcci\u00f3n": "fe80::8376:a87d:4560:d0af",
+                    "M\u00e1scara de red": null
+                }
+            ],
+            "Conexi\u00f3n de \u00e1rea local* 2": [
+                {
+                    "Tipo": "MAC",
+                    "Direcci\u00f3n": "82-E9-3A-66-16-4F"
+                },
+                {
+                    "Tipo": "IPv4",
+                    "Direcci\u00f3n": "169.254.91.129",
+                    "M\u00e1scara de red": "255.255.0.0",
+                    "Broadcast": null
+                },
+                {
+                    "Tipo": "IPv6",
+                    "Direcci\u00f3n": "fe80::79d6:7705:344b:9722",
+                    "M\u00e1scara de red": null
+                }
+            ],
+            "Ethernet": [
+                {
+                    "Tipo": "MAC",
+                    "Direcci\u00f3n": "14-CB-19-0C-E3-7E"
+                },
+                {
+                    "Tipo": "IPv4",
+                    "Direcci\u00f3n": "192.168.18.26",
+                    "M\u00e1scara de red": "255.255.255.0",
+                    "Broadcast": null
+                },
+                {
+                    "Tipo": "IPv6",
+                    "Direcci\u00f3n": "fe80::450:191f:4bc9:e23c",
+                    "M\u00e1scara de red": null
+                }
+            ],
+            "Conexi\u00f3n de red Bluetooth": [
+                {
+                    "Tipo": "MAC",
+                    "Direcci\u00f3n": "00-E9-3A-66-16-4E"
+                },
+                {
+                    "Tipo": "IPv4",
+                    "Direcci\u00f3n": "169.254.213.153",
+                    "M\u00e1scara de red": "255.255.0.0",
+                    "Broadcast": null
+                },
+                {
+                    "Tipo": "IPv6",
+                    "Direcci\u00f3n": "fe80::9793:9d98:46ab:c2fc",
+                    "M\u00e1scara de red": null
+                }
+            ],
+            "Loopback Pseudo-Interface 1": [
+                {
+                    "Tipo": "IPv4",
+                    "Direcci\u00f3n": "127.0.0.1",
+                    "M\u00e1scara de red": "255.0.0.0",
+                    "Broadcast": null
+                },
+                {
+                    "Tipo": "IPv6",
+                    "Direcci\u00f3n": "::1",
+                    "M\u00e1scara de red": null
+                }
+            ]
+        },
+        "Bater\u00eda": {
+            "Porcentaje": 100,
+            "Enchufado": true
+        },
+        "Tarjetas Gr\u00e1ficas": "No se encontraron GPUs.",
+        "Espacio en Disco": {
+            "Total (GB)": 231.84,
+            "Usado (GB)": 149.6,
+            "Libre (GB)": 82.24
+        }
+    }
+}
+2025-02-10 17:04:25,496 - ERROR - [agent_service.py:109] - 🚨 Error en el registro: Cannot connect to host 161.132.39.159:8000 ssl:default [El equipo remoto rechazó la conexión de red]
+2025-02-10 17:04:25,497 - ERROR - [agent_service.py:111] - Causa: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-10 17:04:26,548 - DEBUG - [agent_service.py:80] - 🔄 Enviando datos de registro: {
+    "client_token": "cli_a5380ce9961f463eb1df00ef1ec9c393",
+    "hostname": "Isidro",
+    "username": "Isidro",
+    "ip_address": "192.168.18.26",
+    "device_type": "Windows",
+    "system_info": {
+        "Sistema": {
+            "Nombre del SO": "Windows",
+            "Versi\u00f3n del SO": "10.0.26100",
+            "Arquitectura": "64bit",
+            "Nombre del dispositivo": "Isidro",
+            "Nombre del usuario": "Isidro",
+            "Procesador": "Intel64 Family 6 Model 142 Stepping 12, GenuineIntel"
+        },
+        "CPU": {
+            "Modelo": "Intel64 Family 6 Model 142 Stepping 12, GenuineIntel",
+            "N\u00facleos f\u00edsicos": 2,
+            "N\u00facleos l\u00f3gicos": 4,
+            "Frecuencia (MHz)": 2592.0,
+            "Uso actual (%)": 32.8
+        },
+        "Memoria": {
+            "Total RAM (GB)": 11.83,
+            "Disponible RAM (GB)": 3.42,
+            "Uso de RAM (%)": 71.1
+        },
+        "Discos": [
+            {
+                "Dispositivo": "C:\\",
+                "Punto de montaje": "C:\\",
+                "Tipo de sistema de archivos": "NTFS",
+                "Total (GB)": 231.84,
+                "Usado (GB)": 149.6,
+                "Disponible (GB)": 82.24,
+                "Porcentaje de uso (%)": 64.5
+            },
+            {
+                "Dispositivo": "D:\\",
+                "Punto de montaje": "D:\\",
+                "Tipo de sistema de archivos": "NTFS",
+                "Total (GB)": 931.51,
+                "Usado (GB)": 59.82,
+                "Disponible (GB)": 871.69,
+                "Porcentaje de uso (%)": 6.4
+            }
+        ],
+        "Red": {
+            "Wi-Fi": [
+                {
+                    "Tipo": "MAC",
+                    "Direcci\u00f3n": "00-E9-3A-66-16-4F"
+                },
+                {
+                    "Tipo": "IPv4",
+                    "Direcci\u00f3n": "169.254.226.212",
+                    "M\u00e1scara de red": "255.255.0.0",
+                    "Broadcast": null
+                },
+                {
+                    "Tipo": "IPv6",
+                    "Direcci\u00f3n": "fe80::3f4b:1eaa:2cc5:e844",
+                    "M\u00e1scara de red": null
+                }
+            ],
+            "Conexi\u00f3n de \u00e1rea local* 1": [
+                {
+                    "Tipo": "MAC",
+                    "Direcci\u00f3n": "02-E9-3A-66-16-4F"
+                },
+                {
+                    "Tipo": "IPv4",
+                    "Direcci\u00f3n": "169.254.138.12",
+                    "M\u00e1scara de red": "255.255.0.0",
+                    "Broadcast": null
+                },
+                {
+                    "Tipo": "IPv6",
+                    "Direcci\u00f3n": "fe80::8376:a87d:4560:d0af",
+                    "M\u00e1scara de red": null
+                }
+            ],
+            "Conexi\u00f3n de \u00e1rea local* 2": [
+                {
+                    "Tipo": "MAC",
+                    "Direcci\u00f3n": "82-E9-3A-66-16-4F"
+                },
+                {
+                    "Tipo": "IPv4",
+                    "Direcci\u00f3n": "169.254.91.129",
+                    "M\u00e1scara de red": "255.255.0.0",
+                    "Broadcast": null
+                },
+                {
+                    "Tipo": "IPv6",
+                    "Direcci\u00f3n": "fe80::79d6:7705:344b:9722",
+                    "M\u00e1scara de red": null
+                }
+            ],
+            "Ethernet": [
+                {
+                    "Tipo": "MAC",
+                    "Direcci\u00f3n": "14-CB-19-0C-E3-7E"
+                },
+                {
+                    "Tipo": "IPv4",
+                    "Direcci\u00f3n": "192.168.18.26",
+                    "M\u00e1scara de red": "255.255.255.0",
+                    "Broadcast": null
+                },
+                {
+                    "Tipo": "IPv6",
+                    "Direcci\u00f3n": "fe80::450:191f:4bc9:e23c",
+                    "M\u00e1scara de red": null
+                }
+            ],
+            "Conexi\u00f3n de red Bluetooth": [
+                {
+                    "Tipo": "MAC",
+                    "Direcci\u00f3n": "00-E9-3A-66-16-4E"
+                },
+                {
+                    "Tipo": "IPv4",
+                    "Direcci\u00f3n": "169.254.213.153",
+                    "M\u00e1scara de red": "255.255.0.0",
+                    "Broadcast": null
+                },
+                {
+                    "Tipo": "IPv6",
+                    "Direcci\u00f3n": "fe80::9793:9d98:46ab:c2fc",
+                    "M\u00e1scara de red": null
+                }
+            ],
+            "Loopback Pseudo-Interface 1": [
+                {
+                    "Tipo": "IPv4",
+                    "Direcci\u00f3n": "127.0.0.1",
+                    "M\u00e1scara de red": "255.0.0.0",
+                    "Broadcast": null
+                },
+                {
+                    "Tipo": "IPv6",
+                    "Direcci\u00f3n": "::1",
+                    "M\u00e1scara de red": null
+                }
+            ]
+        },
+        "Bater\u00eda": {
+            "Porcentaje": 100,
+            "Enchufado": true
+        },
+        "Tarjetas Gr\u00e1ficas": "No se encontraron GPUs.",
+        "Espacio en Disco": {
+            "Total (GB)": 231.84,
+            "Usado (GB)": 149.6,
+            "Libre (GB)": 82.24
+        }
+    }
+}
+2025-02-10 17:04:28,624 - ERROR - [agent_service.py:109] - 🚨 Error en el registro: Cannot connect to host 161.132.39.159:8000 ssl:default [El equipo remoto rechazó la conexión de red]
+2025-02-10 17:04:28,625 - ERROR - [agent_service.py:111] - Causa: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-10 17:04:29,702 - DEBUG - [agent_service.py:80] - 🔄 Enviando datos de registro: {
+    "client_token": "cli_a5380ce9961f463eb1df00ef1ec9c393",
+    "hostname": "Isidro",
+    "username": "Isidro",
+    "ip_address": "192.168.18.26",
+    "device_type": "Windows",
+    "system_info": {
+        "Sistema": {
+            "Nombre del SO": "Windows",
+            "Versi\u00f3n del SO": "10.0.26100",
+            "Arquitectura": "64bit",
+            "Nombre del dispositivo": "Isidro",
+            "Nombre del usuario": "Isidro",
+            "Procesador": "Intel64 Family 6 Model 142 Stepping 12, GenuineIntel"
+        },
+        "CPU": {
+            "Modelo": "Intel64 Family 6 Model 142 Stepping 12, GenuineIntel",
+            "N\u00facleos f\u00edsicos": 2,
+            "N\u00facleos l\u00f3gicos": 4,
+            "Frecuencia (MHz)": 2592.0,
+            "Uso actual (%)": 40.7
+        },
+        "Memoria": {
+            "Total RAM (GB)": 11.83,
+            "Disponible RAM (GB)": 3.46,
+            "Uso de RAM (%)": 70.7
+        },
+        "Discos": [
+            {
+                "Dispositivo": "C:\\",
+                "Punto de montaje": "C:\\",
+                "Tipo de sistema de archivos": "NTFS",
+                "Total (GB)": 231.84,
+                "Usado (GB)": 149.6,
+                "Disponible (GB)": 82.24,
+                "Porcentaje de uso (%)": 64.5
+            },
+            {
+                "Dispositivo": "D:\\",
+                "Punto de montaje": "D:\\",
+                "Tipo de sistema de archivos": "NTFS",
+                "Total (GB)": 931.51,
+                "Usado (GB)": 59.82,
+                "Disponible (GB)": 871.69,
+                "Porcentaje de uso (%)": 6.4
+            }
+        ],
+        "Red": {
+            "Wi-Fi": [
+                {
+                    "Tipo": "MAC",
+                    "Direcci\u00f3n": "00-E9-3A-66-16-4F"
+                },
+                {
+                    "Tipo": "IPv4",
+                    "Direcci\u00f3n": "169.254.226.212",
+                    "M\u00e1scara de red": "255.255.0.0",
+                    "Broadcast": null
+                },
+                {
+                    "Tipo": "IPv6",
+                    "Direcci\u00f3n": "fe80::3f4b:1eaa:2cc5:e844",
+                    "M\u00e1scara de red": null
+                }
+            ],
+            "Conexi\u00f3n de \u00e1rea local* 1": [
+                {
+                    "Tipo": "MAC",
+                    "Direcci\u00f3n": "02-E9-3A-66-16-4F"
+                },
+                {
+                    "Tipo": "IPv4",
+                    "Direcci\u00f3n": "169.254.138.12",
+                    "M\u00e1scara de red": "255.255.0.0",
+                    "Broadcast": null
+                },
+                {
+                    "Tipo": "IPv6",
+                    "Direcci\u00f3n": "fe80::8376:a87d:4560:d0af",
+                    "M\u00e1scara de red": null
+                }
+            ],
+            "Conexi\u00f3n de \u00e1rea local* 2": [
+                {
+                    "Tipo": "MAC",
+                    "Direcci\u00f3n": "82-E9-3A-66-16-4F"
+                },
+                {
+                    "Tipo": "IPv4",
+                    "Direcci\u00f3n": "169.254.91.129",
+                    "M\u00e1scara de red": "255.255.0.0",
+                    "Broadcast": null
+                },
+                {
+                    "Tipo": "IPv6",
+                    "Direcci\u00f3n": "fe80::79d6:7705:344b:9722",
+                    "M\u00e1scara de red": null
+                }
+            ],
+            "Ethernet": [
+                {
+                    "Tipo": "MAC",
+                    "Direcci\u00f3n": "14-CB-19-0C-E3-7E"
+                },
+                {
+                    "Tipo": "IPv4",
+                    "Direcci\u00f3n": "192.168.18.26",
+                    "M\u00e1scara de red": "255.255.255.0",
+                    "Broadcast": null
+                },
+                {
+                    "Tipo": "IPv6",
+                    "Direcci\u00f3n": "fe80::450:191f:4bc9:e23c",
+                    "M\u00e1scara de red": null
+                }
+            ],
+            "Conexi\u00f3n de red Bluetooth": [
+                {
+                    "Tipo": "MAC",
+                    "Direcci\u00f3n": "00-E9-3A-66-16-4E"
+                },
+                {
+                    "Tipo": "IPv4",
+                    "Direcci\u00f3n": "169.254.213.153",
+                    "M\u00e1scara de red": "255.255.0.0",
+                    "Broadcast": null
+                },
+                {
+                    "Tipo": "IPv6",
+                    "Direcci\u00f3n": "fe80::9793:9d98:46ab:c2fc",
+                    "M\u00e1scara de red": null
+                }
+            ],
+            "Loopback Pseudo-Interface 1": [
+                {
+                    "Tipo": "IPv4",
+                    "Direcci\u00f3n": "127.0.0.1",
+                    "M\u00e1scara de red": "255.0.0.0",
+                    "Broadcast": null
+                },
+                {
+                    "Tipo": "IPv6",
+                    "Direcci\u00f3n": "::1",
+                    "M\u00e1scara de red": null
+                }
+            ]
+        },
+        "Bater\u00eda": {
+            "Porcentaje": 100,
+            "Enchufado": true
+        },
+        "Tarjetas Gr\u00e1ficas": "No se encontraron GPUs.",
+        "Espacio en Disco": {
+            "Total (GB)": 231.84,
+            "Usado (GB)": 149.6,
+            "Libre (GB)": 82.24
+        }
+    }
+}
+2025-02-10 17:04:31,766 - ERROR - [agent_service.py:109] - 🚨 Error en el registro: Cannot connect to host 161.132.39.159:8000 ssl:default [El equipo remoto rechazó la conexión de red]
+2025-02-10 17:04:31,767 - ERROR - [agent_service.py:111] - Causa: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-10 17:04:32,810 - DEBUG - [agent_service.py:80] - 🔄 Enviando datos de registro: {
+    "client_token": "cli_a5380ce9961f463eb1df00ef1ec9c393",
+    "hostname": "Isidro",
+    "username": "Isidro",
+    "ip_address": "192.168.18.26",
+    "device_type": "Windows",
+    "system_info": {
+        "Sistema": {
+            "Nombre del SO": "Windows",
+            "Versi\u00f3n del SO": "10.0.26100",
+            "Arquitectura": "64bit",
+            "Nombre del dispositivo": "Isidro",
+            "Nombre del usuario": "Isidro",
+            "Procesador": "Intel64 Family 6 Model 142 Stepping 12, GenuineIntel"
+        },
+        "CPU": {
+            "Modelo": "Intel64 Family 6 Model 142 Stepping 12, GenuineIntel",
+            "N\u00facleos f\u00edsicos": 2,
+            "N\u00facleos l\u00f3gicos": 4,
+            "Frecuencia (MHz)": 2592.0,
+            "Uso actual (%)": 26.8
+        },
+        "Memoria": {
+            "Total RAM (GB)": 11.83,
+            "Disponible RAM (GB)": 3.5,
+            "Uso de RAM (%)": 70.4
+        },
+        "Discos": [
+            {
+                "Dispositivo": "C:\\",
+                "Punto de montaje": "C:\\",
+                "Tipo de sistema de archivos": "NTFS",
+                "Total (GB)": 231.84,
+                "Usado (GB)": 149.6,
+                "Disponible (GB)": 82.24,
+                "Porcentaje de uso (%)": 64.5
+            },
+            {
+                "Dispositivo": "D:\\",
+                "Punto de montaje": "D:\\",
+                "Tipo de sistema de archivos": "NTFS",
+                "Total (GB)": 931.51,
+                "Usado (GB)": 59.82,
+                "Disponible (GB)": 871.69,
+                "Porcentaje de uso (%)": 6.4
+            }
+        ],
+        "Red": {
+            "Wi-Fi": [
+                {
+                    "Tipo": "MAC",
+                    "Direcci\u00f3n": "00-E9-3A-66-16-4F"
+                },
+                {
+                    "Tipo": "IPv4",
+                    "Direcci\u00f3n": "169.254.226.212",
+                    "M\u00e1scara de red": "255.255.0.0",
+                    "Broadcast": null
+                },
+                {
+                    "Tipo": "IPv6",
+                    "Direcci\u00f3n": "fe80::3f4b:1eaa:2cc5:e844",
+                    "M\u00e1scara de red": null
+                }
+            ],
+            "Conexi\u00f3n de \u00e1rea local* 1": [
+                {
+                    "Tipo": "MAC",
+                    "Direcci\u00f3n": "02-E9-3A-66-16-4F"
+                },
+                {
+                    "Tipo": "IPv4",
+                    "Direcci\u00f3n": "169.254.138.12",
+                    "M\u00e1scara de red": "255.255.0.0",
+                    "Broadcast": null
+                },
+                {
+                    "Tipo": "IPv6",
+                    "Direcci\u00f3n": "fe80::8376:a87d:4560:d0af",
+                    "M\u00e1scara de red": null
+                }
+            ],
+            "Conexi\u00f3n de \u00e1rea local* 2": [
+                {
+                    "Tipo": "MAC",
+                    "Direcci\u00f3n": "82-E9-3A-66-16-4F"
+                },
+                {
+                    "Tipo": "IPv4",
+                    "Direcci\u00f3n": "169.254.91.129",
+                    "M\u00e1scara de red": "255.255.0.0",
+                    "Broadcast": null
+                },
+                {
+                    "Tipo": "IPv6",
+                    "Direcci\u00f3n": "fe80::79d6:7705:344b:9722",
+                    "M\u00e1scara de red": null
+                }
+            ],
+            "Ethernet": [
+                {
+                    "Tipo": "MAC",
+                    "Direcci\u00f3n": "14-CB-19-0C-E3-7E"
+                },
+                {
+                    "Tipo": "IPv4",
+                    "Direcci\u00f3n": "192.168.18.26",
+                    "M\u00e1scara de red": "255.255.255.0",
+                    "Broadcast": null
+                },
+                {
+                    "Tipo": "IPv6",
+                    "Direcci\u00f3n": "fe80::450:191f:4bc9:e23c",
+                    "M\u00e1scara de red": null
+                }
+            ],
+            "Conexi\u00f3n de red Bluetooth": [
+                {
+                    "Tipo": "MAC",
+                    "Direcci\u00f3n": "00-E9-3A-66-16-4E"
+                },
+                {
+                    "Tipo": "IPv4",
+                    "Direcci\u00f3n": "169.254.213.153",
+                    "M\u00e1scara de red": "255.255.0.0",
+                    "Broadcast": null
+                },
+                {
+                    "Tipo": "IPv6",
+                    "Direcci\u00f3n": "fe80::9793:9d98:46ab:c2fc",
+                    "M\u00e1scara de red": null
+                }
+            ],
+            "Loopback Pseudo-Interface 1": [
+                {
+                    "Tipo": "IPv4",
+                    "Direcci\u00f3n": "127.0.0.1",
+                    "M\u00e1scara de red": "255.0.0.0",
+                    "Broadcast": null
+                },
+                {
+                    "Tipo": "IPv6",
+                    "Direcci\u00f3n": "::1",
+                    "M\u00e1scara de red": null
+                }
+            ]
+        },
+        "Bater\u00eda": {
+            "Porcentaje": 100,
+            "Enchufado": true
+        },
+        "Tarjetas Gr\u00e1ficas": "No se encontraron GPUs.",
+        "Espacio en Disco": {
+            "Total (GB)": 231.84,
+            "Usado (GB)": 149.6,
+            "Libre (GB)": 82.24
+        }
+    }
+}
+2025-02-10 17:04:34,878 - ERROR - [agent_service.py:109] - 🚨 Error en el registro: Cannot connect to host 161.132.39.159:8000 ssl:default [El equipo remoto rechazó la conexión de red]
+2025-02-10 17:04:34,878 - ERROR - [agent_service.py:111] - Causa: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-10 17:04:35,914 - DEBUG - [agent_service.py:80] - 🔄 Enviando datos de registro: {
+    "client_token": "cli_a5380ce9961f463eb1df00ef1ec9c393",
+    "hostname": "Isidro",
+    "username": "Isidro",
+    "ip_address": "192.168.18.26",
+    "device_type": "Windows",
+    "system_info": {
+        "Sistema": {
+            "Nombre del SO": "Windows",
+            "Versi\u00f3n del SO": "10.0.26100",
+            "Arquitectura": "64bit",
+            "Nombre del dispositivo": "Isidro",
+            "Nombre del usuario": "Isidro",
+            "Procesador": "Intel64 Family 6 Model 142 Stepping 12, GenuineIntel"
+        },
+        "CPU": {
+            "Modelo": "Intel64 Family 6 Model 142 Stepping 12, GenuineIntel",
+            "N\u00facleos f\u00edsicos": 2,
+            "N\u00facleos l\u00f3gicos": 4,
+            "Frecuencia (MHz)": 2592.0,
+            "Uso actual (%)": 37.9
+        },
+        "Memoria": {
+            "Total RAM (GB)": 11.83,
+            "Disponible RAM (GB)": 3.46,
+            "Uso de RAM (%)": 70.7
+        },
+        "Discos": [
+            {
+                "Dispositivo": "C:\\",
+                "Punto de montaje": "C:\\",
+                "Tipo de sistema de archivos": "NTFS",
+                "Total (GB)": 231.84,
+                "Usado (GB)": 149.6,
+                "Disponible (GB)": 82.24,
+                "Porcentaje de uso (%)": 64.5
+            },
+            {
+                "Dispositivo": "D:\\",
+                "Punto de montaje": "D:\\",
+                "Tipo de sistema de archivos": "NTFS",
+                "Total (GB)": 931.51,
+                "Usado (GB)": 59.82,
+                "Disponible (GB)": 871.69,
+                "Porcentaje de uso (%)": 6.4
+            }
+        ],
+        "Red": {
+            "Wi-Fi": [
+                {
+                    "Tipo": "MAC",
+                    "Direcci\u00f3n": "00-E9-3A-66-16-4F"
+                },
+                {
+                    "Tipo": "IPv4",
+                    "Direcci\u00f3n": "169.254.226.212",
+                    "M\u00e1scara de red": "255.255.0.0",
+                    "Broadcast": null
+                },
+                {
+                    "Tipo": "IPv6",
+                    "Direcci\u00f3n": "fe80::3f4b:1eaa:2cc5:e844",
+                    "M\u00e1scara de red": null
+                }
+            ],
+            "Conexi\u00f3n de \u00e1rea local* 1": [
+                {
+                    "Tipo": "MAC",
+                    "Direcci\u00f3n": "02-E9-3A-66-16-4F"
+                },
+                {
+                    "Tipo": "IPv4",
+                    "Direcci\u00f3n": "169.254.138.12",
+                    "M\u00e1scara de red": "255.255.0.0",
+                    "Broadcast": null
+                },
+                {
+                    "Tipo": "IPv6",
+                    "Direcci\u00f3n": "fe80::8376:a87d:4560:d0af",
+                    "M\u00e1scara de red": null
+                }
+            ],
+            "Conexi\u00f3n de \u00e1rea local* 2": [
+                {
+                    "Tipo": "MAC",
+                    "Direcci\u00f3n": "82-E9-3A-66-16-4F"
+                },
+                {
+                    "Tipo": "IPv4",
+                    "Direcci\u00f3n": "169.254.91.129",
+                    "M\u00e1scara de red": "255.255.0.0",
+                    "Broadcast": null
+                },
+                {
+                    "Tipo": "IPv6",
+                    "Direcci\u00f3n": "fe80::79d6:7705:344b:9722",
+                    "M\u00e1scara de red": null
+                }
+            ],
+            "Ethernet": [
+                {
+                    "Tipo": "MAC",
+                    "Direcci\u00f3n": "14-CB-19-0C-E3-7E"
+                },
+                {
+                    "Tipo": "IPv4",
+                    "Direcci\u00f3n": "192.168.18.26",
+                    "M\u00e1scara de red": "255.255.255.0",
+                    "Broadcast": null
+                },
+                {
+                    "Tipo": "IPv6",
+                    "Direcci\u00f3n": "fe80::450:191f:4bc9:e23c",
+                    "M\u00e1scara de red": null
+                }
+            ],
+            "Conexi\u00f3n de red Bluetooth": [
+                {
+                    "Tipo": "MAC",
+                    "Direcci\u00f3n": "00-E9-3A-66-16-4E"
+                },
+                {
+                    "Tipo": "IPv4",
+                    "Direcci\u00f3n": "169.254.213.153",
+                    "M\u00e1scara de red": "255.255.0.0",
+                    "Broadcast": null
+                },
+                {
+                    "Tipo": "IPv6",
+                    "Direcci\u00f3n": "fe80::9793:9d98:46ab:c2fc",
+                    "M\u00e1scara de red": null
+                }
+            ],
+            "Loopback Pseudo-Interface 1": [
+                {
+                    "Tipo": "IPv4",
+                    "Direcci\u00f3n": "127.0.0.1",
+                    "M\u00e1scara de red": "255.0.0.0",
+                    "Broadcast": null
+                },
+                {
+                    "Tipo": "IPv6",
+                    "Direcci\u00f3n": "::1",
+                    "M\u00e1scara de red": null
+                }
+            ]
+        },
+        "Bater\u00eda": {
+            "Porcentaje": 100,
+            "Enchufado": true
+        },
+        "Tarjetas Gr\u00e1ficas": "No se encontraron GPUs.",
+        "Espacio en Disco": {
+            "Total (GB)": 231.84,
+            "Usado (GB)": 149.6,
+            "Libre (GB)": 82.24
+        }
+    }
+}
+2025-02-10 17:04:37,974 - ERROR - [agent_service.py:109] - 🚨 Error en el registro: Cannot connect to host 161.132.39.159:8000 ssl:default [El equipo remoto rechazó la conexión de red]
+2025-02-10 17:04:37,975 - ERROR - [agent_service.py:111] - Causa: [WinError 1225] El equipo remoto rechazó la conexión de red
+2025-02-10 17:04:39,018 - DEBUG - [agent_service.py:80] - 🔄 Enviando datos de registro: {
+    "client_token": "cli_a5380ce9961f463eb1df00ef1ec9c393",
+    "hostname": "Isidro",
+    "username": "Isidro",
+    "ip_address": "192.168.18.26",
+    "device_type": "Windows",
+    "system_info": {
+        "Sistema": {
+            "Nombre del SO": "Windows",
+            "Versi\u00f3n del SO": "10.0.26100",
+            "Arquitectura": "64bit",
+            "Nombre del dispositivo": "Isidro",
+            "Nombre del usuario": "Isidro",
+            "Procesador": "Intel64 Family 6 Model 142 Stepping 12, GenuineIntel"
+        },
+        "CPU": {
+            "Modelo": "Intel64 Family 6 Model 142 Stepping 12, GenuineIntel",
+            "N\u00facleos f\u00edsicos": 2,
+            "N\u00facleos l\u00f3gicos": 4,
+            "Frecuencia (MHz)": 2592.0,
+            "Uso actual (%)": 16.3
+        },
+        "Memoria": {
+            "Total RAM (GB)": 11.83,
+            "Disponible RAM (GB)": 3.45,
+            "Uso de RAM (%)": 70.8
+        },
+        "Discos": [
+            {
+                "Dispositivo": "C:\\",
+                "Punto de montaje": "C:\\",
+                "Tipo de sistema de archivos": "NTFS",
+                "Total (GB)": 231.84,
+                "Usado (GB)": 149.6,
+                "Disponible (GB)": 82.24,
+                "Porcentaje de uso (%)": 64.5
+            },
+            {
+                "Dispositivo": "D:\\",
+                "Punto de montaje": "D:\\",
+                "Tipo de sistema de archivos": "NTFS",
+                "Total (GB)": 931.51,
+                "Usado (GB)": 59.82,
+                "Disponible (GB)": 871.69,
+                "Porcentaje de uso (%)": 6.4
+            }
+        ],
+        "Red": {
+            "Wi-Fi": [
+                {
+                    "Tipo": "MAC",
+                    "Direcci\u00f3n": "00-E9-3A-66-16-4F"
+                },
+                {
+                    "Tipo": "IPv4",
+                    "Direcci\u00f3n": "169.254.226.212",
+                    "M\u00e1scara de red": "255.255.0.0",
+                    "Broadcast": null
+                },
+                {
+                    "Tipo": "IPv6",
+                    "Direcci\u00f3n": "fe80::3f4b:1eaa:2cc5:e844",
+                    "M\u00e1scara de red": null
+                }
+            ],
+            "Conexi\u00f3n de \u00e1rea local* 1": [
+                {
+                    "Tipo": "MAC",
+                    "Direcci\u00f3n": "02-E9-3A-66-16-4F"
+                },
+                {
+                    "Tipo": "IPv4",
+                    "Direcci\u00f3n": "169.254.138.12",
+                    "M\u00e1scara de red": "255.255.0.0",
+                    "Broadcast": null
+                },
+                {
+                    "Tipo": "IPv6",
+                    "Direcci\u00f3n": "fe80::8376:a87d:4560:d0af",
+                    "M\u00e1scara de red": null
+                }
+            ],
+            "Conexi\u00f3n de \u00e1rea local* 2": [
+                {
+                    "Tipo": "MAC",
+                    "Direcci\u00f3n": "82-E9-3A-66-16-4F"
+                },
+                {
+                    "Tipo": "IPv4",
+                    "Direcci\u00f3n": "169.254.91.129",
+                    "M\u00e1scara de red": "255.255.0.0",
+                    "Broadcast": null
+                },
+                {
+                    "Tipo": "IPv6",
+                    "Direcci\u00f3n": "fe80::79d6:7705:344b:9722",
+                    "M\u00e1scara de red": null
+                }
+            ],
+            "Ethernet": [
+                {
+                    "Tipo": "MAC",
+                    "Direcci\u00f3n": "14-CB-19-0C-E3-7E"
+                },
+                {
+                    "Tipo": "IPv4",
+                    "Direcci\u00f3n": "192.168.18.26",
+                    "M\u00e1scara de red": "255.255.255.0",
+                    "Broadcast": null
+                },
+                {
+                    "Tipo": "IPv6",
+                    "Direcci\u00f3n": "fe80::450:191f:4bc9:e23c",
+                    "M\u00e1scara de red": null
+                }
+            ],
+            "Conexi\u00f3n de red Bluetooth": [
+                {
+                    "Tipo": "MAC",
+                    "Direcci\u00f3n": "00-E9-3A-66-16-4E"
+                },
+                {
+                    "Tipo": "IPv4",
+                    "Direcci\u00f3n": "169.254.213.153",
+                    "M\u00e1scara de red": "255.255.0.0",
+                    "Broadcast": null
+                },
+                {
+                    "Tipo": "IPv6",
+                    "Direcci\u00f3n": "fe80::9793:9d98:46ab:c2fc",
+                    "M\u00e1scara de red": null
+                }
+            ],
+            "Loopback Pseudo-Interface 1": [
+                {
+                    "Tipo": "IPv4",
+                    "Direcci\u00f3n": "127.0.0.1",
+                    "M\u00e1scara de red": "255.0.0.0",
+                    "Broadcast": null
+                },
+                {
+                    "Tipo": "IPv6",
+                    "Direcci\u00f3n": "::1",
+                    "M\u00e1scara de red": null
+                }
+            ]
+        },
+        "Bater\u00eda": {
+            "Porcentaje": 100,
+            "Enchufado": true
+        },
+        "Tarjetas Gr\u00e1ficas": "No se encontraron GPUs.",
+        "Espacio en Disco": {
+            "Total (GB)": 231.84,
+            "Usado (GB)": 149.6,
+            "Libre (GB)": 82.24
+        }
+    }
+}
+2025-02-10 17:04:41,068 - ERROR - [agent_service.py:109] - 🚨 Error en el registro: Cannot connect to host 161.132.39.159:8000 ssl:default [El equipo remoto rechazó la conexión de red]
+2025-02-10 17:04:41,069 - ERROR - [agent_service.py:111] - Causa: [WinError 1225] El equipo remoto rechazó la conexión de red
