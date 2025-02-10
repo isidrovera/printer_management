@@ -12,7 +12,7 @@ class PrinterMonitorService:
 
     def update_printer_data(self, printer_data: Dict[str, Any], agent_id: int = None) -> Printer:
         """
-        Actualiza los datos de una impresora.
+        Actualiza los datos de una impresora manteniendo valores anteriores si no hay actualizaciones.
         
         Args:
             printer_data (Dict[str, Any]): Datos de la impresora
@@ -20,13 +20,9 @@ class PrinterMonitorService:
             
         Returns:
             Printer: Objeto impresora actualizado o creado
-            
-        Raises:
-            ValueError: Si faltan datos requeridos
-            Exception: Para otros errores durante el proceso
         """
         try:
-            logger.info(f"Iniciando creación/actualización de impresora con datos: {printer_data}")
+            logger.info(f"Iniciando actualización de impresora con datos: {printer_data}")
 
             if not printer_data:
                 logger.error("No se proporcionaron datos de la impresora")
@@ -54,13 +50,17 @@ class PrinterMonitorService:
                     agent_id=agent_id,
                     status=printer_data.get("status", "offline"),
                     last_check=datetime.utcnow(),
-                    oid_config_id=1  # ID por defecto para PrinterOIDs
+                    oid_config_id=1
                 )
 
                 # Asignar cliente si se proporciona
                 if printer_data.get("client_id"):
                     printer.client_id = int(printer_data["client_id"])
                     logger.info(f"Cliente asignado a la nueva impresora: {printer_data['client_id']}")
+
+                # Inicializar printer_data con los nuevos datos si existen
+                if printer_data.get("printer_data"):
+                    printer.printer_data = printer_data["printer_data"]
 
                 self.db.add(printer)
 
@@ -69,7 +69,6 @@ class PrinterMonitorService:
                 printer.name = printer_data["name"]
                 printer.brand = printer_data["brand"]
                 printer.model = printer_data["model"]
-                printer.status = printer_data.get("status", "offline")
                 printer.last_check = datetime.utcnow()
 
                 # Actualizar agent_id si se proporciona
@@ -80,9 +79,52 @@ class PrinterMonitorService:
                 if printer_data.get("client_id"):
                     printer.client_id = int(printer_data["client_id"])
 
-                # Actualizar datos de monitoreo si están presentes
+                # Manejar actualización de printer_data preservando valores anteriores
                 if printer_data.get("printer_data"):
-                    printer.printer_data = printer_data["printer_data"]
+                    current_data = printer.printer_data or {}
+                    new_data = printer_data["printer_data"]
+
+                    # Actualizar contadores solo si hay nuevos datos
+                    if "counters" in new_data:
+                        current_counters = current_data.get("counters", {})
+                        new_counters = new_data["counters"]
+                        
+                        # Preservar valores anteriores si los nuevos son 0 o None
+                        for counter_key in ["total_pages", "color_pages", "bw_pages"]:
+                            if counter_key in new_counters:
+                                new_value = new_counters[counter_key]
+                                if new_value is None or new_value == 0:
+                                    new_counters[counter_key] = current_counters.get(counter_key, 0)
+                        
+                        current_data["counters"] = new_counters
+
+                    # Actualizar suministros solo si hay nuevos datos
+                    if "supplies" in new_data:
+                        current_supplies = current_data.get("supplies", {})
+                        new_supplies = new_data["supplies"]
+                        
+                        # Preservar valores anteriores para toners y drums
+                        for supply_type in ["toners", "drums"]:
+                            if supply_type in new_supplies:
+                                current_supply = current_supplies.get(supply_type, {})
+                                new_supply = new_supplies[supply_type]
+                                
+                                for color in ["black", "cyan", "magenta", "yellow"]:
+                                    if color in new_supply:
+                                        new_percentage = new_supply[color].get("percentage")
+                                        if new_percentage is None or new_percentage == 0:
+                                            if color in current_supply:
+                                                new_supply[color]["percentage"] = current_supply[color].get("percentage", 0)
+                        
+                        current_data["supplies"] = new_supplies
+
+                    # Actualizar estado solo si es diferente de offline
+                    if new_data.get("status") and new_data["status"] != "offline":
+                        printer.status = new_data["status"]
+                    elif printer_data.get("status") and printer_data["status"] != "offline":
+                        printer.status = printer_data["status"]
+
+                    printer.printer_data = current_data
 
             self.db.commit()
             self.db.refresh(printer)
