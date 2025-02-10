@@ -9,3 +9,5 @@ qrcode
 pydantic_settings
 sqlalchemy
 passlib
+pydantic[email]
+email-validator
