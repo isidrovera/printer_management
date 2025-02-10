@@ -6,15 +6,18 @@ import logging
 logger = logging.getLogger(__name__)
 
 async def auth_middleware(request: Request, call_next):
-    # Permitir acceso a rutas públicas
+    # Rutas públicas
     public_paths = ["/auth/login", "/static/", "/favicon.ico"]
     if any(request.url.path.startswith(path) for path in public_paths):
         return await call_next(request)
 
-    # Verificar autenticación para otras rutas
-    if "auth_token" not in request.cookies:
-        logger.error("Token no encontrado en cookies")
+    # Verificar token JWT
+    token = request.cookies.get("auth_token")
+    
+    if not token and not request.url.path.startswith("/auth/"):
         return RedirectResponse(url="/auth/login", status_code=303)
+        
+    if token and request.url.path == "/auth/login":
+        return RedirectResponse(url="/auth/change-password", status_code=303)
 
-    response = await call_next(request)
-    return response
+    return await call_next(request)
