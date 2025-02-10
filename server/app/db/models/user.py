@@ -86,12 +86,15 @@ class User(BaseModel):
     updated_by_id = Column(Integer, ForeignKey('users.id'))
     
     # Relaciones
-    permissions = relationship("Permission", secondary=user_permissions, back_populates="users")
-    created_by = relationship("User", 
+   
+    created_by = relationship("User",
         foreign_keys=[created_by_id], 
+        remote_side="User.id",  # Indica el lado remoto de la relación
         backref=backref("created_users", uselist=True))
-    updated_by = relationship("User", 
+
+    updated_by = relationship("User",
         foreign_keys=[updated_by_id], 
+        remote_side="User.id",
         backref=backref("updated_users", uselist=True))
                 
     @staticmethod
