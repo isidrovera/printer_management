@@ -6,13 +6,19 @@ import logging
 logger = logging.getLogger(__name__)
 
 async def first_login_middleware(request: Request, call_next):
-    if request.url.path.startswith(("/api/", "/monitor/")):
+    logger.debug(f"[FIRST_LOGIN] Inicio procesamiento: {request.url.path}")
+    
+    try:
         user = getattr(request.state, "user", None)
+        logger.debug(f"[FIRST_LOGIN] Usuario en state: {user.username if user else None}")
         
         if user and user.must_change_password:
+            logger.info(f"[FIRST_LOGIN] Usuario {user.username} debe cambiar contraseña")
             if not request.url.path.startswith("/auth/change-password"):
-                logger.info(f"Redirigiendo a usuario {user.username} a cambio de contraseña obligatorio")
+                logger.info("[FIRST_LOGIN] Redirigiendo a cambio de contraseña")
                 return RedirectResponse(url="/auth/change-password", status_code=303)
+    except Exception as e:
+        logger.error(f"[FIRST_LOGIN] Error: {str(e)}")
     
-    response = await call_next(request)
-    return response
+    logger.debug("[FIRST_LOGIN] Procesamiento completado")
+    return await call_next(request)
