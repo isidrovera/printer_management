@@ -40,3 +40,6 @@ async def get_current_user(request: Request) -> User:
     except JWTError as e:
         logger.error(f"[AUTH] Error JWT: {e}")
         raise HTTPException(status_code=401)
+
+
+    __all__ = ["auth_middleware"]
