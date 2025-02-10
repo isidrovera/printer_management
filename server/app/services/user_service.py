@@ -1,7 +1,7 @@
 # server/app/services/user_service.py
 from sqlalchemy.orm import Session
 from app.db.models.user import User, Permission, UserStatus
-from app.schemas.user import UserCreate, UserUpdate
+from app.schemas.auth import UserCreate, UserUpdate
 from fastapi import HTTPException
 import logging
 from typing import Optional, List
