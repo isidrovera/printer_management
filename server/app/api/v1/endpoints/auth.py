@@ -93,7 +93,6 @@ async def login_form(request: Request):
 
 @router.post("/login")
 async def login(request: Request, db: Session = Depends(get_db)):
-    """Procesa el login web"""
     try:
         form = await request.form()
         username = form.get("username")
@@ -105,36 +104,25 @@ async def login(request: Request, db: Session = Depends(get_db)):
         if not user:
             return templates.TemplateResponse(
                 "auth/login.html",
-                {
-                    "request": request,
-                    "error": "Credenciales incorrectas"
-                }
+                {"request": request, "error": "Credenciales incorrectas"}
             )
             
         access_token = create_access_token(data={"sub": user.username})
-        response = RedirectResponse(url="/", status_code=303)
+        response = RedirectResponse(url="/auth/change-password" if user.must_change_password else "/", status_code=303)
         response.set_cookie(
             key="access_token",
             value=f"Bearer {access_token}",
-            httponly=True,
-            max_age=3600,
-            secure=True
+            httponly=True
         )
         
-        # Redirigir a cambio de contraseña si es necesario
-        if user.must_change_password:
-            response = RedirectResponse(url="/auth/change-password", status_code=303)
-        
+        logger.info(f"Login exitoso: {username}")
         return response
         
     except Exception as e:
         logger.error(f"Error en login: {str(e)}")
         return templates.TemplateResponse(
             "auth/login.html",
-            {
-                "request": request,
-                "error": "Error en el servidor"
-            }
+            {"request": request, "error": "Error en el servidor"}
         )
 
 @router.get("/logout")
