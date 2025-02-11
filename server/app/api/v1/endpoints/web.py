@@ -22,6 +22,8 @@ from pathlib import Path
 from app.core.config import settings
 from fastapi.responses import FileResponse
 from app.schemas.user import UserRole, UserStatus, UserDepartment
+from app.core.auth import get_current_user
+from app.db.models.user import User
 from fastapi import HTTPException
 from datetime import datetime
 
