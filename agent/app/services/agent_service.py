@@ -14,10 +14,13 @@ import platform
 import socket
 import aiohttp
 import os
+import ctypes
+import sys
 from ..core.config import settings
 from .system_info_service import SystemInfoService
 from .printer_service import PrinterService
 from .printer_monitor_service import PrinterMonitorService
+from .smb_service import SMBScannerService
 from datetime import datetime
 from ..core.config import settings
 
@@ -30,21 +33,45 @@ class AgentService:
         self.system_info = SystemInfoService()
         self.printer_monitor = PrinterMonitorService(settings.SERVER_URL)
         self.printer_service = PrinterService()
+        self.smb_service = SMBScannerService()
         self.reconnect_interval = 10
         self.active_tunnels = {}
+        
     
     async def start(self):
-        """Inicia el agente, registrándolo si es necesario."""
+        """Inicia el agente, registrándolo si es necesario y configura el servicio SMB."""
+        logger.info("Iniciando el agente y servicios...")
+        
+        # Verificar privilegios de administrador
+        if not ctypes.windll.shell32.IsUserAnAdmin():
+            logger.error("❌ Se requieren privilegios de administrador para ejecutar el agente")
+            logger.info("Por favor, ejecute el agente como administrador")
+            sys.exit(1)
+        
+        # Intentar configurar SMB primero
+        try:
+            logger.info("Iniciando configuración del servicio SMB...")
+            smb_setup_result = await self.smb_service.setup()
+            if smb_setup_result:
+                logger.info("✅ Servicio SMB configurado exitosamente")
+            else:
+                logger.warning("⚠️ Servicio SMB configurado parcialmente")
+        except Exception as e:
+            logger.error(f"❌ Error configurando servicio SMB: {e}")
+            # No detenemos el agente si falla SMB, solo registramos el error
+
+        # Bucle principal del agente
         while True:
             try:
                 if not settings.AGENT_TOKEN:
+                    logger.info("Iniciando registro del agente...")
                     await self._register()
                 else:
+                    logger.info("Conectando agente al servidor...")
                     await self._connect()
             except Exception as e:
-                logger.error(f"Critical error in agent start: {e}")
+                logger.error(f"Error crítico en el inicio del agente: {e}")
                 await asyncio.sleep(self.reconnect_interval)
-    
     async def _register(self):
         """Registra el agente con el servidor o lo actualiza si ya existe."""
         system_info = await self.system_info.get_system_info()

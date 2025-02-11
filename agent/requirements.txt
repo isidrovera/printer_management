@@ -8,3 +8,5 @@ aiosnmp
 pysnmplib
 netifaces
 gputil
+pywin32
+wmi
