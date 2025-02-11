@@ -269,8 +269,10 @@ class TunnelService:
         Lista todos los túneles
         """
         try:
-            result = await self.db.execute(select(Tunnel))
-            return result.scalars().all()
+            # Usando query en lugar de select para mantener compatibilidad
+            tunnels = self.db.query(Tunnel).all()
+            logger.info(f"Se encontraron {len(tunnels)} túneles")
+            return tunnels
         except Exception as e:
             logger.error(f"Error al listar túneles: {e}")
             return []
@@ -280,8 +282,10 @@ class TunnelService:
         Obtiene todos los túneles (método usado por el dashboard)
         """
         try:
-            result = await self.db.execute(select(Tunnel))
-            return result.scalars().all()
+            # Usando query en lugar de select para mantener compatibilidad
+            tunnels = self.db.query(Tunnel).all()
+            logger.info(f"Se obtuvieron {len(tunnels)} túneles")
+            return tunnels
         except Exception as e:
             logger.error(f"Error al obtener todos los túneles: {e}")
             return []
