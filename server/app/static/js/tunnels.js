@@ -219,15 +219,20 @@ function formatDate(dateString) {
 function updateStats() {
     const stats = {
         total: document.querySelectorAll('tbody tr').length,
-        active: document.querySelectorAll('tr span:contains("Active")').length,
-        creating: document.querySelectorAll('tr span:contains("Creating")').length,
-        error: document.querySelectorAll('tr span:contains("Error")').length
+        active: Array.from(document.querySelectorAll('tr span')).filter(span => 
+            span.textContent.toLowerCase().includes('active')).length,
+        creating: Array.from(document.querySelectorAll('tr span')).filter(span => 
+            span.textContent.toLowerCase().includes('creating')).length,
+        error: Array.from(document.querySelectorAll('tr span')).filter(span => 
+            span.textContent.toLowerCase().includes('error')).length
     };
 
     // Actualizar los contadores en las tarjetas de estadísticas
     Object.keys(stats).forEach(key => {
         const element = document.querySelector(`[data-stat="${key}"]`);
-        if (element) element.textContent = stats[key];
+        if (element) {
+            element.textContent = stats[key];
+        }
     });
 }
 
