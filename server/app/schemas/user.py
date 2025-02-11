@@ -83,3 +83,23 @@ class PasswordChange(BaseModel):
    current_password: str
    new_password: str
    confirm_password: str
+
+
+class User(UserBase):
+    id: int
+    role: UserRole
+    status: UserStatus
+    department: Optional[UserDepartment]
+    job_title: Optional[str]
+    phone: Optional[str]
+    mobile: Optional[str]
+    is_superuser: bool
+    can_login: bool
+    email_verified: bool
+    last_login: Optional[datetime]
+    last_active: Optional[datetime]
+    created_at: datetime
+    updated_at: Optional[datetime]
+
+    class Config:
+        from_attributes = True
