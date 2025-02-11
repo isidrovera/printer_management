@@ -14,6 +14,7 @@ from app.services.agent_service import AgentService
 from app.services.driver_service import DriverService
 from app.services.tunnel_service import TunnelService
 from app.services.monitor_service import PrinterMonitorService
+from app.services.user_service import UserService
 from app.db.models.printer import Printer
 from app.db.models.client import Client, ClientStatus, ClientType
 from fastapi import File, UploadFile
