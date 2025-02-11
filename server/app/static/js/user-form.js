@@ -45,17 +45,19 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (response.ok) {
                 console.log('✅ Operación exitosa');
-                showNotification(
+                showUserFormNotification(
                     isEdit ? 'Usuario actualizado exitosamente' : 'Usuario creado exitosamente',
                     'success'
                 );
-                setTimeout(() => window.location.href = '/users', 1000);
+                window.location.href = '/users';  // Redirección inmediata
+                return;  // Importante: detener la ejecución aquí
             } else {
                 throw new Error(result.detail || 'Error procesando la solicitud');
             }
         } catch (error) {
             console.error('❌ Error:', error);
-            showNotification(error.message, 'error');
+            showUserFormNotification(error.message, 'error');
+            // No redirigir en caso de error
         }
     });
 
@@ -118,7 +120,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const passwordValidation = validatePassword(passwordField.value);
             if (!passwordValidation.isValid) {
                 passwordField.classList.add('border-red-500');
-                showNotification(
+                showUserFormNotification(
                     `La contraseña debe contener: ${passwordValidation.errors.join(', ')}`, 
                     'error'
                 );
@@ -173,10 +175,10 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Función para mostrar notificaciones
-    function showNotification(message, type = 'success') {
+    function showUserFormNotification(message, type = 'success') {
         console.log(`🔔 Mostrando notificación:`, { message, type });
         
-        const container = document.getElementById('notification-container') || createNotificationContainer();
+        const container = document.getElementById('userform-notification-container') || createUserFormNotificationContainer();
         const notification = document.createElement('div');
         
         notification.className = `p-4 rounded-lg shadow-lg ${
@@ -194,13 +196,17 @@ document.addEventListener('DOMContentLoaded', function() {
         `;
         
         container.appendChild(notification);
-        setTimeout(() => notification.remove(), 5000);
+        
+        // Solo configurar el timeout para notificaciones de error
+        if (type === 'error') {
+            setTimeout(() => notification.remove(), 5000);
+        }
     }
     
-    function createNotificationContainer() {
+    function createUserFormNotificationContainer() {
         console.log('📦 Creando contenedor de notificaciones');
         const container = document.createElement('div');
-        container.id = 'notification-container';
+        container.id = 'userform-notification-container';
         container.className = 'fixed bottom-4 right-4 z-50 space-y-2';
         document.body.appendChild(container);
         return container;
