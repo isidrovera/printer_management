@@ -1120,3 +1120,254 @@ async def delete_printer(printer_id: int, db: Session = Depends(get_db)):
             status_code=500,
             content={"success": False, "detail": str(e)}
         )
+
+
+# Agregar estas rutas en web.py después de las rutas existentes
+
+# ============= Manejo de Usuarios =============
+@router.get("/users")
+async def list_users(
+    request: Request,
+    search: Optional[str] = None,
+    role: Optional[str] = None,
+    status: Optional[str] = None,
+    db: Session = Depends(get_db)
+):
+    """Vista de listado de usuarios con opciones de filtrado"""
+    try:
+        user_service = UserService(db)
+        users = await user_service.get_all_users()
+        
+        return templates.TemplateResponse(
+            "users/list.html",
+            {
+                "request": request,
+                "users": users,
+                "roles": UserRole,
+                "statuses": UserStatus,
+                "departments": UserDepartment,
+                "current_search": search,
+                "current_role": role,
+                "current_status": status
+            }
+        )
+    except Exception as e:
+        logger.error(f"Error listing users: {str(e)}")
+        return templates.TemplateResponse(
+            "users/list.html",
+            {
+                "request": request,
+                "users": [],
+                "roles": UserRole,
+                "statuses": UserStatus,
+                "departments": UserDepartment,
+                "error": str(e)
+            }
+        )
+
+@router.get("/users/create")
+async def create_user_form(request: Request):
+    """Formulario de creación de usuario"""
+    return templates.TemplateResponse(
+        "users/form.html",
+        {
+            "request": request,
+            "user": None,
+            "roles": UserRole,
+            "statuses": UserStatus,
+            "departments": UserDepartment
+        }
+    )
+
+@router.post("/users/create")
+async def create_user(request: Request, db: Session = Depends(get_db)):
+    """Procesa la creación de un nuevo usuario"""
+    try:
+        form = await request.form()
+        user_data = UserCreate(
+            username=form.get("username"),
+            email=form.get("email"),
+            password=form.get("password"),
+            full_name=form.get("full_name"),
+            role=form.get("role", UserRole.VIEWER),
+            department=form.get("department")
+        )
+
+        user_service = UserService(db)
+        user = await user_service.create_user(user_data)
+        
+        logger.info(f"Usuario creado exitosamente: {user.username}")
+        return RedirectResponse("/users", status_code=303)
+    
+    except HTTPException as e:
+        logger.warning(f"Error de validación al crear usuario: {str(e)}")
+        return templates.TemplateResponse(
+            "users/form.html",
+            {
+                "request": request,
+                "user": None,
+                "error": e.detail,
+                "roles": UserRole,
+                "statuses": UserStatus,
+                "departments": UserDepartment,
+                "form_data": dict(form)
+            }
+        )
+    except Exception as e:
+        logger.error(f"Error creating user: {str(e)}")
+        return templates.TemplateResponse(
+            "users/form.html",
+            {
+                "request": request,
+                "user": None,
+                "error": str(e),
+                "roles": UserRole,
+                "statuses": UserStatus,
+                "departments": UserDepartment,
+                "form_data": dict(form)
+            }
+        )
+
+@router.get("/users/{user_id}/edit")
+async def edit_user_form(request: Request, user_id: int, db: Session = Depends(get_db)):
+    """Formulario de edición de usuario"""
+    user_service = UserService(db)
+    user = await user_service.get_user_by_id(user_id)
+    
+    if not user:
+        return RedirectResponse("/users", status_code=303)
+        
+    return templates.TemplateResponse(
+        "users/form.html",
+        {
+            "request": request,
+            "user": user,
+            "roles": UserRole,
+            "statuses": UserStatus,
+            "departments": UserDepartment
+        }
+    )
+
+@router.post("/users/{user_id}/edit")
+async def edit_user(request: Request, user_id: int, db: Session = Depends(get_db)):
+    """Procesa la edición de un usuario"""
+    try:
+        form = await request.form()
+        
+        def clean_value(value):
+            return None if value in ['None', 'none', '', None] else value
+
+        user_data = UserUpdate(
+            email=clean_value(form.get("email")),
+            full_name=clean_value(form.get("full_name")),
+            job_title=clean_value(form.get("job_title")),
+            department=clean_value(form.get("department")),
+            phone=clean_value(form.get("phone")),
+            mobile=clean_value(form.get("mobile")),
+            role=clean_value(form.get("role")),
+            status=clean_value(form.get("status"))
+        )
+
+        user_service = UserService(db)
+        user = await user_service.update_user(user_id, user_data)
+        
+        if not user:
+            raise ValueError("Usuario no encontrado")
+
+        logger.info(f"Usuario {user_id} actualizado exitosamente")
+        return RedirectResponse("/users", status_code=303)
+        
+    except ValueError as e:
+        logger.warning(f"Error de validación al actualizar usuario: {str(e)}")
+        return templates.TemplateResponse(
+            "users/form.html",
+            {
+                "request": request,
+                "user": {"id": user_id, **dict(form)},
+                "error": str(e),
+                "roles": UserRole,
+                "statuses": UserStatus,
+                "departments": UserDepartment
+            }
+        )
+    except Exception as e:
+        logger.error(f"Error al actualizar usuario: {str(e)}")
+        return templates.TemplateResponse(
+            "users/form.html",
+            {
+                "request": request,
+                "user": {"id": user_id, **dict(form)},
+                "error": "Error al actualizar el usuario. Por favor, intente nuevamente.",
+                "roles": UserRole,
+                "statuses": UserStatus,
+                "departments": UserDepartment
+            }
+        )
+
+@router.get("/users/{user_id}/change-password")
+async def change_password_form(request: Request, user_id: int, db: Session = Depends(get_db)):
+    """Formulario para cambio de contraseña"""
+    user_service = UserService(db)
+    user = await user_service.get_user_by_id(user_id)
+    
+    if not user:
+        return RedirectResponse("/users", status_code=303)
+        
+    return templates.TemplateResponse(
+        "users/change_password.html",
+        {
+            "request": request,
+            "user": user
+        }
+    )
+
+@router.post("/users/{user_id}/change-password")
+async def change_password(request: Request, user_id: int, db: Session = Depends(get_db)):
+    """Procesa el cambio de contraseña"""
+    try:
+        form = await request.form()
+        current_password = form.get("current_password")
+        new_password = form.get("new_password")
+        confirm_password = form.get("confirm_password")
+        
+        if new_password != confirm_password:
+            raise ValueError("Las contraseñas no coinciden")
+            
+        user_service = UserService(db)
+        success = await user_service.change_password(user_id, current_password, new_password)
+        
+        if success:
+            return RedirectResponse("/users", status_code=303)
+        raise ValueError("Error al cambiar la contraseña")
+        
+    except Exception as e:
+        logger.error(f"Error al cambiar contraseña: {str(e)}")
+        return templates.TemplateResponse(
+            "users/change_password.html",
+            {
+                "request": request,
+                "user_id": user_id,
+                "error": str(e)
+            }
+        )
+
+@router.delete("/users/{user_id}")
+async def delete_user(user_id: int, db: Session = Depends(get_db)):
+    """Desactiva un usuario (soft delete)"""
+    try:
+        user_service = UserService(db)
+        success = await user_service.deactivate_user(user_id)
+        
+        if success:
+            return {"success": True}
+            
+        return JSONResponse(
+            status_code=404,
+            content={"success": False, "error": "Usuario no encontrado"}
+        )
+    except Exception as e:
+        logger.error(f"Error desactivando usuario: {str(e)}")
+        return JSONResponse(
+            status_code=500,
+            content={"success": False, "error": str(e)}
+        )

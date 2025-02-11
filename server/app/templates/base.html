@@ -40,6 +40,11 @@
                         <a class="hover:text-blue-400" href="/monitor/printers">
                             <i class="fas fa-print mr-1"></i> Impresoras
                         </a>
+                        {% if request.state.user.is_superuser %}
+                        <a class="hover:text-blue-400" href="/users">
+                            <i class="fas fa-user-cog mr-1"></i> Usuarios
+                        </a>
+                        {% endif %}
                     </div>
                 </div>
 
@@ -79,6 +84,11 @@
                     <a class="block hover:text-blue-400 py-2" href="/monitor/printers">
                         <i class="fas fa-print mr-1"></i> Impresoras
                     </a>
+                    {% if request.state.user.is_superuser %}
+                    <a class="block hover:text-blue-400 py-2" href="/users">
+                        <i class="fas fa-user-cog mr-1"></i> Usuarios
+                    </a>
+                    {% endif %}
                 </div>
             </div>
         </div>

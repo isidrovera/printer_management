@@ -3,9 +3,14 @@ from fastapi import APIRouter
 from app.api.v1.endpoints import (
    agents, websocket, web, printers, drivers,
    tunnels, monitor_printers, printer_oids,
-   dashboard, auth
+   dashboard, auth, users
 )
-
+# Rutas para usuarios
+api_router.include_router(
+    users.router,
+    prefix="/users",
+    tags=["users"]
+)
 # Routers principales
 api_router = APIRouter()
 web_router = APIRouter()
