@@ -21,7 +21,7 @@ from fastapi import File, UploadFile
 from pathlib import Path
 from app.core.config import settings
 from fastapi.responses import FileResponse
-from app.schemas.user import UserRole, UserStatus, UserDepartment
+from app.schemas.user import UserRole, UserStatus, UserDepartment, UserCreate, UserUpdate
 from app.core.auth import get_current_user
 from app.db.models.user import User
 from fastapi import HTTPException
@@ -1127,7 +1127,6 @@ async def delete_printer(printer_id: int, db: Session = Depends(get_db)):
 
 
 # Agregar estas rutas en web.py después de las rutas existentes
-
 # ============= Manejo de Usuarios =============
 @router.get("/users")
 async def list_users(
@@ -1135,10 +1134,14 @@ async def list_users(
     search: Optional[str] = None,
     role: Optional[str] = None,
     status: Optional[str] = None,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     """Vista de listado de usuarios con opciones de filtrado"""
     try:
+        if not current_user.is_superuser:
+            raise HTTPException(status_code=403, detail="No tiene permisos para ver usuarios")
+            
         user_service = UserService(db)
         users = await user_service.get_all_users()
         
@@ -1152,7 +1155,8 @@ async def list_users(
                 "departments": UserDepartment,
                 "current_search": search,
                 "current_role": role,
-                "current_status": status
+                "current_status": status,
+                "current_user": current_user
             }
         )
     except Exception as e:
@@ -1165,13 +1169,20 @@ async def list_users(
                 "roles": UserRole,
                 "statuses": UserStatus,
                 "departments": UserDepartment,
-                "error": str(e)
+                "error": str(e),
+                "current_user": current_user
             }
         )
 
 @router.get("/users/create")
-async def create_user_form(request: Request):
+async def create_user_form(
+    request: Request,
+    current_user: User = Depends(get_current_user)
+):
     """Formulario de creación de usuario"""
+    if not current_user.is_superuser:
+        raise HTTPException(status_code=403, detail="No tiene permisos para crear usuarios")
+        
     return templates.TemplateResponse(
         "users/form.html",
         {
@@ -1179,14 +1190,22 @@ async def create_user_form(request: Request):
             "user": None,
             "roles": UserRole,
             "statuses": UserStatus,
-            "departments": UserDepartment
+            "departments": UserDepartment,
+            "current_user": current_user
         }
     )
 
 @router.post("/users/create")
-async def create_user(request: Request, db: Session = Depends(get_db)):
+async def create_user(
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
     """Procesa la creación de un nuevo usuario"""
     try:
+        if not current_user.is_superuser:
+            raise HTTPException(status_code=403, detail="No tiene permisos para crear usuarios")
+            
         form = await request.form()
         user_data = UserCreate(
             username=form.get("username"),
@@ -1198,7 +1217,7 @@ async def create_user(request: Request, db: Session = Depends(get_db)):
         )
 
         user_service = UserService(db)
-        user = await user_service.create_user(user_data)
+        user = await user_service.create_user(user_data, created_by_id=current_user.id)
         
         logger.info(f"Usuario creado exitosamente: {user.username}")
         return RedirectResponse("/users", status_code=303)
@@ -1214,7 +1233,8 @@ async def create_user(request: Request, db: Session = Depends(get_db)):
                 "roles": UserRole,
                 "statuses": UserStatus,
                 "departments": UserDepartment,
-                "form_data": dict(form)
+                "form_data": dict(form),
+                "current_user": current_user
             }
         )
     except Exception as e:
@@ -1228,13 +1248,22 @@ async def create_user(request: Request, db: Session = Depends(get_db)):
                 "roles": UserRole,
                 "statuses": UserStatus,
                 "departments": UserDepartment,
-                "form_data": dict(form)
+                "form_data": dict(form),
+                "current_user": current_user
             }
         )
 
 @router.get("/users/{user_id}/edit")
-async def edit_user_form(request: Request, user_id: int, db: Session = Depends(get_db)):
+async def edit_user_form(
+    request: Request,
+    user_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
     """Formulario de edición de usuario"""
+    if not current_user.is_superuser and current_user.id != user_id:
+        raise HTTPException(status_code=403, detail="No tiene permisos para editar este usuario")
+        
     user_service = UserService(db)
     user = await user_service.get_user_by_id(user_id)
     
@@ -1248,14 +1277,23 @@ async def edit_user_form(request: Request, user_id: int, db: Session = Depends(g
             "user": user,
             "roles": UserRole,
             "statuses": UserStatus,
-            "departments": UserDepartment
+            "departments": UserDepartment,
+            "current_user": current_user
         }
     )
 
 @router.post("/users/{user_id}/edit")
-async def edit_user(request: Request, user_id: int, db: Session = Depends(get_db)):
+async def edit_user(
+    request: Request,
+    user_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
     """Procesa la edición de un usuario"""
     try:
+        if not current_user.is_superuser and current_user.id != user_id:
+            raise HTTPException(status_code=403, detail="No tiene permisos para editar este usuario")
+            
         form = await request.form()
         
         def clean_value(value):
@@ -1273,7 +1311,7 @@ async def edit_user(request: Request, user_id: int, db: Session = Depends(get_db
         )
 
         user_service = UserService(db)
-        user = await user_service.update_user(user_id, user_data)
+        user = await user_service.update_user(user_id, user_data, updated_by_id=current_user.id)
         
         if not user:
             raise ValueError("Usuario no encontrado")
@@ -1291,7 +1329,8 @@ async def edit_user(request: Request, user_id: int, db: Session = Depends(get_db
                 "error": str(e),
                 "roles": UserRole,
                 "statuses": UserStatus,
-                "departments": UserDepartment
+                "departments": UserDepartment,
+                "current_user": current_user
             }
         )
     except Exception as e:
@@ -1304,13 +1343,22 @@ async def edit_user(request: Request, user_id: int, db: Session = Depends(get_db
                 "error": "Error al actualizar el usuario. Por favor, intente nuevamente.",
                 "roles": UserRole,
                 "statuses": UserStatus,
-                "departments": UserDepartment
+                "departments": UserDepartment,
+                "current_user": current_user
             }
         )
 
 @router.get("/users/{user_id}/change-password")
-async def change_password_form(request: Request, user_id: int, db: Session = Depends(get_db)):
+async def change_password_form(
+    request: Request,
+    user_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
     """Formulario para cambio de contraseña"""
+    if not current_user.is_superuser and current_user.id != user_id:
+        raise HTTPException(status_code=403, detail="No tiene permisos para cambiar la contraseña de este usuario")
+        
     user_service = UserService(db)
     user = await user_service.get_user_by_id(user_id)
     
@@ -1321,14 +1369,23 @@ async def change_password_form(request: Request, user_id: int, db: Session = Dep
         "users/change_password.html",
         {
             "request": request,
-            "user": user
+            "user": user,
+            "current_user": current_user
         }
     )
 
 @router.post("/users/{user_id}/change-password")
-async def change_password(request: Request, user_id: int, db: Session = Depends(get_db)):
+async def change_password(
+    request: Request,
+    user_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
     """Procesa el cambio de contraseña"""
     try:
+        if not current_user.is_superuser and current_user.id != user_id:
+            raise HTTPException(status_code=403, detail="No tiene permisos para cambiar la contraseña de este usuario")
+            
         form = await request.form()
         current_password = form.get("current_password")
         new_password = form.get("new_password")
@@ -1351,14 +1408,22 @@ async def change_password(request: Request, user_id: int, db: Session = Depends(
             {
                 "request": request,
                 "user_id": user_id,
-                "error": str(e)
+                "error": str(e),
+                "current_user": current_user
             }
         )
 
 @router.delete("/users/{user_id}")
-async def delete_user(user_id: int, db: Session = Depends(get_db)):
+async def delete_user(
+    user_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
     """Desactiva un usuario (soft delete)"""
     try:
+        if not current_user.is_superuser:
+            raise HTTPException(status_code=403, detail="No tiene permisos para eliminar usuarios")
+            
         user_service = UserService(db)
         success = await user_service.deactivate_user(user_id)
         
