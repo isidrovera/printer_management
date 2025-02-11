@@ -266,8 +266,23 @@ class AgentService:
                         if response.status != 200:
                             raise Exception(f"Error downloading driver: {response.status}")
                         
+                        # Verificar el Content-Type
+                        content_type = response.headers.get('Content-Type', '')
+                        if 'application/zip' not in content_type.lower():
+                            logger.warning(f"Content-Type inesperado: {content_type}")
+                        
                         content = await response.read()
                         logger.debug(f"Descargados {len(content)} bytes")
+                        
+                        # Verificar si el contenido parece un ZIP
+                        if len(content) < 4 or content[:4] != b'PK\x03\x04':
+                            # Intentar decodificar el contenido para ver qué recibimos
+                            try:
+                                text_content = content.decode('utf-8')[:200]
+                                logger.error(f"Contenido no válido recibido: {text_content}")
+                            except:
+                                logger.error("Contenido binario no válido recibido")
+                            raise Exception("El archivo descargado no es un ZIP válido")
                         
                         with open(driver_path, 'wb') as f:
                             f.write(content)
