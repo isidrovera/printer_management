@@ -20,6 +20,7 @@ from fastapi import File, UploadFile
 from pathlib import Path
 from app.core.config import settings
 from fastapi.responses import FileResponse
+from app.schemas.user import UserRole, UserStatus, UserDepartment
 from fastapi import HTTPException
 from datetime import datetime
 
