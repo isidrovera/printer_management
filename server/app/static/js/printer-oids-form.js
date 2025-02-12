@@ -90,57 +90,43 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Contadores de páginas
                 'oid_total_pages', 'oid_total_color_pages', 'oid_total_bw_pages', 'oid_total_copies',
                 'oid_total_prints', 'oid_total_scans', 'oid_duplex_pages', 'oid_total_faxes',
-                
-                // Tamaños de papel
                 'oid_a4_pages', 'oid_a3_pages', 'oid_letter_pages', 'oid_legal_pages',
                 
-                // Tóner - niveles
+                // Tóner - niveles y capacidad
                 'oid_black_toner_level', 'oid_cyan_toner_level', 'oid_magenta_toner_level', 'oid_yellow_toner_level',
-                
-                // Tóner - capacidad máxima
                 'oid_black_toner_max', 'oid_cyan_toner_max', 'oid_magenta_toner_max', 'oid_yellow_toner_max',
-                
-                // Tóner - estado
                 'oid_black_toner_status', 'oid_cyan_toner_status', 'oid_magenta_toner_status', 'oid_yellow_toner_status',
                 
-                // Unidades de imagen
+                // Unidades de imagen / drums
                 'oid_black_drum_level', 'oid_cyan_drum_level', 'oid_magenta_drum_level', 'oid_yellow_drum_level',
                 
                 // Otros consumibles
                 'oid_fuser_unit_level', 'oid_transfer_belt_level', 'oid_waste_toner_level', 'oid_waste_toner_max',
                 
-                // Bandejas 1
-                'oid_tray1_level', 'oid_tray1_max_capacity', 'oid_tray1_status', 
-                'oid_tray1_paper_size', 'oid_tray1_paper_type',
-                
-                // Bandeja 2
-                'oid_tray2_level', 'oid_tray2_max_capacity', 'oid_tray2_status', 
-                'oid_tray2_paper_size', 'oid_tray2_paper_type',
-                
-                // Bandeja 3
-                'oid_tray3_level', 'oid_tray3_max_capacity', 'oid_tray3_status', 
-                'oid_tray3_paper_size', 'oid_tray3_paper_type',
-                
-                // Bandeja Bypass
+                // Bandejas
+                'oid_tray1_level', 'oid_tray1_max_capacity', 'oid_tray1_status', 'oid_tray1_paper_size', 'oid_tray1_paper_type',
+                'oid_tray2_level', 'oid_tray2_max_capacity', 'oid_tray2_status', 'oid_tray2_paper_size', 'oid_tray2_paper_type',
+                'oid_tray3_level', 'oid_tray3_max_capacity', 'oid_tray3_status', 'oid_tray3_paper_size', 'oid_tray3_paper_type',
                 'oid_bypass_tray_level', 'oid_bypass_tray_status',
                 
-                // Sistema
+                // Sistema e información
                 'oid_printer_status', 'oid_printer_model', 'oid_serial_number', 'oid_firmware_version',
                 'oid_system_contact', 'oid_system_name', 'oid_system_location', 'oid_printer_memory',
                 'oid_temperature', 'oid_display_message',
                 
-                // Errores y alertas
+                // Mensajes y alertas
                 'oid_error_messages', 'oid_warning_messages', 'oid_service_messages',
                 
-                // Información de red
+                // Red
                 'oid_ip_address', 'oid_mac_address', 'oid_subnet_mask', 'oid_gateway'
             ];
 
-            // Recopilación de datos
+            // Recopilar datos del formulario
             fields.forEach(field => {
                 const value = getValue(field);
-                formData[field] = value;
-                logDebug(`Campo ${field}:`, value);
+                if (value !== '') {  // Solo incluir campos con valor
+                    formData[field] = value;
+                }
             });
 
             const printerOidsId = form.dataset.printerOidsId;
@@ -163,42 +149,55 @@ document.addEventListener('DOMContentLoaded', function() {
                 statusText: response.statusText
             });
 
-            if (response.redirected) {
-                logDebug('Redirección detectada:', response.url);
-                window.location.href = response.url;
-                return;
-            }
-
-            if (!response.ok) {
-                const contentType = response.headers.get("content-type");
-                let errorMessage = 'Error al procesar el formulario';
-                
-                if (contentType && contentType.includes("application/json")) {
-                    const errorData = await response.json();
-                    logDebug('Error JSON recibido:', errorData);
-                    errorMessage = errorData.detail || errorMessage;
-                } else {
-                    logDebug('Error no JSON recibido');
-                }
-                throw new Error(errorMessage);
+            const contentType = response.headers.get("content-type");
+            if (!contentType || !contentType.includes("application/json")) {
+                throw new Error('Respuesta no válida del servidor');
             }
 
             const result = await response.json();
-            logDebug('Respuesta exitosa:', result);
+            
+            if (!response.ok) {
+                throw new Error(result.error || 'Error al procesar el formulario');
+            }
 
-            showNotification(
-                `Configuración ${printerOidsId ? 'actualizada' : 'creada'} exitosamente`, 
-                'success'
-            );
+            showNotification(result.message || 'Configuración guardada exitosamente', 'success');
 
+            // Redirigir después de un breve delay
             setTimeout(() => {
-                window.location.href = '/printer-oids';
+                window.location.href = result.redirect || '/printer-oids';
             }, 1500);
 
         } catch (error) {
             logDebug('Error en el proceso:', error);
-            console.error('Error:', error);
             showNotification(error.message, 'error');
         }
     });
+
+    // Función para limpiar formulario
+    window.resetForm = function() {
+        form.reset();
+        showNotification('Formulario limpiado', 'info');
+    };
+
+    // Función para validar OID
+    window.validateOID = function(input) {
+        const oidPattern = /^([0-9]+\.)*[0-9]+$/;
+        const value = input.value.trim();
+        
+        if (value && !oidPattern.test(value)) {
+            input.classList.add('border-red-500');
+            showNotification('Formato de OID inválido. Use formato numérico (ej: 1.3.6.1.2.1)', 'error');
+        } else {
+            input.classList.remove('border-red-500');
+        }
+    };
+});
+
+// Asegurarse de que existe el contenedor de notificaciones
+document.addEventListener('DOMContentLoaded', function() {
+    if (!document.getElementById('notification-container')) {
+        const container = document.createElement('div');
+        container.id = 'notification-container';
+        document.body.appendChild(container);
+    }
 });

@@ -884,55 +884,27 @@ async def create_printer_oids(request: Request, db: Session = Depends(get_db)):
     Procesa la creación de nuevas configuraciones de OIDs
     """
     try:
-        form = await request.form()
+        # Obtener datos según el tipo de contenido
+        if request.headers.get('content-type') == 'application/json':
+            oid_data = await request.json()
+        else:
+            form = await request.form()
+            oid_data = dict(form)
         
-        # Recopilar todos los campos del formulario
-        oid_data = {
-            # Información básica
-            "brand": form.get("brand"),
-            "model_family": form.get("model_family"),
-            "description": form.get("description"),
+        logger.debug(f"Datos recibidos: {oid_data}")
+        
+        # Validar campos requeridos
+        if not oid_data.get('brand'):
+            return JSONResponse(
+                status_code=400,
+                content={"error": "El campo Marca es requerido"}
+            )
             
-            # Contadores de páginas
-            "oid_total_pages": form.get("oid_total_pages"),
-            "oid_total_color_pages": form.get("oid_total_color_pages"),
-            "oid_total_bw_pages": form.get("oid_total_bw_pages"),
-            "oid_total_copies": form.get("oid_total_copies"),
-            "oid_total_prints": form.get("oid_total_prints"),
-            "oid_total_scans": form.get("oid_total_scans"),
-            "oid_duplex_pages": form.get("oid_duplex_pages"),
-            "oid_total_faxes": form.get("oid_total_faxes"),
-            
-            # Niveles de tóner
-            "oid_black_toner_level": form.get("oid_black_toner_level"),
-            "oid_cyan_toner_level": form.get("oid_cyan_toner_level"),
-            "oid_magenta_toner_level": form.get("oid_magenta_toner_level"),
-            "oid_yellow_toner_level": form.get("oid_yellow_toner_level"),
-            
-            # Capacidades máximas de tóner
-            "oid_black_toner_max": form.get("oid_black_toner_max"),
-            "oid_cyan_toner_max": form.get("oid_cyan_toner_max"),
-            "oid_magenta_toner_max": form.get("oid_magenta_toner_max"),
-            "oid_yellow_toner_max": form.get("oid_yellow_toner_max"),
-            
-            # Estados de tóner
-            "oid_black_toner_status": form.get("oid_black_toner_status"),
-            "oid_cyan_toner_status": form.get("oid_cyan_toner_status"),
-            "oid_magenta_toner_status": form.get("oid_magenta_toner_status"),
-            "oid_yellow_toner_status": form.get("oid_yellow_toner_status"),
-            
-            # Unidades de imagen/drums
-            "oid_black_drum_level": form.get("oid_black_drum_level"),
-            "oid_cyan_drum_level": form.get("oid_cyan_drum_level"),
-            "oid_magenta_drum_level": form.get("oid_magenta_drum_level"),
-            "oid_yellow_drum_level": form.get("oid_yellow_drum_level"),
-            
-            # Otros consumibles
-            "oid_fuser_unit_level": form.get("oid_fuser_unit_level"),
-            "oid_transfer_belt_level": form.get("oid_transfer_belt_level"),
-            "oid_waste_toner_level": form.get("oid_waste_toner_level"),
-            "oid_waste_toner_max": form.get("oid_waste_toner_max")
-        }
+        if not oid_data.get('model_family'):
+            return JSONResponse(
+                status_code=400,
+                content={"error": "El campo Familia de Modelo es requerido"}
+            )
         
         printer_oids_service = PrinterOIDsService(db)
         
@@ -943,31 +915,28 @@ async def create_printer_oids(request: Request, db: Session = Depends(get_db)):
         )
         
         if existing:
-            raise ValueError("Ya existe una configuración para esta marca y familia de modelos")
+            return JSONResponse(
+                status_code=400,
+                content={"error": "Ya existe una configuración para esta marca y familia de modelos"}
+            )
         
         # Crear nueva configuración
-        await printer_oids_service.create(oid_data)
-        return RedirectResponse("/printer-oids", status_code=303)
-    
-    except ValueError as e:
-        logger.warning(f"Error de validación al crear OIDs: {str(e)}")
-        return templates.TemplateResponse(
-            "printer_oids/form.html",
-            {
-                "request": request,
-                "printer_oids": None,
-                "error": str(e)
+        new_oid = await printer_oids_service.create(oid_data)
+        
+        return JSONResponse(
+            status_code=201,
+            content={
+                "message": "Configuración creada exitosamente",
+                "id": new_oid.id,
+                "redirect": "/printer-oids"
             }
         )
+    
     except Exception as e:
         logger.error(f"Error inesperado al crear OIDs: {str(e)}")
-        return templates.TemplateResponse(
-            "printer_oids/form.html",
-            {
-                "request": request,
-                "printer_oids": None,
-                "error": "Error interno al crear la configuración"
-            }
+        return JSONResponse(
+            status_code=500,
+            content={"error": str(e)}
         )
 
 # 3. Edición de OIDs
