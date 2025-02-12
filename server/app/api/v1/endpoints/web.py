@@ -956,21 +956,64 @@ async def edit_printer_oids_form(request: Request, oid_id: int, db: Session = De
 
 @router.post("/printer-oids/{oid_id}/edit")
 async def edit_printer_oids(request: Request, oid_id: int, db: Session = Depends(get_db)):
+    """
+    Actualiza una configuración de OIDs existente
+    """
     try:
         logger.debug(f"Iniciando actualización de OID {oid_id}")
+        
+        # Obtener y validar datos JSON
         form_data = await request.json()
         logger.debug(f"Datos recibidos: {form_data}")
         
+        # Validar campos requeridos
+        if not form_data.get('brand'):
+            return JSONResponse(
+                status_code=400,
+                content={"error": "El campo Marca es requerido"}
+            )
+            
+        if not form_data.get('model_family'):
+            return JSONResponse(
+                status_code=400,
+                content={"error": "El campo Familia de Modelo es requerido"}
+            )
+        
         printer_oids_service = PrinterOIDsService(db)
+        
+        # Verificar si existe el registro
+        existing = printer_oids_service.get_by_id(oid_id)
+        if not existing:
+            return JSONResponse(
+                status_code=404,
+                content={"error": "Configuración de OIDs no encontrada"}
+            )
+        
+        # Actualizar configuración
         result = await printer_oids_service.update(oid_id, form_data)
         logger.debug(f"Actualización completada: {result}")
         
-        return RedirectResponse("/printer-oids", status_code=303)
+        # Retornar respuesta JSON exitosa
+        return JSONResponse(
+            status_code=200,
+            content={
+                "message": "Configuración actualizada exitosamente",
+                "id": oid_id,
+                "redirect": "/printer-oids"
+            }
+        )
+        
+    except ValueError as e:
+        logger.warning(f"Error de validación al actualizar OIDs: {str(e)}")
+        return JSONResponse(
+            status_code=400,
+            content={"error": str(e)}
+        )
     except Exception as e:
         logger.error(f"Error al actualizar OIDs: {str(e)}")
-        return templates.TemplateResponse(
-            "printer_oids/form.html",
-            {"request": request, "printer_oids": {"id": oid_id, **form_data}, "error": str(e)}
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"Error al actualizar la configuración: {str(e)}"}
         )
 # 4. Eliminación de OIDs
 @router.delete("/printer-oids/{oid_id}", name="delete_printer_oids")
