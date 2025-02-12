@@ -8,44 +8,87 @@ from sqlalchemy import and_
 import json
 import socket
 from app.core.logging import logger
+class AgentStatus:
+    ONLINE = "online"
+    OFFLINE = "offline"  # PC apagada normalmente
+    CONNECTION_LOST = "connection_lost"  # PC encendida pero sin conexión
+    ERROR = "error"
 
 class AgentService:
     def __init__(self, db_session: Session):
         self.db = db_session
-        self.HEARTBEAT_TIMEOUT = 300  # 5 minutos en segundos
+        self.HEARTBEAT_TIMEOUT = 300  # 5 minutos para marcar conexión perdida
+        self.OFFLINE_TIMEOUT = 600    # 10 minutos para marcar offline
 
     async def check_agent_status(self, agent: Agent) -> str:
         """
         Verifica el estado real del agente basado en su último heartbeat
         """
         if not agent.updated_at:
-            return "offline"
-            
+            return AgentStatus.OFFLINE
+                
         time_since_update = (datetime.utcnow() - agent.updated_at).total_seconds()
-        return "online" if time_since_update < self.HEARTBEAT_TIMEOUT else "offline"
+        
+        if time_since_update < self.HEARTBEAT_TIMEOUT:
+            return AgentStatus.ONLINE
+        elif time_since_update < self.OFFLINE_TIMEOUT:
+            return AgentStatus.CONNECTION_LOST
+        else:
+            return AgentStatus.OFFLINE
 
     async def update_agents_status(self):
         """
         Actualiza el estado de todos los agentes basado en su último heartbeat
         """
         try:
-            timeout_threshold = datetime.utcnow() - timedelta(seconds=self.HEARTBEAT_TIMEOUT)
-            agents_to_update = self.db.query(Agent).filter(
+            current_time = datetime.utcnow()
+            heartbeat_threshold = current_time - timedelta(seconds=self.HEARTBEAT_TIMEOUT)
+            offline_threshold = current_time - timedelta(seconds=self.OFFLINE_TIMEOUT)
+
+            # Primero actualizamos los que perdieron conexión
+            agents_connection_lost = self.db.query(Agent).filter(
                 and_(
                     Agent.is_active == True,
-                    Agent.status == 'online',
-                    Agent.updated_at < timeout_threshold
+                    Agent.status == AgentStatus.ONLINE,
+                    Agent.updated_at < heartbeat_threshold,
+                    Agent.updated_at >= offline_threshold
                 )
             ).all()
 
-            for agent in agents_to_update:
-                agent.status = 'offline'
-                logger.info(f"Agente {agent.id} marcado como offline por inactividad")
+            for agent in agents_connection_lost:
+                agent.status = AgentStatus.CONNECTION_LOST
+                logger.info(f"Agente {agent.id} marcado como connection_lost")
+
+            # Luego los que están realmente offline
+            agents_offline = self.db.query(Agent).filter(
+                and_(
+                    Agent.is_active == True,
+                    Agent.status.in_([AgentStatus.ONLINE, AgentStatus.CONNECTION_LOST]),
+                    Agent.updated_at < offline_threshold
+                )
+            ).all()
+
+            for agent in agents_offline:
+                agent.status = AgentStatus.OFFLINE
+                logger.info(f"Agente {agent.id} marcado como offline")
 
             self.db.commit()
         except Exception as e:
             logger.error(f"Error actualizando estados de agentes: {str(e)}")
-
+    async def register_shutdown(self, agent_token: str) -> bool:
+        """Registra un apagado normal del agente"""
+        try:
+            agent = await self.get_agent_by_token(agent_token)
+            if agent:
+                agent.status = AgentStatus.OFFLINE
+                agent.updated_at = datetime.utcnow()
+                self.db.commit()
+                logger.info(f"Agente {agent_token} registrado como apagado normal")
+                return True
+            return False
+        except Exception as e:
+            logger.error(f"Error registrando apagado del agente: {str(e)}")
+            return False
     async def register_agent(
         self, 
         client_token: str,
