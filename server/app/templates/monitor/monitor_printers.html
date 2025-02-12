@@ -140,16 +140,17 @@
                             <span class="text-sm text-gray-900">{{ printer.ip_address }}</span>
                         </div>
                     </td>
-                   
-                    <!-- Celda de toners -->
+                    <!-- Celda de toners ajustada -->
                     <td class="px-6 py-4 whitespace-nowrap">
                         <div class="flex space-x-2">
                             <!-- Negro -->
                             <div class="relative flex flex-col items-center">
                                 <div class="relative w-6 h-6" title="Negro: {{ printer.supplies.black.level|default(0) }}%">
-                                    <div class="absolute inset-0 bg-gray-200 rounded"></div>
-                                    <div class="absolute inset-0 bg-gray-800 rounded"
-                                        style="clip-path: inset({{ 100 - (printer.supplies.black.level|default(0)) }}% 0 0 0);">
+                                    <div class="absolute inset-0 bg-gray-200 rounded-sm">
+                                        <div class="absolute top-0 left-0 right-0 h-1.5 bg-gray-300 rounded-t-sm"></div>
+                                    </div>
+                                    <div class="absolute bottom-0 left-0 right-0 bg-gray-800 rounded-sm transition-all duration-300"
+                                        style="height: {{ printer.supplies.black.level|default(0) }}%">
                                     </div>
                                 </div>
                                 <span class="mt-1 text-xs text-gray-600">{{ printer.supplies.black.level|default(0) }}%</span>
@@ -158,9 +159,11 @@
                             <!-- Cyan -->
                             <div class="relative flex flex-col items-center">
                                 <div class="relative w-6 h-6" title="Cyan: {{ printer.supplies.cyan.level|default(0) }}%">
-                                    <div class="absolute inset-0 bg-gray-200 rounded"></div>
-                                    <div class="absolute inset-0 bg-blue-400 rounded"
-                                        style="clip-path: inset({{ 100 - (printer.supplies.cyan.level|default(0)) }}% 0 0 0);">
+                                    <div class="absolute inset-0 bg-gray-200 rounded-sm">
+                                        <div class="absolute top-0 left-0 right-0 h-1.5 bg-gray-300 rounded-t-sm"></div>
+                                    </div>
+                                    <div class="absolute bottom-0 left-0 right-0 bg-blue-400 rounded-sm transition-all duration-300"
+                                        style="height: {{ printer.supplies.cyan.level|default(0) }}%">
                                     </div>
                                 </div>
                                 <span class="mt-1 text-xs text-gray-600">{{ printer.supplies.cyan.level|default(0) }}%</span>
@@ -169,9 +172,11 @@
                             <!-- Magenta -->
                             <div class="relative flex flex-col items-center">
                                 <div class="relative w-6 h-6" title="Magenta: {{ printer.supplies.magenta.level|default(0) }}%">
-                                    <div class="absolute inset-0 bg-gray-200 rounded"></div>
-                                    <div class="absolute inset-0 bg-pink-500 rounded"
-                                        style="clip-path: inset({{ 100 - (printer.supplies.magenta.level|default(0)) }}% 0 0 0);">
+                                    <div class="absolute inset-0 bg-gray-200 rounded-sm">
+                                        <div class="absolute top-0 left-0 right-0 h-1.5 bg-gray-300 rounded-t-sm"></div>
+                                    </div>
+                                    <div class="absolute bottom-0 left-0 right-0 bg-pink-500 rounded-sm transition-all duration-300"
+                                        style="height: {{ printer.supplies.magenta.level|default(0) }}%">
                                     </div>
                                 </div>
                                 <span class="mt-1 text-xs text-gray-600">{{ printer.supplies.magenta.level|default(0) }}%</span>
@@ -180,16 +185,18 @@
                             <!-- Amarillo -->
                             <div class="relative flex flex-col items-center">
                                 <div class="relative w-6 h-6" title="Amarillo: {{ printer.supplies.yellow.level|default(0) }}%">
-                                    <div class="absolute inset-0 bg-gray-200 rounded"></div>
-                                    <div class="absolute inset-0 bg-yellow-400 rounded"
-                                        style="clip-path: inset({{ 100 - (printer.supplies.yellow.level|default(0)) }}% 0 0 0);">
+                                    <div class="absolute inset-0 bg-gray-200 rounded-sm">
+                                        <div class="absolute top-0 left-0 right-0 h-1.5 bg-gray-300 rounded-t-sm"></div>
+                                    </div>
+                                    <div class="absolute bottom-0 left-0 right-0 bg-yellow-400 rounded-sm transition-all duration-300"
+                                        style="height: {{ printer.supplies.yellow.level|default(0) }}%">
                                     </div>
                                 </div>
                                 <span class="mt-1 text-xs text-gray-600">{{ printer.supplies.yellow.level|default(0) }}%</span>
                             </div>
                         </div>
                     </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
+                    <td class="px-6 py-4 whitespace-nowrap">
                         <div class="flex items-center space-x-2">
                             <span class="text-sm text-gray-500">Total:</span>
                             <span class="text-sm font-medium">{{ printer.counters.total|default(0)|numberformat
