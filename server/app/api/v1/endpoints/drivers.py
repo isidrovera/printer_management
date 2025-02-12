@@ -4,6 +4,9 @@ from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.services.driver_service import DriverService
 from typing import List
+import os
+from fastapi.responses import FileResponse  # Agregar este import
+from app.core.config import settings
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 
@@ -110,8 +113,8 @@ async def delete_driver(driver_id: int, db: Session = Depends(get_db)):
             content={"detail": f"Error al eliminar el driver: {str(e)}"},
             headers={"Content-Type": "application/json"}
         )
-@router.get("/download/{driver_id}")  # Nueva ruta: /api/v1/agents/drivers/download/{driver_id}
-async def download_driver_agent(driver_id: int, db: Session = Depends(get_db)):
+@router.get("/download/{driver_id}")
+async def download_driver(driver_id: int, db: Session = Depends(get_db)):
     try:
         driver_service = DriverService(db)
         driver = await driver_service.get_by_id(driver_id)
@@ -119,8 +122,12 @@ async def download_driver_agent(driver_id: int, db: Session = Depends(get_db)):
         if not driver:
             raise HTTPException(status_code=404, detail="Driver no encontrado")
             
+        file_path = os.path.join(settings.DRIVERS_STORAGE_PATH, driver.driver_filename)
+        if not os.path.exists(file_path):
+            raise HTTPException(status_code=404, detail="Archivo del driver no encontrado")
+            
         return FileResponse(
-            path=os.path.join(settings.DRIVERS_STORAGE_PATH, driver.driver_filename),
+            path=file_path,
             filename=driver.driver_filename,
             media_type='application/zip'
         )

@@ -63,11 +63,7 @@ api_router.include_router(
     prefix="/printers",
     tags=["printers"]
 )
-api_router.include_router(
-    agent_drivers.router,
-    prefix="/agents/drivers",
-    tags=["agent_drivers"]
-)
+
 # Rutas para túneles
 api_router.include_router(
     tunnels.router,
