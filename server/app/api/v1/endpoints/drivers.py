@@ -113,8 +113,8 @@ async def delete_driver(driver_id: int, db: Session = Depends(get_db)):
             content={"detail": f"Error al eliminar el driver: {str(e)}"},
             headers={"Content-Type": "application/json"}
         )
-@router.get("/download/{driver_id}")
-async def download_driver(driver_id: int, db: Session = Depends(get_db)):
+@router.get("/agents/drivers/download/{driver_id}")  # Ruta exacta que coincide con la URL del agente
+async def download_driver_agent(driver_id: int, db: Session = Depends(get_db)):
     try:
         driver_service = DriverService(db)
         driver = await driver_service.get_by_id(driver_id)
