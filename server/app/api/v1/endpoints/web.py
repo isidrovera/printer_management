@@ -985,32 +985,24 @@ async def edit_printer_oids_form(request: Request, oid_id: int, db: Session = De
         {"request": request, "printer_oids": oids}
     )
 
-@router.post("/printer-oids/{oid_id}/edit", name="edit_printer_oids")
+@router.post("/printer-oids/{oid_id}/edit")
 async def edit_printer_oids(request: Request, oid_id: int, db: Session = Depends(get_db)):
-    """
-    Procesa la actualización de una configuración existente
-    """
     try:
-        form = await request.form()
+        logger.debug(f"Iniciando actualización de OID {oid_id}")
+        form_data = await request.json()
+        logger.debug(f"Datos recibidos: {form_data}")
+        
         printer_oids_service = PrinterOIDsService(db)
+        result = await printer_oids_service.update(oid_id, form_data)
+        logger.debug(f"Actualización completada: {result}")
         
-        # Recopilar todos los campos actualizados
-        oid_data = {
-            "brand": form.get("brand"),
-            "model_family": form.get("model_family"),
-            "description": form.get("description"),
-            # ... [incluir todos los campos como en create]
-        }
-        
-        await printer_oids_service.update(oid_id, oid_data)
         return RedirectResponse("/printer-oids", status_code=303)
     except Exception as e:
         logger.error(f"Error al actualizar OIDs: {str(e)}")
         return templates.TemplateResponse(
             "printer_oids/form.html",
-            {"request": request, "printer_oids": {"id": oid_id, **oid_data}, "error": str(e)}
+            {"request": request, "printer_oids": {"id": oid_id, **form_data}, "error": str(e)}
         )
-
 # 4. Eliminación de OIDs
 @router.delete("/printer-oids/{oid_id}", name="delete_printer_oids")
 async def delete_printer_oids(oid_id: int, db: Session = Depends(get_db)):
