@@ -1,11 +1,19 @@
 // static/js/printer-oids-form.js
+// static/js/printer-oids-form.js
 
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.querySelector('form');
     
+    if (!form) return;
+
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
         
+        if (!validateForm()) {
+            showNotification('Por favor, complete los campos requeridos', 'error');
+            return;
+        }
+
         // Recopilar todos los campos del formulario
         const formData = {
             // Información Básica
@@ -73,33 +81,38 @@ document.addEventListener('DOMContentLoaded', function() {
         };
 
         try {
-            // Determinar si es una actualización o creación nueva
             const printerOidsId = form.dataset.printerOidsId;
             const url = printerOidsId ? 
-                `/api/v1/printer-oids/${printerOidsId}` : 
-                '/api/v1/printer-oids';
-            const method = printerOidsId ? 'PUT' : 'POST';
+                `/printer-oids/${printerOidsId}/edit` : 
+                '/printer-oids/create';
 
             const response = await fetch(url, {
-                method: method,
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(formData)
+                body: JSON.stringify(Object.fromEntries(new FormData(form)))
             });
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.detail || 'Error al procesar el formulario');
+            if (response.redirected) {
+                window.location.href = response.url;
+                return;
             }
 
-            // Mostrar mensaje de éxito
+            if (!response.ok) {
+                const contentType = response.headers.get("content-type");
+                if (contentType && contentType.includes("application/json")) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || 'Error al procesar el formulario');
+                }
+                throw new Error('Error al procesar el formulario');
+            }
+
             showNotification(
                 `Configuración ${printerOidsId ? 'actualizada' : 'creada'} exitosamente`, 
                 'success'
             );
 
-            // Redireccionar a la lista después de un breve delay
             setTimeout(() => {
                 window.location.href = '/printer-oids';
             }, 1500);
@@ -107,26 +120,48 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (error) {
             console.error('Error:', error);
             showNotification(error.message, 'error');
+            
+            // Actualizar mensaje de error en el formulario
+            const errorDiv = document.querySelector('.error-message');
+            if (errorDiv) {
+                errorDiv.textContent = error.message;
+                errorDiv.classList.remove('hidden');
+            }
         }
     });
 });
 
+// Función de validación del formulario
+function validateForm() {
+    const requiredFields = ['brand', 'model_family'];
+    let isValid = true;
+
+    requiredFields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (field && !field.value.trim()) {
+            isValid = false;
+            field.classList.add('border-red-500');
+        } else if (field) {
+            field.classList.remove('border-red-500');
+        }
+    });
+
+    return isValid;
+}
+
 // Función auxiliar para obtener el valor de un campo
 function getValue(id) {
     const element = document.getElementById(id);
-    return element ? element.value : '';
+    return element ? element.value.trim() : '';
 }
 
 // Función para mostrar notificaciones
 function showNotification(message, type = 'info') {
     const container = document.getElementById('notification-container');
-    if (!container) {
-        console.error('Container de notificaciones no encontrado');
-        return;
-    }
+    if (!container) return;
 
     const notification = document.createElement('div');
-    notification.className = `fixed top-4 right-4 z-50 flex items-center p-4 rounded-lg shadow-lg ${
+    notification.className = `flex items-center p-4 mb-4 rounded-lg shadow-lg ${
         type === 'success' ? 'bg-green-100 text-green-800' :
         type === 'error' ? 'bg-red-100 text-red-800' :
         'bg-blue-100 text-blue-800'
@@ -140,11 +175,39 @@ function showNotification(message, type = 'info') {
     } mr-2`;
     
     notification.appendChild(icon);
-    notification.insertAdjacentText('beforeend', message);
+    
+    const messageText = document.createElement('span');
+    messageText.textContent = message;
+    notification.appendChild(messageText);
     
     container.appendChild(notification);
 
+    // Animación de entrada
+    notification.style.opacity = '0';
+    notification.style.transform = 'translateY(-20px)';
+    notification.style.transition = 'all 0.3s ease-in-out';
+    
     setTimeout(() => {
-        notification.remove();
-    }, 5000);
+        notification.style.opacity = '1';
+        notification.style.transform = 'translateY(0)';
+    }, 10);
+
+    // Animación de salida y eliminación
+    setTimeout(() => {
+        notification.style.opacity = '0';
+        notification.style.transform = 'translateY(-20px)';
+        
+        setTimeout(() => {
+            notification.remove();
+        }, 300);
+    }, 4700);
 }
+
+// Limpiar errores al escribir
+document.addEventListener('input', function(e) {
+    if (e.target.classList.contains('border-red-500')) {
+        if (e.target.value.trim()) {
+            e.target.classList.remove('border-red-500');
+        }
+    }
+});

@@ -17,6 +17,7 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body class="bg-gray-100 min-h-screen">
+    <div id="notification-container" class="fixed top-4 right-4 z-50"></div>
     <!-- Barra de Navegación -->
     {% if request.state.user %}
     <nav class="bg-gray-800 text-white">
