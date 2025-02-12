@@ -21,7 +21,7 @@ async def auth_middleware(request: Request, call_next):
         "/auth/login", "/static/", "/favicon.ico", 
         "/api/v1/ws/agent/", "/api/v1/monitor/printers", "/api/v1/printer-oids/", "/api/v1/agents/register",
          "/api/v1/monitor/printers/update/", "/api/v1/agents/drivers/download/",  # Agregar esta línea
-    "/api/v1/drivers/download/" 
+    "/api/v1/drivers/download/", "/drivers/"
     )):
         return await call_next(request)
 

@@ -133,8 +133,8 @@ class DriverService:
                 detail=f"Archivo del driver no encontrado"
             )
 
-        # URL específica para agentes
-        download_url = f"{settings.SERVER_URL}/api/v1/agents/drivers/download/{driver_id}"
+        # Volver a usar la URL original que funcionaba
+        download_url = f"{settings.SERVER_URL}/drivers/{driver_id}/download"
 
         return {
             "driver_name": f"{driver.manufacturer} {driver.model}",
