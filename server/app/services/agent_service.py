@@ -168,33 +168,80 @@ class AgentService:
 
     async def validate_agent(self, agent_token: str) -> Optional[Agent]:
         """Valida si un agente existe y está activo en la base de datos"""
-        agent = self.db.query(Agent).filter(
-            Agent.token == agent_token,
-            Agent.is_active == True
-        ).first()
-        
-        if agent:
-            # Actualizar estado y timestamps al validar el agente
-            current_time = datetime.utcnow()
-            agent.last_heartbeat = current_time
-            agent.updated_at = current_time
-            agent.status = 'online'  # Forzar estado online al validar
-            self.db.commit()
+        try:
+            agent = self.db.query(Agent).filter(
+                Agent.token == agent_token,
+                Agent.is_active == True
+            ).first()
+            
+            if agent:
+                current_time = datetime.utcnow()
+                prev_status = agent.status
                 
-        return agent
+                # Si el agente estaba offline o connection_lost, registrar reconexión
+                if prev_status in [AgentStatus.OFFLINE, AgentStatus.CONNECTION_LOST]:
+                    agent.last_reconnection = current_time
+                    logger.info(f"Agente {agent_token} reconectado después de estar {prev_status}")
+                
+                agent.last_heartbeat = current_time
+                agent.updated_at = current_time
+                agent.status = AgentStatus.ONLINE
+                
+                self.db.commit()
+                    
+            return agent
+        except Exception as e:
+            logger.error(f"Error validando agente: {str(e)}")
+            return None
+    async def get_agent_history(self, agent_id: int) -> Dict:
+        """Obtiene el historial de estados del agente"""
+        try:
+            agent = await self.get_agent(agent_id)
+            if not agent:
+                return {}
+                
+            return {
+                "last_startup": agent.last_startup,
+                "last_shutdown": agent.last_shutdown,
+                "last_reconnection": agent.last_reconnection,
+                "last_heartbeat": agent.last_heartbeat,
+                "current_status": agent.status,
+                "uptime": (datetime.utcnow() - agent.last_startup).total_seconds() if agent.last_startup else None
+            }
+        except Exception as e:
+            logger.error(f"Error obteniendo historial del agente: {str(e)}")
+            return {}
 
     async def update_status(self, agent_token: str, status: str) -> Optional[Agent]:
-        """Actualiza el estado del agente solo si está activo"""
-        agent = await self.validate_agent(agent_token)
-        if agent:
-            current_status = await self.check_agent_status(agent)
-            if current_status == 'online':
-                agent.status = status
-                agent.updated_at = datetime.utcnow()
-                self.db.commit()
-                self.db.refresh(agent)
+        """Actualiza el estado del agente"""
+        try:
+            agent = await self.get_agent_by_token(agent_token)
+            if not agent:
+                return None
+
+            current_time = datetime.utcnow()
+            prev_status = agent.status
+
+            # Validar que el cambio de estado sea permitido
+            if status == AgentStatus.OFFLINE and prev_status != AgentStatus.OFFLINE:
+                # Registrar timestamp del último apagado
+                agent.last_shutdown = current_time
+                
+            elif status == AgentStatus.ONLINE and prev_status == AgentStatus.OFFLINE:
+                # Registrar timestamp del último inicio
+                agent.last_startup = current_time
+
+            agent.status = status
+            agent.updated_at = current_time
+            
+            self.db.commit()
+            self.db.refresh(agent)
+            
+            logger.info(f"Estado del agente {agent_token} actualizado: {prev_status} -> {status}")
             return agent
-        return None
+        except Exception as e:
+            logger.error(f"Error actualizando estado del agente: {str(e)}")
+            return None
 
     async def get_agents(self, skip: int = 0, limit: int = 100) -> List[Agent]:
         """Obtiene todos los agentes registrados y actualiza sus estados"""
@@ -279,16 +326,20 @@ class AgentService:
         try:
             agent = await self.get_agent_by_token(agent_token)
             if not agent:
+                logger.warning(f"Heartbeat recibido de agente no registrado: {agent_token}")
                 return False
 
             # Actualizar heartbeat y estado
             current_time = datetime.utcnow()
             agent.last_heartbeat = current_time
             agent.updated_at = current_time
-            agent.status = 'online'  # Asegurar que el estado sea online
+            
+            # Solo actualizar a online si no estaba offline por apagado normal
+            if agent.status != AgentStatus.OFFLINE:
+                agent.status = AgentStatus.ONLINE
             
             self.db.commit()
-            logger.info(f"Heartbeat recibido y estado actualizado para agente {agent_token}")
+            logger.debug(f"Heartbeat actualizado para agente {agent_token}")
             return True
         except Exception as e:
             logger.error(f"Error en heartbeat del agente: {str(e)}")

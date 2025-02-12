@@ -5,12 +5,17 @@ import socket
 import uuid
 import json
 import shutil
+import logging
+
+# Configuración del logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 class SystemInfoService:
     @staticmethod
     async def get_system_info():
         """Recopila la información detallada del sistema y hardware"""
         try:
+            logging.info("Obteniendo información del sistema...")
             system_info = {
                 "Sistema": {
                     "Nombre del SO": platform.system(),
@@ -38,14 +43,16 @@ class SystemInfoService:
                 "Tarjetas Gráficas": SystemInfoService.get_gpu_info(),
                 "Espacio en Disco": SystemInfoService.get_disk_usage()
             }
-
+            logging.info("Información del sistema obtenida correctamente.")
             return system_info
         except Exception as e:
+            logging.error(f"Error al obtener información del sistema: {str(e)}")
             return {"error": f"Error al obtener información del sistema: {str(e)}"}
 
     @staticmethod
     def get_disk_info():
         """Obtiene la información de los discos duros"""
+        logging.info("Obteniendo información de discos...")
         disk_info = []
         partitions = psutil.disk_partitions()
         
@@ -61,7 +68,9 @@ class SystemInfoService:
                     "Disponible (GB)": round(usage.free / (1024 ** 3), 2),
                     "Porcentaje de uso (%)": usage.percent
                 })
+                logging.info(f"Disco {partition.device}: {usage.percent}% usado")
             except Exception as e:
+                logging.warning(f"No se pudo obtener información del disco {partition.device}: {str(e)}")
                 continue
         
         return disk_info
@@ -69,6 +78,7 @@ class SystemInfoService:
     @staticmethod
     def get_network_info():
         """Obtiene la información de la red, incluyendo interfaces y direcciones IP"""
+        logging.info("Obteniendo información de red...")
         network_info = {}
         interfaces = psutil.net_if_addrs()
         
@@ -94,11 +104,13 @@ class SystemInfoService:
                         "Dirección": address.address
                     })
         
+        logging.info("Información de red obtenida correctamente.")
         return network_info
 
     @staticmethod
     def get_battery_info():
         """Obtiene la información de la batería si está disponible"""
+        logging.info("Obteniendo información de la batería...")
         try:
             battery = psutil.sensors_battery()
             if battery:
@@ -113,6 +125,7 @@ class SystemInfoService:
     @staticmethod
     def get_gpu_info():
         """Obtiene información de la GPU si está disponible (requiere PyCUDA o GPUtil)"""
+        logging.info("Obteniendo información de la GPU...")
         try:
             import GPUtil
             gpus = GPUtil.getGPUs()
@@ -130,11 +143,13 @@ class SystemInfoService:
             
             return gpu_info if gpu_info else "No se encontraron GPUs."
         except ImportError:
-            return "GPUtil no instalado. Instalar con: pip install gputil"
+            logging.warning("GPUtil no instalado. Instalar con: pip install gputil")
+            return "GPUtil no instalado."
 
     @staticmethod
     def get_disk_usage():
         """Obtiene el uso de disco en la carpeta del sistema"""
+        logging.info("Obteniendo uso de disco...")
         total, used, free = shutil.disk_usage("/")
         return {
             "Total (GB)": round(total / (1024 ** 3), 2),
