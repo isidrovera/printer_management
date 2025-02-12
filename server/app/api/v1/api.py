@@ -5,7 +5,7 @@ from app.api.v1.endpoints import (
     tunnels, monitor_printers, printer_oids,
     dashboard, auth, users
 )
-
+from app.api.v1.endpoints import agent_drivers
 # Definición de routers principales
 api_router = APIRouter()
 web_router = APIRouter()
@@ -63,7 +63,11 @@ api_router.include_router(
     prefix="/printers",
     tags=["printers"]
 )
-
+api_router.include_router(
+    agent_drivers.router,
+    prefix="/agents/drivers",
+    tags=["agent_drivers"]
+)
 # Rutas para túneles
 api_router.include_router(
     tunnels.router,
