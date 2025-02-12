@@ -119,10 +119,6 @@ class DriverService:
             raise HTTPException(status_code=500, detail=f"Error al eliminar el driver: {str(e)}")
 
     async def get_driver_for_installation(self, driver_id: int) -> Dict:
-        """
-        Obtiene toda la información necesaria para instalar un driver.
-        """
-        # Obtener el driver por ID
         driver = await self.get_by_id(driver_id)
         if not driver:
             raise HTTPException(
@@ -130,20 +126,19 @@ class DriverService:
                 detail=f"Driver con ID {driver_id} no encontrado"
             )
 
-        # Validar que el archivo del driver exista
         driver_path = Path(settings.DRIVERS_STORAGE_PATH) / driver.driver_filename
         if not driver_path.exists():
             raise HTTPException(
                 status_code=404,
-                detail=f"Archivo del driver {driver.driver_filename} no encontrado en {settings.DRIVERS_STORAGE_PATH}"
+                detail=f"Archivo del driver no encontrado"
             )
 
-        # Construir la URL correcta de descarga
-        download_url = f"{settings.SERVER_URL}/drivers/{driver_id}/download"
+        # URL específica para agentes
+        download_url = f"{settings.SERVER_URL}/api/v1/agents/drivers/download/{driver_id}"
 
         return {
             "driver_name": f"{driver.manufacturer} {driver.model}",
-            "download_url": download_url,  # URL sin el /api/v1
+            "download_url": download_url,
             "manufacturer": driver.manufacturer,
             "model": driver.model,
             "driver_filename": driver.driver_filename,

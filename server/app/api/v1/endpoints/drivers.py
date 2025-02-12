@@ -110,3 +110,19 @@ async def delete_driver(driver_id: int, db: Session = Depends(get_db)):
             content={"detail": f"Error al eliminar el driver: {str(e)}"},
             headers={"Content-Type": "application/json"}
         )
+@router.get("/download/{driver_id}")  # Nueva ruta: /api/v1/agents/drivers/download/{driver_id}
+async def download_driver_agent(driver_id: int, db: Session = Depends(get_db)):
+    try:
+        driver_service = DriverService(db)
+        driver = await driver_service.get_by_id(driver_id)
+        
+        if not driver:
+            raise HTTPException(status_code=404, detail="Driver no encontrado")
+            
+        return FileResponse(
+            path=os.path.join(settings.DRIVERS_STORAGE_PATH, driver.driver_filename),
+            filename=driver.driver_filename,
+            media_type='application/zip'
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
