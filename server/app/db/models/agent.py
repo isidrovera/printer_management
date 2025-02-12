@@ -25,9 +25,9 @@ class Agent(BaseModel):
     status = Column(String, default='offline')
     is_active = Column(Boolean, default=True)
     last_heartbeat = Column(DateTime, default=datetime.utcnow)  # Nuevo campo para heartbeat
-    last_startup = Column(DateTime)
-    last_shutdown = Column(DateTime)
-    last_reconnection = Column(DateTime)
+    last_startup = Column(TIMESTAMP(timezone=True))
+    last_shutdown = Column(TIMESTAMP(timezone=True))
+    last_reconnection = Column(TIMESTAMP(timezone=True))
    
     client = relationship("Client", back_populates="agents")
     printer_jobs = relationship("PrinterJob", back_populates="agent")
