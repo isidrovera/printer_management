@@ -1,5 +1,5 @@
 #server\app\services\printer_oids.py
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Tuple, Dict
 from sqlalchemy.orm import Session
 from app.db.models.printer_oids import PrinterOIDs
 from app.schemas.printer_oids import PrinterOIDsCreate, PrinterOIDsUpdate
