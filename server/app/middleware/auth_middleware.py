@@ -10,32 +10,18 @@ from app.core.config import settings
 logger = logging.getLogger(__name__)
 
 async def auth_middleware(request: Request, call_next):
-    logger.debug(f"[AUTH] Inicio: {request.url.path} - Tipo: {request.scope['type']}")
+    logger.debug(f"[AUTH] Inicio: {request.url.path}")
 
-    # Verificar si es una conexión WebSocket
+    # Excluir WebSockets de autenticación
     if request.scope["type"] == "websocket":
-        # Validar si viene de Cloudflare
-        cf_connecting_ip = request.headers.get("CF-Connecting-IP")
-        if cf_connecting_ip:
-            logger.debug(f"[AUTH] Conexión WebSocket desde Cloudflare IP: {cf_connecting_ip}")
-            return await call_next(request)
         return await call_next(request)
 
-    # Excluir rutas específicas
+    # Excluir rutas específicas para agentes
     if request.url.path.startswith((
-        "/auth/login", 
-        "/static/", 
-        "/favicon.ico", 
-        "/api/v1/ws/agent/", 
-        "/api/v1/ws/status",
-        "/api/v1/ws",
-        "/api/v1/monitor/printers", 
-        "/api/v1/printer-oids/", 
-        "/api/v1/agents/register",
-        "/api/v1/monitor/printers/update/", 
-        "/api/v1/agents/drivers/download/",
-        "/api/v1/drivers/download/", 
-        "/drivers/"
+        "/auth/login", "/static/", "/favicon.ico", 
+        "/api/v1/ws/agent/", "/api/v1/monitor/printers", "/api/v1/printer-oids/", "/api/v1/agents/register",
+         "/api/v1/monitor/printers/update/", "/api/v1/agents/drivers/download/",  # Agregar esta línea
+    "/api/v1/drivers/download/", "/drivers/"
     )):
         return await call_next(request)
 
