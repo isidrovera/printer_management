@@ -18,6 +18,22 @@
                        class="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                 <i class="fas fa-search absolute right-3 top-2.5 h-5 w-5 text-gray-400"></i>
             </div>
+
+            <!-- Botones Excel -->
+            <button id="exportExcelBtn" 
+                    class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                <i class="fas fa-file-excel mr-2"></i>
+                <span>Exportar Excel</span>
+            </button>
+            
+            <label class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors cursor-pointer">
+                <i class="fas fa-file-import mr-2"></i>
+                <span>Importar Excel</span>
+                <input type="file" 
+                       id="importExcelInput" 
+                       accept=".xlsx,.xls" 
+                       class="hidden">
+            </label>
             
             <!-- Botón Agregar -->
             <a href="/printer-oids/create" 
@@ -28,9 +44,9 @@
         </div>
     </div>
 
-    <!-- Resumen de configuraciones -->
+    <!-- Resto del contenido original sin cambios -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-        <!-- Total Configuraciones -->
+        <!-- Cards se mantienen igual -->
         <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
             <div class="flex items-center justify-between">
                 <div>
@@ -43,7 +59,6 @@
             </div>
         </div>
         
-        <!-- Total Marcas -->
         <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
             <div class="flex items-center justify-between">
                 <div>
@@ -56,7 +71,6 @@
             </div>
         </div>
 
-        <!-- Total Familias -->
         <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
             <div class="flex items-center justify-between">
                 <div>
@@ -70,9 +84,9 @@
         </div>
     </div>
 
-    <!-- Tabla de Configuraciones OID -->
+    <!-- Tabla y contenido restante igual -->
     <div class="overflow-x-auto shadow ring-1 ring-black ring-opacity-5 rounded-lg">
-        <table class="w-full border-collapse">
+        <table class="w-full border-collapse" id="oidsTable">
             <thead class="bg-gray-50">
                 <tr>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Marca</th>
@@ -84,7 +98,18 @@
             </thead>
             <tbody class="bg-white divide-y divide-gray-200" id="oidsTableBody">
                 {% for oid in printer_oids %}
-                <tr class="hover:bg-gray-50 transition-colors">
+                <tr class="hover:bg-gray-50 transition-colors" 
+                    data-oid-id="{{ oid.id }}"
+                    data-brand="{{ oid.brand }}"
+                    data-model-family="{{ oid.model_family }}"
+                    data-description="{{ oid.description }}"
+                    data-serial-oid="{{ oid.serial_number_oid }}"
+                    data-toner-black-oid="{{ oid.toner_black_oid }}"
+                    data-toner-cyan-oid="{{ oid.toner_cyan_oid }}"
+                    data-toner-magenta-oid="{{ oid.toner_magenta_oid }}"
+                    data-toner-yellow-oid="{{ oid.toner_yellow_oid }}"
+                    data-page-count-oid="{{ oid.page_count_oid }}"
+                    data-status-oid="{{ oid.status_oid }}">
                     <td class="px-6 py-4 whitespace-nowrap">
                         <div class="flex items-center">
                             <i class="fas fa-tag text-blue-400 mr-2"></i>
@@ -107,21 +132,16 @@
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div class="flex items-center justify-end space-x-2">
-                            <!-- Botón Ver Detalles -->
                             <button onclick="showOIDDetails('{{ oid.id }}')"
                                     class="inline-flex items-center px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors">
                                 <i class="fas fa-eye mr-2"></i>
                                 <span>Ver</span>
                             </button>
-
-                            <!-- Botón Editar -->
                             <a href="/printer-oids/{{ oid.id }}/edit"
                                class="inline-flex items-center px-3 py-2 bg-amber-100 text-amber-700 rounded-lg hover:bg-amber-200 transition-colors">
                                 <i class="fas fa-edit mr-2"></i>
                                 <span>Editar</span>
                             </a>
-
-                            <!-- Botón Eliminar -->
                             <button onclick="deleteOID('{{ oid.id }}')"
                                     class="inline-flex items-center px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors">
                                 <i class="fas fa-trash-alt mr-2"></i>
@@ -150,6 +170,7 @@
         {% endif %}
     </div>
 </div>
+
 
 <!-- Modal de Detalles -->
 <div class="fixed inset-0 hidden z-50" id="oidDetailsModal">
@@ -184,5 +205,7 @@
 
 {% block scripts %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="/static/js/oids.js"></script>
+<script src="/static/js/oids_excel.js"></script>
 {% endblock %}
