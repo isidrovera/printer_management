@@ -1,8 +1,10 @@
 # server/main.py
+# server/main.py
 import logging
 import os
 from pathlib import Path
 from contextlib import asynccontextmanager
+from fastapi import FastAPI, Request
 
 logging.basicConfig(
    level=logging.DEBUG,
@@ -51,6 +53,17 @@ app = FastAPI(
    title=settings.PROJECT_NAME,
    lifespan=lifespan
 )
+
+# Middleware para WebSocket con Cloudflare
+@app.middleware("http")
+async def handle_cloudflare_websocket(request: Request, call_next):
+    if request.scope["type"] == "websocket":
+        # Agregar headers necesarios para WebSocket
+        headers = dict(request.scope["headers"])
+        headers[b"upgrade"] = b"websocket"
+        headers[b"connection"] = b"upgrade"
+        request.scope["headers"] = [(k, v) for k, v in headers.items()]
+    return await call_next(request)
 
 # Middlewares en orden
 app.add_middleware(BaseHTTPMiddleware, dispatch=auth_middleware)
