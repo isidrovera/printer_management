@@ -128,13 +128,32 @@ class PrinterMonitorService:
                     'last_check': datetime.utcnow().isoformat(),
                     'error': 'Printer not responding'
                 }
-
-            # Obtener OIDs para la marca
+    
+            # Obtener OIDs específicos para la marca
             oids = await self._get_printer_oids(brand)
             if not oids:
                 logger.error(f"❌ No se encontraron OIDs para la marca {brand}")
                 return None
-
+    
+            oid_config = oids[0] if oids else {}
+    
+            # OIDs estándar como respaldo
+            standard_oids = {
+                'model': '1.3.6.1.2.1.25.3.2.1.3.1',  # Host-Resources-MIB::hrDeviceDescr
+                'serial': '1.3.6.1.2.1.43.5.1.1.17.1',  # Printer-MIB::prtGeneralSerialNumber
+            }
+    
+            # Intentar primero con OIDs específicos de la marca, luego con los estándar
+            model = await self._get_snmp_value(ip, oid_config.get('oid_model'))
+            if model is None:
+                logger.debug(f"Intentando obtener modelo con OID estándar para {ip}")
+                model = await self._get_snmp_value(ip, standard_oids['model'])
+    
+            serial = await self._get_snmp_value(ip, oid_config.get('oid_serial'))
+            if serial is None:
+                logger.debug(f"Intentando obtener número de serie con OID estándar para {ip}")
+                serial = await self._get_snmp_value(ip, standard_oids['serial'])
+    
             # Recolectar datos SNMP
             counters = await self._get_counter_data(ip, oids)
             supplies = await self._get_supplies_data(ip, oids)
@@ -143,18 +162,20 @@ class PrinterMonitorService:
             printer_data = {
                 'ip_address': ip,
                 'brand': brand,
+                'model': self._convert_snmp_value(model) or 'Unknown',
+                'serial_number': self._convert_snmp_value(serial) or 'Unknown',
                 'last_check': datetime.utcnow().isoformat(),
                 'status': status.get('status', 'unknown'),
                 'counters': counters,
                 'supplies': supplies,
                 'error': None
             }
-
+    
             logger.info(f"✅ Datos recolectados exitosamente para {ip}")
             logger.debug(f"📊 Datos recolectados: {json.dumps(self._convert_nested_snmp_values(printer_data), indent=2)}")
             
             return printer_data
-
+    
         except Exception as e:
             logger.error(f"❌ Error recolectando datos de {ip}: {str(e)}", exc_info=True)
             return {
@@ -496,7 +517,8 @@ class PrinterMonitorService:
                 'ip_address': ip,
                 'name': printer_info.get('name'),
                 'brand': printer_info.get('brand'),
-                'model': printer_info.get('model'),
+                'model': processed_data.get('model', printer_info.get('model')),
+                'serial_number': processed_data.get('serial_number'),
                 'client_id': printer_info.get('client_id'),
                 'status': processed_data.get('status', 'offline'),
                 'last_check': datetime.utcnow().isoformat()
@@ -506,9 +528,11 @@ class PrinterMonitorService:
             update_data['printer_data'] = {
                 'counters': processed_data.get('counters', {}),
                 'supplies': processed_data.get('supplies', {}),
-                'status': processed_data.get('status', 'offline')
+                'status': processed_data.get('status', 'offline'),
+                'model': processed_data.get('model'),
+                'serial_number': processed_data.get('serial_number')
             }
-            
+    
             # Validar serialización antes de enviar
             try:
                 json.dumps(update_data)
@@ -525,7 +549,6 @@ class PrinterMonitorService:
                     "Content-Type": "application/json"
                 }
                 
-                # Parámetros de consulta requeridos
                 params = {
                     'agent_id': str(self._get_agent_id())
                 }
