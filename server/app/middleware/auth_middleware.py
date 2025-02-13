@@ -7,7 +7,7 @@ import jwt
 from jose import JWTError
 from app.core.config import settings
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(name)
 
 async def auth_middleware(request: Request, call_next):
     logger.debug(f"[AUTH] Inicio: {request.url.path}")
