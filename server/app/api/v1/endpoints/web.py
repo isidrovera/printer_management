@@ -1037,6 +1037,136 @@ async def delete_printer_oids(oid_id: int, db: Session = Depends(get_db)):
             content={"success": False, "error": str(e)}
         )
         
+# 5. Importación/Exportación Excel
+@router.post("/api/printer-oids/import", name="import_printer_oids")
+async def import_printer_oids(request: Request, db: Session = Depends(get_db)):
+    """
+    Importa configuraciones de OIDs desde un archivo Excel
+    """
+    try:
+        data = await request.json()
+        printer_oids_service = PrinterOIDsService(db)
+        
+        # Contadores para el resultado
+        created = 0
+        updated = 0
+        errors = []
+
+        for oid_data in data.get('oids', []):
+            try:
+                # Validar campos requeridos
+                if not oid_data.get('brand') or not oid_data.get('model_family'):
+                    errors.append(f"Marca y Familia de Modelo son requeridos para el registro")
+                    continue
+
+                # Verificar si existe por marca y familia
+                existing = printer_oids_service.get_by_brand_and_family(
+                    oid_data["brand"],
+                    oid_data["model_family"]
+                )
+
+                if existing:
+                    # Actualizar si existe
+                    await printer_oids_service.update(existing.id, oid_data)
+                    updated += 1
+                else:
+                    # Crear nuevo si no existe
+                    await printer_oids_service.create(oid_data)
+                    created += 1
+
+            except Exception as e:
+                errors.append(f"Error en registro {oid_data.get('brand')}: {str(e)}")
+                continue
+
+        return JSONResponse(
+            status_code=200,
+            content={
+                "message": "Importación completada",
+                "created": created,
+                "updated": updated,
+                "errors": errors
+            }
+        )
+
+    except Exception as e:
+        logger.error(f"Error en importación de Excel: {str(e)}")
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"Error en la importación: {str(e)}"}
+        )
+
+@router.get("/api/printer-oids/export", name="export_printer_oids")
+async def export_printer_oids(request: Request, db: Session = Depends(get_db)):
+    """
+    Exporta todas las configuraciones de OIDs a Excel
+    """
+    try:
+        printer_oids_service = PrinterOIDsService(db)
+        oids = printer_oids_service.get_all()
+        
+        # Convertir a diccionarios para la respuesta JSON
+        oids_data = []
+        for oid in oids:
+            oid_dict = {
+                "brand": oid.brand,
+                "model_family": oid.model_family,
+                "description": oid.description,
+                # Contadores de Páginas
+                "oid_total_pages": oid.oid_total_pages,
+                "oid_total_color_pages": oid.oid_total_color_pages,
+                "oid_total_bw_pages": oid.oid_total_bw_pages,
+                "oid_total_copies": oid.oid_total_copies,
+                # Tóner
+                "oid_black_toner_level": oid.oid_black_toner_level,
+                "oid_cyan_toner_level": oid.oid_cyan_toner_level,
+                "oid_magenta_toner_level": oid.oid_magenta_toner_level,
+                "oid_yellow_toner_level": oid.oid_yellow_toner_level,
+                # Unidades de Imagen
+                "oid_black_drum_level": oid.oid_black_drum_level,
+                "oid_cyan_drum_level": oid.oid_cyan_drum_level,
+                "oid_magenta_drum_level": oid.oid_magenta_drum_level,
+                "oid_yellow_drum_level": oid.oid_yellow_drum_level,
+                # Otros Consumibles
+                "oid_fuser_unit_level": oid.oid_fuser_unit_level,
+                "oid_transfer_belt_level": oid.oid_transfer_belt_level,
+                "oid_waste_toner_level": oid.oid_waste_toner_level,
+                "oid_waste_toner_max": oid.oid_waste_toner_max,
+                # Bandejas
+                "oid_tray1_level": oid.oid_tray1_level,
+                "oid_tray1_max_capacity": oid.oid_tray1_max_capacity,
+                "oid_tray1_status": oid.oid_tray1_status,
+                "oid_tray1_paper_size": oid.oid_tray1_paper_size,
+                "oid_tray1_paper_type": oid.oid_tray1_paper_type,
+                "oid_tray2_level": oid.oid_tray2_level,
+                "oid_tray2_max_capacity": oid.oid_tray2_max_capacity,
+                "oid_tray2_status": oid.oid_tray2_status,
+                "oid_tray2_paper_size": oid.oid_tray2_paper_size,
+                "oid_tray2_paper_type": oid.oid_tray2_paper_type,
+                "oid_tray3_level": oid.oid_tray3_level,
+                "oid_tray3_max_capacity": oid.oid_tray3_max_capacity,
+                "oid_tray3_status": oid.oid_tray3_status,
+                "oid_tray3_paper_size": oid.oid_tray3_paper_size,
+                "oid_tray3_paper_type": oid.oid_tray3_paper_type,
+                "oid_bypass_tray_level": oid.oid_bypass_tray_level,
+                "oid_bypass_tray_status": oid.oid_bypass_tray_status,
+                # Información del Sistema
+                "oid_printer_status": oid.oid_printer_status,
+                "oid_printer_model": oid.oid_printer_model,
+                "oid_serial_number": oid.oid_serial_number,
+                "oid_firmware_version": oid.oid_firmware_version,
+                "oid_system_contact": oid.oid_system_contact,
+                "oid_system_name": oid.oid_system_name
+            }
+            oids_data.append(oid_dict)
+
+        return JSONResponse(content=oids_data)
+
+    except Exception as e:
+        logger.error(f"Error en exportación a Excel: {str(e)}")
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"Error en la exportación: {str(e)}"}
+        )
         
 # Agregar este endpoint en web.py
 
