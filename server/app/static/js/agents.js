@@ -6,19 +6,39 @@ let agentToDelete = null;
 
 // Configuración WebSocket
 const WS_CONFIG = {
-    url: `wss://${window.location.host}/api/v1/ws/status`,
     reconnectInterval: 1000,
-    maxReconnectAttempts: 10,  // Aumentamos el número de reintentos
-    currentInstallation: null  // Para trackear instalación en progreso
+    maxReconnectAttempts: 10,
+    currentInstallation: null,
+    // Función para obtener la URL segura del WebSocket
+    getWSUrl: () => {
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const host = window.location.host;
+        return `${protocol}//${host}/api/v1/ws/status`;
+    },
+    // Función para obtener la URL base de la API
+    getApiUrl: () => {
+        return `${window.location.protocol}//${window.location.host}/api/v1`;
+    }
 };
 
 // Inicialización cuando el DOM está listo
 document.addEventListener('DOMContentLoaded', function () {
-    initializeWebSocket();
-    initializeSearchFilter();
-    initializeFormHandlers();
-    initializeDriverSelect(); // Añadido para cargar drivers al inicio
+    console.group('Inicialización de la aplicación');
+    console.log('Iniciando configuración...');
+    
+    try {
+        initializeWebSocket();
+        initializeSearchFilter();
+        initializeFormHandlers();
+        initializeDriverSelect();
+        console.log('✅ Inicialización completada');
+    } catch (error) {
+        console.error('❌ Error durante la inicialización:', error);
+    }
+    
+    console.groupEnd();
 });
+
 // Función para manejar la reconexión del WebSocket
 function handleWebSocketReconnection(event) {
     console.log('WebSocket cerrado. Código:', event.code);
@@ -87,77 +107,23 @@ function addLogMessage(message, type = 'info') {
 function initializeWebSocket() {
     try {
         console.group('Inicialización WebSocket');
-        console.log('Intentando conectar WebSocket a:', WS_CONFIG.url);
+        const wsUrl = WS_CONFIG.getWSUrl();
+        console.log('Intentando conectar WebSocket a:', wsUrl);
         
-        wsConnection = new WebSocket(WS_CONFIG.url);
-
-        wsConnection.onopen = () => {
-            console.log('✅ WebSocket conectado exitosamente');
-            reconnectAttempts = 0;
-            showNotification('Conexión establecida con el servidor', 'success');
-            addLogMessage('Conexión establecida con el servidor', 'success');
-        };
-
-        wsConnection.onmessage = (event) => {
-            console.group('Mensaje WebSocket Recibido');
-            console.log('Mensaje raw:', event.data);
-
-            try {
-                // Verificar si es un mensaje de log del agente
-                if (typeof event.data === 'string' && event.data.startsWith('Agent')) {
-                    console.log('📝 Mensaje de log del agente:', event.data);
-                    handleAgentLogMessage(event.data);
-                    console.groupEnd();
-                    return;
-                }
-
-                // Intentar parsear como JSON
-                let data;
-                try {
-                    data = JSON.parse(event.data);
-                    console.log('✅ JSON parseado correctamente:', data);
-                } catch (parseError) {
-                    console.warn('⚠️ No se pudo parsear como JSON:', {
-                        error: parseError,
-                        rawData: event.data.slice(0, 100) + (event.data.length > 100 ? '...' : '')
-                    });
-                    handleAgentLogMessage(event.data);
-                    console.groupEnd();
-                    return;
-                }
-
-                // Procesar mensaje JSON según su tipo
-                if (data && data.type) {
-                    console.log(`🔄 Procesando mensaje de tipo: ${data.type}`);
-                    processJsonMessage(data);
-                } else {
-                    console.log('ℹ️ Mensaje JSON sin tipo específico:', data);
-                }
-
-            } catch (error) {
-                console.error('❌ Error procesando mensaje:', error);
-                addLogMessage('Error al procesar mensaje: ' + error.message, 'error');
-            }
-            console.groupEnd();
-        };
-
-        wsConnection.onclose = (event) => {
-            console.warn('⚠️ WebSocket cerrado. Código:', event.code);
-            handleWebSocketClose(event);
-        };
-
-        wsConnection.onerror = (error) => {
-            console.error('❌ Error en WebSocket:', error);
-            showNotification('Error en la conexión con el servidor', 'error');
-            addLogMessage('Error en la conexión con el servidor', 'error');
-        };
-
+        wsConnection = new WebSocket(wsUrl);
+        
+        wsConnection.onopen = handleWebSocketOpen;
+        wsConnection.onmessage = handleWebSocketMessage;
+        wsConnection.onclose = handleWebSocketClose;
+        wsConnection.onerror = handleWebSocketError;
+        
     } catch (error) {
         console.error('❌ Error al crear conexión WebSocket:', error);
-        showNotification('Error al crear la conexión con el servidor', 'error');
-        addLogMessage('Error al crear la conexión con el servidor', 'error');
+        handleWebSocketError(error);
     }
+    console.groupEnd();
 }
+
 
 // Procesar diferentes tipos de mensajes JSON
 function processJsonMessage(data) {
@@ -216,6 +182,12 @@ function updateAgentStatus(data) {
         console.groupEnd();
     }
 }
+function handleWebSocketOpen() {
+    console.log('✅ WebSocket conectado exitosamente');
+    reconnectAttempts = 0;
+    showNotification('Conexión establecida con el servidor', 'success');
+    addLogMessage('Conexión establecida con el servidor', 'success');
+}
 
 // Manejar cierre de WebSocket
 function handleWebSocketClose(event) {
@@ -255,11 +227,23 @@ function updatePrinterStatus(data) {
 }
 
 // Manejar mensajes de error
-function handleErrorMessage(data) {
-    console.error('❌ Error recibido del servidor:', data.error);
-    showNotification(data.error.message || 'Error del servidor', 'error');
+function handleWebSocketMessage(event) {
+    console.group('Mensaje WebSocket Recibido');
+    try {
+        if (typeof event.data === 'string') {
+            if (event.data.startsWith('Agent')) {
+                handleAgentLogMessage(event.data);
+            } else {
+                const data = JSON.parse(event.data);
+                processJsonMessage(data);
+            }
+        }
+    } catch (error) {
+        console.error('Error procesando mensaje:', error);
+        handleAgentLogMessage(event.data);
+    }
+    console.groupEnd();
 }
-
 
 
 // Función para inicializar el filtro de búsqueda
@@ -377,7 +361,7 @@ async function initializeDriverSelect() {
     try {
         addLogMessage('Cargando lista de drivers...', 'info');
         
-        const response = await fetch('/api/v1/drivers', {
+        const response = await fetch(`${WS_CONFIG.getApiUrl()}/drivers`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -386,7 +370,6 @@ async function initializeDriverSelect() {
         });
 
         if (!response.ok) {
-            const text = await response.text();
             throw new Error(`Error al obtener drivers. Status: ${response.status}`);
         }
 
