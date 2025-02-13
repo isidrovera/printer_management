@@ -128,33 +128,67 @@ class PrinterMonitorService:
                     'last_check': datetime.utcnow().isoformat(),
                     'error': 'Printer not responding'
                 }
-    
+
             # Obtener OIDs específicos para la marca
             oids = await self._get_printer_oids(brand)
             if not oids:
                 logger.error(f"❌ No se encontraron OIDs para la marca {brand}")
                 return None
-    
+
             oid_config = oids[0] if oids else {}
-    
-            # OIDs estándar como respaldo
-            standard_oids = {
-                'model': '1.3.6.1.2.1.25.3.2.1.3.1',  # Host-Resources-MIB::hrDeviceDescr
-                'serial': '1.3.6.1.2.1.43.5.1.1.17.1',  # Printer-MIB::prtGeneralSerialNumber
-            }
-    
-            # Intentar primero con OIDs específicos de la marca, luego con los estándar
-            model = await self._get_snmp_value(ip, oid_config.get('oid_model'))
-            if model is None:
-                logger.debug(f"Intentando obtener modelo con OID estándar para {ip}")
-                model = await self._get_snmp_value(ip, standard_oids['model'])
-    
-            serial = await self._get_snmp_value(ip, oid_config.get('oid_serial'))
-            if serial is None:
-                logger.debug(f"Intentando obtener número de serie con OID estándar para {ip}")
-                serial = await self._get_snmp_value(ip, standard_oids['serial'])
-    
-            # Recolectar datos SNMP
+            
+            # Debug de la configuración completa de OIDs
+            logger.info(f"📋 Configuración de OIDs para {brand}:")
+            for key, value in oid_config.items():
+                logger.info(f"  {key}: {value}")
+            
+            # Obtener modelo y número de serie usando los nombres correctos de OIDs
+            model = None
+            serial = None
+            model_updated = False
+            
+            # Usar los nombres correctos de los campos de la base de datos
+            if 'oid_printer_model' in oid_config and oid_config['oid_printer_model']:
+                logger.info(f"Intentando obtener modelo con OID: {oid_config['oid_printer_model']}")
+                snmp_model = await self._get_snmp_value(ip, oid_config['oid_printer_model'])
+                if snmp_model:
+                    model = self._convert_snmp_value(snmp_model)
+                    model_updated = True
+                    logger.info(f"✅ Modelo obtenido vía SNMP: {model} (valor crudo: {snmp_model})")
+                else:
+                    logger.warning(f"No se pudo obtener modelo vía SNMP")
+            else:
+                logger.warning(f"No se encontró OID de modelo configurado para {brand}")
+            
+            if 'oid_serial_number' in oid_config and oid_config['oid_serial_number']:
+                logger.info(f"Intentando obtener serie con OID: {oid_config['oid_serial_number']}")
+                snmp_serial = await self._get_snmp_value(ip, oid_config['oid_serial_number'])
+                if snmp_serial:
+                    serial = self._convert_snmp_value(snmp_serial)
+                    logger.info(f"✅ Número de serie obtenido vía SNMP: {serial} (valor crudo: {snmp_serial})")
+                else:
+                    logger.warning(f"No se pudo obtener número de serie vía SNMP")
+            else:
+                logger.warning(f"No se encontró OID de serie configurado para {brand}")
+
+            # Obtener datos existentes solo si no tenemos datos de SNMP
+            if not model_updated or not serial:
+                printers = await self.get_monitored_printers()
+                existing_printer = next((p for p in printers if p['ip_address'] == ip), None)
+
+                if existing_printer:
+                    logger.info("📋 Datos existentes de la impresora:")
+                    logger.info(f"  Modelo: {existing_printer.get('model')}")
+                    logger.info(f"  Serie: {existing_printer.get('serial_number')}")
+
+                    if not model_updated:
+                        model = existing_printer.get('model')
+                        logger.info(f"Usando modelo existente: {model}")
+                    
+                    if not serial:
+                        serial = existing_printer.get('serial_number')
+
+            # Recolectar otros datos SNMP
             counters = await self._get_counter_data(ip, oids)
             supplies = await self._get_supplies_data(ip, oids)
             status = await self.get_printer_status(ip)
@@ -162,20 +196,26 @@ class PrinterMonitorService:
             printer_data = {
                 'ip_address': ip,
                 'brand': brand,
-                'model': self._convert_snmp_value(model) or 'Unknown',
-                'serial_number': self._convert_snmp_value(serial) or 'Unknown',
+                'model': model or 'Unknown',
+                'serial_number': serial,
                 'last_check': datetime.utcnow().isoformat(),
                 'status': status.get('status', 'unknown'),
                 'counters': counters,
                 'supplies': supplies,
-                'error': None
+                'error': None,
+                'model_updated': model_updated
             }
-    
+
             logger.info(f"✅ Datos recolectados exitosamente para {ip}")
-            logger.debug(f"📊 Datos recolectados: {json.dumps(self._convert_nested_snmp_values(printer_data), indent=2)}")
+            logger.info("📊 Resumen de datos recolectados:")
+            logger.info(f"  Modelo final: {printer_data['model']} (actualizado vía SNMP: {model_updated})")
+            logger.info(f"  Serie final: {printer_data['serial_number']}")
+            logger.info(f"  Estado: {printer_data['status']}")
+            logger.info(f"  Contadores: {printer_data['counters']}")
+            logger.info(f"  Suministros: {printer_data['supplies']}")
             
             return printer_data
-    
+
         except Exception as e:
             logger.error(f"❌ Error recolectando datos de {ip}: {str(e)}", exc_info=True)
             return {
@@ -185,7 +225,6 @@ class PrinterMonitorService:
                 'last_check': datetime.utcnow().isoformat(),
                 'error': str(e)
             }
-
     async def _get_printer_oids(self, brand: str) -> List[Dict]:
         """
         Obtiene la configuración de OIDs para una marca de impresora.
@@ -512,13 +551,35 @@ class PrinterMonitorService:
             # Convertir todos los valores SNMP
             processed_data = self._convert_nested_snmp_values(data)
             
-            # Preparar los datos según el formato requerido por el servidor
+            # Debug de los datos que tenemos
+            logger.info("🔍 Datos disponibles para actualización:")
+            logger.info(f"  - Datos del servidor:")
+            logger.info(f"    Modelo: {printer_info.get('model')}")
+            logger.info(f"    Serie: {printer_info.get('serial_number')}")
+            logger.info(f"  - Datos procesados:")
+            logger.info(f"    Modelo: {processed_data.get('model')}")
+            logger.info(f"    Serie: {processed_data.get('serial_number')}")
+            
+            # Asegurarnos de que tenemos un modelo válido
+            model = None
+            if processed_data.get('model') and processed_data['model'] != 'Unknown':
+                model = processed_data['model']
+                logger.info(f"Usando modelo de los datos procesados: {model}")
+            elif printer_info.get('model'):
+                model = printer_info['model']
+                logger.info(f"Usando modelo del servidor: {model}")
+                
+            if not model:
+                logger.error("❌ No se encontró un modelo válido para la impresora")
+                return False
+                
+            # Preparar los datos de actualización
             update_data = {
                 'ip_address': ip,
                 'name': printer_info.get('name'),
                 'brand': printer_info.get('brand'),
-                'model': processed_data.get('model', printer_info.get('model')),
-                'serial_number': processed_data.get('serial_number'),
+                'model': model,  # Usar el modelo validado
+                'serial_number': processed_data.get('serial_number') or printer_info.get('serial_number'),
                 'client_id': printer_info.get('client_id'),
                 'status': processed_data.get('status', 'offline'),
                 'last_check': datetime.utcnow().isoformat()
@@ -529,13 +590,25 @@ class PrinterMonitorService:
                 'counters': processed_data.get('counters', {}),
                 'supplies': processed_data.get('supplies', {}),
                 'status': processed_data.get('status', 'offline'),
-                'model': processed_data.get('model'),
-                'serial_number': processed_data.get('serial_number')
+                'model': model,  # También incluir el modelo aquí
+                'serial_number': processed_data.get('serial_number') or printer_info.get('serial_number')
             }
-    
+
+            # Debug de los datos que vamos a enviar
+            logger.info("📤 Datos que se enviarán al servidor:")
+            logger.info(f"  - Modelo final: {update_data['model']}")
+            logger.info(f"  - Serie final: {update_data['serial_number']}")
+            logger.info(f"  - Estado: {update_data['status']}")
+            
+            # Validar que tenemos un modelo antes de enviar
+            if not update_data.get('model'):
+                logger.error("❌ Error: No hay modelo para enviar")
+                return False
+                
             # Validar serialización antes de enviar
             try:
-                json.dumps(update_data)
+                json_data = json.dumps(update_data)
+                logger.debug(f"JSON a enviar: {json_data}")
             except Exception as e:
                 logger.error(f"Error de serialización para {ip}: {str(e)}")
                 return False
@@ -553,11 +626,6 @@ class PrinterMonitorService:
                     'agent_id': str(self._get_agent_id())
                 }
                 
-                logger.debug(f"Enviando datos a {url}")
-                logger.debug(f"Headers: {headers}")
-                logger.debug(f"Parámetros: {params}")
-                logger.debug(f"Datos: {json.dumps(update_data, indent=2)}")
-                
                 async with session.post(
                     url, 
                     json=update_data, 
@@ -567,12 +635,13 @@ class PrinterMonitorService:
                     response_text = await response.text()
                     
                     if response.status == 200:
-                        logger.info(f"Datos actualizados exitosamente para {ip}")
+                        logger.info(f"✅ Datos actualizados exitosamente para {ip}")
                         return True
                     else:
-                        logger.error(f"Error actualizando datos para {ip}")
+                        logger.error(f"❌ Error actualizando datos para {ip}")
                         logger.error(f"Status: {response.status}")
                         logger.error(f"Respuesta: {response_text}")
+                        logger.error(f"Datos enviados: {json.dumps(update_data, indent=2)}")
                         return False
                         
         except aiohttp.ClientError as e:

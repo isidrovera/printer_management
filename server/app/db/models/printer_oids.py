@@ -115,8 +115,28 @@ class PrinterOIDs(BaseModel):
             "brand": self.brand,
             "model_family": self.model_family,
             "description": self.description,
-            # Incluir todos los OIDs en el diccionario
+            # OIDs básicos (para compatibilidad con código existente)
+            "oid_total_pages": self.oid_total_pages,
+            "oid_total_color_pages": self.oid_total_color_pages,
+            "oid_total_bw_pages": self.oid_total_bw_pages,
+            "oid_black_toner_level": self.oid_black_toner_level,
+            "oid_cyan_toner_level": self.oid_cyan_toner_level,
+            "oid_magenta_toner_level": self.oid_magenta_toner_level,
+            "oid_yellow_toner_level": self.oid_yellow_toner_level,
+            # OIDs de sistema (modelo y serie)
+            "oid_printer_model": self.oid_printer_model,
+            "oid_serial_number": self.oid_serial_number,
+            # Estructura completa organizada
             "oids": {
+                "system": {
+                    "model": self.oid_printer_model,
+                    "serial": self.oid_serial_number,
+                    "status": self.oid_printer_status,
+                    "firmware": self.oid_firmware_version,
+                    "memory": self.oid_printer_memory,
+                    "temperature": self.oid_temperature,
+                    "display": self.oid_display_message
+                },
                 "counters": {
                     "total_pages": self.oid_total_pages,
                     "total_color_pages": self.oid_total_color_pages,
@@ -133,7 +153,18 @@ class PrinterOIDs(BaseModel):
                     "magenta": self.oid_magenta_toner_level,
                     "yellow": self.oid_yellow_toner_level
                 },
-                # ... más categorías organizadas ...
+                "toner_max": {
+                    "black": self.oid_black_toner_max,
+                    "cyan": self.oid_cyan_toner_max,
+                    "magenta": self.oid_magenta_toner_max,
+                    "yellow": self.oid_yellow_toner_max
+                },
+                "network": {
+                    "ip": self.oid_ip_address,
+                    "mac": self.oid_mac_address,
+                    "subnet": self.oid_subnet_mask,
+                    "gateway": self.oid_gateway
+                }
             }
         }
         
