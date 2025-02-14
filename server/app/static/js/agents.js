@@ -3,20 +3,22 @@
 // Variables globales
 let currentAgentToken = '';
 let agentToDelete = null;
+let wsConnection = null;
+let reconnectAttempts = 0;  // Agregar esta línea
+// Configuración WebSocket
+// Función para obtener la URL base segura
+function getSecureBaseUrl() {
+    const protocol = window.location.protocol;
+    const host = window.location.host;
+    return `${protocol}//${host}`;
+}
 
-// Configuración WebSocket
-// Configuración WebSocket
 const WS_CONFIG = {
-    // Modificar esto para usar la ruta correcta que coincida con el backend
-    url: `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/api/v1/ws/status`,
+    url: `wss://${window.location.host}/api/v1/ws/status`,
     reconnectInterval: 1000,
     maxReconnectAttempts: 10,
     currentInstallation: null
 };
-// Función para obtener la URL base segura
-function getSecureBaseUrl() {
-    return `${window.location.protocol}//${window.location.host}`;
-}
 
 function updateAgentInfoContent(agentInfo) {
     const content = document.getElementById('agentInfoContent');
@@ -119,44 +121,34 @@ function initializeWebSocket() {
         console.group('Inicialización WebSocket');
         console.log('Intentando conectar WebSocket a:', WS_CONFIG.url);
         
+        if (wsConnection) {
+            wsConnection.close();
+        }
+
         wsConnection = new WebSocket(WS_CONFIG.url);
 
         wsConnection.onopen = () => {
             console.log('✅ WebSocket conectado exitosamente');
-            reconnectAttempts = 0;  // Reseteamos los intentos cuando la conexión es exitosa
+            reconnectAttempts = 0;
             showNotification('Conexión establecida con el servidor', 'success');
             addLogMessage('Conexión establecida con el servidor', 'success');
         };
 
+        wsConnection.onmessage = handleWebSocketMessage;
+
         wsConnection.onclose = (event) => {
             console.warn('⚠️ WebSocket cerrado. Código:', event.code);
-            if (event.code === 403) {
-                console.error('Error de autenticación en WebSocket');
-                showNotification('Error de autenticación en la conexión', 'error');
-                addLogMessage('Error de autenticación en la conexión', 'error');
-            } else {
-                handleWebSocketClose(event);
-            }
+            handleWebSocketClose(event);
         };
 
         wsConnection.onerror = (error) => {
             console.error('❌ Error en WebSocket:', error);
-            showNotification('Error en la conexión con el servidor', 'error');
             addLogMessage('Error en la conexión con el servidor', 'error');
         };
 
     } catch (error) {
         console.error('❌ Error al crear conexión WebSocket:', error);
-        showNotification('Error al crear la conexión con el servidor', 'error');
         addLogMessage('Error al crear la conexión con el servidor', 'error');
-        
-        // Intentar reconexión después de un error
-        setTimeout(() => {
-            if (reconnectAttempts < WS_CONFIG.maxReconnectAttempts) {
-                reconnectAttempts++;
-                initializeWebSocket();
-            }
-        }, WS_CONFIG.reconnectInterval);
     }
 }
 
@@ -220,15 +212,27 @@ function updateAgentStatus(data) {
 
 // Manejar cierre de WebSocket
 function handleWebSocketClose(event) {
-    showNotification('Conexión perdida con el servidor', 'warning');
+    addLogMessage('Conexión perdida con el servidor', 'warning');
 
     if (reconnectAttempts < WS_CONFIG.maxReconnectAttempts) {
         reconnectAttempts++;
+        const delay = WS_CONFIG.reconnectInterval * Math.pow(2, reconnectAttempts - 1);
         console.log(`🔄 Intento de reconexión ${reconnectAttempts} de ${WS_CONFIG.maxReconnectAttempts}`);
-        setTimeout(initializeWebSocket, WS_CONFIG.reconnectInterval);
+        addLogMessage(`Reintentando conexión en ${delay/1000} segundos...`, 'info');
+        
+        setTimeout(() => {
+            if (wsConnection) {
+                try {
+                    wsConnection.close();
+                } catch (e) {
+                    console.error('Error cerrando conexión anterior:', e);
+                }
+            }
+            initializeWebSocket();
+        }, delay);
     } else {
         console.error('❌ Máximo número de intentos de reconexión alcanzado');
-        showNotification('No se pudo restablecer la conexión con el servidor', 'error');
+        addLogMessage('No se pudo restablecer la conexión con el servidor', 'error');
     }
 }
 
@@ -378,28 +382,18 @@ async function initializeDriverSelect() {
     try {
         addLogMessage('Cargando lista de drivers...', 'info');
         
-        // Asegurar que siempre usamos HTTPS
-        const baseUrl = `${window.location.protocol}//${window.location.host}`;
+        const baseUrl = getSecureBaseUrl();
         const response = await fetch(`${baseUrl}/api/v1/drivers`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
-            // Importante: Asegurar que las credenciales se envían
             credentials: 'same-origin'
         });
 
         if (!response.ok) {
-            const errorText = await response.text();
-            let errorMessage;
-            try {
-                const errorJson = JSON.parse(errorText);
-                errorMessage = errorJson.detail || `Error al obtener drivers. Status: ${response.status}`;
-            } catch {
-                errorMessage = `Error al obtener drivers. Status: ${response.status}`;
-            }
-            throw new Error(errorMessage);
+            throw new Error(`Error al obtener drivers. Status: ${response.status}`);
         }
 
         const drivers = await response.json();
@@ -408,21 +402,12 @@ async function initializeDriverSelect() {
             throw new Error('El formato de datos devuelto no es válido');
         }
 
-        // Limpiar y deshabilitar el select mientras se cargan los datos
-        driverSelect.disabled = true;
-        driverSelect.innerHTML = '<option value="">Cargando drivers...</option>';
-
-        // Ordenar drivers por fabricante y modelo
+        driverSelect.innerHTML = '<option value="">Seleccione un driver</option>';
         const sortedDrivers = drivers.sort((a, b) => {
-            const manufacturerCompare = a.manufacturer.localeCompare(b.manufacturer);
-            if (manufacturerCompare !== 0) return manufacturerCompare;
-            return a.model.localeCompare(b.model);
+            return a.manufacturer.localeCompare(b.manufacturer) || 
+                   a.model.localeCompare(b.model);
         });
 
-        // Reiniciar el select con la opción por defecto
-        driverSelect.innerHTML = '<option value="">Seleccione un driver</option>';
-
-        // Agregar las opciones de drivers
         sortedDrivers.forEach((driver) => {
             const option = document.createElement('option');
             option.value = driver.id;
@@ -430,23 +415,15 @@ async function initializeDriverSelect() {
             driverSelect.appendChild(option);
         });
 
-        // Habilitar el select y mostrar mensaje de éxito
-        driverSelect.disabled = false;
         addLogMessage('Drivers cargados correctamente', 'success');
 
     } catch (error) {
         console.error('Error completo inicializando drivers:', error);
-        
-        // Mostrar mensaje de error en el select
+        addLogMessage(`Error al cargar drivers: ${error.message}`, 'error');
         driverSelect.innerHTML = '<option value="">Error al cargar drivers</option>';
         driverSelect.disabled = true;
-        
-        // Mostrar mensajes de error
-        addLogMessage(`Error al cargar drivers: ${error.message}`, 'error');
-        showNotification(`Error al cargar drivers: ${error.message}`, 'error');
     }
 }
-
 // Función para mostrar el modal de instalación de impresora
 function showInstallPrinter(agentToken) {
     currentAgentToken = agentToken;
