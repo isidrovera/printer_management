@@ -7,7 +7,7 @@ let agentToDelete = null;
 // Configuración WebSocket
 const WS_CONFIG = {
     // Usar la ubicación actual y asegurarse de que sea WSS
-    url: `${window.location.protocol === 'https:' ? 'wss:' : 'wss:'}//${window.location.host}/api/v1/ws/status`,
+    url: `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/api/v1/ws/status`,
     reconnectInterval: 1000,
     maxReconnectAttempts: 10,
     currentInstallation: null
@@ -16,6 +16,30 @@ const WS_CONFIG = {
 // Función para obtener la URL base segura
 function getSecureBaseUrl() {
     return `${window.location.protocol}//${window.location.host}`;
+}
+
+function updateAgentInfoContent(agentInfo) {
+    const content = document.getElementById('agentInfoContent');
+    if (!content) return;
+    
+    // Actualizar el contenido con la información del agente
+    content.innerHTML = `
+        <div class="p-4">
+            <h3 class="text-lg font-bold mb-4">Información del Agente</h3>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <p><strong>Hostname:</strong> ${agentInfo.hostname}</p>
+                    <p><strong>Username:</strong> ${agentInfo.username}</p>
+                    <p><strong>IP:</strong> ${agentInfo.ip_address}</p>
+                </div>
+                <div>
+                    <p><strong>Tipo:</strong> ${agentInfo.device_type}</p>
+                    <p><strong>Estado:</strong> ${agentInfo.status}</p>
+                    <p><strong>Token:</strong> ${agentInfo.token}</p>
+                </div>
+            </div>
+        </div>
+    `;
 }
 
 // Inicialización cuando el DOM está listo
@@ -378,46 +402,107 @@ function initializeFormHandlers() {
 // Función para inicializar el select de drivers
 // Función para inicializar el select de drivers
 async function initializeDriverSelect() {
+    // Obtener el elemento select del DOM
     const driverSelect = document.getElementById('driver');
     if (!driverSelect) return;
 
     try {
+        // Mostrar mensaje de carga
         addLogMessage('Cargando lista de drivers...', 'info');
         
-        const response = await fetch(`${getSecureBaseUrl()}/api/v1/drivers`, {
+        // Obtener la URL base segura y hacer la petición fetch
+        const baseUrl = getSecureBaseUrl();
+        const response = await fetch(`${baseUrl}/api/v1/drivers`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
-            }
+            },
+            // Asegurar que se envían las credenciales si es necesario
+            credentials: 'same-origin'
         });
 
+        // Verificar si la respuesta es exitosa
         if (!response.ok) {
-            throw new Error(`Error al obtener drivers. Status: ${response.status}`);
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(
+                errorData.detail || 
+                `Error al obtener drivers. Status: ${response.status}`
+            );
         }
 
+        // Parsear la respuesta JSON
         const drivers = await response.json();
         
+        // Validar que la respuesta sea un array
         if (!Array.isArray(drivers)) {
             throw new Error('El formato de datos devuelto no es válido');
         }
 
-        driverSelect.innerHTML = '<option value="">Seleccione un driver</option>';
-        drivers.forEach((driver) => {
+        // Limpiar el select y agregar la opción por defecto
+        driverSelect.innerHTML = `
+            <option value="" disabled selected>
+                Seleccione un driver
+            </option>
+        `;
+
+        // Ordenar drivers por fabricante y modelo
+        const sortedDrivers = drivers.sort((a, b) => {
+            const manufComp = a.manufacturer.localeCompare(b.manufacturer);
+            if (manufComp !== 0) return manufComp;
+            return a.model.localeCompare(b.model);
+        });
+
+        // Agregar cada driver como una opción al select
+        sortedDrivers.forEach((driver) => {
             const option = document.createElement('option');
             option.value = driver.id;
             option.textContent = `${driver.manufacturer} - ${driver.model} (${driver.driver_filename})`;
+            
+            // Agregar atributos de datos adicionales si son necesarios
+            option.dataset.manufacturer = driver.manufacturer;
+            option.dataset.model = driver.model;
+            option.dataset.filename = driver.driver_filename;
+            
             driverSelect.appendChild(option);
         });
 
+        // Mostrar mensaje de éxito
         addLogMessage('Drivers cargados correctamente', 'success');
+        
+        // Habilitar el select si estaba deshabilitado
+        driverSelect.disabled = false;
+
+        // Disparar evento personalizado para notificar que los drivers se han cargado
+        driverSelect.dispatchEvent(new CustomEvent('driversLoaded', {
+            detail: { drivers: sortedDrivers }
+        }));
 
     } catch (error) {
+        // Manejo de errores
         console.error('Error completo inicializando drivers:', error);
+        
+        // Mostrar mensajes de error
         addLogMessage(`Error al cargar drivers: ${error.message}`, 'error');
         showNotification(`Error al cargar drivers: ${error.message}`, 'error');
+        
+        // Deshabilitar el select en caso de error
+        driverSelect.disabled = true;
+        
+        // Agregar una opción que indique el error
+        driverSelect.innerHTML = `
+            <option value="" disabled selected>
+                Error al cargar drivers
+            </option>
+        `;
+        
+        // Disparar evento de error
+        driverSelect.dispatchEvent(new CustomEvent('driversError', {
+            detail: { error: error.message }
+        }));
     }
 }
+
 
 // Función para mostrar el modal de instalación de impresora
 function showInstallPrinter(agentToken) {
