@@ -75,9 +75,7 @@ class PrinterMonitorService:
                 # Actualizar agent_id si se proporciona
                 if agent_id is not None:
                     printer.agent_id = agent_id
-                # Actualizar número de serie si está presente en los datos
-                if "serial_number" in printer_data:
-                    printer.serial_number = printer_data["serial_number"]
+
                 # Actualizar cliente si se proporciona
                 if printer_data.get("client_id"):
                     printer.client_id = int(printer_data["client_id"])
