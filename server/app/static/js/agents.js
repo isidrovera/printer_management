@@ -5,14 +5,14 @@ let currentAgentToken = '';
 let agentToDelete = null;
 
 // Configuración WebSocket
+// Configuración WebSocket
 const WS_CONFIG = {
-    // Usar la ubicación actual y asegurarse de que sea WSS
+    // Modificar esto para usar la ruta correcta que coincida con el backend
     url: `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/api/v1/ws/status`,
     reconnectInterval: 1000,
     maxReconnectAttempts: 10,
     currentInstallation: null
 };
-
 // Función para obtener la URL base segura
 function getSecureBaseUrl() {
     return `${window.location.protocol}//${window.location.host}`;
@@ -123,57 +123,20 @@ function initializeWebSocket() {
 
         wsConnection.onopen = () => {
             console.log('✅ WebSocket conectado exitosamente');
-            reconnectAttempts = 0;
+            reconnectAttempts = 0;  // Reseteamos los intentos cuando la conexión es exitosa
             showNotification('Conexión establecida con el servidor', 'success');
             addLogMessage('Conexión establecida con el servidor', 'success');
         };
 
-        wsConnection.onmessage = (event) => {
-            console.group('Mensaje WebSocket Recibido');
-            console.log('Mensaje raw:', event.data);
-
-            try {
-                // Verificar si es un mensaje de log del agente
-                if (typeof event.data === 'string' && event.data.startsWith('Agent')) {
-                    console.log('📝 Mensaje de log del agente:', event.data);
-                    handleAgentLogMessage(event.data);
-                    console.groupEnd();
-                    return;
-                }
-
-                // Intentar parsear como JSON
-                let data;
-                try {
-                    data = JSON.parse(event.data);
-                    console.log('✅ JSON parseado correctamente:', data);
-                } catch (parseError) {
-                    console.warn('⚠️ No se pudo parsear como JSON:', {
-                        error: parseError,
-                        rawData: event.data.slice(0, 100) + (event.data.length > 100 ? '...' : '')
-                    });
-                    handleAgentLogMessage(event.data);
-                    console.groupEnd();
-                    return;
-                }
-
-                // Procesar mensaje JSON según su tipo
-                if (data && data.type) {
-                    console.log(`🔄 Procesando mensaje de tipo: ${data.type}`);
-                    processJsonMessage(data);
-                } else {
-                    console.log('ℹ️ Mensaje JSON sin tipo específico:', data);
-                }
-
-            } catch (error) {
-                console.error('❌ Error procesando mensaje:', error);
-                addLogMessage('Error al procesar mensaje: ' + error.message, 'error');
-            }
-            console.groupEnd();
-        };
-
         wsConnection.onclose = (event) => {
             console.warn('⚠️ WebSocket cerrado. Código:', event.code);
-            handleWebSocketClose(event);
+            if (event.code === 403) {
+                console.error('Error de autenticación en WebSocket');
+                showNotification('Error de autenticación en la conexión', 'error');
+                addLogMessage('Error de autenticación en la conexión', 'error');
+            } else {
+                handleWebSocketClose(event);
+            }
         };
 
         wsConnection.onerror = (error) => {
@@ -186,6 +149,14 @@ function initializeWebSocket() {
         console.error('❌ Error al crear conexión WebSocket:', error);
         showNotification('Error al crear la conexión con el servidor', 'error');
         addLogMessage('Error al crear la conexión con el servidor', 'error');
+        
+        // Intentar reconexión después de un error
+        setTimeout(() => {
+            if (reconnectAttempts < WS_CONFIG.maxReconnectAttempts) {
+                reconnectAttempts++;
+                initializeWebSocket();
+            }
+        }, WS_CONFIG.reconnectInterval);
     }
 }
 
