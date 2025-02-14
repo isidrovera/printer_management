@@ -286,37 +286,31 @@ function initializeFormHandlers() {
         installForm.addEventListener('submit', async function(e) {
             e.preventDefault();
 
+            // Obtener el botón de envío antes de deshabilitarlo
+            const submitButton = e.target.querySelector('button[type="submit"]');
+            if (!submitButton) {
+                showNotification('Error: Botón de envío no encontrado', 'error');
+                return;
+            }
+
             try {
-                const submitButton = installForm.querySelector('button[type="submit"]');
                 const driverId = document.getElementById('driver').value;
                 const printerIp = document.getElementById('printerIp').value;
 
                 if (!driverId || !printerIp) {
                     showNotification('Por favor complete todos los campos', 'error');
-                    addLogMessage({
-                        timestamp: new Date().toISOString().replace('T', ' ').split('.')[0],
-                        type: 'error',
-                        message: 'Error: Faltan campos requeridos'
-                    });
                     return;
                 }
 
-                // Guardar información de la instalación actual
-                WS_CONFIG.currentInstallation = {
-                    driverId,
-                    printerIp,
-                    startTime: new Date()
-                };
+                // Verificar estado del agente antes de la instalación
+                const agentStatus = await checkAgentStatus(currentAgentToken);
+                if (!agentStatus.connected) {
+                    throw new Error('El agente no está conectado. Por favor, verifique la conexión.');
+                }
 
-                // Deshabilitar el botón de envío y cambiar el texto
+                // Deshabilitar el botón y mostrar estado
                 submitButton.disabled = true;
                 submitButton.innerHTML = 'Instalando...';
-                
-                addLogMessage({
-                    timestamp: new Date().toISOString().replace('T', ' ').split('.')[0],
-                    type: 'info',
-                    message: 'Iniciando instalación de impresora...'
-                });
 
                 const response = await fetch(`/api/v1/printers/install/${currentAgentToken}`, {
                     method: 'POST',
@@ -335,38 +329,30 @@ function initializeFormHandlers() {
                     throw new Error(errorData.detail || `Error en la instalación: ${response.status}`);
                 }
 
-                addLogMessage({
-                    timestamp: new Date().toISOString().replace('T', ' ').split('.')[0],
-                    type: 'info',
-                    message: 'Comando enviado. La instalación continúa en segundo plano...'
-                });
-
-                // Cambiar el texto del botón de cerrar
-                const closeButton = document.querySelector('button[onclick="closeModal(\'installPrinterModal\')"]');
-                if (closeButton) {
-                    closeButton.textContent = 'Cerrar ventana';
-                }
-
-                // Deshabilitar los campos del formulario
-                document.getElementById('driver').disabled = true;
-                document.getElementById('printerIp').disabled = true;
+                showNotification('Instalación iniciada correctamente', 'success');
 
             } catch (error) {
                 console.error('Error detallado:', error);
-                addLogMessage({
-                    timestamp: new Date().toISOString().replace('T', ' ').split('.')[0],
-                    type: 'error',
-                    message: `Error: ${error.message}`
-                });
+                showNotification(error.message, 'error');
                 
-                // Reactivar el botón de envío en caso de error
+                // Restaurar el botón
                 submitButton.disabled = false;
                 submitButton.innerHTML = 'Instalar';
-                
-                // Limpiar instalación actual
-                WS_CONFIG.currentInstallation = null;
             }
         });
+    }
+}
+async function checkAgentStatus(agentToken) {
+    try {
+        const response = await fetch(`/api/v1/agents/${agentToken}/status`);
+        const data = await response.json();
+        return {
+            connected: data.status === 'online',
+            status: data.status
+        };
+    } catch (error) {
+        console.error('Error verificando estado del agente:', error);
+        return { connected: false, status: 'error' };
     }
 }
 // Función para inicializar el select de drivers

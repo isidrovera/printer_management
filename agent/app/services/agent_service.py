@@ -328,6 +328,13 @@ class AgentService:
             logger.error(f"Error enviando respuesta de error: {e}")
     async def _handle_printer_installation(self, data, websocket):
         """Maneja la instalación de impresoras."""
+        installation_state = {
+            'started': False,
+            'driver_downloaded': False,
+            'driver_extracted': False,
+            'installation_completed': False
+        }
+        
         try:
             driver_url = data.get('driver_url')
             if not driver_url:
@@ -338,6 +345,24 @@ class AgentService:
             model = data.get('model')
             driver_filename = data.get('driver_filename')
 
+            # Guardar estado inicial de la instalación
+            await self._save_installation_state({
+                'driver_url': driver_url,
+                'printer_ip': printer_ip,
+                'manufacturer': manufacturer,
+                'model': model,
+                'driver_filename': driver_filename,
+                'state': installation_state
+            })
+
+            # Notificar inicio de instalación
+            await websocket.send(json.dumps({
+                'type': 'installation_status',
+                'status': 'starting',
+                'message': 'Iniciando instalación de impresora...'
+            }))
+            installation_state['started'] = True
+
             driver_name = os.path.splitext(driver_filename)[0]
             logger.debug(f"Nombre del driver a usar: {driver_name}")
 
@@ -345,23 +370,33 @@ class AgentService:
                 driver_path = os.path.join(temp_dir, driver_filename)
                 logger.debug(f"Driver se guardará en: {driver_path}")
                 
+                # Verificar conexión antes de descargar
+                if not websocket.open:
+                    raise ConnectionError("WebSocket connection lost before download")
+                
                 async with aiohttp.ClientSession() as session:
                     logger.debug(f"Iniciando descarga desde: {driver_url}")
+                    # Notificar inicio de descarga
+                    await websocket.send(json.dumps({
+                        'type': 'installation_status',
+                        'status': 'downloading',
+                        'message': 'Descargando driver...'
+                    }))
+                    
                     async with session.get(driver_url) as response:
                         if response.status != 200:
                             raise Exception(f"Error downloading driver: {response.status}")
                         
-                        # Verificar el Content-Type
                         content_type = response.headers.get('Content-Type', '')
                         if 'application/zip' not in content_type.lower():
                             logger.warning(f"Content-Type inesperado: {content_type}")
                         
                         content = await response.read()
                         logger.debug(f"Descargados {len(content)} bytes")
+                        installation_state['driver_downloaded'] = True
                         
-                        # Verificar si el contenido parece un ZIP
+                        # Verificar contenido ZIP
                         if len(content) < 4 or content[:4] != b'PK\x03\x04':
-                            # Intentar decodificar el contenido para ver qué recibimos
                             try:
                                 text_content = content.decode('utf-8')[:200]
                                 logger.error(f"Contenido no válido recibido: {text_content}")
@@ -372,15 +407,30 @@ class AgentService:
                         with open(driver_path, 'wb') as f:
                             f.write(content)
                         
+                        # Notificar extracción
+                        await websocket.send(json.dumps({
+                            'type': 'installation_status',
+                            'status': 'extracting',
+                            'message': 'Extrayendo driver...'
+                        }))
+                        
                         try:
                             with zipfile.ZipFile(driver_path, 'r') as zip_ref:
                                 extract_dir = os.path.join(temp_dir, "extracted")
                                 os.makedirs(extract_dir, exist_ok=True)
                                 zip_ref.extractall(extract_dir)
                                 logger.debug(f"ZIP extraído en: {extract_dir}")
+                                installation_state['driver_extracted'] = True
                         except Exception as e:
                             logger.error(f"Error con el archivo ZIP: {e}")
                             raise
+
+                        # Notificar inicio de instalación del driver
+                        await websocket.send(json.dumps({
+                            'type': 'installation_status',
+                            'status': 'installing',
+                            'message': 'Instalando driver...'
+                        }))
 
                         result = await self.printer_service.install(
                             driver_path,
@@ -390,16 +440,69 @@ class AgentService:
                             driver_name
                         )
                         
+                        installation_state['installation_completed'] = True
                         logger.info(f"Printer installation result: {result}")
+                        
+                        # Notificar resultado final
                         await websocket.send(json.dumps({
                             'type': 'installation_result',
                             'success': result['success'],
                             'message': result['message']
                         }))
 
+                        # Si la instalación fue exitosa, eliminar el estado guardado
+                        if result['success']:
+                            await self._clear_installation_state()
+
+        except websockets.exceptions.ConnectionClosed as e:
+            logger.error(f"Conexión perdida durante la instalación: {e}")
+            await self._save_installation_state({
+                'error': str(e),
+                'state': installation_state
+            })
+            raise
+
         except Exception as e:
             logger.error(f"Error during printer installation: {e}")
+            await self._save_installation_state({
+                'error': str(e),
+                'state': installation_state
+            })
             await self._send_error_response(websocket, f"Error en instalación: {e}")
+    async def _save_installation_state(self, state_data):
+        """Guarda el estado de la instalación para posible recuperación"""
+        try:
+            state_file = os.path.join(os.path.dirname(__file__), 'installation_state.json')
+            with open(state_file, 'w') as f:
+                json.dump(state_data, f)
+            logger.debug("Estado de instalación guardado")
+        except Exception as e:
+            logger.error(f"Error guardando estado de instalación: {e}")
+    async def _clear_installation_state(self):
+        """Elimina el archivo de estado de instalación"""
+        try:
+            state_file = os.path.join(os.path.dirname(__file__), 'installation_state.json')
+            if os.path.exists(state_file):
+                os.remove(state_file)
+                logger.debug("Estado de instalación eliminado")
+        except Exception as e:
+            logger.error(f"Error eliminando estado de instalación: {e}")
+    async def _check_pending_installations(self):
+        """Verifica y reanuda instalaciones pendientes si existen"""
+        try:
+            state_file = os.path.join(os.path.dirname(__file__), 'installation_state.json')
+            if os.path.exists(state_file):
+                with open(state_file, 'r') as f:
+                    pending_state = json.load(f)
+                    
+                if pending_state.get('state', {}).get('started') and not pending_state.get('state', {}).get('installation_completed'):
+                    logger.info("Encontrada instalación pendiente, intentando reanudar...")
+                    # Aquí podrías implementar la lógica para reanudar la instalación
+                    # desde el punto donde se quedó
+                    return pending_state
+        except Exception as e:
+            logger.error(f"Error verificando instalaciones pendientes: {e}")
+        return None
 
     async def _handle_printer_created(self, data, websocket):
         """Maneja la notificación de una nueva impresora creada."""
