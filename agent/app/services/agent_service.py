@@ -45,6 +45,14 @@ class AgentService:
         self.is_shutting_down = False
         self.current_status = AgentStatus.OFFLINE
         
+        # Nuevas variables de configuración
+        self.ws_ping_interval = 20
+        self.ws_ping_timeout = 10
+        self.ws_close_timeout = 5
+        self.last_heartbeat_received = time.time()
+        self.heartbeat_timeout = 60  # Tiempo máximo sin heartbeat antes de reconectar
+        self.connection_monitor_task = None
+        
         
     
     async def start(self):
@@ -166,58 +174,150 @@ class AgentService:
     async def _connect(self):
         """Conecta el agente al servidor usando el token existente y mantiene la conexión."""
         backoff_time = self.reconnect_interval
-        max_backoff = 300  # Máximo 5 minutos entre intentos
         
         while True:
             try:
+                # Verificar configuración inicial
+                logger.info("🔄 Iniciando proceso de conexión WebSocket")
+                logger.debug(f"Estado actual del agente: {self.current_status}")
+                logger.debug(f"Configuración - Ping Interval: {self.ws_ping_interval}s")
+                logger.debug(f"Configuración - Ping Timeout: {self.ws_ping_timeout}s")
+                logger.debug(f"Configuración - Close Timeout: {self.ws_close_timeout}s")
+                
+                # Verificar token
+                if not settings.AGENT_TOKEN:
+                    logger.error("❌ No se encontró AGENT_TOKEN")
+                    await asyncio.sleep(backoff_time)
+                    continue
+                
                 ws_url = f"{settings.SERVER_URL}/api/v1/ws/agent/{settings.AGENT_TOKEN}"
-                logger.debug(f"🔗 Conectando al servidor WebSocket: {ws_url}")
-
-                async with websockets.connect(ws_url, ping_interval=20, ping_timeout=10) as websocket:
-                    logger.info("✅ Conectado al servidor WebSocket correctamente.")
-                    backoff_time = self.reconnect_interval  # Resetear backoff al conectar exitosamente
+                logger.info(f"🔗 Intentando conexión WebSocket a: {ws_url}")
+                logger.debug(f"Tiempo de backoff actual: {backoff_time}s")
+                
+                async with websockets.connect(
+                    ws_url,
+                    ping_interval=self.ws_ping_interval,
+                    ping_timeout=self.ws_ping_timeout,
+                    close_timeout=self.ws_close_timeout,
+                    max_size=10_485_760  # 10MB max message size
+                ) as websocket:
+                    logger.info("✅ Conexión WebSocket establecida exitosamente")
+                    logger.debug(f"Características de la conexión: {websocket.logger}")
                     
-                    # Crear y manejar las tareas de forma más controlada
-                    tasks = []
-                    tasks.append(asyncio.create_task(self._handle_connection(websocket)))
-                    tasks.append(asyncio.create_task(self._periodic_updates(websocket)))
-                    tasks.append(asyncio.create_task(self._heartbeat_loop(websocket)))
+                    # Actualizar estado
+                    previous_status = self.current_status
+                    self.current_status = AgentStatus.ONLINE
+                    logger.info(f"Estado actualizado: {previous_status} -> {self.current_status}")
+                    
+                    # Reset backoff y heartbeat
+                    backoff_time = self.reconnect_interval
+                    self.last_heartbeat_received = time.time()
+                    logger.debug(f"Reset de backoff a {backoff_time}s")
+                    logger.debug(f"Último heartbeat actualizado: {self.last_heartbeat_received}")
+                    
+                    # Iniciar monitor de conexión
+                    logger.info("🔄 Iniciando monitor de conexión")
+                    self.connection_monitor_task = asyncio.create_task(
+                        self._monitor_connection(websocket)
+                    )
+                    
+                    # Crear tareas
+                    logger.info("🔄 Iniciando tareas de mantenimiento de conexión")
+                    tasks = [
+                        asyncio.create_task(self._handle_connection(websocket)),
+                        asyncio.create_task(self._periodic_updates(websocket)),
+                        asyncio.create_task(self._heartbeat_loop(websocket)),
+                        self.connection_monitor_task
+                    ]
+                    logger.debug(f"Tareas creadas: {len(tasks)}")
                     
                     try:
-                        # Esperar a que cualquier tarea termine o lance una excepción
+                        logger.debug("Esperando a que las tareas se completen...")
                         done, pending = await asyncio.wait(
                             tasks,
-                            return_when=asyncio.FIRST_EXCEPTION
+                            return_when=asyncio.FIRST_COMPLETED
                         )
                         
-                        # Cancelar las tareas pendientes
-                        for task in pending:
-                            task.cancel()
-                            
-                        # Propagar cualquier excepción
+                        # Verificar tareas completadas
+                        logger.debug(f"Tareas completadas: {len(done)}")
+                        logger.debug(f"Tareas pendientes: {len(pending)}")
+                        
+                        # Verificar errores
                         for task in done:
                             if task.exception():
+                                logger.error(f"❌ Error en tarea: {task.exception()}")
                                 raise task.exception()
-                                
+                        
+                    except Exception as e:
+                        logger.error(f"❌ Error durante la ejecución de tareas: {e}")
+                        raise
+                    
                     finally:
-                        # Asegurarse de que todas las tareas se cancelen
+                        logger.info("🔄 Limpiando tareas...")
+                        cancelled_tasks = 0
                         for task in tasks:
                             if not task.done():
                                 task.cancel()
-                                
-                        # Esperar a que todas las tareas se cancelen
+                                cancelled_tasks += 1
+                        logger.debug(f"Tareas canceladas: {cancelled_tasks}")
+                        
                         await asyncio.gather(*tasks, return_exceptions=True)
+                        previous_status = self.current_status
+                        self.current_status = AgentStatus.CONNECTION_LOST
+                        logger.info(f"Estado actualizado: {previous_status} -> {self.current_status}")
 
-            except (websockets.exceptions.ConnectionClosed, 
+            except (websockets.exceptions.ConnectionClosed,
                     websockets.exceptions.WebSocketException,
-                    ConnectionRefusedError) as e:
-                logger.error(f"🚨 Conexión WebSocket cerrada/fallida: {e}")
+                    ConnectionRefusedError,
+                    asyncio.TimeoutError) as e:
+                self.current_status = AgentStatus.CONNECTION_LOST
+                logger.error(f"🚨 Error de conexión WebSocket: {e}")
+                logger.error(f"Tipo de error: {type(e).__name__}")
+                logger.error(f"Detalles adicionales: {str(e)}")
+                logger.info(f"Esperando {backoff_time}s antes de reintentar...")
                 await asyncio.sleep(backoff_time)
-                backoff_time = min(backoff_time * 2, max_backoff)
+                backoff_time = min(backoff_time * 2, self.max_reconnect_interval)
+                logger.debug(f"Nuevo tiempo de backoff: {backoff_time}s")
+            
+            except Exception as e:
+                self.current_status = AgentStatus.ERROR
+                logger.error(f"🚨 Error inesperado en la conexión: {e}")
+                logger.error(f"Tipo de error: {type(e).__name__}")
+                if hasattr(e, '__traceback__'):
+                    logger.error(f"Traceback: {traceback.format_exc()}")
+                logger.info(f"Esperando {backoff_time}s antes de reintentar...")
+                await asyncio.sleep(backoff_time)
+                backoff_time = min(backoff_time * 2, self.max_reconnect_interval)
+                logger.debug(f"Nuevo tiempo de backoff: {backoff_time}s")
+    async def _monitor_connection(self, websocket):
+        """Monitorea la salud de la conexión WebSocket."""
+        while True:
+            try:
+                # Verificar tiempo desde último heartbeat
+                time_since_last_heartbeat = time.time() - self.last_heartbeat_received
+                
+                if time_since_last_heartbeat > self.heartbeat_timeout:
+                    logger.warning("⚠️ Timeout de heartbeat detectado")
+                    self.current_status = AgentStatus.CONNECTION_LOST
+                    return
+                
+                # Verificar el estado de la conexión usando ping/pong
+                try:
+                    pong_waiter = await websocket.ping()
+                    await asyncio.wait_for(pong_waiter, timeout=self.ws_ping_timeout)
+                except (asyncio.TimeoutError, websockets.exceptions.ConnectionClosed):
+                    logger.warning("⚠️ WebSocket no responde a ping")
+                    self.current_status = AgentStatus.CONNECTION_LOST
+                    return
+                    
+                await asyncio.sleep(5)  # Verificar cada 5 segundos
                 
             except Exception as e:
-                logger.error(f"🚨 Error inesperado en la conexión WebSocket: {e}")
-                await asyncio.sleep(backoff_time)
+                logger.error(f"🚨 Error en monitor de conexión: {e}")
+                self.current_status = AgentStatus.CONNECTION_LOST
+                return
+
+
 
     async def _handle_connection(self, websocket):
         """Maneja la conexión WebSocket activa."""
@@ -277,6 +377,7 @@ class AgentService:
     async def _handle_heartbeat(self, websocket):
         """Maneja los mensajes de heartbeat."""
         try:
+            self.last_heartbeat_received = time.time()
             response = {
                 'type': 'heartbeat_response',
                 'status': self.current_status,
@@ -286,37 +387,49 @@ class AgentService:
             logger.debug("Heartbeat enviado correctamente")
         except Exception as e:
             logger.error(f"Error sending heartbeat response: {e}")
-            raise  # Propagar el error para forzar reconexión
+            raise
+
     async def _heartbeat_loop(self, websocket):
         """Mantiene el heartbeat activo con el servidor."""
         heartbeat_interval = 30  # 30 segundos entre heartbeats
-        last_heartbeat = 0
+        retry_count = 0
+        max_retries = 3
         
-        try:
-            while True:
-                current_time = time.time()
+        while True:
+            try:
+                heartbeat_message = json.dumps({
+                    'type': 'heartbeat',
+                    'status': self.current_status,
+                    'timestamp': datetime.utcnow().isoformat()
+                })
                 
-                # Verificar si es tiempo de enviar heartbeat
-                if current_time - last_heartbeat >= heartbeat_interval:
-                    try:
-                        # Enviar heartbeat
-                        await websocket.send(json.dumps({
-                            'type': 'heartbeat',
-                            'status': self.current_status,
-                            'timestamp': datetime.utcnow().isoformat()
-                        }))
-                        last_heartbeat = current_time
-                        
-                    except Exception as e:
-                        logger.error(f"Error enviando heartbeat: {e}")
-                        raise
-                        
-                # Esperar un tiempo corto antes de la siguiente iteración
-                await asyncio.sleep(1)
+                try:
+                    await asyncio.wait_for(
+                        websocket.send(heartbeat_message),
+                        timeout=self.ws_ping_timeout
+                    )
+                    retry_count = 0  # Reset contador de reintentos si el envío fue exitoso
+                    
+                except asyncio.TimeoutError:
+                    retry_count += 1
+                    logger.warning(f"Timeout enviando heartbeat (intento {retry_count}/{max_retries})")
+                    if retry_count >= max_retries:
+                        logger.error("Demasiados fallos de heartbeat consecutivos")
+                        self.current_status = AgentStatus.CONNECTION_LOST
+                        return
+                    continue
                 
-        except Exception as e:
-            logger.error(f"Error fatal en heartbeat loop: {e}")
-            raise  # Propagar el error para reiniciar la conexión
+                await asyncio.sleep(heartbeat_interval)
+                
+            except websockets.exceptions.ConnectionClosed:
+                logger.error("Conexión cerrada durante heartbeat")
+                self.current_status = AgentStatus.CONNECTION_LOST
+                return
+                
+            except Exception as e:
+                logger.error(f"Error en heartbeat loop: {e}")
+                self.current_status = AgentStatus.ERROR
+                return
     async def _send_error_response(self, websocket, error_message: str):
         """Envía una respuesta de error al servidor."""
         try:
@@ -328,13 +441,6 @@ class AgentService:
             logger.error(f"Error enviando respuesta de error: {e}")
     async def _handle_printer_installation(self, data, websocket):
         """Maneja la instalación de impresoras."""
-        installation_state = {
-            'started': False,
-            'driver_downloaded': False,
-            'driver_extracted': False,
-            'installation_completed': False
-        }
-        
         try:
             driver_url = data.get('driver_url')
             if not driver_url:
@@ -345,24 +451,6 @@ class AgentService:
             model = data.get('model')
             driver_filename = data.get('driver_filename')
 
-            # Guardar estado inicial de la instalación
-            await self._save_installation_state({
-                'driver_url': driver_url,
-                'printer_ip': printer_ip,
-                'manufacturer': manufacturer,
-                'model': model,
-                'driver_filename': driver_filename,
-                'state': installation_state
-            })
-
-            # Notificar inicio de instalación
-            await websocket.send(json.dumps({
-                'type': 'installation_status',
-                'status': 'starting',
-                'message': 'Iniciando instalación de impresora...'
-            }))
-            installation_state['started'] = True
-
             driver_name = os.path.splitext(driver_filename)[0]
             logger.debug(f"Nombre del driver a usar: {driver_name}")
 
@@ -370,33 +458,23 @@ class AgentService:
                 driver_path = os.path.join(temp_dir, driver_filename)
                 logger.debug(f"Driver se guardará en: {driver_path}")
                 
-                # Verificar conexión antes de descargar
-                if not websocket.open:
-                    raise ConnectionError("WebSocket connection lost before download")
-                
                 async with aiohttp.ClientSession() as session:
                     logger.debug(f"Iniciando descarga desde: {driver_url}")
-                    # Notificar inicio de descarga
-                    await websocket.send(json.dumps({
-                        'type': 'installation_status',
-                        'status': 'downloading',
-                        'message': 'Descargando driver...'
-                    }))
-                    
                     async with session.get(driver_url) as response:
                         if response.status != 200:
                             raise Exception(f"Error downloading driver: {response.status}")
                         
+                        # Verificar el Content-Type
                         content_type = response.headers.get('Content-Type', '')
                         if 'application/zip' not in content_type.lower():
                             logger.warning(f"Content-Type inesperado: {content_type}")
                         
                         content = await response.read()
                         logger.debug(f"Descargados {len(content)} bytes")
-                        installation_state['driver_downloaded'] = True
                         
-                        # Verificar contenido ZIP
+                        # Verificar si el contenido parece un ZIP
                         if len(content) < 4 or content[:4] != b'PK\x03\x04':
+                            # Intentar decodificar el contenido para ver qué recibimos
                             try:
                                 text_content = content.decode('utf-8')[:200]
                                 logger.error(f"Contenido no válido recibido: {text_content}")
@@ -407,30 +485,15 @@ class AgentService:
                         with open(driver_path, 'wb') as f:
                             f.write(content)
                         
-                        # Notificar extracción
-                        await websocket.send(json.dumps({
-                            'type': 'installation_status',
-                            'status': 'extracting',
-                            'message': 'Extrayendo driver...'
-                        }))
-                        
                         try:
                             with zipfile.ZipFile(driver_path, 'r') as zip_ref:
                                 extract_dir = os.path.join(temp_dir, "extracted")
                                 os.makedirs(extract_dir, exist_ok=True)
                                 zip_ref.extractall(extract_dir)
                                 logger.debug(f"ZIP extraído en: {extract_dir}")
-                                installation_state['driver_extracted'] = True
                         except Exception as e:
                             logger.error(f"Error con el archivo ZIP: {e}")
                             raise
-
-                        # Notificar inicio de instalación del driver
-                        await websocket.send(json.dumps({
-                            'type': 'installation_status',
-                            'status': 'installing',
-                            'message': 'Instalando driver...'
-                        }))
 
                         result = await self.printer_service.install(
                             driver_path,
@@ -440,69 +503,16 @@ class AgentService:
                             driver_name
                         )
                         
-                        installation_state['installation_completed'] = True
                         logger.info(f"Printer installation result: {result}")
-                        
-                        # Notificar resultado final
                         await websocket.send(json.dumps({
                             'type': 'installation_result',
                             'success': result['success'],
                             'message': result['message']
                         }))
 
-                        # Si la instalación fue exitosa, eliminar el estado guardado
-                        if result['success']:
-                            await self._clear_installation_state()
-
-        except websockets.exceptions.ConnectionClosed as e:
-            logger.error(f"Conexión perdida durante la instalación: {e}")
-            await self._save_installation_state({
-                'error': str(e),
-                'state': installation_state
-            })
-            raise
-
         except Exception as e:
             logger.error(f"Error during printer installation: {e}")
-            await self._save_installation_state({
-                'error': str(e),
-                'state': installation_state
-            })
             await self._send_error_response(websocket, f"Error en instalación: {e}")
-    async def _save_installation_state(self, state_data):
-        """Guarda el estado de la instalación para posible recuperación"""
-        try:
-            state_file = os.path.join(os.path.dirname(__file__), 'installation_state.json')
-            with open(state_file, 'w') as f:
-                json.dump(state_data, f)
-            logger.debug("Estado de instalación guardado")
-        except Exception as e:
-            logger.error(f"Error guardando estado de instalación: {e}")
-    async def _clear_installation_state(self):
-        """Elimina el archivo de estado de instalación"""
-        try:
-            state_file = os.path.join(os.path.dirname(__file__), 'installation_state.json')
-            if os.path.exists(state_file):
-                os.remove(state_file)
-                logger.debug("Estado de instalación eliminado")
-        except Exception as e:
-            logger.error(f"Error eliminando estado de instalación: {e}")
-    async def _check_pending_installations(self):
-        """Verifica y reanuda instalaciones pendientes si existen"""
-        try:
-            state_file = os.path.join(os.path.dirname(__file__), 'installation_state.json')
-            if os.path.exists(state_file):
-                with open(state_file, 'r') as f:
-                    pending_state = json.load(f)
-                    
-                if pending_state.get('state', {}).get('started') and not pending_state.get('state', {}).get('installation_completed'):
-                    logger.info("Encontrada instalación pendiente, intentando reanudar...")
-                    # Aquí podrías implementar la lógica para reanudar la instalación
-                    # desde el punto donde se quedó
-                    return pending_state
-        except Exception as e:
-            logger.error(f"Error verificando instalaciones pendientes: {e}")
-        return None
 
     async def _handle_printer_created(self, data, websocket):
         """Maneja la notificación de una nueva impresora creada."""
