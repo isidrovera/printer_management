@@ -45,14 +45,6 @@ class AgentService:
         self.is_shutting_down = False
         self.current_status = AgentStatus.OFFLINE
         
-        # Nuevas variables de configuración
-        self.ws_ping_interval = 20
-        self.ws_ping_timeout = 10
-        self.ws_close_timeout = 5
-        self.last_heartbeat_received = time.time()
-        self.heartbeat_timeout = 60  # Tiempo máximo sin heartbeat antes de reconectar
-        self.connection_monitor_task = None
-        
         
     
     async def start(self):
@@ -174,150 +166,58 @@ class AgentService:
     async def _connect(self):
         """Conecta el agente al servidor usando el token existente y mantiene la conexión."""
         backoff_time = self.reconnect_interval
+        max_backoff = 300  # Máximo 5 minutos entre intentos
         
         while True:
             try:
-                # Verificar configuración inicial
-                logger.info("🔄 Iniciando proceso de conexión WebSocket")
-                logger.debug(f"Estado actual del agente: {self.current_status}")
-                logger.debug(f"Configuración - Ping Interval: {self.ws_ping_interval}s")
-                logger.debug(f"Configuración - Ping Timeout: {self.ws_ping_timeout}s")
-                logger.debug(f"Configuración - Close Timeout: {self.ws_close_timeout}s")
-                
-                # Verificar token
-                if not settings.AGENT_TOKEN:
-                    logger.error("❌ No se encontró AGENT_TOKEN")
-                    await asyncio.sleep(backoff_time)
-                    continue
-                
                 ws_url = f"{settings.SERVER_URL}/api/v1/ws/agent/{settings.AGENT_TOKEN}"
-                logger.info(f"🔗 Intentando conexión WebSocket a: {ws_url}")
-                logger.debug(f"Tiempo de backoff actual: {backoff_time}s")
-                
-                async with websockets.connect(
-                    ws_url,
-                    ping_interval=self.ws_ping_interval,
-                    ping_timeout=self.ws_ping_timeout,
-                    close_timeout=self.ws_close_timeout,
-                    max_size=10_485_760  # 10MB max message size
-                ) as websocket:
-                    logger.info("✅ Conexión WebSocket establecida exitosamente")
-                    logger.debug(f"Características de la conexión: {websocket.logger}")
+                logger.debug(f"🔗 Conectando al servidor WebSocket: {ws_url}")
+
+                async with websockets.connect(ws_url, ping_interval=20, ping_timeout=10) as websocket:
+                    logger.info("✅ Conectado al servidor WebSocket correctamente.")
+                    backoff_time = self.reconnect_interval  # Resetear backoff al conectar exitosamente
                     
-                    # Actualizar estado
-                    previous_status = self.current_status
-                    self.current_status = AgentStatus.ONLINE
-                    logger.info(f"Estado actualizado: {previous_status} -> {self.current_status}")
-                    
-                    # Reset backoff y heartbeat
-                    backoff_time = self.reconnect_interval
-                    self.last_heartbeat_received = time.time()
-                    logger.debug(f"Reset de backoff a {backoff_time}s")
-                    logger.debug(f"Último heartbeat actualizado: {self.last_heartbeat_received}")
-                    
-                    # Iniciar monitor de conexión
-                    logger.info("🔄 Iniciando monitor de conexión")
-                    self.connection_monitor_task = asyncio.create_task(
-                        self._monitor_connection(websocket)
-                    )
-                    
-                    # Crear tareas
-                    logger.info("🔄 Iniciando tareas de mantenimiento de conexión")
-                    tasks = [
-                        asyncio.create_task(self._handle_connection(websocket)),
-                        asyncio.create_task(self._periodic_updates(websocket)),
-                        asyncio.create_task(self._heartbeat_loop(websocket)),
-                        self.connection_monitor_task
-                    ]
-                    logger.debug(f"Tareas creadas: {len(tasks)}")
+                    # Crear y manejar las tareas de forma más controlada
+                    tasks = []
+                    tasks.append(asyncio.create_task(self._handle_connection(websocket)))
+                    tasks.append(asyncio.create_task(self._periodic_updates(websocket)))
+                    tasks.append(asyncio.create_task(self._heartbeat_loop(websocket)))
                     
                     try:
-                        logger.debug("Esperando a que las tareas se completen...")
+                        # Esperar a que cualquier tarea termine o lance una excepción
                         done, pending = await asyncio.wait(
                             tasks,
-                            return_when=asyncio.FIRST_COMPLETED
+                            return_when=asyncio.FIRST_EXCEPTION
                         )
                         
-                        # Verificar tareas completadas
-                        logger.debug(f"Tareas completadas: {len(done)}")
-                        logger.debug(f"Tareas pendientes: {len(pending)}")
-                        
-                        # Verificar errores
+                        # Cancelar las tareas pendientes
+                        for task in pending:
+                            task.cancel()
+                            
+                        # Propagar cualquier excepción
                         for task in done:
                             if task.exception():
-                                logger.error(f"❌ Error en tarea: {task.exception()}")
                                 raise task.exception()
-                        
-                    except Exception as e:
-                        logger.error(f"❌ Error durante la ejecución de tareas: {e}")
-                        raise
-                    
+                                
                     finally:
-                        logger.info("🔄 Limpiando tareas...")
-                        cancelled_tasks = 0
+                        # Asegurarse de que todas las tareas se cancelen
                         for task in tasks:
                             if not task.done():
                                 task.cancel()
-                                cancelled_tasks += 1
-                        logger.debug(f"Tareas canceladas: {cancelled_tasks}")
-                        
+                                
+                        # Esperar a que todas las tareas se cancelen
                         await asyncio.gather(*tasks, return_exceptions=True)
-                        previous_status = self.current_status
-                        self.current_status = AgentStatus.CONNECTION_LOST
-                        logger.info(f"Estado actualizado: {previous_status} -> {self.current_status}")
 
-            except (websockets.exceptions.ConnectionClosed,
+            except (websockets.exceptions.ConnectionClosed, 
                     websockets.exceptions.WebSocketException,
-                    ConnectionRefusedError,
-                    asyncio.TimeoutError) as e:
-                self.current_status = AgentStatus.CONNECTION_LOST
-                logger.error(f"🚨 Error de conexión WebSocket: {e}")
-                logger.error(f"Tipo de error: {type(e).__name__}")
-                logger.error(f"Detalles adicionales: {str(e)}")
-                logger.info(f"Esperando {backoff_time}s antes de reintentar...")
+                    ConnectionRefusedError) as e:
+                logger.error(f"🚨 Conexión WebSocket cerrada/fallida: {e}")
                 await asyncio.sleep(backoff_time)
-                backoff_time = min(backoff_time * 2, self.max_reconnect_interval)
-                logger.debug(f"Nuevo tiempo de backoff: {backoff_time}s")
-            
-            except Exception as e:
-                self.current_status = AgentStatus.ERROR
-                logger.error(f"🚨 Error inesperado en la conexión: {e}")
-                logger.error(f"Tipo de error: {type(e).__name__}")
-                if hasattr(e, '__traceback__'):
-                    logger.error(f"Traceback: {traceback.format_exc()}")
-                logger.info(f"Esperando {backoff_time}s antes de reintentar...")
-                await asyncio.sleep(backoff_time)
-                backoff_time = min(backoff_time * 2, self.max_reconnect_interval)
-                logger.debug(f"Nuevo tiempo de backoff: {backoff_time}s")
-    async def _monitor_connection(self, websocket):
-        """Monitorea la salud de la conexión WebSocket."""
-        while True:
-            try:
-                # Verificar tiempo desde último heartbeat
-                time_since_last_heartbeat = time.time() - self.last_heartbeat_received
-                
-                if time_since_last_heartbeat > self.heartbeat_timeout:
-                    logger.warning("⚠️ Timeout de heartbeat detectado")
-                    self.current_status = AgentStatus.CONNECTION_LOST
-                    return
-                
-                # Verificar el estado de la conexión usando ping/pong
-                try:
-                    pong_waiter = await websocket.ping()
-                    await asyncio.wait_for(pong_waiter, timeout=self.ws_ping_timeout)
-                except (asyncio.TimeoutError, websockets.exceptions.ConnectionClosed):
-                    logger.warning("⚠️ WebSocket no responde a ping")
-                    self.current_status = AgentStatus.CONNECTION_LOST
-                    return
-                    
-                await asyncio.sleep(5)  # Verificar cada 5 segundos
+                backoff_time = min(backoff_time * 2, max_backoff)
                 
             except Exception as e:
-                logger.error(f"🚨 Error en monitor de conexión: {e}")
-                self.current_status = AgentStatus.CONNECTION_LOST
-                return
-
-
+                logger.error(f"🚨 Error inesperado en la conexión WebSocket: {e}")
+                await asyncio.sleep(backoff_time)
 
     async def _handle_connection(self, websocket):
         """Maneja la conexión WebSocket activa."""
@@ -377,7 +277,6 @@ class AgentService:
     async def _handle_heartbeat(self, websocket):
         """Maneja los mensajes de heartbeat."""
         try:
-            self.last_heartbeat_received = time.time()
             response = {
                 'type': 'heartbeat_response',
                 'status': self.current_status,
@@ -387,49 +286,37 @@ class AgentService:
             logger.debug("Heartbeat enviado correctamente")
         except Exception as e:
             logger.error(f"Error sending heartbeat response: {e}")
-            raise
-
+            raise  # Propagar el error para forzar reconexión
     async def _heartbeat_loop(self, websocket):
         """Mantiene el heartbeat activo con el servidor."""
         heartbeat_interval = 30  # 30 segundos entre heartbeats
-        retry_count = 0
-        max_retries = 3
+        last_heartbeat = 0
         
-        while True:
-            try:
-                heartbeat_message = json.dumps({
-                    'type': 'heartbeat',
-                    'status': self.current_status,
-                    'timestamp': datetime.utcnow().isoformat()
-                })
+        try:
+            while True:
+                current_time = time.time()
                 
-                try:
-                    await asyncio.wait_for(
-                        websocket.send(heartbeat_message),
-                        timeout=self.ws_ping_timeout
-                    )
-                    retry_count = 0  # Reset contador de reintentos si el envío fue exitoso
-                    
-                except asyncio.TimeoutError:
-                    retry_count += 1
-                    logger.warning(f"Timeout enviando heartbeat (intento {retry_count}/{max_retries})")
-                    if retry_count >= max_retries:
-                        logger.error("Demasiados fallos de heartbeat consecutivos")
-                        self.current_status = AgentStatus.CONNECTION_LOST
-                        return
-                    continue
+                # Verificar si es tiempo de enviar heartbeat
+                if current_time - last_heartbeat >= heartbeat_interval:
+                    try:
+                        # Enviar heartbeat
+                        await websocket.send(json.dumps({
+                            'type': 'heartbeat',
+                            'status': self.current_status,
+                            'timestamp': datetime.utcnow().isoformat()
+                        }))
+                        last_heartbeat = current_time
+                        
+                    except Exception as e:
+                        logger.error(f"Error enviando heartbeat: {e}")
+                        raise
+                        
+                # Esperar un tiempo corto antes de la siguiente iteración
+                await asyncio.sleep(1)
                 
-                await asyncio.sleep(heartbeat_interval)
-                
-            except websockets.exceptions.ConnectionClosed:
-                logger.error("Conexión cerrada durante heartbeat")
-                self.current_status = AgentStatus.CONNECTION_LOST
-                return
-                
-            except Exception as e:
-                logger.error(f"Error en heartbeat loop: {e}")
-                self.current_status = AgentStatus.ERROR
-                return
+        except Exception as e:
+            logger.error(f"Error fatal en heartbeat loop: {e}")
+            raise  # Propagar el error para reiniciar la conexión
     async def _send_error_response(self, websocket, error_message: str):
         """Envía una respuesta de error al servidor."""
         try:
