@@ -400,109 +400,81 @@ function initializeFormHandlers() {
     }
 }
 // Función para inicializar el select de drivers
-// Función para inicializar el select de drivers
 async function initializeDriverSelect() {
-    // Obtener el elemento select del DOM
     const driverSelect = document.getElementById('driver');
     if (!driverSelect) return;
 
     try {
-        // Mostrar mensaje de carga
         addLogMessage('Cargando lista de drivers...', 'info');
         
-        // Obtener la URL base segura y hacer la petición fetch
-        const baseUrl = getSecureBaseUrl();
+        // Asegurar que siempre usamos HTTPS
+        const baseUrl = `${window.location.protocol}//${window.location.host}`;
         const response = await fetch(`${baseUrl}/api/v1/drivers`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
-            // Asegurar que se envían las credenciales si es necesario
+            // Importante: Asegurar que las credenciales se envían
             credentials: 'same-origin'
         });
 
-        // Verificar si la respuesta es exitosa
         if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            throw new Error(
-                errorData.detail || 
-                `Error al obtener drivers. Status: ${response.status}`
-            );
+            const errorText = await response.text();
+            let errorMessage;
+            try {
+                const errorJson = JSON.parse(errorText);
+                errorMessage = errorJson.detail || `Error al obtener drivers. Status: ${response.status}`;
+            } catch {
+                errorMessage = `Error al obtener drivers. Status: ${response.status}`;
+            }
+            throw new Error(errorMessage);
         }
 
-        // Parsear la respuesta JSON
         const drivers = await response.json();
         
-        // Validar que la respuesta sea un array
         if (!Array.isArray(drivers)) {
             throw new Error('El formato de datos devuelto no es válido');
         }
 
-        // Limpiar el select y agregar la opción por defecto
-        driverSelect.innerHTML = `
-            <option value="" disabled selected>
-                Seleccione un driver
-            </option>
-        `;
+        // Limpiar y deshabilitar el select mientras se cargan los datos
+        driverSelect.disabled = true;
+        driverSelect.innerHTML = '<option value="">Cargando drivers...</option>';
 
         // Ordenar drivers por fabricante y modelo
         const sortedDrivers = drivers.sort((a, b) => {
-            const manufComp = a.manufacturer.localeCompare(b.manufacturer);
-            if (manufComp !== 0) return manufComp;
+            const manufacturerCompare = a.manufacturer.localeCompare(b.manufacturer);
+            if (manufacturerCompare !== 0) return manufacturerCompare;
             return a.model.localeCompare(b.model);
         });
 
-        // Agregar cada driver como una opción al select
+        // Reiniciar el select con la opción por defecto
+        driverSelect.innerHTML = '<option value="">Seleccione un driver</option>';
+
+        // Agregar las opciones de drivers
         sortedDrivers.forEach((driver) => {
             const option = document.createElement('option');
             option.value = driver.id;
             option.textContent = `${driver.manufacturer} - ${driver.model} (${driver.driver_filename})`;
-            
-            // Agregar atributos de datos adicionales si son necesarios
-            option.dataset.manufacturer = driver.manufacturer;
-            option.dataset.model = driver.model;
-            option.dataset.filename = driver.driver_filename;
-            
             driverSelect.appendChild(option);
         });
 
-        // Mostrar mensaje de éxito
-        addLogMessage('Drivers cargados correctamente', 'success');
-        
-        // Habilitar el select si estaba deshabilitado
+        // Habilitar el select y mostrar mensaje de éxito
         driverSelect.disabled = false;
-
-        // Disparar evento personalizado para notificar que los drivers se han cargado
-        driverSelect.dispatchEvent(new CustomEvent('driversLoaded', {
-            detail: { drivers: sortedDrivers }
-        }));
+        addLogMessage('Drivers cargados correctamente', 'success');
 
     } catch (error) {
-        // Manejo de errores
         console.error('Error completo inicializando drivers:', error);
+        
+        // Mostrar mensaje de error en el select
+        driverSelect.innerHTML = '<option value="">Error al cargar drivers</option>';
+        driverSelect.disabled = true;
         
         // Mostrar mensajes de error
         addLogMessage(`Error al cargar drivers: ${error.message}`, 'error');
         showNotification(`Error al cargar drivers: ${error.message}`, 'error');
-        
-        // Deshabilitar el select en caso de error
-        driverSelect.disabled = true;
-        
-        // Agregar una opción que indique el error
-        driverSelect.innerHTML = `
-            <option value="" disabled selected>
-                Error al cargar drivers
-            </option>
-        `;
-        
-        // Disparar evento de error
-        driverSelect.dispatchEvent(new CustomEvent('driversError', {
-            detail: { error: error.message }
-        }));
     }
 }
-
 
 // Función para mostrar el modal de instalación de impresora
 function showInstallPrinter(agentToken) {
