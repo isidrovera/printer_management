@@ -7,7 +7,7 @@ let agentToDelete = null;
 // Configuración WebSocket
 const WS_CONFIG = {
     // Usar la ubicación actual y asegurarse de que sea WSS
-    url: `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/api/v1/ws/status`,
+    url: `${window.location.protocol === 'https:' ? 'wss:' : 'wss:'}//${window.location.host}/api/v1/ws/status`,
     reconnectInterval: 1000,
     maxReconnectAttempts: 10,
     currentInstallation: null
