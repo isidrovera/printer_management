@@ -1,56 +1,194 @@
 // static/js/agents.js
 
-// Variables globales
+// agents.js - Parte 1: Configuración principal y WebSocket
+
+// Variables globales con logging
 let currentAgentToken = '';
 let agentToDelete = null;
+let wsConnection = null;
+let reconnectAttempts = 0;
 
-// Configuración WebSocket
+// Configuración con logging detallado
 const WS_CONFIG = {
-    url: `wss://${window.location.host}/api/v1/ws/status`,
+    url: `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/api/v1/ws/status`,
     reconnectInterval: 1000,
-    maxReconnectAttempts: 10,  // Aumentamos el número de reintentos
-    currentInstallation: null  // Para trackear instalación en progreso
+    maxReconnectAttempts: 10,
+    currentInstallation: null
 };
+
+// Logger mejorado
+const Logger = {
+    group: (name) => {
+        console.group(`🔍 ${name}`);
+    },
+    groupEnd: () => console.groupEnd(),
+    info: (msg, data) => {
+        console.log(`ℹ️ ${msg}`, data || '');
+    },
+    success: (msg, data) => {
+        console.log(`✅ ${msg}`, data || '');
+    },
+    warning: (msg, data) => {
+        console.warn(`⚠️ ${msg}`, data || '');
+    },
+    error: (msg, error) => {
+        console.error(`❌ ${msg}`, error || '');
+    }
+};
+
+// Función para obtener la URL base segura
+function getSecureBaseUrl() {
+    const baseUrl = `${window.location.protocol}//${window.location.host}`;
+    Logger.info('Base URL generada:', baseUrl);
+    return baseUrl;
+}
 
 // Inicialización cuando el DOM está listo
 document.addEventListener('DOMContentLoaded', function () {
-    initializeWebSocket();
-    initializeSearchFilter();
-    initializeFormHandlers();
-    initializeDriverSelect(); // Añadido para cargar drivers al inicio
-});
-// Función para manejar la reconexión del WebSocket
-function handleWebSocketReconnection(event) {
-    console.log('WebSocket cerrado. Código:', event.code);
-    addLogMessage({
-        timestamp: new Date().toISOString().replace('T', ' ').split('.')[0],
-        type: 'warning',
-        message: 'Conexión interrumpida. Reintentando...'
-    });
-
-    // Si hay una instalación en progreso, intentar reconectar
-    if (WS_CONFIG.currentInstallation) {
-        if (reconnectAttempts < WS_CONFIG.maxReconnectAttempts) {
-            reconnectAttempts++;
-            console.log(`Intento de reconexión ${reconnectAttempts} de ${WS_CONFIG.maxReconnectAttempts}`);
-            setTimeout(initializeWebSocket, WS_CONFIG.reconnectInterval);
-        } else {
-            addLogMessage({
-                timestamp: new Date().toISOString().replace('T', ' ').split('.')[0],
-                type: 'warning',
-                message: 'No se pudo restablecer la conexión. La instalación continúa en segundo plano.'
-            });
-        }
+    Logger.group('Inicialización de la Aplicación');
+    try {
+        Logger.info('Iniciando componentes principales');
+        initializeWebSocket();
+        initializeSearchFilter();
+        initializeFormHandlers();
+        initializeDriverSelect();
+        Logger.success('Componentes principales inicializados correctamente');
+    } catch (error) {
+        Logger.error('Error en la inicialización principal:', error);
     }
+    Logger.groupEnd();
+});
+
+// Inicialización WebSocket con logging detallado
+function initializeWebSocket() {
+    Logger.group('Inicialización WebSocket');
+    
+    try {
+        Logger.info('Intentando conectar WebSocket a:', WS_CONFIG.url);
+        wsConnection = new WebSocket(WS_CONFIG.url);
+
+        wsConnection.onopen = () => {
+            Logger.success('WebSocket conectado exitosamente');
+            reconnectAttempts = 0;
+            showNotification('Conexión establecida con el servidor', 'success');
+            addLogMessage('Conexión establecida con el servidor', 'success');
+        };
+
+        wsConnection.onmessage = handleWebSocketMessage;
+        wsConnection.onclose = handleWebSocketClose;
+        wsConnection.onerror = handleWebSocketError;
+
+    } catch (error) {
+        Logger.error('Error al crear conexión WebSocket:', error);
+        showNotification('Error al crear la conexión con el servidor', 'error');
+        addLogMessage('Error al crear la conexión con el servidor', 'error');
+    }
+
+    Logger.groupEnd();
 }
 
-// Función para añadir un mensaje de log
+// Manejador de mensajes WebSocket
+function handleWebSocketMessage(event) {
+    Logger.group('Mensaje WebSocket Recibido');
+    
+    try {
+        Logger.info('Mensaje raw recibido:', event.data);
+
+        if (typeof event.data === 'string' && event.data.startsWith('Agent')) {
+            Logger.info('Procesando mensaje de log del agente');
+            handleAgentLogMessage(event.data);
+            return;
+        }
+
+        // Intentar parsear como JSON
+        let data = JSON.parse(event.data);
+        Logger.success('JSON parseado correctamente:', data);
+        
+        if (data && data.type) {
+            processJsonMessage(data);
+        } else {
+            Logger.warning('Mensaje JSON sin tipo específico:', data);
+        }
+
+    } catch (error) {
+        Logger.error('Error procesando mensaje WebSocket:', error);
+        addLogMessage('Error al procesar mensaje: ' + error.message, 'error');
+    }
+
+    Logger.groupEnd();
+}
+
+// Manejador de cierre de WebSocket
+function handleWebSocketClose(event) {
+    Logger.group('Cierre de WebSocket');
+    Logger.warning('WebSocket cerrado. Código:', event.code);
+    
+    showNotification('Conexión perdida con el servidor', 'warning');
+    addLogMessage('Conexión interrumpida. Reintentando...', 'warning');
+
+    if (reconnectAttempts < WS_CONFIG.maxReconnectAttempts) {
+        reconnectAttempts++;
+        Logger.info(`Intento de reconexión ${reconnectAttempts} de ${WS_CONFIG.maxReconnectAttempts}`);
+        setTimeout(initializeWebSocket, WS_CONFIG.reconnectInterval);
+    } else {
+        Logger.error('Máximo número de intentos de reconexión alcanzado');
+        showNotification('No se pudo restablecer la conexión con el servidor', 'error');
+    }
+
+    Logger.groupEnd();
+}
+
+// Manejador de errores WebSocket
+function handleWebSocketError(error) {
+    Logger.group('Error WebSocket');
+    Logger.error('Error en la conexión WebSocket:', error);
+    showNotification('Error en la conexión con el servidor', 'error');
+    addLogMessage('Error en la conexión con el servidor', 'error');
+    Logger.groupEnd();
+}
+
+// Procesar diferentes tipos de mensajes JSON
+function processJsonMessage(data) {
+    Logger.group('Procesamiento de Mensaje JSON');
+    Logger.info('Tipo de mensaje:', data.type);
+
+    try {
+        switch (data.type) {
+            case 'agent_status':
+                updateAgentStatus(data);
+                break;
+            case 'printer_status':
+                updatePrinterStatus(data);
+                break;
+            case 'error':
+                handleErrorMessage(data);
+                break;
+            default:
+                Logger.warning('Tipo de mensaje no reconocido:', data.type);
+        }
+    } catch (error) {
+        Logger.error('Error procesando mensaje JSON:', error);
+    }
+
+    Logger.groupEnd();
+}
+// agents.js - Parte 2: UI y Actualizaciones de Estado
+
+// Función para añadir mensaje de log con timestamp
 function addLogMessage(message, type = 'info') {
-    const logContainer = document.getElementById('logMessages');
-    if (logContainer) {
+    Logger.group('Agregar Mensaje de Log');
+    
+    try {
+        const logContainer = document.getElementById('logMessages');
+        if (!logContainer) {
+            Logger.warning('Contenedor de logs no encontrado');
+            return;
+        }
+
         const logEntry = document.createElement('div');
         const timestamp = new Date().toLocaleTimeString();
         
+        // Configurar clases y símbolos según el tipo
         let classes = 'py-1 px-2 rounded';
         let symbol = '';
         switch (type) {
@@ -77,406 +215,30 @@ function addLogMessage(message, type = 'info') {
         logContainer.appendChild(logEntry);
         logContainer.scrollTop = logContainer.scrollHeight;
 
-        // Mantener solo los últimos N mensajes
+        // Mantener solo los últimos 50 mensajes
         while (logContainer.children.length > 50) {
             logContainer.removeChild(logContainer.firstChild);
         }
-    }
-}
-// Inicializar WebSocket
-function initializeWebSocket() {
-    try {
-        console.group('Inicialización WebSocket');
-        console.log('Intentando conectar WebSocket a:', WS_CONFIG.url);
-        
-        wsConnection = new WebSocket(WS_CONFIG.url);
 
-        wsConnection.onopen = () => {
-            console.log('✅ WebSocket conectado exitosamente');
-            reconnectAttempts = 0;
-            showNotification('Conexión establecida con el servidor', 'success');
-            addLogMessage('Conexión establecida con el servidor', 'success');
-        };
-
-        wsConnection.onmessage = (event) => {
-            console.group('Mensaje WebSocket Recibido');
-            console.log('Mensaje raw:', event.data);
-
-            try {
-                // Verificar si es un mensaje de log del agente
-                if (typeof event.data === 'string' && event.data.startsWith('Agent')) {
-                    console.log('📝 Mensaje de log del agente:', event.data);
-                    handleAgentLogMessage(event.data);
-                    console.groupEnd();
-                    return;
-                }
-
-                // Intentar parsear como JSON
-                let data;
-                try {
-                    data = JSON.parse(event.data);
-                    console.log('✅ JSON parseado correctamente:', data);
-                } catch (parseError) {
-                    console.warn('⚠️ No se pudo parsear como JSON:', {
-                        error: parseError,
-                        rawData: event.data.slice(0, 100) + (event.data.length > 100 ? '...' : '')
-                    });
-                    handleAgentLogMessage(event.data);
-                    console.groupEnd();
-                    return;
-                }
-
-                // Procesar mensaje JSON según su tipo
-                if (data && data.type) {
-                    console.log(`🔄 Procesando mensaje de tipo: ${data.type}`);
-                    processJsonMessage(data);
-                } else {
-                    console.log('ℹ️ Mensaje JSON sin tipo específico:', data);
-                }
-
-            } catch (error) {
-                console.error('❌ Error procesando mensaje:', error);
-                addLogMessage('Error al procesar mensaje: ' + error.message, 'error');
-            }
-            console.groupEnd();
-        };
-
-        wsConnection.onclose = (event) => {
-            console.warn('⚠️ WebSocket cerrado. Código:', event.code);
-            handleWebSocketClose(event);
-        };
-
-        wsConnection.onerror = (error) => {
-            console.error('❌ Error en WebSocket:', error);
-            showNotification('Error en la conexión con el servidor', 'error');
-            addLogMessage('Error en la conexión con el servidor', 'error');
-        };
-
+        Logger.success('Mensaje de log agregado correctamente');
     } catch (error) {
-        console.error('❌ Error al crear conexión WebSocket:', error);
-        showNotification('Error al crear la conexión con el servidor', 'error');
-        addLogMessage('Error al crear la conexión con el servidor', 'error');
-    }
-}
-
-// Procesar diferentes tipos de mensajes JSON
-function processJsonMessage(data) {
-    switch (data.type) {
-        case 'agent_status':
-            updateAgentStatus(data);
-            break;
-        case 'printer_status':
-            updatePrinterStatus(data);
-            break;
-        case 'error':
-            handleErrorMessage(data);
-            break;
-        default:
-            console.log('📌 Mensaje recibido sin tipo específico:', data);
-    }
-}
-
-// Manejar mensajes de log del agente
-function handleAgentLogMessage(message) {
-    let type = 'info';
-    if (message.toLowerCase().includes('error')) {
-        type = 'error';
-    } else if (message.toLowerCase().includes('warning')) {
-        type = 'warning';
-    } else if (message.toLowerCase().includes('success') || message.toLowerCase().includes('completed')) {
-        type = 'success';
+        Logger.error('Error al agregar mensaje de log:', error);
     }
 
-    const cleanMessage = message.replace(/^Agent agt_[^\s]+\s*/, '');
-    addLogMessage(cleanMessage, type);
+    Logger.groupEnd();
 }
 
-
-
-// Funciones auxiliares para manejar diferentes tipos de mensajes
-function updateAgentStatus(data) {
-    try {
-        console.group('Actualización Estado Agente');
-        console.log('Datos recibidos:', data);
-
-        const agentElement = document.querySelector(`[data-agent-id="${data.agent_id}"]`);
-        if (agentElement) {
-            const statusElement = agentElement.querySelector('.agent-status');
-            if (statusElement) {
-                statusElement.className = `agent-status status-${data.status}`;
-                statusElement.textContent = data.status;
-                console.log('✅ Estado del agente actualizado');
-            }
-        } else {
-            console.warn('⚠️ Elemento del agente no encontrado');
-        }
-        console.groupEnd();
-    } catch (error) {
-        console.error('❌ Error al actualizar estado del agente:', error);
-        console.groupEnd();
-    }
-}
-
-// Manejar cierre de WebSocket
-function handleWebSocketClose(event) {
-    showNotification('Conexión perdida con el servidor', 'warning');
-
-    if (reconnectAttempts < WS_CONFIG.maxReconnectAttempts) {
-        reconnectAttempts++;
-        console.log(`🔄 Intento de reconexión ${reconnectAttempts} de ${WS_CONFIG.maxReconnectAttempts}`);
-        setTimeout(initializeWebSocket, WS_CONFIG.reconnectInterval);
-    } else {
-        console.error('❌ Máximo número de intentos de reconexión alcanzado');
-        showNotification('No se pudo restablecer la conexión con el servidor', 'error');
-    }
-}
-
-function updatePrinterStatus(data) {
-    try {
-        console.group('Actualización Estado Impresora');
-        console.log('Datos recibidos:', data);
-
-        const printerElement = document.querySelector(`[data-printer-id="${data.printer_id}"]`);
-        if (printerElement) {
-            const statusElement = printerElement.querySelector('.printer-status');
-            if (statusElement) {
-                statusElement.className = `printer-status status-${data.status}`;
-                statusElement.textContent = data.status;
-                console.log('✅ Estado de la impresora actualizado');
-            }
-        } else {
-            console.warn('⚠️ Elemento de la impresora no encontrado');
-        }
-        console.groupEnd();
-    } catch (error) {
-        console.error('❌ Error al actualizar estado de la impresora:', error);
-        console.groupEnd();
-    }
-}
-
-// Manejar mensajes de error
-function handleErrorMessage(data) {
-    console.error('❌ Error recibido del servidor:', data.error);
-    showNotification(data.error.message || 'Error del servidor', 'error');
-}
-
-
-
-// Función para inicializar el filtro de búsqueda
-function initializeSearchFilter() {
-    const searchInput = document.getElementById('searchInput');
-    if (searchInput) {
-        searchInput.addEventListener('input', function(e) {
-            const searchTerm = e.target.value.toLowerCase();
-            const rows = document.querySelectorAll('tbody tr');
-
-            rows.forEach((row) => {
-                const text = row.textContent.toLowerCase();
-                row.style.display = text.includes(searchTerm) ? '' : 'none';
-            });
-        });
-    }
-}
-
-
-// Función para inicializar manejadores de formularios
-function initializeFormHandlers() {
-    const installForm = document.getElementById('installPrinterForm');
-    if (installForm) {
-        installForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-
-            try {
-                const submitButton = installForm.querySelector('button[type="submit"]');
-                const driverId = document.getElementById('driver').value;
-                const printerIp = document.getElementById('printerIp').value;
-
-                if (!driverId || !printerIp) {
-                    showNotification('Por favor complete todos los campos', 'error');
-                    addLogMessage({
-                        timestamp: new Date().toISOString().replace('T', ' ').split('.')[0],
-                        type: 'error',
-                        message: 'Error: Faltan campos requeridos'
-                    });
-                    return;
-                }
-
-                // Guardar información de la instalación actual
-                WS_CONFIG.currentInstallation = {
-                    driverId,
-                    printerIp,
-                    startTime: new Date()
-                };
-
-                // Deshabilitar el botón de envío y cambiar el texto
-                submitButton.disabled = true;
-                submitButton.innerHTML = 'Instalando...';
-                
-                addLogMessage({
-                    timestamp: new Date().toISOString().replace('T', ' ').split('.')[0],
-                    type: 'info',
-                    message: 'Iniciando instalación de impresora...'
-                });
-
-                const response = await fetch(`/api/v1/printers/install/${currentAgentToken}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        printer_ip: printerIp,
-                        driver_id: parseInt(driverId)
-                    })
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.detail || `Error en la instalación: ${response.status}`);
-                }
-
-                addLogMessage({
-                    timestamp: new Date().toISOString().replace('T', ' ').split('.')[0],
-                    type: 'info',
-                    message: 'Comando enviado. La instalación continúa en segundo plano...'
-                });
-
-                // Cambiar el texto del botón de cerrar
-                const closeButton = document.querySelector('button[onclick="closeModal(\'installPrinterModal\')"]');
-                if (closeButton) {
-                    closeButton.textContent = 'Cerrar ventana';
-                }
-
-                // Deshabilitar los campos del formulario
-                document.getElementById('driver').disabled = true;
-                document.getElementById('printerIp').disabled = true;
-
-            } catch (error) {
-                console.error('Error detallado:', error);
-                addLogMessage({
-                    timestamp: new Date().toISOString().replace('T', ' ').split('.')[0],
-                    type: 'error',
-                    message: `Error: ${error.message}`
-                });
-                
-                // Reactivar el botón de envío en caso de error
-                submitButton.disabled = false;
-                submitButton.innerHTML = 'Instalar';
-                
-                // Limpiar instalación actual
-                WS_CONFIG.currentInstallation = null;
-            }
-        });
-    }
-}
-// Función para inicializar el select de drivers
-async function initializeDriverSelect() {
-    const driverSelect = document.getElementById('driver');
-    if (!driverSelect) return;
-
-    try {
-        addLogMessage('Cargando lista de drivers...', 'info');
-        
-        const response = await fetch('/api/v1/drivers', {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
-        });
-
-        if (!response.ok) {
-            const text = await response.text();
-            throw new Error(`Error al obtener drivers. Status: ${response.status}`);
-        }
-
-        const drivers = await response.json();
-        
-        if (!Array.isArray(drivers)) {
-            throw new Error('El formato de datos devuelto no es válido');
-        }
-
-        driverSelect.innerHTML = '<option value="">Seleccione un driver</option>';
-        drivers.forEach((driver) => {
-            const option = document.createElement('option');
-            option.value = driver.id;
-            option.textContent = `${driver.manufacturer} - ${driver.model} (${driver.driver_filename})`;
-            driverSelect.appendChild(option);
-        });
-
-        addLogMessage('Drivers cargados correctamente', 'success');
-
-    } catch (error) {
-        console.error('Error completo inicializando drivers:', error);
-        addLogMessage(`Error al cargar drivers: ${error.message}`, 'error');
-        showNotification(`Error al cargar drivers: ${error.message}`, 'error');
-    }
-}
-// Función para mostrar el modal de instalación de impresora
-function showInstallPrinter(agentToken) {
-    currentAgentToken = agentToken;
-    
-    const modal = document.getElementById('installPrinterModal');
-    if (modal) {
-        modal.classList.remove('hidden');
-        
-        // Resetear el formulario y habilitar campos
-        const form = document.getElementById('installPrinterForm');
-        form.reset();
-        
-        // Habilitar campos y botones
-        document.getElementById('driver').disabled = false;
-        document.getElementById('printerIp').disabled = false;
-        const submitButton = form.querySelector('button[type="submit"]');
-        if (submitButton) {
-            submitButton.disabled = false;
-            submitButton.innerHTML = 'Instalar';
-        }
-        
-        // Limpiar logs anteriores
-        const logMessages = document.getElementById('logMessages');
-        if (logMessages) {
-            logMessages.innerHTML = '';
-            addLogMessage('Iniciando proceso de instalación...', 'info');
-        }
-        
-        initializeDriverSelect();
-    }
-}
-
-
-// Función para cerrar un modal por ID
-function closeModal(modalId) {
-    const modal = document.getElementById(modalId);
-    if (modal) {
-        // Verificar si hay una instalación en progreso
-        if (WS_CONFIG.currentInstallation) {
-            const installationTime = (new Date() - WS_CONFIG.currentInstallation.startTime) / 1000;
-            if (installationTime < 60) { // Si han pasado menos de 60 segundos
-                if (!confirm('La instalación está en progreso. ¿Está seguro que desea cerrar la ventana?')) {
-                    return;
-                }
-            }
-        }
-        
-        modal.classList.add('hidden');
-        if (modalId === 'installPrinterModal') {
-            document.getElementById('installPrinterForm').reset();
-            WS_CONFIG.currentInstallation = null; // Limpiar instalación actual
-            const logMessages = document.getElementById('logMessages');
-            if (logMessages) {
-                logMessages.innerHTML = '';
-            }
-        }
-    }
-}
 // Función para mostrar notificaciones
 function showNotification(message, type = 'info') {
-    console.log(`[${type.toUpperCase()}] ${message}`);
+    Logger.group('Mostrar Notificación');
     
-    // Implementación de notificación visual
-    const notificationContainer = document.getElementById('notification-container');
-    if (notificationContainer) {
+    try {
+        const notificationContainer = document.getElementById('notification-container');
+        if (!notificationContainer) {
+            Logger.warning('Contenedor de notificaciones no encontrado');
+            return;
+        }
+
         // Crear elemento de notificación
         const notification = document.createElement('div');
         notification.classList.add('notification', `notification-${type}`);
@@ -490,390 +252,476 @@ function showNotification(message, type = 'info') {
         const closeButton = notification.querySelector('.close-notification');
         closeButton.addEventListener('click', () => {
             notification.remove();
+            Logger.info('Notificación cerrada por el usuario');
         });
 
         notificationContainer.appendChild(notification);
 
-        // Eliminar la notificación después de unos segundos
+        // Auto-eliminar después de 5 segundos
         setTimeout(() => {
             notification.classList.add('fade-out');
             setTimeout(() => {
                 notification.remove();
+                Logger.info('Notificación eliminada automáticamente');
             }, 500);
         }, 5000);
+
+        Logger.success('Notificación mostrada correctamente');
+    } catch (error) {
+        Logger.error('Error al mostrar notificación:', error);
     }
+
+    Logger.groupEnd();
 }
 
-
-async function showAgentInfo(agentId) {
-    const modal = document.getElementById("agentInfoModal");
-    const content = document.getElementById("agentInfoContent");
-
-    modal.classList.remove("hidden");
-    content.innerHTML = `
-        <div class="flex justify-center items-center p-8">
-            <i class="fas fa-circle-notch fa-spin text-blue-500 text-3xl mr-3"></i>
-            <span class="text-gray-600 text-lg">Cargando información...</span>
-        </div>
-    `;
+// Función para actualizar estado del agente
+function updateAgentStatus(data) {
+    Logger.group('Actualización Estado Agente');
+    Logger.info('Datos de actualización:', data);
 
     try {
-        const response = await fetch(`/api/v1/agents/${agentId}`);
-        if (!response.ok) {
-            throw new Error(`Error al cargar los datos: ${response.status}`);
+        const agentElement = document.querySelector(`[data-agent-id="${data.agent_id}"]`);
+        if (!agentElement) {
+            Logger.warning('Elemento del agente no encontrado:', data.agent_id);
+            return;
         }
-        const agent = await response.json();
-        console.log('Datos del agente:', agent);
 
-        content.innerHTML = `
-            <div class="grid grid-cols-2 gap-6 p-4">
-                <!-- Información Básica del Agente -->
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                        <i class="fas fa-desktop text-blue-500 mr-2"></i>
-                        Información del Agente
-                    </h2>
-                    <div class="space-y-4">
-                        <div class="flex items-center">
-                            <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
-                                <i class="fas fa-laptop text-blue-500"></i>
-                            </div>
-                            <div class="ml-3 flex-1">
-                                <span class="text-sm text-gray-500">Hostname</span>
-                                <p class="font-medium">${agent.hostname}</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center">
-                            <div class="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center">
-                                <i class="fas fa-user text-green-500"></i>
-                            </div>
-                            <div class="ml-3 flex-1">
-                                <span class="text-sm text-gray-500">Usuario</span>
-                                <p class="font-medium">${agent.username}</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center">
-                            <div class="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center">
-                                <i class="fas fa-network-wired text-purple-500"></i>
-                            </div>
-                            <div class="ml-3 flex-1">
-                                <span class="text-sm text-gray-500">IP</span>
-                                <p class="font-medium">${agent.ip_address}</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center">
-                            <div class="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center">
-                                <i class="fas fa-cog text-indigo-500"></i>
-                            </div>
-                            <div class="ml-3 flex-1">
-                                <span class="text-sm text-gray-500">Tipo de Dispositivo</span>
-                                <p class="font-medium">${agent.device_type}</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center">
-                            <div class="w-10 h-10 rounded-lg bg-${agent.status === 'online' ? 'green' : 'red'}-50 flex items-center justify-center">
-                                <i class="fas fa-circle text-${agent.status === 'online' ? 'green' : 'red'}-500"></i>
-                            </div>
-                            <div class="ml-3 flex-1">
-                                <span class="text-sm text-gray-500">Estado</span>
-                                <p class="font-medium capitalize">${agent.status}</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center">
-                            <div class="w-10 h-10 rounded-lg bg-yellow-50 flex items-center justify-center">
-                                <i class="fas fa-key text-yellow-500"></i>
-                            </div>
-                            <div class="ml-3 flex-1">
-                                <span class="text-sm text-gray-500">Token</span>
-                                <p class="font-mono text-sm">${agent.token}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        const statusElement = agentElement.querySelector('.agent-status');
+        if (!statusElement) {
+            Logger.warning('Elemento de estado no encontrado');
+            return;
+        }
 
-                <!-- Información del Sistema -->
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                        <i class="fas fa-microchip text-indigo-500 mr-2"></i>
-                        Sistema Operativo
-                    </h2>
-                    <div class="space-y-4">
-                        <div class="flex items-center">
-                            <div class="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center">
-                                <i class="fas fa-windows text-indigo-500"></i>
-                            </div>
-                            <div class="ml-3 flex-1">
-                                <span class="text-sm text-gray-500">Sistema Operativo</span>
-                                <p class="font-medium">${agent.system_info.Sistema["Nombre del SO"]}</p>
-                                <p class="text-sm text-gray-500">Versión ${agent.system_info.Sistema["Versión del SO"]}</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center">
-                            <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
-                                <i class="fas fa-microchip text-blue-500"></i>
-                            </div>
-                            <div class="ml-3 flex-1">
-                                <span class="text-sm text-gray-500">Arquitectura</span>
-                                <p class="font-medium">${agent.system_info.Sistema.Arquitectura}</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center">
-                            <div class="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center">
-                                <i class="fas fa-laptop text-green-500"></i>
-                            </div>
-                            <div class="ml-3 flex-1">
-                                <span class="text-sm text-gray-500">Nombre del dispositivo</span>
-                                <p class="font-medium">${agent.system_info.Sistema["Nombre del dispositivo"]}</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center">
-                            <div class="w-10 h-10 rounded-lg bg-red-50 flex items-center justify-center">
-                                <i class="fas fa-user text-red-500"></i>
-                            </div>
-                            <div class="ml-3 flex-1">
-                                <span class="text-sm text-gray-500">Nombre del usuario</span>
-                                <p class="font-medium">${agent.system_info.Sistema["Nombre del usuario"]}</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center">
-                            <div class="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center">
-                                <i class="fas fa-microchip text-purple-500"></i>
-                            </div>
-                            <div class="ml-3 flex-1">
-                                <span class="text-sm text-gray-500">Procesador</span>
-                                <p class="font-medium">${agent.system_info.Sistema.Procesador}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Información de Hardware -->
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                        <i class="fas fa-memory text-red-500 mr-2"></i>
-                        Hardware
-                    </h2>
-                    <div class="space-y-4">
-                        <!-- CPU -->
-                        <div class="border-b pb-4">
-                            <div class="flex items-center">
-                                <div class="w-10 h-10 rounded-lg bg-red-50 flex items-center justify-center">
-                                    <i class="fas fa-microchip text-red-500"></i>
-                                </div>
-                                <div class="ml-3 flex-1">
-                                    <span class="text-sm text-gray-500">Procesador</span>
-                                    <p class="font-medium">${agent.system_info.CPU.Modelo}</p>
-                                    <div class="grid grid-cols-2 gap-2 mt-1">
-                                        <p class="text-sm text-gray-500">
-                                            Núcleos físicos: ${agent.system_info.CPU["Núcleos físicos"]}
-                                        </p>
-                                        <p class="text-sm text-gray-500">
-                                            Núcleos lógicos: ${agent.system_info.CPU["Núcleos lógicos"]}
-                                        </p>
-                                        <p class="text-sm text-gray-500">
-                                            Frecuencia: ${agent.system_info.CPU["Frecuencia (MHz)"]} MHz
-                                        </p>
-                                        <p class="text-sm text-gray-500">
-                                            Uso actual: ${agent.system_info.CPU["Uso actual (%)"]}%
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- RAM -->
-                        <div class="border-b pb-4">
-                            <div class="flex items-center">
-                                <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
-                                    <i class="fas fa-memory text-blue-500"></i>
-                                </div>
-                                <div class="ml-3 flex-1">
-                                    <span class="text-sm text-gray-500">Memoria RAM</span>
-                                    <p class="font-medium">${agent.system_info.Memoria["Total RAM (GB)"]} GB Total</p>
-                                    <div class="grid grid-cols-2 gap-2 mt-1">
-                                        <p class="text-sm text-gray-500">
-                                            Disponible: ${agent.system_info.Memoria["Disponible RAM (GB)"]} GB
-                                        </p>
-                                        <p class="text-sm text-gray-500">
-                                            Uso: ${agent.system_info.Memoria["Uso de RAM (%)"]}%
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Batería -->
-                        <div class="border-b pb-4">
-                            <div class="flex items-center">
-                                <div class="w-10 h-10 rounded-lg bg-yellow-50 flex items-center justify-center">
-                                    <i class="fas fa-battery-full text-yellow-500"></i>
-                                </div>
-                                <div class="ml-3 flex-1">
-                                    <span class="text-sm text-gray-500">Batería</span>
-                                    <p class="font-medium">${agent.system_info.Batería.Porcentaje}% ${agent.system_info.Batería.Enchufado ? '(Conectado)' : '(Desconectado)'}</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- GPU -->
-                        <div class="">
-                            <div class="flex items-center">
-                                <div class="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center">
-                                    <i class="fas fa-desktop text-green-500"></i>
-                                </div>
-                                <div class="ml-3 flex-1">
-                                    <span class="text-sm text-gray-500">Tarjeta Gráfica</span>
-                                    <p class="font-medium">${agent.system_info["Tarjetas Gráficas"]}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Información de Almacenamiento -->
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                        <i class="fas fa-hdd text-purple-500 mr-2"></i>
-                        Almacenamiento
-                    </h2>
-                    <div class="space-y-4">
-                        <!-- Resumen de Espacio -->
-                        <div class="border-b pb-4">
-                            <div class="flex items-center">
-                                <div class="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center">
-                                    <i class="fas fa-chart-pie text-purple-500"></i>
-                                </div>
-                                <div class="ml-3 flex-1">
-                                    <span class="text-sm text-gray-500">Espacio Total</span>
-                                    <p class="font-medium">${agent.system_info["Espacio en Disco"]["Total (GB)"]} GB</p>
-                                    <div class="grid grid-cols-2 gap-2 mt-1">
-                                        <p class="text-sm text-gray-500">
-                                            Usado: ${agent.system_info["Espacio en Disco"]["Usado (GB)"]} GB
-                                        </p>
-                                        <p class="text-sm text-gray-500">
-                                            Libre: ${agent.system_info["Espacio en Disco"]["Libre (GB)"]} GB
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Detalles de Discos -->
-                        ${agent.system_info.Discos.map((disco, index) => `
-                            <div class="border-b last:border-0 pb-4 last:pb-0">
-                                <div class="flex items-center">
-                                    <div class="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center">
-                                        <i class="fas fa-hdd text-purple-500"></i>
-                                    </div>
-                                    <div class="ml-3 flex-1">
-                                        <span class="text-sm text-gray-500">Disco ${disco.Dispositivo}</span>
-                                        <p class="font-medium">${disco["Total (GB)"]} GB (${disco["Tipo de sistema de archivos"]})</p>
-                                        <div class="grid grid-cols-2 gap-2 mt-1">
-                                            <p class="text-sm text-gray-500">
-                                                Punto de montaje: ${disco["Punto de montaje"]}
-                                            </p>
-                                            <p class="text-sm text-gray-500">
-                                                Usado: ${disco["Usado (GB)"]} GB
-                                            </p>
-                                            <p class="text-sm text-gray-500">
-                                                Disponible: ${disco["Disponible (GB)"]} GB
-                                            </p>
-                                            <p class="text-sm text-gray-500">
-                                                Uso: ${disco["Porcentaje de uso (%)"]}%
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-
-                <!-- Información de Red -->
-                <div class="col-span-2 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                        <i class="fas fa-network-wired text-blue-500 mr-2"></i>
-                        Interfaces de Red
-                    </h2>
-                    <div class="grid grid-cols-2 gap-4">
-                        ${Object.entries(agent.system_info.Red).map(([interfaceName, configs]) => `
-                            <div class="bg-gray-50 rounded-lg p-4">
-                                <div class="flex items-center mb-3">
-                                    <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
-                                        <i class="fas fa-${
-                                            interfaceName.toLowerCase().includes('wi-fi') ? 'wifi' : 
-                                            interfaceName.toLowerCase().includes('ethernet') ? 'ethernet' : 
-                                            interfaceName.toLowerCase().includes('bluetooth') ? 'bluetooth' : 
-                                            'network-wired'
-                                        } text-blue-500"></i>
-                                    </div>
-                                    <div class="ml-3">
-                                        <span class="font-medium text-gray-900">${interfaceName}</span>
-                                    </div>
-                                </div>
-                                <div class="space-y-2">
-                                    ${configs.map(config => `
-                                        <div class="bg-white rounded p-2">
-                                            <div class="flex justify-between items-center">
-                                                <span class="text-sm text-gray-500">${config.Tipo}:</span>
-                                                <span class="text-sm font-medium">${config.Dirección}</span>
-                                            </div>
-                                            ${config["Máscara de red"] ? `
-                                                <div class="flex justify-between items-center mt-1">
-                                                    <span class="text-sm text-gray-500">Máscara:</span>
-                                                    <span class="text-sm font-medium">${config["Máscara de red"]}</span>
-                                                </div>
-                                            ` : ''}
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-            </div>
-        `;
+        statusElement.className = `agent-status status-${data.status}`;
+        statusElement.textContent = data.status;
+        Logger.success('Estado del agente actualizado correctamente');
 
     } catch (error) {
-        console.error('Error:', error);
-        content.innerHTML = `
-            <div class="text-center py-8">
-                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-100 mb-4">
-                    <i class="fas fa-exclamation-circle text-red-500 text-2xl"></i>
-                </div>
-                <h3 class="text-lg font-medium text-gray-900 mb-2">Error al cargar la información</h3>
-                <p class="text-sm text-gray-500">${error.message}</p>
-            </div>
-        `;
+        Logger.error('Error al actualizar estado del agente:', error);
     }
+
+    Logger.groupEnd();
 }
 
-function closeModal(modalId) {
-    document.getElementById(modalId).classList.add("hidden");
+// Función para actualizar estado de la impresora
+function updatePrinterStatus(data) {
+    Logger.group('Actualización Estado Impresora');
+    Logger.info('Datos de actualización:', data);
+
+    try {
+        const printerElement = document.querySelector(`[data-printer-id="${data.printer_id}"]`);
+        if (!printerElement) {
+            Logger.warning('Elemento de la impresora no encontrado:', data.printer_id);
+            return;
+        }
+
+        const statusElement = printerElement.querySelector('.printer-status');
+        if (!statusElement) {
+            Logger.warning('Elemento de estado no encontrado');
+            return;
+        }
+
+        statusElement.className = `printer-status status-${data.status}`;
+        statusElement.textContent = data.status;
+        Logger.success('Estado de la impresora actualizado correctamente');
+
+    } catch (error) {
+        Logger.error('Error al actualizar estado de la impresora:', error);
+    }
+
+    Logger.groupEnd();
 }
 
+// Función para manejar mensajes de error
+function handleErrorMessage(data) {
+    Logger.group('Manejo de Mensaje de Error');
+    Logger.error('Error recibido del servidor:', data.error);
+    
+    showNotification(data.error.message || 'Error del servidor', 'error');
+    addLogMessage(data.error.message || 'Error del servidor', 'error');
+    
+    Logger.groupEnd();
+}
 
-async function deleteAgent(agentId) {
-    if (!confirm("¿Estás seguro de que deseas eliminar este agente?")) {
+// Función para inicializar el filtro de búsqueda
+function initializeSearchFilter() {
+    Logger.group('Inicialización Filtro de Búsqueda');
+
+    try {
+        const searchInput = document.getElementById('searchInput');
+        if (!searchInput) {
+            Logger.warning('Elemento de búsqueda no encontrado');
+            return;
+        }
+
+        searchInput.addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('tbody tr');
+
+            Logger.info('Término de búsqueda:', searchTerm);
+            Logger.info('Número de filas a filtrar:', rows.length);
+
+            rows.forEach((row) => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+
+            Logger.success('Filtro aplicado correctamente');
+        });
+
+        Logger.success('Filtro de búsqueda inicializado');
+    } catch (error) {
+        Logger.error('Error al inicializar filtro de búsqueda:', error);
+    }
+
+    Logger.groupEnd();
+}
+// agents.js - Parte 3: Manejadores de Formularios e Interacciones API
+
+// Función para inicializar manejadores de formularios
+function initializeFormHandlers() {
+    Logger.group('Inicialización Manejadores de Formularios');
+
+    try {
+        const installForm = document.getElementById('installPrinterForm');
+        if (!installForm) {
+            Logger.warning('Formulario de instalación no encontrado');
+            return;
+        }
+
+        installForm.addEventListener('submit', handleInstallFormSubmit);
+        Logger.success('Manejadores de formulario inicializados');
+    } catch (error) {
+        Logger.error('Error al inicializar manejadores de formulario:', error);
+    }
+
+    Logger.groupEnd();
+}
+
+// Manejador del envío del formulario de instalación
+async function handleInstallFormSubmit(e) {
+    e.preventDefault();
+    Logger.group('Procesando Envío de Formulario de Instalación');
+
+    try {
+        const submitButton = e.target.querySelector('button[type="submit"]');
+        const driverId = document.getElementById('driver').value;
+        const printerIp = document.getElementById('printerIp').value;
+
+        // Validación de campos
+        if (!driverId || !printerIp) {
+            Logger.warning('Campos incompletos en el formulario');
+            showNotification('Por favor complete todos los campos', 'error');
+            addLogMessage('Error: Faltan campos requeridos', 'error');
+            return;
+        }
+
+        // Guardar información de la instalación actual
+        WS_CONFIG.currentInstallation = {
+            driverId,
+            printerIp,
+            startTime: new Date()
+        };
+
+        Logger.info('Iniciando instalación con datos:', WS_CONFIG.currentInstallation);
+
+        // Deshabilitar interfaz durante la instalación
+        disableInstallationInterface(submitButton);
+        addLogMessage('Iniciando instalación de impresora...', 'info');
+
+        const response = await fetch(`${getSecureBaseUrl()}/api/v1/printers/install/${currentAgentToken}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                printer_ip: printerIp,
+                driver_id: parseInt(driverId)
+            })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.detail || `Error en la instalación: ${response.status}`);
+        }
+
+        Logger.success('Comando de instalación enviado correctamente');
+        addLogMessage('Comando enviado. La instalación continúa en segundo plano...', 'info');
+        updateInstallationInterface();
+
+    } catch (error) {
+        Logger.error('Error en la instalación:', error);
+        handleInstallationError(error);
+    }
+
+    Logger.groupEnd();
+}
+
+// Función para inicializar el select de drivers
+async function initializeDriverSelect() {
+    Logger.group('Inicialización Select de Drivers');
+
+    const driverSelect = document.getElementById('driver');
+    if (!driverSelect) {
+        Logger.warning('Elemento select de drivers no encontrado');
         return;
     }
 
     try {
-        const response = await fetch(`/api/v1/agents/${agentId}`, {
+        addLogMessage('Cargando lista de drivers...', 'info');
+        
+        const response = await fetch(`${getSecureBaseUrl()}/api/v1/drivers`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error al obtener drivers. Status: ${response.status}`);
+        }
+
+        const drivers = await response.json();
+        
+        if (!Array.isArray(drivers)) {
+            throw new Error('El formato de datos devuelto no es válido');
+        }
+
+        Logger.info('Drivers obtenidos:', drivers);
+        populateDriverSelect(driverSelect, drivers);
+        addLogMessage('Drivers cargados correctamente', 'success');
+
+    } catch (error) {
+        Logger.error('Error inicializando drivers:', error);
+        handleDriverLoadError(error);
+    }
+
+    Logger.groupEnd();
+}
+
+// Función para poblar el select de drivers
+function populateDriverSelect(select, drivers) {
+    Logger.group('Poblando Select de Drivers');
+
+    try {
+        select.innerHTML = '<option value="">Seleccione un driver</option>';
+        drivers.forEach((driver) => {
+            const option = document.createElement('option');
+            option.value = driver.id;
+            option.textContent = `${driver.manufacturer} - ${driver.model} (${driver.driver_filename})`;
+            select.appendChild(option);
+        });
+        Logger.success('Select de drivers poblado correctamente');
+    } catch (error) {
+        Logger.error('Error al poblar select de drivers:', error);
+        throw error;
+    }
+
+    Logger.groupEnd();
+}
+
+// Función para mostrar el modal de instalación de impresora
+function showInstallPrinter(agentToken) {
+    Logger.group('Mostrando Modal de Instalación');
+
+    try {
+        currentAgentToken = agentToken;
+        
+        const modal = document.getElementById('installPrinterModal');
+        if (!modal) {
+            Logger.warning('Modal de instalación no encontrado');
+            return;
+        }
+
+        modal.classList.remove('hidden');
+        resetInstallationForm();
+        initializeDriverSelect();
+        
+        Logger.success('Modal de instalación mostrado correctamente');
+    } catch (error) {
+        Logger.error('Error al mostrar modal de instalación:', error);
+        showNotification('Error al abrir el formulario de instalación', 'error');
+    }
+
+    Logger.groupEnd();
+}
+
+// Función para mostrar información del agente
+async function showAgentInfo(agentId) {
+    Logger.group('Mostrando Información del Agente');
+
+    try {
+        const modal = document.getElementById("agentInfoModal");
+        const content = document.getElementById("agentInfoContent");
+
+        if (!modal || !content) {
+            Logger.warning('Elementos del modal de información no encontrados');
+            return;
+        }
+
+        modal.classList.remove("hidden");
+        showLoadingState(content);
+
+        const response = await fetch(`${getSecureBaseUrl()}/api/v1/agents/${agentId}`);
+        if (!response.ok) {
+            throw new Error(`Error al cargar los datos: ${response.status}`);
+        }
+
+        const agent = await response.json();
+        Logger.info('Datos del agente recibidos:', agent);
+        updateAgentInfoContent(content, agent);
+        
+        Logger.success('Información del agente mostrada correctamente');
+    } catch (error) {
+        Logger.error('Error al mostrar información del agente:', error);
+        handleAgentInfoError(content, error);
+    }
+
+    Logger.groupEnd();
+}
+
+// Función para eliminar un agente
+async function deleteAgent(agentId) {
+    Logger.group('Eliminando Agente');
+
+    if (!confirm("¿Estás seguro de que deseas eliminar este agente?")) {
+        Logger.info('Eliminación cancelada por el usuario');
+        return;
+    }
+
+    try {
+        const response = await fetch(`${getSecureBaseUrl()}/api/v1/agents/${agentId}`, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
             },
         });
 
-        if (response.ok) {
-            alert("Agente eliminado correctamente.");
-            location.reload(); // Recargar la página para actualizar la lista
-        } else {
+        if (!response.ok) {
             const errorData = await response.json();
-            alert(`Error: ${errorData.detail}`);
+            throw new Error(errorData.detail);
         }
+
+        Logger.success('Agente eliminado correctamente');
+        showNotification("Agente eliminado correctamente.", "success");
+        location.reload();
     } catch (error) {
-        console.error("Error eliminando el agente:", error);
-        alert("Ocurrió un error al intentar eliminar el agente.");
+        Logger.error('Error al eliminar agente:', error);
+        showNotification(`Error al eliminar agente: ${error.message}`, "error");
     }
+
+    Logger.groupEnd();
+}
+
+// Funciones auxiliares para la interfaz
+
+function disableInstallationInterface(submitButton) {
+    submitButton.disabled = true;
+    submitButton.innerHTML = 'Instalando...';
+    document.getElementById('driver').disabled = true;
+    document.getElementById('printerIp').disabled = true;
+}
+
+function updateInstallationInterface() {
+    const closeButton = document.querySelector('button[onclick="closeModal(\'installPrinterModal\')"]');
+    if (closeButton) {
+        closeButton.textContent = 'Cerrar ventana';
+    }
+}
+
+function handleInstallationError(error) {
+    addLogMessage(`Error: ${error.message}`, 'error');
+    const submitButton = document.querySelector('button[type="submit"]');
+    if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.innerHTML = 'Instalar';
+    }
+    WS_CONFIG.currentInstallation = null;
+}
+
+function handleDriverLoadError(error) {
+    addLogMessage(`Error al cargar drivers: ${error.message}`, 'error');
+    showNotification(`Error al cargar drivers: ${error.message}`, 'error');
+}
+
+function resetInstallationForm() {
+    const form = document.getElementById('installPrinterForm');
+    if (form) {
+        form.reset();
+        const submitButton = form.querySelector('button[type="submit"]');
+        if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.innerHTML = 'Instalar';
+        }
+    }
+    
+    const logMessages = document.getElementById('logMessages');
+    if (logMessages) {
+        logMessages.innerHTML = '';
+        addLogMessage('Iniciando proceso de instalación...', 'info');
+    }
+}
+
+function showLoadingState(content) {
+    content.innerHTML = `
+        <div class="flex justify-center items-center p-8">
+            <i class="fas fa-circle-notch fa-spin text-blue-500 text-3xl mr-3"></i>
+            <span class="text-gray-600 text-lg">Cargando información...</span>
+        </div>
+    `;
+}
+
+function handleAgentInfoError(content, error) {
+    content.innerHTML = `
+        <div class="text-center py-8">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-100 mb-4">
+                <i class="fas fa-exclamation-circle text-red-500 text-2xl"></i>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">Error al cargar la información</h3>
+            <p class="text-sm text-gray-500">${error.message}</p>
+        </div>
+    `;
+}
+
+// Función para cerrar modales
+function closeModal(modalId) {
+    Logger.group('Cerrando Modal');
+
+    try {
+        const modal = document.getElementById(modalId);
+        if (!modal) {
+            Logger.warning('Modal no encontrado:', modalId);
+            return;
+        }
+
+        // Verificar instalación en progreso
+        if (modalId === 'installPrinterModal' && WS_CONFIG.currentInstallation) {
+            const installationTime = (new Date() - WS_CONFIG.currentInstallation.startTime) / 1000;
+            if (installationTime < 60) {
+                if (!confirm('La instalación está en progreso. ¿Está seguro que desea cerrar la ventana?')) {
+                    Logger.info('Cierre de modal cancelado por el usuario');
+                    return;
+                }
+            }
+        }
+
+        modal.classList.add('hidden');
+        
+        // Limpieza adicional para el modal de instalación
+        if (modalId === 'installPrinterModal') {
+            const form = document.getElementById('installPrinterForm');
+            if (form) form.reset();
+            WS_CONFIG.currentInstallation = null;
+            const logMessages = document.getElementById('logMessages');
+            if (logMessages) logMessages.innerHTML = '';
+        }
+
+        Logger.success('Modal cerrado correctamente:', modalId);
+    } catch (error) {
+        Logger.error('Error al cerrar modal:', error);
+    }
+
+    Logger.groupEnd();
 }
