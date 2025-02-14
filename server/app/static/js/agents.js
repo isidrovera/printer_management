@@ -4,22 +4,24 @@
 let currentAgentToken = '';
 let agentToDelete = null;
 let wsConnection = null;
-let reconnectAttempts = 0;  // Agregar esta línea
-// Configuración WebSocket
-// Función para obtener la URL base segura
+let reconnectAttempts = 0;
+
+
 function getSecureBaseUrl() {
-    const protocol = window.location.protocol;
+    return `${window.location.protocol}//${window.location.host}`;
+}
+function getWebSocketUrl(path) {
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const host = window.location.host;
-    return `${protocol}//${host}`;
+    return `${protocol}//${host}${path}`;
 }
 
 const WS_CONFIG = {
-    url: `wss://${window.location.host}/api/v1/ws/status`,
+    url: getWebSocketUrl('/api/v1/ws/status'),
     reconnectInterval: 1000,
     maxReconnectAttempts: 10,
     currentInstallation: null
 };
-
 function updateAgentInfoContent(agentInfo) {
     const content = document.getElementById('agentInfoContent');
     if (!content) return;
@@ -397,7 +399,6 @@ async function initializeDriverSelect() {
         }
 
         const drivers = await response.json();
-        
         if (!Array.isArray(drivers)) {
             throw new Error('El formato de datos devuelto no es válido');
         }

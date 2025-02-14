@@ -50,13 +50,13 @@ api_router.include_router(
     tags=["agents"]
 )
 
+
 # Rutas para websocket
 api_router.include_router(
     websocket.router,
-    prefix="/api/v1/ws",  # Cambiar de "/wss" a "/api/v1/ws"
+    prefix="/api/v1/ws",  # Cambiado de "/wss" a "/api/v1/ws"
     tags=["websocket"]
 )
-
 # Rutas para impresoras
 api_router.include_router(
     printers.router,
