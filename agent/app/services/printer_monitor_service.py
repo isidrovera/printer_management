@@ -4,7 +4,7 @@ import logging
 import aiohttp
 import json
 from datetime import datetime
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List, Optional, Union
 from pysnmp.hlapi import *
 import sys
 import os
@@ -142,12 +142,11 @@ class PrinterMonitorService:
             for key, value in oid_config.items():
                 logger.info(f"  {key}: {value}")
             
-            # Obtener modelo y número de serie usando los nombres correctos de OIDs
+            # Obtener datos críticos: modelo y número de serie
             model = None
             serial = None
             model_updated = False
-            
-            # Usar los nombres correctos de los campos de la base de datos
+
             if 'oid_printer_model' in oid_config and oid_config['oid_printer_model']:
                 logger.info(f"Intentando obtener modelo con OID: {oid_config['oid_printer_model']}")
                 snmp_model = await self._get_snmp_value(ip, oid_config['oid_printer_model'])
@@ -155,8 +154,6 @@ class PrinterMonitorService:
                     model = self._convert_snmp_value(snmp_model)
                     model_updated = True
                     logger.info(f"✅ Modelo obtenido vía SNMP: {model} (valor crudo: {snmp_model})")
-                else:
-                    logger.warning(f"No se pudo obtener modelo vía SNMP")
             else:
                 logger.warning(f"No se encontró OID de modelo configurado para {brand}")
             
@@ -166,37 +163,35 @@ class PrinterMonitorService:
                 if snmp_serial:
                     serial = self._convert_snmp_value(snmp_serial)
                     logger.info(f"✅ Número de serie obtenido vía SNMP: {serial} (valor crudo: {snmp_serial})")
-                else:
-                    logger.warning(f"No se pudo obtener número de serie vía SNMP")
             else:
                 logger.warning(f"No se encontró OID de serie configurado para {brand}")
-
-            # Obtener datos existentes solo si no tenemos datos de SNMP
-            if not model_updated or not serial:
-                printers = await self.get_monitored_printers()
-                existing_printer = next((p for p in printers if p['ip_address'] == ip), None)
-
-                if existing_printer:
-                    logger.info("📋 Datos existentes de la impresora:")
-                    logger.info(f"  Modelo: {existing_printer.get('model')}")
-                    logger.info(f"  Serie: {existing_printer.get('serial_number')}")
-
-                    if not model_updated:
-                        model = existing_printer.get('model')
-                        logger.info(f"Usando modelo existente: {model}")
-                    
-                    if not serial:
-                        serial = existing_printer.get('serial_number')
 
             # Recolectar otros datos SNMP
             counters = await self._get_counter_data(ip, oids)
             supplies = await self._get_supplies_data(ip, oids)
             status = await self.get_printer_status(ip)
             
+            # Obtener datos existentes como respaldo
+            printers = await self.get_monitored_printers()
+            existing_printer = next((p for p in printers if p['ip_address'] == ip), None)
+
+            if existing_printer:
+                logger.info("📋 Datos existentes de la impresora:")
+                logger.info(f"  Modelo: {existing_printer.get('model')}")
+                logger.info(f"  Serie: {existing_printer.get('serial_number')}")
+
+                # Usar valores existentes solo si no obtuvimos nuevos
+                if not model:
+                    model = existing_printer.get('model')
+                    logger.info(f"Usando modelo existente: {model}")
+                
+                if not serial:
+                    serial = existing_printer.get('serial_number')
+            
             printer_data = {
                 'ip_address': ip,
                 'brand': brand,
-                'model': model or 'Unknown',
+                'model': model,
                 'serial_number': serial,
                 'last_check': datetime.utcnow().isoformat(),
                 'status': status.get('status', 'unknown'),
@@ -208,7 +203,7 @@ class PrinterMonitorService:
 
             logger.info(f"✅ Datos recolectados exitosamente para {ip}")
             logger.info("📊 Resumen de datos recolectados:")
-            logger.info(f"  Modelo final: {printer_data['model']} (actualizado vía SNMP: {model_updated})")
+            logger.info(f"  Modelo final: {printer_data['model']} (actualizado: {model_updated})")
             logger.info(f"  Serie final: {printer_data['serial_number']}")
             logger.info(f"  Estado: {printer_data['status']}")
             logger.info(f"  Contadores: {printer_data['counters']}")
@@ -460,15 +455,15 @@ class PrinterMonitorService:
             logger.error(f"❌ Error general en consulta SNMP para {ip} - {oid}: {str(e)}", exc_info=True)
             return None
 
-    def _convert_snmp_value(self, value: Any) -> Optional[int]:
+    def _convert_snmp_value(self, value: Any) -> Optional[Union[int, str]]:
         """
-        Convierte valores SNMP a enteros.
+        Convierte valores SNMP preservando el formato original según el contexto.
         
         Args:
             value (Any): Valor SNMP a convertir
             
         Returns:
-            Optional[int]: Valor convertido o None si no es válido
+            Optional[Union[int, str]]: Valor convertido o None si no es válido
         """
         try:
             if value is None:
@@ -476,22 +471,29 @@ class PrinterMonitorService:
             
             if hasattr(value, 'prettyPrint'):
                 value_str = value.prettyPrint()
-                try:
-                    # Si es un string numérico simple
+                
+                # Si está entre comillas, eliminarlas
+                if value_str.startswith('"') and value_str.endswith('"'):
+                    value_str = value_str[1:-1]
+                
+                # Si el valor es enteramente numérico, convertirlo a int
+                if value_str.isdigit():
                     return int(value_str)
-                except ValueError:
-                    # Si tiene otros caracteres, intentar extraer el número
-                    value_str = ''.join(c for c in value_str if c.isdigit())
-                    return int(value_str) if value_str else None
-            
+                
+                # Si es un valor con caracteres no numéricos, devolverlo tal cual
+                return value_str
+                
+            # Para valores numéricos directos
             if isinstance(value, (int, float)):
                 return int(value)
-                
-            return None
+            
+            # Para cualquier otro tipo
+            return str(value)
 
         except Exception as e:
             logger.error(f"❌ Error convirtiendo valor SNMP: {str(e)}", exc_info=True)
             return None
+
 
     def _convert_nested_snmp_values(self, data: Any) -> Any:
         """
