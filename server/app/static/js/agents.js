@@ -5,11 +5,12 @@ let currentAgentToken = '';
 let agentToDelete = null;
 
 // Configuración WebSocket
+// Configuración WebSocket mejorada
 const WS_CONFIG = {
-    url: `wss://${window.location.host}/api/v1/ws/status`,
+    url: `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/api/v1/ws/status`,
     reconnectInterval: 1000,
-    maxReconnectAttempts: 10,  // Aumentamos el número de reintentos
-    currentInstallation: null  // Para trackear instalación en progreso
+    maxReconnectAttempts: 10,
+    currentInstallation: null
 };
 
 // Inicialización cuando el DOM está listo
