@@ -21,4 +21,3 @@ websockets
 uvicorn[standard]
 wsproto
 requests
-itsdangerous
