@@ -20,6 +20,7 @@ from ..core.config import settings
 from .system_info_service import SystemInfoService
 from .printer_service import PrinterService
 from .printer_monitor_service import PrinterMonitorService
+from ..core.message_queue import MessageQueue, MessagePriority
 from .smb_service import SMBScannerService
 from datetime import datetime
 from ..core.config import settings
@@ -44,6 +45,7 @@ class AgentService:
         self.active_tunnels = {}
         self.is_shutting_down = False
         self.current_status = AgentStatus.OFFLINE
+        self.message_queue = MessageQueue()
         
         
     
@@ -221,20 +223,31 @@ class AgentService:
 
     async def _handle_connection(self, websocket):
         """Maneja la conexión WebSocket activa."""
+        # Iniciar el procesador de mensajes
+        processor_task = asyncio.create_task(
+            self.message_queue.process_messages(
+                lambda msg: self._process_message(msg, websocket)
+            )
+        )
+        
         try:
             while True:
                 message = await websocket.recv()
-                
                 try:
                     data = json.loads(message)
                     message_type = data.get('type')
                     
-                    if message_type == 'heartbeat':
-                        await self._handle_heartbeat(websocket)
+                    # Asignar prioridad basada en el tipo de mensaje
+                    if message_type in ['install_printer', 'create_tunnel']:
+                        priority = MessagePriority.HIGH
+                    elif message_type in ['scan_printers']:
+                        priority = MessagePriority.MEDIUM
                     else:
-                        logger.debug(f"Mensaje recibido: {message}")
-                        await self._process_message(data, websocket)
-                        
+                        priority = MessagePriority.LOW
+                    
+                    logger.debug(f"Encolando mensaje tipo {message_type} con prioridad {priority.name}")
+                    await self.message_queue.put(priority, data)
+                    
                 except json.JSONDecodeError:
                     logger.error(f"JSON inválido recibido: {message}")
                     continue
@@ -248,6 +261,9 @@ class AgentService:
         except Exception as e:
             logger.error(f"Error en el manejador de conexión: {str(e)}")
             raise
+        finally:
+            self.message_queue.stop()
+            await processor_task
 
     async def _process_message(self, data, websocket):
         """Procesa los mensajes recibidos del servidor."""
