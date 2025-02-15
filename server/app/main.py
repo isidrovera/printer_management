@@ -1,6 +1,7 @@
 # server/main.py
 import logging
 import os
+import itsdangerous
 from pathlib import Path
 from contextlib import asynccontextmanager
 from fastapi import FastAPI

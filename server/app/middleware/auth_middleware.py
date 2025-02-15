@@ -4,6 +4,7 @@ from fastapi.responses import RedirectResponse
 import logging
 from app.core.auth import get_current_user
 import jwt
+import itsdangerous
 from jose import JWTError
 from app.core.config import settings
 
