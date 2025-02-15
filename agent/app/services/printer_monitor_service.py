@@ -614,7 +614,7 @@ class PrinterMonitorService:
                 return False
             
             async with aiohttp.ClientSession() as session:
-                base_url = self.server_url.replace('ws://', 'http://')
+                base_url = self.server_url.replace('wss://', 'https://')
                 url = f"{base_url}/api/v1/monitor/printers/update"
                 
                 headers = {
