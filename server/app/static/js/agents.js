@@ -382,23 +382,30 @@ async function initializeDriverSelect() {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
+                'Cache-Control': 'no-cache',
+                'Pragma': 'no-cache'
+            },
+            credentials: 'same-origin'
         });
 
         if (!response.ok) {
-            const text = await response.text();
-            throw new Error(`Error al obtener drivers. Status: ${response.status}`);
+            throw new Error(`Error HTTP: ${response.status}`);
         }
 
         const drivers = await response.json();
         
         if (!Array.isArray(drivers)) {
-            throw new Error('El formato de datos devuelto no es válido');
+            throw new Error('Formato de datos inválido');
         }
 
+        // Limpiar y repoblar el select
         driverSelect.innerHTML = '<option value="">Seleccione un driver</option>';
-        drivers.forEach((driver) => {
+        
+        const sortedDrivers = drivers.sort((a, b) => 
+            `${a.manufacturer} ${a.model}`.localeCompare(`${b.manufacturer} ${b.model}`)
+        );
+
+        sortedDrivers.forEach((driver) => {
             const option = document.createElement('option');
             option.value = driver.id;
             option.textContent = `${driver.manufacturer} - ${driver.model} (${driver.driver_filename})`;
@@ -408,7 +415,7 @@ async function initializeDriverSelect() {
         addLogMessage('Drivers cargados correctamente', 'success');
 
     } catch (error) {
-        console.error('Error completo inicializando drivers:', error);
+        console.error('Error cargando drivers:', error);
         addLogMessage(`Error al cargar drivers: ${error.message}`, 'error');
         showNotification(`Error al cargar drivers: ${error.message}`, 'error');
     }
