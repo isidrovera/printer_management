@@ -2,6 +2,9 @@
 import asyncio
 import logging
 import aiohttp
+import asyncio
+import platform
+import subprocess
 import json
 from datetime import datetime
 from typing import Dict, Any, List, Optional, Union
@@ -118,16 +121,17 @@ class PrinterMonitorService:
         try:
             logger.info(f"🔄 Iniciando recolección de datos - IP: {ip}, Marca: {brand}")
             
+            # Verificación rápida con ping primero
+            if not await self._ping_host(ip):
+                logger.warning(f"❌ Impresora {ip} no responde a ping")
+                return None
+
+            logger.info(f"✅ Impresora {ip} responde a ping, continuando con SNMP")
+            
             # Verificar conexión antes de continuar
             if not await self.check_printer_connection(ip):
-                logger.error(f"❌ Impresora {ip} no responde")
-                return {
-                    'ip_address': ip,
-                    'brand': brand,
-                    'status': 'offline',
-                    'last_check': datetime.utcnow().isoformat(),
-                    'error': 'Printer not responding'
-                }
+                logger.error(f"❌ Impresora {ip} no responde a SNMP")
+                return None
 
             # Obtener OIDs específicos para la marca
             oids = await self._get_printer_oids(brand)
@@ -137,7 +141,6 @@ class PrinterMonitorService:
 
             oid_config = oids[0] if oids else {}
             
-            # Debug de la configuración completa de OIDs
             logger.info(f"📋 Configuración de OIDs para {brand}:")
             for key, value in oid_config.items():
                 logger.info(f"  {key}: {value}")
@@ -180,7 +183,6 @@ class PrinterMonitorService:
                 logger.info(f"  Modelo: {existing_printer.get('model')}")
                 logger.info(f"  Serie: {existing_printer.get('serial_number')}")
 
-                # Usar valores existentes solo si no obtuvimos nuevos
                 if not model:
                     model = existing_printer.get('model')
                     logger.info(f"Usando modelo existente: {model}")
@@ -213,13 +215,7 @@ class PrinterMonitorService:
 
         except Exception as e:
             logger.error(f"❌ Error recolectando datos de {ip}: {str(e)}", exc_info=True)
-            return {
-                'ip_address': ip,
-                'brand': brand,
-                'status': 'error',
-                'last_check': datetime.utcnow().isoformat(),
-                'error': str(e)
-            }
+            return None
     async def _get_printer_oids(self, brand: str) -> List[Dict]:
         """
         Obtiene la configuración de OIDs para una marca de impresora.
@@ -652,9 +648,45 @@ class PrinterMonitorService:
         except Exception as e:
             logger.error(f"Error inesperado actualizando {ip}: {str(e)}", exc_info=True)
             return False
+    async def _ping_host(self, ip: str, timeout: int = 1) -> bool:
+        """
+        Realiza un ping rápido a la IP especificada.
+        
+        Args:
+            ip (str): IP a verificar
+            timeout (int): Timeout en segundos
+            
+        Returns:
+            bool: True si responde al ping
+        """
+        try:
+            # Comando diferente según el sistema operativo
+            if platform.system().lower() == "windows":
+                cmd = f'ping -n 1 -w {timeout*1000} {ip}'  # timeout en ms en Windows
+            else:
+                cmd = f'ping -c 1 -W {timeout} {ip}'
+                
+            # Ejecutar el ping de forma asíncrona
+            proc = await asyncio.create_subprocess_shell(
+                cmd,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE
+            )
+            
+            # Esperar la respuesta con timeout
+            try:
+                stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=timeout+0.5)
+                return proc.returncode == 0
+            except asyncio.TimeoutError:
+                proc.kill()  # Matar el proceso si excede el timeout
+                return False
+                
+        except Exception as e:
+            logger.error(f"Error en ping a {ip}: {e}")
+            return False
     async def check_printer_connection(self, ip: str) -> bool:
         """
-        Verifica si una impresora está conectada y responde.
+        Verifica si una impresora está conectada usando ping primero.
         
         Args:
             ip (str): IP de la impresora
@@ -665,26 +697,37 @@ class PrinterMonitorService:
         try:
             logger.info(f"🔌 Verificando conexión con impresora {ip}")
             
-            # OID del sistema - debería responder cualquier dispositivo SNMP
-            system_oid = '1.3.6.1.2.1.1.1.0'
+            # Primero hacer un ping rápido
+            is_alive = await self._ping_host(ip)
             
-            response = await self._get_snmp_value(ip, system_oid)
-            is_connected = response is not None
-            
-            if is_connected:
-                logger.info(f"✅ Impresora {ip} responde correctamente")
-            else:
-                logger.warning(f"⚠️ Impresora {ip} no responde")
+            if not is_alive:
+                logger.warning(f"⚠️ Impresora {ip} no responde a ping")
+                return False
                 
-            return is_connected
+            logger.info(f"✅ Impresora {ip} responde a ping")
+            return True
             
         except Exception as e:
-            logger.error(f"❌ Error verificando conexión con {ip}: {str(e)}", exc_info=True)
+            logger.error(f"❌ Error verificando conexión con {ip}: {str(e)}")
             return False
 
+    async def _update_offline_status(self, ip: str) -> None:
+        """
+        Actualiza el estado de una impresora como offline en el servidor.
+        
+        Args:
+            ip (str): IP de la impresora
+        """
+        try:
+            await self.update_printer_data(ip, {
+                'status': 'offline',
+                'last_check': datetime.utcnow().isoformat()
+            })
+        except Exception as e:
+            logger.error(f"Error actualizando estado offline para {ip}: {e}")
     async def get_printer_status(self, ip: str) -> Dict[str, Any]:
         """
-        Obtiene el estado actual de una impresora.
+        Obtiene el estado actual de la impresora.
         
         Args:
             ip (str): IP de la impresora
@@ -695,38 +738,42 @@ class PrinterMonitorService:
         try:
             logger.info(f"🔍 Obteniendo estado de impresora {ip}")
             
-            # OID estándar para estado de impresora
+            # Definir códigos de estado comunes
+            status_codes = {
+                1: {'status': 'error', 'details': 'Status code: 1'},
+                2: {'status': 'warning', 'details': 'Status code: 2'},
+                3: {'status': 'idle', 'details': 'Status code: 3'},
+                4: {'status': 'printing', 'details': 'Status code: 4'},
+                5: {'status': 'warmup', 'details': 'Status code: 5'}
+            }
+            
+            # OID genérico de estado - funciona en la mayoría de impresoras
             status_oid = '1.3.6.1.2.1.25.3.5.1.1.1'
             
-            status_value = await self._get_snmp_value(ip, status_oid)
-            if status_value is None:
-                logger.warning(f"⚠️ No se pudo obtener estado de {ip}")
-                return {'status': 'unknown', 'details': 'No response'}
+            # Función interna para obtener el estado
+            async def get_status():
+                raw_status = await self._get_snmp_value(ip, status_oid)
+                if raw_status is not None:
+                    status_value = self._convert_snmp_value(raw_status)
+                    status_info = status_codes.get(status_value, {
+                        'status': 'unknown',
+                        'details': f'Unknown status code: {status_value}'
+                    })
+                    status_info['raw_status'] = status_value
+                    logger.info(f"📊 Estado obtenido para {ip}: {status_info}")
+                    return status_info
+                
+                logger.warning(f"⚠️ No se pudo obtener estado específico para {ip}")
+                return {'status': 'unknown', 'details': 'No status data available'}
             
-            status_code = self._convert_snmp_value(status_value)
-            
-            # Mapeo de códigos de estado
-            status_map = {
-                1: 'other',
-                2: 'unknown',
-                3: 'idle',
-                4: 'printing',
-                5: 'warmup',
-                6: 'stopped',
-                7: 'offline',
-                8: 'error',
-                9: 'service_required'
-            }
-            
-            status = {
-                'status': status_map.get(status_code, 'unknown'),
-                'details': f'Status code: {status_code}',
-                'raw_status': status_code
-            }
-            
-            logger.info(f"📊 Estado obtenido para {ip}: {status}")
-            return status
-            
+            # Intentar obtener el estado con timeout
+            try:
+                return await asyncio.wait_for(get_status(), timeout=3)
+            except asyncio.TimeoutError:
+                logger.warning(f"⏱️ Timeout obteniendo estado de {ip}")
+                return {'status': 'timeout', 'details': 'Status request timed out'}
+                
         except Exception as e:
-            logger.error(f"❌ Error obteniendo estado de {ip}: {str(e)}", exc_info=True)
-            return {'status': 'error', 'details': str(e)}
+            error_msg = f"❌ Error obteniendo estado: {str(e)}"
+            logger.error(error_msg)
+            return {'status': 'error', 'details': error_msg}

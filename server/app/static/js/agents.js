@@ -4,72 +4,12 @@
 let currentAgentToken = '';
 let agentToDelete = null;
 
-
-const APP_CONFIG = {
-    baseUrl: window.location.protocol === 'https:' ? 'https://' : 'http://' + window.location.host,
-    wsUrl: (window.location.protocol === 'https:' ? 'wss://' : 'ws://') + window.location.host,
-    maxRetries: 3
-};
-
-// Función para construir URLs seguras
-const getSecureUrl = (path) => {
-    // Asegurarse de que siempre usemos HTTPS cuando la página está en HTTPS
-    const baseUrl = window.location.protocol === 'https:' ? 
-        'https://' + window.location.host :
-        window.location.protocol + '//' + window.location.host;
-    return `${baseUrl}${path}`;
-};
-
-// Función mejorada para realizar peticiones fetch
-async function secureFetch(url, options = {}) {
-    // Asegurarnos de que la URL sea HTTPS si la página está en HTTPS
-    const secureUrl = url.startsWith('http') ? url : getSecureUrl(url);
-    
-    const defaultOptions = {
-        credentials: 'same-origin',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-        },
-        redirect: 'follow' // Seguir redirecciones automáticamente
-    };
-
-    const finalOptions = {
-        ...defaultOptions,
-        ...options,
-        headers: {
-            ...defaultOptions.headers,
-            ...options.headers
-        }
-    };
-
-    try {
-        const response = await fetch(secureUrl, finalOptions);
-        
-        // Manejar errores HTTP
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        // Si la respuesta es JSON, devolverla parseada
-        const contentType = response.headers.get("content-type");
-        if (contentType && contentType.includes("application/json")) {
-            return await response.json();
-        }
-        
-        return response;
-    } catch (error) {
-        console.error('Error en fetch:', error);
-        throw error;
-    }
-}
-
-// Configuración WebSocket mejorada
+// Configuración WebSocket
 const WS_CONFIG = {
-    url: `${APP_CONFIG.wsUrl}/api/v1/ws/status`,
+    url: `ws://${window.location.host}/api/v1/ws/status`,
     reconnectInterval: 1000,
-    maxReconnectAttempts: 10,
-    currentInstallation: null
+    maxReconnectAttempts: 10,  // Aumentamos el número de reintentos
+    currentInstallation: null  // Para trackear instalación en progreso
 };
 
 // Inicialización cuando el DOM está listo
@@ -77,9 +17,8 @@ document.addEventListener('DOMContentLoaded', function () {
     initializeWebSocket();
     initializeSearchFilter();
     initializeFormHandlers();
-    initializeDriverSelect();
+    initializeDriverSelect(); // Añadido para cargar drivers al inicio
 });
-
 // Función para manejar la reconexión del WebSocket
 function handleWebSocketReconnection(event) {
     console.log('WebSocket cerrado. Código:', event.code);
@@ -159,9 +98,59 @@ function initializeWebSocket() {
             addLogMessage('Conexión establecida con el servidor', 'success');
         };
 
-        wsConnection.onmessage = handleWebSocketMessage;
-        wsConnection.onclose = handleWebSocketClose;
-        wsConnection.onerror = handleWebSocketError;
+        wsConnection.onmessage = (event) => {
+            console.group('Mensaje WebSocket Recibido');
+            console.log('Mensaje raw:', event.data);
+
+            try {
+                // Verificar si es un mensaje de log del agente
+                if (typeof event.data === 'string' && event.data.startsWith('Agent')) {
+                    console.log('📝 Mensaje de log del agente:', event.data);
+                    handleAgentLogMessage(event.data);
+                    console.groupEnd();
+                    return;
+                }
+
+                // Intentar parsear como JSON
+                let data;
+                try {
+                    data = JSON.parse(event.data);
+                    console.log('✅ JSON parseado correctamente:', data);
+                } catch (parseError) {
+                    console.warn('⚠️ No se pudo parsear como JSON:', {
+                        error: parseError,
+                        rawData: event.data.slice(0, 100) + (event.data.length > 100 ? '...' : '')
+                    });
+                    handleAgentLogMessage(event.data);
+                    console.groupEnd();
+                    return;
+                }
+
+                // Procesar mensaje JSON según su tipo
+                if (data && data.type) {
+                    console.log(`🔄 Procesando mensaje de tipo: ${data.type}`);
+                    processJsonMessage(data);
+                } else {
+                    console.log('ℹ️ Mensaje JSON sin tipo específico:', data);
+                }
+
+            } catch (error) {
+                console.error('❌ Error procesando mensaje:', error);
+                addLogMessage('Error al procesar mensaje: ' + error.message, 'error');
+            }
+            console.groupEnd();
+        };
+
+        wsConnection.onclose = (event) => {
+            console.warn('⚠️ WebSocket cerrado. Código:', event.code);
+            handleWebSocketClose(event);
+        };
+
+        wsConnection.onerror = (error) => {
+            console.error('❌ Error en WebSocket:', error);
+            showNotification('Error en la conexión con el servidor', 'error');
+            addLogMessage('Error en la conexión con el servidor', 'error');
+        };
 
     } catch (error) {
         console.error('❌ Error al crear conexión WebSocket:', error);
@@ -169,7 +158,6 @@ function initializeWebSocket() {
         addLogMessage('Error al crear la conexión con el servidor', 'error');
     }
 }
-
 
 // Procesar diferentes tipos de mensajes JSON
 function processJsonMessage(data) {
@@ -389,7 +377,20 @@ async function initializeDriverSelect() {
     try {
         addLogMessage('Cargando lista de drivers...', 'info');
         
-        const drivers = await secureFetch('/api/v1/drivers');
+        const response = await fetch('/api/v1/drivers', {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            const text = await response.text();
+            throw new Error(`Error al obtener drivers. Status: ${response.status}`);
+        }
+
+        const drivers = await response.json();
         
         if (!Array.isArray(drivers)) {
             throw new Error('El formato de datos devuelto no es válido');
@@ -409,17 +410,6 @@ async function initializeDriverSelect() {
         console.error('Error completo inicializando drivers:', error);
         addLogMessage(`Error al cargar drivers: ${error.message}`, 'error');
         showNotification(`Error al cargar drivers: ${error.message}`, 'error');
-    }
-}
-async function installPrinter(data) {
-    try {
-        return await secureFetch(`/api/v1/printers/install/${currentAgentToken}`, {
-            method: 'POST',
-            body: JSON.stringify(data)
-        });
-    } catch (error) {
-        console.error('Error en la instalación:', error);
-        throw error;
     }
 }
 // Función para mostrar el modal de instalación de impresora
