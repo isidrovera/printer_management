@@ -6,10 +6,10 @@ let agentToDelete = null;
 
 // Configuración WebSocket
 const WS_CONFIG = {
-    url: `ws://${window.location.host}/api/v1/ws/status`,
+    url: `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/api/v1/ws/status`,
     reconnectInterval: 1000,
-    maxReconnectAttempts: 10,  // Aumentamos el número de reintentos
-    currentInstallation: null  // Para trackear instalación en progreso
+    maxReconnectAttempts: 10,
+    currentInstallation: null
 };
 
 // Inicialización cuando el DOM está listo
@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function () {
     initializeWebSocket();
     initializeSearchFilter();
     initializeFormHandlers();
-    initializeDriverSelect(); // Añadido para cargar drivers al inicio
+    initializeDriverSelect();
 });
 // Función para manejar la reconexión del WebSocket
 function handleWebSocketReconnection(event) {
@@ -377,7 +377,7 @@ async function initializeDriverSelect() {
     try {
         addLogMessage('Cargando lista de drivers...', 'info');
         
-        const response = await fetch('/api/v1/drivers', {
+        const response = await fetch(`${window.location.protocol}//${window.location.host}/api/v1/drivers`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
