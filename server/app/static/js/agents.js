@@ -291,15 +291,20 @@ function initializeFormHandlers() {
                 const driverId = document.getElementById('driver').value;
                 const printerIp = document.getElementById('printerIp').value;
 
+                // Validación de campos
                 if (!driverId || !printerIp) {
+                    console.warn('Campos incompletos:', { driverId, printerIp });
                     showNotification('Por favor complete todos los campos', 'error');
-                    addLogMessage({
-                        timestamp: new Date().toISOString().replace('T', ' ').split('.')[0],
-                        type: 'error',
-                        message: 'Error: Faltan campos requeridos'
-                    });
+                    addLogMessage('Error: Faltan campos requeridos', 'error');
                     return;
                 }
+
+                // Log de inicio de instalación
+                console.log('Iniciando instalación:', {
+                    driverId,
+                    printerIp,
+                    agentToken: currentAgentToken
+                });
 
                 // Guardar información de la instalación actual
                 WS_CONFIG.currentInstallation = {
@@ -312,13 +317,13 @@ function initializeFormHandlers() {
                 submitButton.disabled = true;
                 submitButton.innerHTML = 'Instalando...';
                 
-                addLogMessage({
-                    timestamp: new Date().toISOString().replace('T', ' ').split('.')[0],
-                    type: 'info',
-                    message: 'Iniciando instalación de impresora...'
-                });
+                addLogMessage('Iniciando instalación de impresora...', 'info');
 
-                const response = await fetch(`/api/v1/printers/install/${currentAgentToken}`, {
+                // Construir URL con el protocolo correcto
+                const installUrl = `${window.location.protocol}//${window.location.host}/api/v1/printers/install/${currentAgentToken}`;
+                console.log('URL de instalación:', installUrl);
+
+                const response = await fetch(installUrl, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -335,11 +340,8 @@ function initializeFormHandlers() {
                     throw new Error(errorData.detail || `Error en la instalación: ${response.status}`);
                 }
 
-                addLogMessage({
-                    timestamp: new Date().toISOString().replace('T', ' ').split('.')[0],
-                    type: 'info',
-                    message: 'Comando enviado. La instalación continúa en segundo plano...'
-                });
+                console.log('Comando de instalación enviado correctamente');
+                addLogMessage('Comando enviado. La instalación continúa en segundo plano...', 'info');
 
                 // Cambiar el texto del botón de cerrar
                 const closeButton = document.querySelector('button[onclick="closeModal(\'installPrinterModal\')"]');
@@ -352,21 +354,22 @@ function initializeFormHandlers() {
                 document.getElementById('printerIp').disabled = true;
 
             } catch (error) {
-                console.error('Error detallado:', error);
-                addLogMessage({
-                    timestamp: new Date().toISOString().replace('T', ' ').split('.')[0],
-                    type: 'error',
-                    message: `Error: ${error.message}`
-                });
+                console.error('Error detallado en la instalación:', error);
+                addLogMessage(`Error: ${error.message}`, 'error');
                 
                 // Reactivar el botón de envío en caso de error
-                submitButton.disabled = false;
-                submitButton.innerHTML = 'Instalar';
+                const submitButton = installForm.querySelector('button[type="submit"]');
+                if (submitButton) {
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = 'Instalar';
+                }
                 
                 // Limpiar instalación actual
                 WS_CONFIG.currentInstallation = null;
             }
         });
+    } else {
+        console.warn('Formulario de instalación no encontrado en el DOM');
     }
 }
 // Función para inicializar el select de drivers
