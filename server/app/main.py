@@ -26,14 +26,24 @@ from app.db.base import Base
 
 # Middleware HTTPS
 async def https_redirect_middleware(request: Request, call_next):
-    if (
-        not request.url.scheme == "https" 
-        and not request.base_url.hostname == "localhost"
-        and not request.base_url.hostname.startswith("192.168.")
-        and not request.base_url.hostname.startswith("127.0.0.1")
-    ):
+    # Verificar si estamos detrás de un proxy HTTPS (Cloudflare)
+    cf_visitor = request.headers.get('cf-visitor')
+    x_forwarded_proto = request.headers.get('x-forwarded-proto')
+    
+    is_https = (
+        request.url.scheme == "https" or
+        (cf_visitor and '"scheme":"https"' in cf_visitor) or
+        (x_forwarded_proto == "https") or
+        request.base_url.hostname == "localhost" or
+        request.base_url.hostname.startswith("192.168.") or
+        request.base_url.hostname.startswith("127.0.0.1")
+    )
+
+    if not is_https:
+        # Construir la URL HTTPS preservando el path y query params
         url = request.url.replace(scheme="https")
         return RedirectResponse(str(url), status_code=301)
+
     return await call_next(request)
 
 # Configurar el sistema de archivos necesarios
