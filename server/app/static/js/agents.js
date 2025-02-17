@@ -5,23 +5,68 @@ let currentAgentToken = '';
 let agentToDelete = null;
 
 
-
-const getSecureUrl = (path) => {
-    const protocol = window.location.protocol;
-    const wsProtocol = protocol === 'https:' ? 'wss:' : 'ws:';
-    const host = window.location.host;
-
-    // Si es una URL de WebSocket
-    if (path.startsWith('/api/v1/ws/')) {
-        return `${wsProtocol}//${host}${path}`;
-    }
-    // Para otras URLs
-    return `${protocol}//${host}${path}`;
+const APP_CONFIG = {
+    baseUrl: window.location.protocol === 'https:' ? 'https://' : 'http://' + window.location.host,
+    wsUrl: (window.location.protocol === 'https:' ? 'wss://' : 'ws://') + window.location.host,
+    maxRetries: 3
 };
 
-// Configuración WebSocket
+// Función para construir URLs seguras
+const getSecureUrl = (path) => {
+    // Asegurarse de que siempre usemos HTTPS cuando la página está en HTTPS
+    const baseUrl = window.location.protocol === 'https:' ? 
+        'https://' + window.location.host :
+        window.location.protocol + '//' + window.location.host;
+    return `${baseUrl}${path}`;
+};
+
+// Función mejorada para realizar peticiones fetch
+async function secureFetch(url, options = {}) {
+    // Asegurarnos de que la URL sea HTTPS si la página está en HTTPS
+    const secureUrl = url.startsWith('http') ? url : getSecureUrl(url);
+    
+    const defaultOptions = {
+        credentials: 'same-origin',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        redirect: 'follow' // Seguir redirecciones automáticamente
+    };
+
+    const finalOptions = {
+        ...defaultOptions,
+        ...options,
+        headers: {
+            ...defaultOptions.headers,
+            ...options.headers
+        }
+    };
+
+    try {
+        const response = await fetch(secureUrl, finalOptions);
+        
+        // Manejar errores HTTP
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        // Si la respuesta es JSON, devolverla parseada
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+            return await response.json();
+        }
+        
+        return response;
+    } catch (error) {
+        console.error('Error en fetch:', error);
+        throw error;
+    }
+}
+
+// Configuración WebSocket mejorada
 const WS_CONFIG = {
-    url: getSecureUrl('/api/v1/ws/status'),
+    url: `${APP_CONFIG.wsUrl}/api/v1/ws/status`,
     reconnectInterval: 1000,
     maxReconnectAttempts: 10,
     currentInstallation: null
@@ -34,6 +79,7 @@ document.addEventListener('DOMContentLoaded', function () {
     initializeFormHandlers();
     initializeDriverSelect();
 });
+
 // Función para manejar la reconexión del WebSocket
 function handleWebSocketReconnection(event) {
     console.log('WebSocket cerrado. Código:', event.code);
@@ -392,26 +438,7 @@ async function initializeDriverSelect() {
     try {
         addLogMessage('Cargando lista de drivers...', 'info');
         
-        // Construir la URL completa usando el protocolo actual
-        const driversUrl = `${window.location.protocol}//${window.location.host}/api/v1/drivers`;
-        console.log('Intentando cargar drivers desde:', driversUrl);
-        
-        const response = await fetch(driversUrl, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            // Asegurar que las credenciales se envíen con la petición
-            credentials: 'same-origin'
-        });
-
-        if (!response.ok) {
-            const text = await response.text();
-            throw new Error(`Error al obtener drivers. Status: ${response.status}`);
-        }
-
-        const drivers = await response.json();
+        const drivers = await secureFetch('/api/v1/drivers');
         
         if (!Array.isArray(drivers)) {
             throw new Error('El formato de datos devuelto no es válido');
