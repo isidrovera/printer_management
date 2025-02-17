@@ -392,12 +392,18 @@ async function initializeDriverSelect() {
     try {
         addLogMessage('Cargando lista de drivers...', 'info');
         
-        const response = await fetch(getSecureUrl('/api/v1/drivers'), {
+        // Construir la URL completa usando el protocolo actual
+        const driversUrl = `${window.location.protocol}//${window.location.host}/api/v1/drivers`;
+        console.log('Intentando cargar drivers desde:', driversUrl);
+        
+        const response = await fetch(driversUrl, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
-            }
+            },
+            // Asegurar que las credenciales se envíen con la petición
+            credentials: 'same-origin'
         });
 
         if (!response.ok) {
