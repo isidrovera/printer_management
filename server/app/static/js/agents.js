@@ -159,59 +159,9 @@ function initializeWebSocket() {
             addLogMessage('Conexión establecida con el servidor', 'success');
         };
 
-        wsConnection.onmessage = (event) => {
-            console.group('Mensaje WebSocket Recibido');
-            console.log('Mensaje raw:', event.data);
-
-            try {
-                // Verificar si es un mensaje de log del agente
-                if (typeof event.data === 'string' && event.data.startsWith('Agent')) {
-                    console.log('📝 Mensaje de log del agente:', event.data);
-                    handleAgentLogMessage(event.data);
-                    console.groupEnd();
-                    return;
-                }
-
-                // Intentar parsear como JSON
-                let data;
-                try {
-                    data = JSON.parse(event.data);
-                    console.log('✅ JSON parseado correctamente:', data);
-                } catch (parseError) {
-                    console.warn('⚠️ No se pudo parsear como JSON:', {
-                        error: parseError,
-                        rawData: event.data.slice(0, 100) + (event.data.length > 100 ? '...' : '')
-                    });
-                    handleAgentLogMessage(event.data);
-                    console.groupEnd();
-                    return;
-                }
-
-                // Procesar mensaje JSON según su tipo
-                if (data && data.type) {
-                    console.log(`🔄 Procesando mensaje de tipo: ${data.type}`);
-                    processJsonMessage(data);
-                } else {
-                    console.log('ℹ️ Mensaje JSON sin tipo específico:', data);
-                }
-
-            } catch (error) {
-                console.error('❌ Error procesando mensaje:', error);
-                addLogMessage('Error al procesar mensaje: ' + error.message, 'error');
-            }
-            console.groupEnd();
-        };
-
-        wsConnection.onclose = (event) => {
-            console.warn('⚠️ WebSocket cerrado. Código:', event.code);
-            handleWebSocketClose(event);
-        };
-
-        wsConnection.onerror = (error) => {
-            console.error('❌ Error en WebSocket:', error);
-            showNotification('Error en la conexión con el servidor', 'error');
-            addLogMessage('Error en la conexión con el servidor', 'error');
-        };
+        wsConnection.onmessage = handleWebSocketMessage;
+        wsConnection.onclose = handleWebSocketClose;
+        wsConnection.onerror = handleWebSocketError;
 
     } catch (error) {
         console.error('❌ Error al crear conexión WebSocket:', error);
@@ -219,6 +169,7 @@ function initializeWebSocket() {
         addLogMessage('Error al crear la conexión con el servidor', 'error');
     }
 }
+
 
 // Procesar diferentes tipos de mensajes JSON
 function processJsonMessage(data) {
@@ -460,7 +411,17 @@ async function initializeDriverSelect() {
         showNotification(`Error al cargar drivers: ${error.message}`, 'error');
     }
 }
-
+async function installPrinter(data) {
+    try {
+        return await secureFetch(`/api/v1/printers/install/${currentAgentToken}`, {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+    } catch (error) {
+        console.error('Error en la instalación:', error);
+        throw error;
+    }
+}
 // Función para mostrar el modal de instalación de impresora
 function showInstallPrinter(agentToken) {
     currentAgentToken = agentToken;
