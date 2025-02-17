@@ -8,8 +8,8 @@ let agentToDelete = null;
 const WS_CONFIG = {
     url: `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/api/v1/ws/status`,
     reconnectInterval: 1000,
-    maxReconnectAttempts: 10,  // Aumentamos el número de reintentos
-    currentInstallation: null  // Para trackear instalación en progreso
+    maxReconnectAttempts: 10,
+    currentInstallation: null
 };
 
 // Inicialización cuando el DOM está listo
@@ -376,8 +376,13 @@ async function initializeDriverSelect() {
 
     try {
         addLogMessage('Cargando lista de drivers...', 'info');
+        console.log('Iniciando carga de drivers - Protocolo:', window.location.protocol);
         
-        const response = await fetch('/api/v1/drivers', {
+        // Usar una URL que mantenga el mismo protocolo que la página
+        const driversUrl = `${window.location.protocol}//${window.location.host}/api/v1/drivers`;
+        console.log('Intentando cargar drivers desde:', driversUrl);
+        
+        const response = await fetch(driversUrl, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -391,6 +396,7 @@ async function initializeDriverSelect() {
         }
 
         const drivers = await response.json();
+        console.log('Drivers cargados exitosamente:', drivers.length);
         
         if (!Array.isArray(drivers)) {
             throw new Error('El formato de datos devuelto no es válido');
