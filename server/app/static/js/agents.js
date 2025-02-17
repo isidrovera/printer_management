@@ -382,7 +382,8 @@ async function initializeDriverSelect() {
         console.log('Iniciando carga de drivers - Protocolo:', window.location.protocol);
         
         // Usar una URL que mantenga el mismo protocolo que la página
-        const driversUrl = `${window.location.protocol}//${window.location.host}/api/v1/drivers`;
+        const driversUrl = `https://copierconnectremote.com/api/v1/drivers`;
+
         console.log('Intentando cargar drivers desde:', driversUrl);
         
         const response = await fetch(driversUrl, {
