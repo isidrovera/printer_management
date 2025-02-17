@@ -382,8 +382,8 @@ async function initializeDriverSelect() {
         addLogMessage('Cargando lista de drivers...', 'info');
         console.log('Iniciando carga de drivers - Protocolo:', window.location.protocol);
 
-        // Construir la URL asegurando que el protocolo sea correcto
-        const driversUrl = `${window.location.protocol}//${window.location.host}/api/v1/drivers`;
+        // Construir la URL asegurando que sea HTTPS
+        const driversUrl = `${window.location.protocol === 'https:' ? 'https://' : 'http://'}${window.location.host}/api/v1/drivers`;
 
         console.log('Intentando cargar drivers desde:', driversUrl);
 
@@ -428,6 +428,7 @@ async function initializeDriverSelect() {
         showNotification(`Error al cargar drivers: ${error.message}`, 'error');
     }
 }
+
 
 // Función para mostrar el modal de instalación de impresora
 function showInstallPrinter(agentToken) {
