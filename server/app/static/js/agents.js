@@ -373,6 +373,7 @@ function initializeFormHandlers() {
     }
 }
 // Función para inicializar el select de drivers
+// Función para inicializar el select de drivers
 async function initializeDriverSelect() {
     const driverSelect = document.getElementById('driver');
     if (!driverSelect) return;
@@ -380,12 +381,12 @@ async function initializeDriverSelect() {
     try {
         addLogMessage('Cargando lista de drivers...', 'info');
         console.log('Iniciando carga de drivers - Protocolo:', window.location.protocol);
-        
-        // Usar una URL que mantenga el mismo protocolo que la página
-        const driversUrl = `https://copierconnectremote.com/api/v1/drivers`;
+
+        // Construir la URL asegurando que el protocolo sea correcto
+        const driversUrl = `${window.location.protocol}//${window.location.host}/api/v1/drivers`;
 
         console.log('Intentando cargar drivers desde:', driversUrl);
-        
+
         const response = await fetch(driversUrl, {
             method: 'GET',
             headers: {
@@ -394,20 +395,25 @@ async function initializeDriverSelect() {
             }
         });
 
+        console.log('Respuesta del servidor:', response);
+
         if (!response.ok) {
-            const text = await response.text();
+            const errorText = await response.text();
+            console.error(`Error al obtener drivers. Status: ${response.status}, Respuesta: ${errorText}`);
             throw new Error(`Error al obtener drivers. Status: ${response.status}`);
         }
 
         const drivers = await response.json();
-        console.log('Drivers cargados exitosamente:', drivers.length);
-        
+        console.log('Drivers cargados exitosamente:', drivers);
+
         if (!Array.isArray(drivers)) {
+            console.error('El formato de datos devuelto no es un array:', drivers);
             throw new Error('El formato de datos devuelto no es válido');
         }
 
         driverSelect.innerHTML = '<option value="">Seleccione un driver</option>';
         drivers.forEach((driver) => {
+            console.log(`Agregando driver: ${driver.manufacturer} - ${driver.model} (${driver.driver_filename})`);
             const option = document.createElement('option');
             option.value = driver.id;
             option.textContent = `${driver.manufacturer} - ${driver.model} (${driver.driver_filename})`;
@@ -422,6 +428,7 @@ async function initializeDriverSelect() {
         showNotification(`Error al cargar drivers: ${error.message}`, 'error');
     }
 }
+
 // Función para mostrar el modal de instalación de impresora
 function showInstallPrinter(agentToken) {
     currentAgentToken = agentToken;
