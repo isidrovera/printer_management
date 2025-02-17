@@ -4,9 +4,24 @@
 let currentAgentToken = '';
 let agentToDelete = null;
 
+
+
+const getSecureUrl = (path) => {
+    const protocol = window.location.protocol;
+    const wsProtocol = protocol === 'https:' ? 'wss:' : 'ws:';
+    const host = window.location.host;
+
+    // Si es una URL de WebSocket
+    if (path.startsWith('/api/v1/ws/')) {
+        return `${wsProtocol}//${host}${path}`;
+    }
+    // Para otras URLs
+    return `${protocol}//${host}${path}`;
+};
+
 // Configuración WebSocket
 const WS_CONFIG = {
-    url: `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/api/v1/ws/status`,
+    url: getSecureUrl('/api/v1/ws/status'),
     reconnectInterval: 1000,
     maxReconnectAttempts: 10,
     currentInstallation: null
@@ -377,7 +392,7 @@ async function initializeDriverSelect() {
     try {
         addLogMessage('Cargando lista de drivers...', 'info');
         
-        const response = await fetch(`${window.location.protocol}//${window.location.host}/api/v1/drivers`, {
+        const response = await fetch(getSecureUrl('/api/v1/drivers'), {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -412,6 +427,7 @@ async function initializeDriverSelect() {
         showNotification(`Error al cargar drivers: ${error.message}`, 'error');
     }
 }
+
 // Función para mostrar el modal de instalación de impresora
 function showInstallPrinter(agentToken) {
     currentAgentToken = agentToken;
