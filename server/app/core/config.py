@@ -2,9 +2,8 @@
 # server/app/core/config.py
 import os
 from pathlib import Path
+from typing import Optional, Dict, Any, List, ClassVar
 from pydantic_settings import BaseSettings
-from typing import Optional, Dict, Any, List
-import logging.config
 
 # Obtener el directorio base del proyecto
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -38,37 +37,20 @@ class Settings(BaseSettings):
     DOMAIN: str = "copierconnectremote.com"
     
     # Configuración de proxy y seguridad
-    PROXY_PREFIX: str = ""  # Por si Nginx añade un prefijo
+    PROXY_PREFIX: str = ""
     BEHIND_PROXY: bool = True
     TRUST_PROXY_HEADERS: bool = True
     
-    # Configuración CORS - Permitir Cloudflare
+    # Configuración CORS
     BACKEND_CORS_ORIGINS: List[str] = [
-        f"https://{DOMAIN}",
-        f"https://www.{DOMAIN}",
+        "https://copierconnectremote.com",
+        "https://www.copierconnectremote.com",
         "http://localhost:8000",
         "http://localhost:3000"
     ]
     
-    # Headers de seguridad por defecto
-    SECURITY_HEADERS: Dict[str, str] = {
-        "X-Frame-Options": "DENY",
-        "X-Content-Type-Options": "nosniff",
-        "X-XSS-Protection": "1; mode=block",
-        "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
-        "Content-Security-Policy": (
-            "default-src 'self' https: wss:; "
-            "img-src 'self' data: https:; "
-            "style-src 'self' 'unsafe-inline' https:; "
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; "
-            "connect-src 'self' https: wss:;"
-        )
-    }
-    
-    # Configuración de logging
-    LOG_LEVEL: str = "INFO"
-    LOG_FORMAT: str = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    LOGGING_CONFIG = {
+    # Configuración de logging como ClassVar
+    LOGGING_CONFIG: ClassVar[Dict[str, Any]] = {
         "version": 1,
         "disable_existing_loggers": False,
         "formatters": {
@@ -120,20 +102,27 @@ class Settings(BaseSettings):
         },
     }
     
+    # Headers de seguridad
+    SECURITY_HEADERS: Dict[str, str] = {
+        "X-Frame-Options": "DENY",
+        "X-Content-Type-Options": "nosniff",
+        "X-XSS-Protection": "1; mode=block",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains"
+    }
+    
     # Configuración de archivos
     MAX_UPLOAD_SIZE: int = 50 * 1024 * 1024  # 50 MB
     ALLOWED_UPLOAD_EXTENSIONS: set = {'.exe', '.msi', '.zip', '.pdf'}
     
+    # URLs base del servidor
     @property
     def SERVER_URL(self) -> str:
-        """URL base del servidor."""
         if self.DEBUG:
             return f"http://{self.HOST}:{self.PORT}"
         return f"https://{self.DOMAIN}"
     
     @property
     def SERVER_WS_URL(self) -> str:
-        """URL base para WebSocket."""
         if self.DEBUG:
             return f"ws://{self.HOST}:{self.PORT}"
         return f"wss://{self.DOMAIN}"
@@ -143,32 +132,26 @@ class Settings(BaseSettings):
         return f"{self.API_V1_STR}/ws/status"
     
     def get_cors_origins(self) -> List[str]:
-        """Obtiene los orígenes permitidos para CORS."""
         if self.DEBUG:
             return ["*"]
         return self.BACKEND_CORS_ORIGINS
     
     def get_security_headers(self, is_websocket: bool = False) -> Dict[str, str]:
-        """Obtiene los headers de seguridad."""
         headers = self.SECURITY_HEADERS.copy()
         if is_websocket:
             headers.pop("Content-Security-Policy", None)
         return headers
     
     def get_ws_url(self) -> str:
-        """Obtiene la URL completa para WebSocket."""
         return f"{self.SERVER_WS_URL}{self.WS_PATH}"
     
     def get_api_url(self, path: str = "") -> str:
-        """Obtiene la URL completa para la API."""
         return f"{self.SERVER_URL}{self.API_V1_STR}{path}"
     
     def validate_upload_file(self, filename: str) -> bool:
-        """Valida si un archivo puede ser subido al sistema."""
         return any(filename.lower().endswith(ext) for ext in self.ALLOWED_UPLOAD_EXTENSIONS)
     
     def get_file_path(self, filename: str, storage_type: str = "drivers") -> Path:
-        """Obtiene la ruta completa para un archivo."""
         storage_map = {
             "drivers": self.DRIVERS_STORAGE_PATH,
             "logs": self.LOGS_STORAGE_PATH,
@@ -194,5 +177,9 @@ class Settings(BaseSettings):
                 "sslmode": "require" if not self.DEBUG else "disable"
             }
 
+    class Config:
+        env_file = ".env"
+        case_sensitive = True
+
 # Instancia global de configuración
-settings = Settings()
+settings = Settings
