@@ -1,14 +1,16 @@
 # server/main.py
+# server/main.py
 import logging
 import os
 from pathlib import Path
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 # Importaciones locales
 from app.core.config import settings
@@ -20,10 +22,7 @@ from app.db.session import engine, SessionLocal
 from app.db.base import Base
 
 # Configuración de logging
-logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
+logging.config.dictConfig(settings.LOGGING_CONFIG)
 logger = logging.getLogger(__name__)
 
 # Configuración de directorios
@@ -64,20 +63,63 @@ async def lifespan(app: FastAPI):
 # Crear aplicación FastAPI
 app = FastAPI(
     title=settings.PROJECT_NAME,
+    description=settings.DESCRIPTION,
+    version=settings.VERSION,
     lifespan=lifespan
 )
 
 # Configuración de middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=settings.get_cors_origins(),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["Content-Type", "X-Total-Count"]
 )
 
+# Middleware para agregar headers de seguridad
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    response = await call_next(request)
+    
+    # Agregar headers de seguridad
+    is_websocket = request.url.path.startswith(f"{settings.API_V1_STR}/ws")
+    security_headers = settings.get_security_headers(is_websocket=is_websocket)
+    
+    for header_name, header_value in security_headers.items():
+        response.headers[header_name] = header_value
+    
+    return response
+
+# Middleware para manejar proxy
+@app.middleware("http")
+async def proxy_middleware(request: Request, call_next):
+    if settings.BEHIND_PROXY and settings.TRUST_PROXY_HEADERS:
+        # Confiar en los headers X-Forwarded-* de Nginx/Cloudflare
+        forwarded_proto = request.headers.get("X-Forwarded-Proto")
+        if forwarded_proto:
+            request.scope["scheme"] = forwarded_proto
+        
+        forwarded_host = request.headers.get("X-Forwarded-Host")
+        if forwarded_host:
+            request.scope["headers"].append(
+                (b"host", forwarded_host.encode())
+            )
+    
+    response = await call_next(request)
+    return response
+
+# Agregar otros middlewares
 app.add_middleware(BaseHTTPMiddleware, dispatch=auth_middleware)
 app.add_middleware(BaseHTTPMiddleware, dispatch=first_login_middleware)
+
+if not settings.DEBUG:
+    # En producción, restringir los hosts permitidos
+    app.add_middleware(
+        TrustedHostMiddleware, 
+        allowed_hosts=[settings.DOMAIN, f"www.{settings.DOMAIN}"]
+    )
 
 # Montar archivos estáticos
 app.mount(
@@ -97,4 +139,12 @@ app.include_router(
 templates.env.filters['numberformat'] = lambda value: "{:,}".format(value)
 templates.env.filters['default'] = lambda value, default_value: value if value is not None else default_value
 
-logger.info("Aplicación inicializada completamente")
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(
+        "main:app",
+        host=settings.HOST,
+        port=settings.PORT,
+        reload=settings.DEBUG,
+        log_config=settings.LOGGING_CONFIG
+    )
