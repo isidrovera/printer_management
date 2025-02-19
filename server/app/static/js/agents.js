@@ -383,7 +383,7 @@ async function initializeDriverSelect() {
         console.log('Iniciando carga de drivers - Protocolo:', window.location.protocol);
 
         // Construir la URL asegurando que sea HTTPS
-        const driversUrl = `${window.location.protocol === 'https:' ? 'https://' : 'http://'}${window.location.host}/api/v1/drivers`;
+        const driversUrl = `${window.location.protocol === 'https:' ? 'https://' : 'http://'}${window.location.host}/api/v1/drivers/`;
 
         console.log('Intentando cargar drivers desde:', driversUrl);
 
