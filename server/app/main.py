@@ -1,5 +1,4 @@
 # server/main.py
-# server/main.py
 import logging
 import os
 from pathlib import Path
@@ -60,12 +59,17 @@ async def lifespan(app: FastAPI):
     # Shutdown
     logger.info("Cerrando aplicación...")
 
-
+# Crear aplicación FastAPI
+app = FastAPI(
+    title=settings.PROJECT_NAME,
+    description=settings.DESCRIPTION,
+    lifespan=lifespan
+)
 
 # Configuración de middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.get_cors_origins(),
+    allow_origins=["*"],  # Permitir todos los orígenes en desarrollo
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -78,7 +82,7 @@ async def add_security_headers(request: Request, call_next):
     response = await call_next(request)
     
     # Agregar headers de seguridad
-    is_websocket = request.url.path.startswith(f"{settings.API_V1_STR}/ws")
+    is_websocket = request.url.path.endswith("/ws")
     security_headers = settings.get_security_headers(is_websocket=is_websocket)
     
     for header_name, header_value in security_headers.items():
@@ -86,34 +90,9 @@ async def add_security_headers(request: Request, call_next):
     
     return response
 
-# Middleware para manejar proxy
-@app.middleware("http")
-async def proxy_middleware(request: Request, call_next):
-    if settings.BEHIND_PROXY and settings.TRUST_PROXY_HEADERS:
-        # Confiar en los headers X-Forwarded-* de Nginx/Cloudflare
-        forwarded_proto = request.headers.get("X-Forwarded-Proto")
-        if forwarded_proto:
-            request.scope["scheme"] = forwarded_proto
-        
-        forwarded_host = request.headers.get("X-Forwarded-Host")
-        if forwarded_host:
-            request.scope["headers"].append(
-                (b"host", forwarded_host.encode())
-            )
-    
-    response = await call_next(request)
-    return response
-
 # Agregar otros middlewares
 app.add_middleware(BaseHTTPMiddleware, dispatch=auth_middleware)
 app.add_middleware(BaseHTTPMiddleware, dispatch=first_login_middleware)
-
-if not settings.DEBUG:
-    # En producción, restringir los hosts permitidos
-    app.add_middleware(
-        TrustedHostMiddleware, 
-        allowed_hosts=[settings.DOMAIN, f"www.{settings.DOMAIN}"]
-    )
 
 # Montar archivos estáticos
 app.mount(
@@ -137,8 +116,8 @@ if __name__ == "__main__":
     import uvicorn
     uvicorn.run(
         "main:app",
-        host=settings.HOST,
-        port=settings.PORT,
-        reload=settings.DEBUG,
+        host="0.0.0.0",
+        port=8000,
+        reload=True,
         log_config=settings.LOGGING_CONFIG
     )
