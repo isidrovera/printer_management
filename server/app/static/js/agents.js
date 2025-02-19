@@ -386,7 +386,7 @@ async function initializeDriverSelect() {
         addLogMessage('Cargando lista de drivers...', 'info');
         
         // Usar la URL con HTTPS forzado
-        const driversUrl = `${API_CONFIG.baseUrl}${API_CONFIG.apiVersion}/drivers`;
+        const driversUrl = `${API_CONFIG.baseUrl}${API_CONFIG.apiVersion}/drivers/`;
         console.log('Intentando cargar drivers desde:', driversUrl);
 
         const response = await fetch(driversUrl, {
