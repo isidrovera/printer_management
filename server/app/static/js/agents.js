@@ -12,6 +12,11 @@ const WS_CONFIG = {
     currentInstallation: null
 };
 
+const API_CONFIG = {
+    baseUrl: 'https://copierconnectremote.com',  // Forzar HTTPS
+    apiVersion: '/api/v1'
+};
+
 // Inicialización cuando el DOM está listo
 document.addEventListener('DOMContentLoaded', function () {
     initializeWebSocket();
@@ -379,11 +384,9 @@ async function initializeDriverSelect() {
 
     try {
         addLogMessage('Cargando lista de drivers...', 'info');
-        console.log('Iniciando carga de drivers - Protocolo:', window.location.protocol);
-
-        // Construir la URL usando protocol-relative URL
-        const driversUrl = `${window.location.protocol}//${window.location.host}/api/v1/drivers`;
         
+        // Usar la URL con HTTPS forzado
+        const driversUrl = `${API_CONFIG.baseUrl}${API_CONFIG.apiVersion}/drivers`;
         console.log('Intentando cargar drivers desde:', driversUrl);
 
         const response = await fetch(driversUrl, {
@@ -426,7 +429,6 @@ async function initializeDriverSelect() {
         showNotification(`Error al cargar drivers: ${error.message}`, 'error');
     }
 }
-
 // Función para mostrar el modal de instalación de impresora
 function showInstallPrinter(agentToken) {
     currentAgentToken = agentToken;
