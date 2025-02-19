@@ -60,12 +60,7 @@ async def lifespan(app: FastAPI):
     # Shutdown
     logger.info("Cerrando aplicación...")
 
-# Crear aplicación FastAPI
-app = FastAPI(
-    title=settings.PROJECT_NAME,   
-    version=settings.VERSION,
-    lifespan=lifespan
-)
+
 
 # Configuración de middleware
 app.add_middleware(
