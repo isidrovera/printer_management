@@ -1,4 +1,5 @@
 # server/app/core/config.py
+# server/app/core/config.py
 import os
 from pathlib import Path
 from pydantic_settings import BaseSettings
@@ -9,6 +10,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent  # server/app/
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "Printer Management System"
+    DESCRIPTION: str = "Sistema de gestión de impresoras"  # Añadido
     DATABASE_URL: str
     SECRET_KEY: str
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
@@ -56,6 +58,7 @@ class Settings(BaseSettings):
     
     class Config:
         env_file = ".env"
+        from_attributes = True  # Actualizado de orm_mode a from_attributes
         
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
