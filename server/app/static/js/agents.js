@@ -373,7 +373,6 @@ function initializeFormHandlers() {
     }
 }
 // Función para inicializar el select de drivers
-// Función para inicializar el select de drivers
 async function initializeDriverSelect() {
     const driverSelect = document.getElementById('driver');
     if (!driverSelect) return;
@@ -382,9 +381,9 @@ async function initializeDriverSelect() {
         addLogMessage('Cargando lista de drivers...', 'info');
         console.log('Iniciando carga de drivers - Protocolo:', window.location.protocol);
 
-        // Construir la URL asegurando que sea HTTPS
-        const driversUrl = `${window.location.protocol === 'https:' ? 'https://' : 'http://'}${window.location.host}/api/v1/drivers/`;
-
+        // Construir la URL usando protocol-relative URL
+        const driversUrl = `${window.location.protocol}//${window.location.host}/api/v1/drivers`;
+        
         console.log('Intentando cargar drivers desde:', driversUrl);
 
         const response = await fetch(driversUrl, {
@@ -394,8 +393,6 @@ async function initializeDriverSelect() {
                 'Content-Type': 'application/json'
             }
         });
-
-        console.log('Respuesta del servidor:', response);
 
         if (!response.ok) {
             const errorText = await response.text();
@@ -411,9 +408,10 @@ async function initializeDriverSelect() {
             throw new Error('El formato de datos devuelto no es válido');
         }
 
+        // Limpiar y repoblar el select
         driverSelect.innerHTML = '<option value="">Seleccione un driver</option>';
+        
         drivers.forEach((driver) => {
-            console.log(`Agregando driver: ${driver.manufacturer} - ${driver.model} (${driver.driver_filename})`);
             const option = document.createElement('option');
             option.value = driver.id;
             option.textContent = `${driver.manufacturer} - ${driver.model} (${driver.driver_filename})`;
@@ -428,7 +426,6 @@ async function initializeDriverSelect() {
         showNotification(`Error al cargar drivers: ${error.message}`, 'error');
     }
 }
-
 
 // Función para mostrar el modal de instalación de impresora
 function showInstallPrinter(agentToken) {
