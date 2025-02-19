@@ -385,11 +385,13 @@ async function initializeDriverSelect() {
     try {
         addLogMessage('Cargando lista de drivers...', 'info');
         
-        // Usar la URL con HTTPS forzado
-        const driversUrl = `${API_CONFIG.baseUrl}${API_CONFIG.apiVersion}/drivers`;
-        console.log('Intentando cargar drivers desde:', driversUrl);
+        // Construir la URL asegurando HTTPS
+        const driversUrl = new URL('/api/v1/drivers', window.location.origin);
+        driversUrl.protocol = 'https:';
+        
+        console.log('Intentando cargar drivers desde:', driversUrl.toString());
 
-        const response = await fetch(driversUrl, {
+        const response = await fetch(driversUrl.toString(), {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -398,22 +400,12 @@ async function initializeDriverSelect() {
         });
 
         if (!response.ok) {
-            const errorText = await response.text();
-            console.error(`Error al obtener drivers. Status: ${response.status}, Respuesta: ${errorText}`);
             throw new Error(`Error al obtener drivers. Status: ${response.status}`);
         }
 
         const drivers = await response.json();
-        console.log('Drivers cargados exitosamente:', drivers);
-
-        if (!Array.isArray(drivers)) {
-            console.error('El formato de datos devuelto no es un array:', drivers);
-            throw new Error('El formato de datos devuelto no es válido');
-        }
-
-        // Limpiar y repoblar el select
-        driverSelect.innerHTML = '<option value="">Seleccione un driver</option>';
         
+        driverSelect.innerHTML = '<option value="">Seleccione un driver</option>';
         drivers.forEach((driver) => {
             const option = document.createElement('option');
             option.value = driver.id;
