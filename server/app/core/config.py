@@ -1,5 +1,4 @@
 # server/app/core/config.py
-# server/app/core/config.py
 import os
 from pathlib import Path
 from pydantic_settings import BaseSettings
@@ -9,8 +8,12 @@ from typing import Optional, Dict, Any, List, ClassVar
 BASE_DIR = Path(__file__).resolve().parent.parent.parent  # server/app/
 
 class Settings(BaseSettings):
+    # Configuración básica del proyecto
     PROJECT_NAME: str = "Printer Management System"
-    DESCRIPTION: str = "Sistema de gestión de impresoras"  # Añadido
+    DESCRIPTION: str = "Sistema de gestión de impresoras"
+    API_V1_STR: str = "/api/v1"  # Añadida esta línea
+    
+    # Configuración de la base de datos y seguridad
     DATABASE_URL: str
     SECRET_KEY: str
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
@@ -72,5 +75,10 @@ class Settings(BaseSettings):
             # Eliminar headers que no son necesarios para WebSocket
             headers.pop("X-Frame-Options", None)
         return headers
+
+    def get_cors_origins(self) -> List[str]:
+        if getattr(self, 'DEBUG', False):
+            return ["*"]
+        return [self.SERVER_URL]
 
 settings = Settings()
