@@ -132,6 +132,7 @@ async def login_for_access_token(
             status_code=500,
             content={"detail": "Error en el servidor"}
         )
+
 # Rutas Web
 @router.get("/login")
 async def login_form(request: Request):
