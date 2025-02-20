@@ -59,6 +59,7 @@ async def verify_2fa(
         }
     )
 # Rutas de API
+# server/app/api/v1/endpoints/auth.py
 @router.post("/token")
 async def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(),
@@ -76,12 +77,18 @@ async def login_for_access_token(
             )
             
         access_token = create_access_token(data={"sub": user.username})
-        return {"access_token": access_token, "token_type": "bearer"}
+        return {
+            "access_token": access_token, 
+            "token_type": "bearer",
+            "user": {
+                "username": user.username,
+                "must_change_password": user.must_change_password
+            }
+        }
         
     except Exception as e:
         logger.error(f"Error en login: {str(e)}")
         raise HTTPException(status_code=500, detail="Error en el servidor")
-
 # Rutas Web
 @router.get("/login")
 async def login_form(request: Request):
