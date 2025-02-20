@@ -24,33 +24,29 @@ async def install_printer(
     db: Session = Depends(get_db)
 ):
     try:
-        logger.debug(f"Datos recibidos: printer_ip='{install_data.printer_ip}' driver_id={install_data.driver_id}")
+        logger.info(f"Iniciando instalación de impresora para agente {agent_token}")
+        logger.debug(f"Datos recibidos: {install_data}")
         
         driver_service = DriverService(db)
         
-        # Obtener información del driver
-        driver_info = await driver_service.get_driver_for_installation(install_data.driver_id)
-        logger.debug(f"Información del driver obtenida: {driver_info}")
-        
-        if not driver_info:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Driver no encontrado"
-            )
-        
-        # Preparar datos de la impresora para el comando
-        printer_data = {
-            "printer_ip": install_data.printer_ip,
-            "manufacturer": driver_info["manufacturer"],
-            "model": driver_info["model"],
-            "driver_url": driver_info["download_url"],
-            "driver_filename": driver_info["driver_filename"]
-        }
-        
         try:
+            # Obtener información del driver con URL de descarga
+            driver_info = await driver_service.get_driver_for_installation(install_data.driver_id)
+            logger.debug(f"Información del driver obtenida: {driver_info}")
+            
+            # Preparar comando de instalación
+            installation_command = {
+                "type": "install_printer",  # Asegurarse de incluir el tipo
+                "printer_ip": install_data.printer_ip,
+                "manufacturer": driver_info["manufacturer"],
+                "model": driver_info["model"],
+                "driver_url": driver_info["download_url"],
+                "driver_filename": driver_info["driver_filename"]
+            }
+            
             # Enviar comando al agente
-            await manager.send_install_printer_command(agent_token, printer_data)
-            logger.info(f"Comando de instalación enviado exitosamente al agente {agent_token}")
+            await manager.send_install_printer_command(agent_token, installation_command)
+            logger.info("Comando de instalación enviado exitosamente")
             
             return {
                 "status": "success",
@@ -61,27 +57,25 @@ async def install_printer(
                 }
             }
             
-        except ValueError as ve:
-            logger.error(f"Error de validación: {str(ve)}")
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=str(ve)
-            )
+        except HTTPException as he:
+            logger.error(f"Error HTTP durante la instalación: {he.detail}")
+            raise he
         except Exception as e:
-            logger.error(f"Error enviando comando al agente: {str(e)}")
+            logger.error(f"Error inesperado durante la instalación: {str(e)}")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"Error enviando comando al agente: {str(e)}"
+                detail=str(e)
             )
             
-    except HTTPException as he:
-        raise he
     except Exception as e:
         logger.error(f"Error crítico en install_printer: {str(e)}")
+        if isinstance(e, HTTPException):
+            raise e
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=str(e)
+            detail=f"Error al procesar la instalación: {str(e)}"
         )
+
 @router.get("/monitored", response_model=List[Dict[str, Any]])
 async def get_monitored_printers(
     db: Session = Depends(get_db)

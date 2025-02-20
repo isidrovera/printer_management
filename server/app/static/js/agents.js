@@ -6,15 +6,10 @@ let agentToDelete = null;
 
 // Configuración WebSocket
 const WS_CONFIG = {
-    url: `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/api/v1/ws/status`,
+    url: `ws://${window.location.host}/api/v1/ws/status`,
     reconnectInterval: 1000,
-    maxReconnectAttempts: 10,
-    currentInstallation: null
-};
-
-const API_CONFIG = {
-    baseUrl: 'https://copierconnectremote.com',  // Forzar HTTPS
-    apiVersion: '/api/v1'
+    maxReconnectAttempts: 10,  // Aumentamos el número de reintentos
+    currentInstallation: null  // Para trackear instalación en progreso
 };
 
 // Inicialización cuando el DOM está listo
@@ -296,20 +291,15 @@ function initializeFormHandlers() {
                 const driverId = document.getElementById('driver').value;
                 const printerIp = document.getElementById('printerIp').value;
 
-                // Validación de campos
                 if (!driverId || !printerIp) {
-                    console.warn('Campos incompletos:', { driverId, printerIp });
                     showNotification('Por favor complete todos los campos', 'error');
-                    addLogMessage('Error: Faltan campos requeridos', 'error');
+                    addLogMessage({
+                        timestamp: new Date().toISOString().replace('T', ' ').split('.')[0],
+                        type: 'error',
+                        message: 'Error: Faltan campos requeridos'
+                    });
                     return;
                 }
-
-                // Log de inicio de instalación
-                console.log('Iniciando instalación:', {
-                    driverId,
-                    printerIp,
-                    agentToken: currentAgentToken
-                });
 
                 // Guardar información de la instalación actual
                 WS_CONFIG.currentInstallation = {
@@ -322,13 +312,13 @@ function initializeFormHandlers() {
                 submitButton.disabled = true;
                 submitButton.innerHTML = 'Instalando...';
                 
-                addLogMessage('Iniciando instalación de impresora...', 'info');
+                addLogMessage({
+                    timestamp: new Date().toISOString().replace('T', ' ').split('.')[0],
+                    type: 'info',
+                    message: 'Iniciando instalación de impresora...'
+                });
 
-                // Construir URL con el protocolo correcto
-                const installUrl = `${window.location.protocol}//${window.location.host}/api/v1/printers/install/${currentAgentToken}`;
-                console.log('URL de instalación:', installUrl);
-
-                const response = await fetch(installUrl, {
+                const response = await fetch(`/api/v1/printers/install/${currentAgentToken}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -345,8 +335,11 @@ function initializeFormHandlers() {
                     throw new Error(errorData.detail || `Error en la instalación: ${response.status}`);
                 }
 
-                console.log('Comando de instalación enviado correctamente');
-                addLogMessage('Comando enviado. La instalación continúa en segundo plano...', 'info');
+                addLogMessage({
+                    timestamp: new Date().toISOString().replace('T', ' ').split('.')[0],
+                    type: 'info',
+                    message: 'Comando enviado. La instalación continúa en segundo plano...'
+                });
 
                 // Cambiar el texto del botón de cerrar
                 const closeButton = document.querySelector('button[onclick="closeModal(\'installPrinterModal\')"]');
@@ -359,22 +352,21 @@ function initializeFormHandlers() {
                 document.getElementById('printerIp').disabled = true;
 
             } catch (error) {
-                console.error('Error detallado en la instalación:', error);
-                addLogMessage(`Error: ${error.message}`, 'error');
+                console.error('Error detallado:', error);
+                addLogMessage({
+                    timestamp: new Date().toISOString().replace('T', ' ').split('.')[0],
+                    type: 'error',
+                    message: `Error: ${error.message}`
+                });
                 
                 // Reactivar el botón de envío en caso de error
-                const submitButton = installForm.querySelector('button[type="submit"]');
-                if (submitButton) {
-                    submitButton.disabled = false;
-                    submitButton.innerHTML = 'Instalar';
-                }
+                submitButton.disabled = false;
+                submitButton.innerHTML = 'Instalar';
                 
                 // Limpiar instalación actual
                 WS_CONFIG.currentInstallation = null;
             }
         });
-    } else {
-        console.warn('Formulario de instalación no encontrado en el DOM');
     }
 }
 // Función para inicializar el select de drivers
@@ -385,13 +377,7 @@ async function initializeDriverSelect() {
     try {
         addLogMessage('Cargando lista de drivers...', 'info');
         
-        // Construir la URL asegurando HTTPS
-        const driversUrl = new URL('/api/v1/drivers', window.location.origin);
-        driversUrl.protocol = 'https:';
-        
-        console.log('Intentando cargar drivers desde:', driversUrl.toString());
-
-        const response = await fetch(driversUrl.toString(), {
+        const response = await fetch('/api/v1/drivers', {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -400,11 +386,16 @@ async function initializeDriverSelect() {
         });
 
         if (!response.ok) {
+            const text = await response.text();
             throw new Error(`Error al obtener drivers. Status: ${response.status}`);
         }
 
         const drivers = await response.json();
         
+        if (!Array.isArray(drivers)) {
+            throw new Error('El formato de datos devuelto no es válido');
+        }
+
         driverSelect.innerHTML = '<option value="">Seleccione un driver</option>';
         drivers.forEach((driver) => {
             const option = document.createElement('option');

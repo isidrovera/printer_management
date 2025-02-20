@@ -20,7 +20,6 @@ from ..core.config import settings
 from .system_info_service import SystemInfoService
 from .printer_service import PrinterService
 from .printer_monitor_service import PrinterMonitorService
-from ..core.message_queue import MessageQueue, MessagePriority
 from .smb_service import SMBScannerService
 from datetime import datetime
 from ..core.config import settings
@@ -45,7 +44,6 @@ class AgentService:
         self.active_tunnels = {}
         self.is_shutting_down = False
         self.current_status = AgentStatus.OFFLINE
-        self.message_queue = MessageQueue()
         
         
     
@@ -224,80 +222,57 @@ class AgentService:
     async def _handle_connection(self, websocket):
         """Maneja la conexión WebSocket activa."""
         try:
-            logger.info("Manejador de conexión iniciado")
             while True:
+                message = await websocket.recv()
+                
                 try:
-                    logger.debug("Esperando mensaje del servidor...")
-                    message = await websocket.recv()
-                    logger.info(f"Mensaje recibido del servidor: {message}")
+                    data = json.loads(message)
+                    message_type = data.get('type')
                     
-                    try:
-                        data = json.loads(message)
-                        message_type = data.get('type')
-                        logger.info(f"Procesando mensaje tipo: {message_type}")
-                        
-                        # Procesar mensaje directamente
+                    if message_type == 'heartbeat':
+                        await self._handle_heartbeat(websocket)
+                    else:
+                        logger.debug(f"Mensaje recibido: {message}")
                         await self._process_message(data, websocket)
                         
-                    except json.JSONDecodeError:
-                        logger.error(f"JSON inválido recibido: {message}")
-                        continue
-                    except Exception as e:
-                        logger.error(f"Error procesando mensaje: {str(e)}")
-                        await self._send_error_response(websocket, str(e))
-                        continue
-                        
-                except websockets.exceptions.ConnectionClosed as e:
-                    logger.error(f"Conexión cerrada por el servidor: {e}")
-                    raise
+                except json.JSONDecodeError:
+                    logger.error(f"JSON inválido recibido: {message}")
+                    continue
                 except Exception as e:
-                    logger.error(f"Error en el bucle de mensajes: {e}")
+                    logger.error(f"Error procesando mensaje: {str(e)}")
                     continue
 
+        except websockets.exceptions.ConnectionClosed:
+            logger.info("Conexión cerrada por el servidor")
+            raise
         except Exception as e:
-            logger.error(f"Error fatal en el manejador de conexión: {e}")
+            logger.error(f"Error en el manejador de conexión: {str(e)}")
             raise
 
     async def _process_message(self, data, websocket):
         """Procesa los mensajes recibidos del servidor."""
         try:
             message_type = data.get('type')
-            logger.info(f"Iniciando procesamiento de mensaje tipo: {message_type}")
-            logger.debug(f"Contenido del mensaje: {data}")
+            logger.debug(f"Procesando mensaje tipo: {message_type}")
             
             if message_type == 'install_printer':
-                logger.info("Procesando comando de instalación de impresora")
                 await self._handle_printer_installation(data, websocket)
-                
             elif message_type == 'heartbeat':
-                logger.debug("Procesando heartbeat")
                 await self._handle_heartbeat(websocket)
-                
             elif message_type == 'create_tunnel':
-                logger.info("Procesando creación de túnel")
                 await self._handle_tunnel_creation(data, websocket)
-                
             elif message_type == 'close_tunnel':
-                logger.info("Procesando cierre de túnel")
                 await self._handle_tunnel_closure(data, websocket)
-                
             elif message_type == 'printer_created':
-                logger.info("Procesando notificación de impresora creada")
                 await self._handle_printer_created(data, websocket)
-                
             elif message_type == 'scan_printers':
-                logger.info("Procesando solicitud de escaneo de impresoras")
                 await self._handle_printer_scan(data, websocket)
-                
             else:
                 logger.warning(f"Tipo de mensaje desconocido: {message_type}")
-                await self._send_error_response(websocket, f"Tipo de mensaje no soportado: {message_type}")
                 
         except Exception as e:
-            error_msg = f"Error procesando mensaje: {str(e)}"
-            logger.error(error_msg)
-            await self._send_error_response(websocket, error_msg)
-            # No relanzar la excepción para mantener la conexión viva
+            logger.error(f"Error procesando mensaje: {e}")
+            await self._send_error_response(websocket, str(e))
 
     async def _handle_heartbeat(self, websocket):
         """Maneja los mensajes de heartbeat."""
@@ -503,11 +478,12 @@ class AgentService:
             await self._send_error_response(websocket, error_msg)
 
     async def _periodic_updates(self, websocket):
-        """
-        Maneja las actualizaciones periódicas mientras la conexión está activa.
-        """
+        """Maneja las actualizaciones periódicas mientras la conexión está activa."""
         try:
             while True:
+                # Actualizar información del sistema
+                await self._update_agent_info()
+                
                 # Actualizar datos de impresoras monitoreadas
                 try:
                     printers = await self.printer_monitor.get_monitored_printers()
@@ -519,19 +495,20 @@ class AgentService:
                                 brand=printer['brand']
                             )
                             
-                            if data is not None:  # Solo actualizar si hay datos válidos
+                            if data:
+                                # Eliminar la referencia a agent_id
                                 await self.printer_monitor.update_printer_data(
                                     ip=printer['ip_address'],
                                     data=data
                                 )
-                                logger.debug(f"✅ Datos actualizados para {printer['ip_address']}")
+                                logger.debug(f"Datos actualizados para {printer['ip_address']}")
                             else:
-                                logger.info(f"⚠️ No se actualizaron datos para {printer['ip_address']} (offline)")
+                                logger.warning(f"No se pudieron obtener datos de {printer['ip_address']}")
                                 
                         except Exception as e:
-                            logger.error(f"Error procesando impresora {printer['ip_address']}: {e}")
+                            logger.error(f"Error actualizando impresora {printer['ip_address']}: {e}")
                             continue
-                        
+                            
                 except Exception as e:
                     logger.error(f"Error en actualización de impresoras: {e}")
                 
@@ -762,15 +739,6 @@ class AgentService:
             logger.error(f"Error enviando estado del túnel: {e}")
 
     async def _notify_shutdown(self):
-        """Notifica al servidor que la PC se está apagando"""
-        try:
-            async with aiohttp.ClientSession() as session:
-                url = f"{settings.SERVER_URL}/api/v1/agents/{settings.AGENT_TOKEN}/shutdown"
-                async with session.post(url) as response:
-                    if response.status == 200:
-                        logger.info("✅ Servidor notificado del apagado")
-        except Exception as e:
-            logger.error(f"❌ Error notificando apagado: {e}")
         """Notifica al servidor que la PC se está apagando"""
         try:
             async with aiohttp.ClientSession() as session:

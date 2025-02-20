@@ -19,12 +19,14 @@ async def test_drivers_endpoint():
         headers={"Content-Type": "application/json"}
     )
 
-@router.get("/")
+@router.get("/")  # Será accesible en /api/v1/drivers
 async def get_all_drivers(db: Session = Depends(get_db)):
     try:
         print("Endpoint drivers llamado")
         driver_service = DriverService(db)
         drivers = await driver_service.get_all()
+        
+        print(f"Drivers encontrados: {len(drivers) if drivers else 0}")
         
         driver_list = jsonable_encoder([
             {
