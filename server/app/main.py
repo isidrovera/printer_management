@@ -70,12 +70,13 @@ app = FastAPI(
 # Configuración de middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://161.132.39.159:3000"],  # URL específica del frontend
+    allow_origins=["*"],  # <-- Permitir cualquier origen temporalmente
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allow_headers=["*"],
+    allow_methods=["*"],  # <-- Permitir todos los métodos HTTP
+    allow_headers=["*"],  # <-- Permitir todos los headers
     expose_headers=["*"]
 )
+
 
 app.add_middleware(BaseHTTPMiddleware, dispatch=auth_middleware)
 app.add_middleware(BaseHTTPMiddleware, dispatch=first_login_middleware)
