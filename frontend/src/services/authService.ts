@@ -5,7 +5,6 @@ const API_URL = 'http://161.132.39.159:8000/api/v1';
 
 const axiosInstance = axios.create({
   baseURL: API_URL,
-  withCredentials: true,  // Importante para CORS
   headers: {
     'Content-Type': 'application/x-www-form-urlencoded'
   }
@@ -14,27 +13,25 @@ const axiosInstance = axios.create({
 export const authService = {
   login: async (username: string, password: string) => {
     try {
-      // Usar la ruta de login directamente en lugar de /token
+      // Usamos /auth/token en lugar de /auth/login
       const formData = new URLSearchParams();
       formData.append('username', username);
       formData.append('password', password);
+      formData.append('grant_type', 'password'); // Requerido por OAuth2PasswordRequestForm
 
-      const response = await axiosInstance.post('/auth/login', formData);
+      const response = await axiosInstance.post('/auth/token', formData);
       
-      // Extraer el token de la cookie si es necesario
-      const token = response.data.access_token;
-      if (token) {
-        localStorage.setItem('token', token);
-        axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      if (response.data.access_token) {
+        localStorage.setItem('token', response.data.access_token);
+        axiosInstance.defaults.headers.common['Authorization'] = 
+          `Bearer ${response.data.access_token}`;
       }
       
       return response.data;
     } catch (error: any) {
       console.error('Error en login:', error);
-      if (error.response?.status === 303) {
-        // Manejar redirección especial
-        const redirectUrl = error.response.headers.location;
-        console.log('Redirección a:', redirectUrl);
+      if (error.response?.status === 401) {
+        throw new Error('Credenciales incorrectas');
       }
       throw new Error(error.response?.data?.detail || 'Error en la autenticación');
     }
@@ -43,6 +40,12 @@ export const authService = {
   logout: () => {
     localStorage.removeItem('token');
     delete axiosInstance.defaults.headers.common['Authorization'];
+  },
+
+  // Verificar si el usuario está autenticado
+  isAuthenticated: () => {
+    const token = localStorage.getItem('token');
+    return !!token;
   }
 };
 
