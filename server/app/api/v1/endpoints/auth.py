@@ -13,7 +13,7 @@ from app.core.auth import create_access_token, get_current_user, get_current_act
 from fastapi.templating import Jinja2Templates
 from typing import Optional
 import logging
-from fastapi import Form
+from fastapi import Form, Response
 logger = logging.getLogger(__name__)
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
@@ -98,13 +98,14 @@ async def verify_2fa(
 # Rutas de API
 @router.post("/token")
 async def login_for_access_token(
-    form_data: OAuth2PasswordRequestForm = Depends(),
+    username: str = Form(...),
+    password: str = Form(...),
     db: Session = Depends(get_db)
 ):
     """Endpoint para obtener token de acceso vía API"""
     try:
         user_service = UserService(db)
-        user = await user_service.authenticate_user(form_data.username, form_data.password)
+        user = await user_service.authenticate_user(username, password)
         
         if not user:
             return JSONResponse(
@@ -114,18 +115,7 @@ async def login_for_access_token(
             
         access_token = create_access_token(data={"sub": user.username})
         
-        if user.must_change_password:
-            return JSONResponse(
-                status_code=200,
-                content={
-                    "access_token": access_token,
-                    "token_type": "bearer",
-                    "must_change_password": True
-                }
-            )
-            
         return JSONResponse(
-            status_code=200,
             content={
                 "access_token": access_token,
                 "token_type": "bearer",
@@ -133,9 +123,9 @@ async def login_for_access_token(
                     "username": user.username,
                     "must_change_password": user.must_change_password
                 }
-            }
+            },
+            status_code=200
         )
-        
     except Exception as e:
         logger.error(f"Error en login: {str(e)}")
         return JSONResponse(
