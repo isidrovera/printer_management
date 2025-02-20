@@ -13,11 +13,48 @@ from app.core.auth import create_access_token, get_current_user, get_current_act
 from fastapi.templating import Jinja2Templates
 from typing import Optional
 import logging
-
+from fastapi import Form
 logger = logging.getLogger(__name__)
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
 # Nuevos endpoints de 2FA
+
+
+@router.post("/api-login")
+async def api_login(
+    username: str = Form(...),
+    password: str = Form(...),
+    db: Session = Depends(get_db)
+):
+    """Endpoint específico para login desde React"""
+    try:
+        user_service = UserService(db)
+        user = await user_service.authenticate_user(username, password)
+        
+        if not user:
+            raise HTTPException(
+                status_code=401,
+                detail="Credenciales incorrectas"
+            )
+            
+        access_token = create_access_token(data={"sub": user.username})
+        
+        return JSONResponse(
+            content={
+                "access_token": access_token,
+                "token_type": "bearer",
+                "user": {
+                    "username": user.username,
+                    "must_change_password": user.must_change_password
+                }
+            },
+            status_code=200
+        )
+        
+    except Exception as e:
+        logger.error(f"Error en login API: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @router.post("/2fa/setup")
 async def setup_2fa(
     request: Request,

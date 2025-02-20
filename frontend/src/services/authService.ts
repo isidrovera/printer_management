@@ -13,13 +13,12 @@ const axiosInstance = axios.create({
 export const authService = {
   login: async (username: string, password: string) => {
     try {
-      // Usamos /auth/token en lugar de /auth/login
+      // Usar el nuevo endpoint api-login
       const formData = new URLSearchParams();
       formData.append('username', username);
       formData.append('password', password);
-      formData.append('grant_type', 'password'); // Requerido por OAuth2PasswordRequestForm
 
-      const response = await axiosInstance.post('/auth/token', formData);
+      const response = await axiosInstance.post('/auth/api-login', formData);
       
       if (response.data.access_token) {
         localStorage.setItem('token', response.data.access_token);
@@ -40,13 +39,5 @@ export const authService = {
   logout: () => {
     localStorage.removeItem('token');
     delete axiosInstance.defaults.headers.common['Authorization'];
-  },
-
-  // Verificar si el usuario está autenticado
-  isAuthenticated: () => {
-    const token = localStorage.getItem('token');
-    return !!token;
   }
 };
-
-export default authService;
