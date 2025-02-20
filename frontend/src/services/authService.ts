@@ -13,17 +13,22 @@ const axiosInstance = axios.create({
 export const authService = {
   login: async (username: string, password: string) => {
     try {
-      // Usar el nuevo endpoint api-login
       const formData = new URLSearchParams();
       formData.append('username', username);
       formData.append('password', password);
+      formData.append('grant_type', 'password');
 
-      const response = await axiosInstance.post('/auth/api-login', formData);
+      const response = await axiosInstance.post('/auth/token', formData);
       
       if (response.data.access_token) {
         localStorage.setItem('token', response.data.access_token);
         axiosInstance.defaults.headers.common['Authorization'] = 
           `Bearer ${response.data.access_token}`;
+          
+        if (response.data.must_change_password) {
+          // Manejar cambio de contraseña obligatorio
+          window.location.href = '/change-password';
+        }
       }
       
       return response.data;

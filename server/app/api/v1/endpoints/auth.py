@@ -96,7 +96,6 @@ async def verify_2fa(
         }
     )
 # Rutas de API
-# server/app/api/v1/endpoints/auth.py
 @router.post("/token")
 async def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(),
@@ -108,24 +107,41 @@ async def login_for_access_token(
         user = await user_service.authenticate_user(form_data.username, form_data.password)
         
         if not user:
-            raise HTTPException(
+            return JSONResponse(
                 status_code=401,
-                detail="Credenciales incorrectas"
+                content={"detail": "Credenciales incorrectas"}
             )
             
         access_token = create_access_token(data={"sub": user.username})
-        return {
-            "access_token": access_token, 
-            "token_type": "bearer",
-            "user": {
-                "username": user.username,
-                "must_change_password": user.must_change_password
+        
+        if user.must_change_password:
+            return JSONResponse(
+                status_code=200,
+                content={
+                    "access_token": access_token,
+                    "token_type": "bearer",
+                    "must_change_password": True
+                }
+            )
+            
+        return JSONResponse(
+            status_code=200,
+            content={
+                "access_token": access_token,
+                "token_type": "bearer",
+                "user": {
+                    "username": user.username,
+                    "must_change_password": user.must_change_password
+                }
             }
-        }
+        )
         
     except Exception as e:
         logger.error(f"Error en login: {str(e)}")
-        raise HTTPException(status_code=500, detail="Error en el servidor")
+        return JSONResponse(
+            status_code=500,
+            content={"detail": "Error en el servidor"}
+        )
 # Rutas Web
 @router.get("/login")
 async def login_form(request: Request):
