@@ -68,28 +68,54 @@ class ConnectionManager:
                 self.logger.error(f"Error sending to connection {conn_id}: {e}")
 
     async def send_install_printer_command(self, agent_token: str, printer_data: dict):
-        """Envía comando de instalación de impresora a un agente específico."""
-        if agent_token not in self.agent_connections:
-            raise ValueError(f"Agent {agent_token} not connected")
+        """
+        Envía comando de instalación de impresora a un agente específico.
         
+        Args:
+            agent_token: Token del agente
+            printer_data: Diccionario con los datos de la impresora y el driver
+            
+        Raises:
+            ValueError: Si el agente no está conectado o los datos son inválidos
+            Exception: Para otros errores de comunicación
+        """
+        # Validar que el agente esté conectado
+        if agent_token not in self.agent_connections:
+            self.logger.error(f"Agent {agent_token} not connected")
+            raise ValueError(f"Agent {agent_token} not connected")
+            
         websocket = self.agent_connections[agent_token]
-
-        # Crear el comando para enviar al agente usando la URL de descarga
+        
+        # Validar datos requeridos
+        required_fields = [
+            "printer_ip", "manufacturer", "model", 
+            "driver_url", "driver_filename"
+        ]
+        
+        missing_fields = [
+            field for field in required_fields 
+            if field not in printer_data
+        ]
+        
+        if missing_fields:
+            error_msg = f"Missing required fields: {', '.join(missing_fields)}"
+            self.logger.error(error_msg)
+            raise ValueError(error_msg)
+            
+        # Crear el comando
         command = {
             "type": "install_printer",
-            "printer_ip": printer_data["printer_ip"],
-            "manufacturer": printer_data["manufacturer"],
-            "model": printer_data["model"],
-            "driver_url": printer_data["driver_url"],  # URL para descargar el driver
-            "driver_filename": printer_data["driver_filename"]
+            **printer_data  # Incluir todos los datos de la impresora
         }
         
         try:
+            self.logger.debug(f"Sending command to agent {agent_token}: {command}")
             await websocket.send_json(command)
             self.logger.info(f"Install printer command sent to agent {agent_token}")
         except Exception as e:
-            self.logger.error(f"Error sending install command to agent {agent_token}: {e}")
-            raise
+            error_msg = f"Error sending command to agent {agent_token}: {str(e)}"
+            self.logger.error(error_msg)
+            raise Exception(error_msg)
 
 manager = ConnectionManager()
 
