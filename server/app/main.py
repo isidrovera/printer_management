@@ -4,12 +4,11 @@ import os
 from pathlib import Path
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 # Importaciones locales
 from app.core.config import settings
@@ -21,7 +20,10 @@ from app.db.session import engine, SessionLocal
 from app.db.base import Base
 
 # Configuración de logging
-logging.config.dictConfig(settings.LOGGING_CONFIG)
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
 logger = logging.getLogger(__name__)
 
 # Configuración de directorios
@@ -62,35 +64,18 @@ async def lifespan(app: FastAPI):
 # Crear aplicación FastAPI
 app = FastAPI(
     title=settings.PROJECT_NAME,
-    description=settings.DESCRIPTION,
     lifespan=lifespan
 )
 
 # Configuración de middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Permitir todos los orígenes en desarrollo
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-    expose_headers=["Content-Type", "X-Total-Count"]
 )
 
-# Middleware para agregar headers de seguridad
-@app.middleware("http")
-async def add_security_headers(request: Request, call_next):
-    response = await call_next(request)
-    
-    # Agregar headers de seguridad
-    is_websocket = request.url.path.endswith("/ws")
-    security_headers = settings.get_security_headers(is_websocket=is_websocket)
-    
-    for header_name, header_value in security_headers.items():
-        response.headers[header_name] = header_value
-    
-    return response
-
-# Agregar otros middlewares
 app.add_middleware(BaseHTTPMiddleware, dispatch=auth_middleware)
 app.add_middleware(BaseHTTPMiddleware, dispatch=first_login_middleware)
 
@@ -112,12 +97,4 @@ app.include_router(
 templates.env.filters['numberformat'] = lambda value: "{:,}".format(value)
 templates.env.filters['default'] = lambda value, default_value: value if value is not None else default_value
 
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(
-        "main:app",
-        host="0.0.0.0",
-        port=8000,
-        reload=True,
-        log_config=settings.LOGGING_CONFIG
-    )
+logger.info("Aplicación inicializada completamente")
