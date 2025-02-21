@@ -1,17 +1,16 @@
-// vite.config.ts
+import path from "path"
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  server: {
-    host: '0.0.0.0',
-    port: 3000,
-    hmr: {
-      host: '161.132.39.159'
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
     },
-    watch: {
-      usePolling: true
-    }
+  },
+  server: {
+    host: '0.0.0.0', // Esto permite acceso desde cualquier IP
+    port: 3000, // Puerto que prefieras
   }
 })
