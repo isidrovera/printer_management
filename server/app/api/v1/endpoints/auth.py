@@ -32,11 +32,12 @@ async def api_login(
         user = await user_service.authenticate_user(username, password)
         
         if not user:
-            raise HTTPException(
+            return JSONResponse(
                 status_code=401,
-                detail="Credenciales incorrectas"
+                content={"detail": "Credenciales incorrectas"}
             )
             
+        # En lugar de redireccionar, devolver directamente el token y la data
         access_token = create_access_token(data={"sub": user.username})
         
         return JSONResponse(
@@ -53,8 +54,10 @@ async def api_login(
         
     except Exception as e:
         logger.error(f"Error en login API: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
-
+        return JSONResponse(
+            status_code=500,
+            content={"detail": str(e)}
+        )
 @router.post("/2fa/setup")
 async def setup_2fa(
     request: Request,
