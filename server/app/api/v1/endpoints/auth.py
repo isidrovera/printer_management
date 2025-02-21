@@ -98,6 +98,7 @@ async def verify_2fa(
 # Rutas de API
 @router.post("/token")
 async def login_for_access_token(
+    request: Request,
     username: str = Form(...),
     password: str = Form(...),
     db: Session = Depends(get_db)
@@ -113,8 +114,22 @@ async def login_for_access_token(
                 content={"detail": "Credenciales incorrectas"}
             )
             
+        # Si es una petición de la web UI, manejala con redirección
+        if "text/html" in request.headers.get("accept", ""):
+            access_token = create_access_token(data={"sub": user.username})
+            response = RedirectResponse(
+                url="/auth/change-password" if user.must_change_password else "/",
+                status_code=303
+            )
+            response.set_cookie(
+                key="access_token",
+                value=f"Bearer {access_token}",
+                httponly=True
+            )
+            return response
+            
+        # Si es una petición de API, devuelve JSON
         access_token = create_access_token(data={"sub": user.username})
-        
         return JSONResponse(
             content={
                 "access_token": access_token,
@@ -132,7 +147,6 @@ async def login_for_access_token(
             status_code=500,
             content={"detail": "Error en el servidor"}
         )
-
 # Rutas Web
 @router.get("/login")
 async def login_form(request: Request):
