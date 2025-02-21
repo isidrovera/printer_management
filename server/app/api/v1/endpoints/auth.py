@@ -93,67 +93,40 @@ async def login_form(request: Request):
         {"request": request}
     )
 
-# server/app/api/v1/endpoints/auth.py
 @router.post("/login")
 async def login(request: Request, db: Session = Depends(get_db)):
     try:
-        # Log de datos recibidos
         form = await request.form()
         username = form.get("username")
         password = form.get("password")
         
-        logger.debug(f"Datos recibidos - Username: {username}, Password: {'*' * len(password)}")
-        
         user_service = UserService(db)
+        user = await user_service.authenticate_user(username, password)
         
-        # Verificar si el usuario existe primero
-        user = await user_service.get_user_by_username(username)
         if not user:
-            logger.warning(f"Usuario no encontrado: {username}")
-            return JSONResponse(
-                status_code=401,
-                content={"detail": "Usuario no encontrado"}
+            return templates.TemplateResponse(
+                "auth/login.html",
+                {"request": request, "error": "Credenciales incorrectas"}
             )
             
-        # Log del usuario encontrado
-        logger.debug(f"Usuario encontrado: {user.username}, is_active: {user.is_active}")
+        access_token = create_access_token(data={"sub": user.username})
+        response = RedirectResponse(url="/auth/change-password" if user.must_change_password else "/", status_code=303)
+        response.set_cookie(
+            key="access_token",
+            value=f"Bearer {access_token}",
+            httponly=True
+        )
         
-        # Intentar autenticación
-        authenticated_user = await user_service.authenticate_user(username, password)
-        
-        if not authenticated_user:
-            logger.warning(f"Contraseña incorrecta para usuario: {username}")
-            return JSONResponse(
-                status_code=401,
-                content={"detail": "Contraseña incorrecta"}
-            )
-            
-        # Crear token JWT
-        access_token = create_access_token(data={"sub": authenticated_user.username})
-        
-        response_data = {
-            "access_token": access_token,
-            "token_type": "bearer",
-            "user": {
-                "id": authenticated_user.id,
-                "username": authenticated_user.username,
-                "email": authenticated_user.email,
-                "full_name": authenticated_user.full_name,
-                "role": authenticated_user.role,
-                "must_change_password": authenticated_user.must_change_password,
-                "is_active": authenticated_user.is_active
-            }
-        }
-        
-        logger.info(f"Login exitoso para usuario: {username}")
-        return JSONResponse(content=response_data)
+        logger.info(f"Login exitoso: {username}")
+        return response
         
     except Exception as e:
         logger.error(f"Error en login: {str(e)}")
-        return JSONResponse(
-            status_code=500,
-            content={"detail": f"Error en el servidor: {str(e)}"}
+        return templates.TemplateResponse(
+            "auth/login.html",
+            {"request": request, "error": "Error en el servidor"}
         )
+
 @router.get("/logout")
 async def logout():
     """Cierra la sesión del usuario"""
