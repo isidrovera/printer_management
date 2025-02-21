@@ -1,4 +1,3 @@
-// src/pages/Auth/Login.tsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -19,6 +18,7 @@ const Login = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('Iniciando proceso de login para usuario:', formData.username);
     setError('');
     setLoading(true);
 
@@ -27,22 +27,32 @@ const Login = () => {
       formDataObj.append('username', formData.username);
       formDataObj.append('password', formData.password);
 
-      // Usar la ruta correcta del API
-      const response = await axios.post('/auth/login', formDataObj);
+      console.log('Enviando petición de login al servidor');
+      const response = await axios.post('/api/auth/login', formDataObj);
       
+      console.log('Respuesta del servidor recibida:', { 
+        status: response.status,
+        user: response.data.user.username 
+      });
+
       login(response.data.access_token, response.data.user);
 
       // Redireccionar según el estado del usuario
       if (response.data.user.must_change_password) {
+        console.log('Usuario debe cambiar contraseña, redirigiendo...');
         navigate('/change-password');
-      } else if (response.data.user.has_2fa) {
-        navigate('/2fa-verify');
       } else {
+        console.log('Login exitoso, redirigiendo al dashboard...');
         navigate('/dashboard');
       }
       
     } catch (err: any) {
       console.error('Error de login:', err);
+      console.error('Detalles del error:', {
+        status: err.response?.status,
+        data: err.response?.data,
+        message: err.message
+      });
       setError(err.response?.data?.detail || 'Error al iniciar sesión');
     } finally {
       setLoading(false);
@@ -77,7 +87,10 @@ const Login = () => {
                 required
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 value={formData.username}
-                onChange={(e) => setFormData({...formData, username: e.target.value})}
+                onChange={(e) => {
+                  console.log('Campo username actualizado');
+                  setFormData({...formData, username: e.target.value});
+                }}
               />
             </div>
 
@@ -92,7 +105,10 @@ const Login = () => {
                 required
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 value={formData.password}
-                onChange={(e) => setFormData({...formData, password: e.target.value})}
+                onChange={(e) => {
+                  console.log('Campo password actualizado');
+                  setFormData({...formData, password: e.target.value});
+                }}
               />
             </div>
 

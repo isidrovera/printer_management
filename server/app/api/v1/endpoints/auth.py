@@ -14,36 +14,40 @@ from typing import Optional
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
+# server/app/api/v1/endpoints/auth.py
 @router.post("/login")
-async def login(
-    form_data: OAuth2PasswordRequestForm = Depends(),
-    db: Session = Depends(get_db)
-):
-    """Endpoint de login que retorna token JWT y datos del usuario"""
+async def login(request: Request, db: Session = Depends(get_db)):
     try:
+        form = await request.form()
+        username = form.get("username")
+        password = form.get("password")
+        
         user_service = UserService(db)
-        user = await user_service.authenticate_user(form_data.username, form_data.password)
+        user = await user_service.authenticate_user(username, password)
         
         if not user:
             raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
+                status_code=401,
                 detail="Credenciales incorrectas"
             )
             
         access_token = create_access_token(data={"sub": user.username})
         
+        # Devolver solo los campos que existen en el modelo
+        user_data = {
+            "id": user.id,
+            "username": user.username,
+            "email": user.email,
+            "full_name": user.full_name,
+            "role": user.role,
+            "must_change_password": user.must_change_password,
+            "is_active": user.is_active
+        }
+        
         return {
             "access_token": access_token,
             "token_type": "bearer",
-            "user": {
-                "id": user.id,
-                "username": user.username,
-                "email": user.email,
-                "full_name": user.full_name,
-                "role": user.role,
-                "must_change_password": user.must_change_password,
-                "has_2fa": user.has_2fa
-            }
+            "user": user_data
         }
         
     except Exception as e:
