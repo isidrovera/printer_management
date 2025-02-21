@@ -12,6 +12,7 @@ import json
 from app.core.auth import create_access_token, get_current_user, get_current_active_user
 from fastapi.templating import Jinja2Templates
 from typing import Optional
+from fastapi import Form
 import logging
 
 logger = logging.getLogger(__name__)
