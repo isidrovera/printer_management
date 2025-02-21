@@ -2,6 +2,9 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 
+
+// Configurar la base URL de axios
+axios.defaults.baseURL = '/api'; 
 interface User {
   id: number;
   username: string;

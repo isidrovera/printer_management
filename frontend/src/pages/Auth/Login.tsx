@@ -1,11 +1,11 @@
 // src/pages/Auth/Login.tsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../../components/ui/button';
 import { Card } from '../../components/ui/card';
 import { Alert } from '../../components/ui/alert';
-import axios from 'axios';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -27,7 +27,8 @@ const Login = () => {
       formDataObj.append('username', formData.username);
       formDataObj.append('password', formData.password);
 
-      const response = await axios.post('/api/auth/login', formDataObj);
+      // Usar la ruta correcta del API
+      const response = await axios.post('/auth/login', formDataObj);
       
       login(response.data.access_token, response.data.user);
 
@@ -37,10 +38,11 @@ const Login = () => {
       } else if (response.data.user.has_2fa) {
         navigate('/2fa-verify');
       } else {
-        navigate('/');
+        navigate('/dashboard');
       }
       
     } catch (err: any) {
+      console.error('Error de login:', err);
       setError(err.response?.data?.detail || 'Error al iniciar sesión');
     } finally {
       setLoading(false);
