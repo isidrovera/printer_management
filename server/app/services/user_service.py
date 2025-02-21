@@ -153,11 +153,12 @@ class UserService:
             logger.error(f"Error obteniendo lista de usuarios: {str(e)}")
             raise
 
-    async def authenticate_user(self, username: str, password: str) -> Optional[User]:
+    def authenticate_user(self, username: str, password: str) -> Optional[User]:
         """Autentica un usuario por username y contraseña."""
         try:
-            user = await self.get_user_by_username(username)
+            user = self.get_user_by_username(username)  # ⚠️ No debe tener `await`
             if not user:
+                logger.warning(f"Usuario no encontrado: {username}")
                 return None
             
             if not user.is_active_user():
@@ -165,27 +166,18 @@ class UserService:
                 return None
                 
             if not user.verify_password(password):
-                # Incrementar contador de intentos fallidos
-                user.failed_login_attempts += 1
-                user.last_login_attempt = datetime.utcnow()
-                
-                # Bloquear cuenta si excede intentos
-                if user.failed_login_attempts >= 3:  # Configurable
-                    user.locked_until = datetime.utcnow() + timedelta(minutes=15)  # Configurable
-                    logger.warning(f"Usuario bloqueado por múltiples intentos fallidos: {username}")
-                
-                self.db.commit()
+                logger.warning(f"Contraseña incorrecta para usuario: {username}")
                 return None
-            
-            # Login exitoso: resetear contadores
+
+            # Si la contraseña es correcta, resetear intentos fallidos
             user.failed_login_attempts = 0
             user.last_login = datetime.utcnow()
             user.last_login_attempt = None
             user.locked_until = None
-            
+
             self.db.commit()
             return user
-            
+
         except Exception as e:
             logger.error(f"Error en autenticación: {str(e)}")
             raise
