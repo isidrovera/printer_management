@@ -71,18 +71,12 @@ app = FastAPI(
 # En main.py, modifica la configuración de CORS así:
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://161.132.39.159:3000"],  # URL específica del frontend
+    allow_origins=["http://161.132.39.159:3000"],
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
-    allow_headers=[
-        "Content-Type",
-        "Authorization",
-        "Accept",
-        "Origin",
-        "X-Requested-With"
-    ]
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["*"],
+    expose_headers=["*"]
 )
-
 
 app.add_middleware(BaseHTTPMiddleware, dispatch=auth_middleware)
 app.add_middleware(BaseHTTPMiddleware, dispatch=first_login_middleware)

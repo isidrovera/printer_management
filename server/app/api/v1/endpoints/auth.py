@@ -37,20 +37,18 @@ async def api_login(
                 content={"detail": "Credenciales incorrectas"}
             )
             
-        # En lugar de redireccionar, devolver directamente el token y la data
+        # Generar token y devolver respuesta JSON
         access_token = create_access_token(data={"sub": user.username})
         
-        return JSONResponse(
-            content={
-                "access_token": access_token,
-                "token_type": "bearer",
-                "user": {
-                    "username": user.username,
-                    "must_change_password": user.must_change_password
-                }
-            },
-            status_code=200
-        )
+        # NO REDIRECCIONAR - devolver JSON directamente
+        return {
+            "access_token": access_token,
+            "token_type": "bearer",
+            "user": {
+                "username": user.username,
+                "must_change_password": user.must_change_password
+            }
+        }
         
     except Exception as e:
         logger.error(f"Error en login API: {str(e)}")
