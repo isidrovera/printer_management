@@ -3,52 +3,83 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from './ui/button';
-import { Printer, MessageSquare, User } from 'lucide-react';
+import { 
+  Printer, 
+  Users, 
+  Monitor, 
+  Network, 
+  HardDrive, 
+  Settings,
+  LogOut 
+} from 'lucide-react';
 
 const Navbar = () => {
-  const { isAuthenticated, user, logout } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
-    navigate('/');
+    navigate('/login');
   };
 
   return (
-    <nav className="bg-white shadow-sm border-b">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          <div className="flex items-center">
-            <Link to="/" className="flex items-center space-x-2">
-              <Printer className="h-6 w-6 text-blue-600" />
-              <span className="font-bold text-xl">PrinterManager</span>
-            </Link>
-            
-            <div className="ml-10 flex space-x-4">
-              <Link to="/" className="text-gray-600 hover:text-blue-600">
-                Inicio
+    <nav className="bg-white shadow-lg">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="flex justify-between h-16">
+          <div className="flex">
+            {/* Logo */}
+            <div className="flex-shrink-0 flex items-center">
+              <Link to="/" className="flex items-center">
+                <Printer className="h-8 w-8 text-blue-600" />
+                <span className="ml-2 text-xl font-bold">PrinterManager</span>
               </Link>
-              <Link to="/forum" className="flex items-center space-x-1 text-gray-600 hover:text-blue-600">
-                <MessageSquare className="h-5 w-5" />
-                <span>Foro</span>
+            </div>
+
+            {/* Navigation Links */}
+            <div className="hidden md:ml-6 md:flex md:space-x-4">
+              <Link to="/monitor/printers" className="flex items-center px-3 py-2 text-gray-700 hover:text-blue-600">
+                <Monitor className="h-5 w-5 mr-1" />
+                <span>Monitoreo</span>
+              </Link>
+              
+              <Link to="/clients" className="flex items-center px-3 py-2 text-gray-700 hover:text-blue-600">
+                <Users className="h-5 w-5 mr-1" />
+                <span>Clientes</span>
+              </Link>
+
+              <Link to="/agents" className="flex items-center px-3 py-2 text-gray-700 hover:text-blue-600">
+                <Network className="h-5 w-5 mr-1" />
+                <span>Agentes</span>
+              </Link>
+
+              <Link to="/drivers" className="flex items-center px-3 py-2 text-gray-700 hover:text-blue-600">
+                <HardDrive className="h-5 w-5 mr-1" />
+                <span>Drivers</span>
+              </Link>
+
+              <Link to="/printer-oids" className="flex items-center px-3 py-2 text-gray-700 hover:text-blue-600">
+                <Settings className="h-5 w-5 mr-1" />
+                <span>OIDs</span>
               </Link>
             </div>
           </div>
-          
-          <div className="flex items-center space-x-4">
-            {isAuthenticated ? (
-              <>
-                <Link to="/dashboard" className="text-gray-600 hover:text-blue-600">
-                  Dashboard
-                </Link>
-                <span className="text-gray-600">{user?.username}</span>
-                <Button onClick={handleLogout} variant="outline">
+
+          {/* User Menu */}
+          <div className="flex items-center">
+            {user ? (
+              <div className="flex items-center space-x-4">
+                <span className="text-gray-700">{user.username}</span>
+                <Button 
+                  variant="outline"
+                  onClick={handleLogout}
+                  className="flex items-center"
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
                   Cerrar Sesión
                 </Button>
-              </>
+              </div>
             ) : (
               <Button onClick={() => navigate('/login')}>
-                <User className="h-5 w-5 mr-2" />
                 Iniciar Sesión
               </Button>
             )}
