@@ -1,45 +1,56 @@
-// src/pages/Auth/Login.tsx
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  console.log('Iniciando proceso de login');
-  setError('');
-  setLoading(true);
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '../../components/ui/button';
+import { Card } from '../../components/ui/card';
+import { Alert } from '../../components/ui/alert';
 
-  try {
-    console.log('Preparando datos de login');
-    const formDataObj = new FormData();
-    formDataObj.append('username', formData.username);
-    formDataObj.append('password', formData.password);
+const Login = () => {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    username: '',
+    password: '',
+  });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-    // Modificar la URL para usar el prefijo /api
-    console.log('Enviando petición de login');
-    const response = await axios.post('/api/auth/login', formDataObj, {
-      headers: {
-        'Accept': 'application/json',
-        'X-Requested-With': 'XMLHttpRequest'
-      },
-      withCredentials: true
-    });
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
 
-    console.log('Respuesta recibida:', response);
-
-    if (response.data.access_token) {
-      login(response.data.access_token, response.data.user);
-      console.log('Login exitoso, redirigiendo...');
+    try {
+      console.log('Iniciando login con:', formData);
       
-      if (response.data.user.must_change_password) {
-        navigate('/change-password');
-      } else {
+      const response = await fetch('/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          username: formData.username,
+          password: formData.password
+        }),
+        credentials: 'include'
+      });
+
+      console.log('Respuesta del servidor:', response);
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Datos recibidos:', data);
         navigate('/dashboard');
+      } else {
+        const errorData = await response.text();
+        console.error('Error response:', errorData);
+        setError('Error al iniciar sesión');
       }
+    } catch (err) {
+      console.error('Error en login:', err);
+      setError('Error al conectar con el servidor');
+    } finally {
+      setLoading(false);
     }
-  } catch (err: any) {
-    console.error('Error completo:', err);
-    setError(err.response?.data?.detail || 'Error al iniciar sesión');
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
