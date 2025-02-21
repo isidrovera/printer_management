@@ -81,27 +81,7 @@ const App = () => {
           <Route path="/clients/:id/edit" element={<PrivateRoute><ClientEdit /></PrivateRoute>} />
           <Route path="/clients/:id" element={<PrivateRoute><ClientDetails /></PrivateRoute>} />
           
-          {/* Rutas de agentes */}
-          <Route path="/agents" element={<PrivateRoute><AgentList /></PrivateRoute>} />
-          <Route path="/agents/:id" element={<PrivateRoute><AgentDetails /></PrivateRoute>} />
           
-          {/* Rutas de drivers */}
-          <Route path="/drivers" element={<PrivateRoute><DriverList /></PrivateRoute>} />
-          <Route path="/drivers/create" element={<PrivateRoute><DriverCreate /></PrivateRoute>} />
-          <Route path="/drivers/:id/edit" element={<PrivateRoute><DriverEdit /></PrivateRoute>} />
-          
-          {/* Rutas de monitoreo de impresoras */}
-          <Route path="/monitor/printers" element={<PrivateRoute><PrinterMonitor /></PrivateRoute>} />
-          <Route path="/printers/:id" element={<PrivateRoute><PrinterDetails /></PrivateRoute>} />
-          <Route path="/printers/report" element={<PrivateRoute><PrinterReport /></PrivateRoute>} />
-          
-          {/* Rutas de OIDs */}
-          <Route path="/printer-oids" element={<PrivateRoute><OIDList /></PrivateRoute>} />
-          <Route path="/printer-oids/create" element={<PrivateRoute><OIDCreate /></PrivateRoute>} />
-          <Route path="/printer-oids/:id/edit" element={<PrivateRoute><OIDEdit /></PrivateRoute>} />
-          
-          {/* Rutas de túneles */}
-          <Route path="/tunnels" element={<PrivateRoute><TunnelList /></PrivateRoute>} />
         </Routes>
       </Router>
     </AuthProvider>
