@@ -153,15 +153,15 @@ class UserService:
             logger.error(f"Error obteniendo lista de usuarios: {str(e)}")
             raise
 
-    def authenticate_user(self, username: str, password: str) -> Optional[User]:
+    async def authenticate_user(self, username: str, password: str) -> Optional[User]:
         """Autentica un usuario por username y contraseña."""
         try:
-            user = self.get_user_by_username(username)  # ⚠️ No debe tener `await`
+            user = await self.get_user_by_username(username)  # 🔹 Corregido: ahora usa `await`
             if not user:
                 logger.warning(f"Usuario no encontrado: {username}")
                 return None
             
-            if not user.is_active_user():
+            if not user.is_active_user():  # Asegurar que el usuario no está inactivo
                 logger.warning(f"Intento de login de usuario inactivo: {username}")
                 return None
                 
