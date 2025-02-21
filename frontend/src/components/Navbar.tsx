@@ -1,10 +1,18 @@
+// src/components/Navbar.tsx
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import { Button } from './ui/button';
 import { Printer, MessageSquare, User } from 'lucide-react';
 
 const Navbar = () => {
+  const { isAuthenticated, user, logout } = useAuth();
   const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
 
   return (
     <nav className="bg-white shadow-sm border-b">
@@ -15,17 +23,35 @@ const Navbar = () => {
               <Printer className="h-6 w-6 text-blue-600" />
               <span className="font-bold text-xl">PrinterManager</span>
             </Link>
+            
+            <div className="ml-10 flex space-x-4">
+              <Link to="/" className="text-gray-600 hover:text-blue-600">
+                Inicio
+              </Link>
+              <Link to="/forum" className="flex items-center space-x-1 text-gray-600 hover:text-blue-600">
+                <MessageSquare className="h-5 w-5" />
+                <span>Foro</span>
+              </Link>
+            </div>
           </div>
           
-          <div className="flex space-x-4">
-            <Link to="/forum" className="flex items-center space-x-1 text-gray-600 hover:text-blue-600">
-              <MessageSquare className="h-5 w-5" />
-              <span>Foro</span>
-            </Link>
-            <Button onClick={() => navigate('/login')}>
-              <User className="h-5 w-5 mr-2" />
-              Iniciar Sesión
-            </Button>
+          <div className="flex items-center space-x-4">
+            {isAuthenticated ? (
+              <>
+                <Link to="/dashboard" className="text-gray-600 hover:text-blue-600">
+                  Dashboard
+                </Link>
+                <span className="text-gray-600">{user?.username}</span>
+                <Button onClick={handleLogout} variant="outline">
+                  Cerrar Sesión
+                </Button>
+              </>
+            ) : (
+              <Button onClick={() => navigate('/login')}>
+                <User className="h-5 w-5 mr-2" />
+                Iniciar Sesión
+              </Button>
+            )}
           </div>
         </div>
       </div>
