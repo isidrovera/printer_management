@@ -16,44 +16,55 @@ router = APIRouter()
 
 # server/app/api/v1/endpoints/auth.py
 @router.post("/login")
-async def login(request: Request, db: Session = Depends(get_db)):
+async def login(
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(get_db)
+):
+    """Endpoint de login que retorna token JWT"""
     try:
-        form = await request.form()
-        username = form.get("username")
-        password = form.get("password")
+        logger.debug(f"Intento de login para usuario: {form_data.username}")
         
         user_service = UserService(db)
-        user = await user_service.authenticate_user(username, password)
+        user = await user_service.authenticate_user(form_data.username, form_data.password)
         
         if not user:
+            logger.warning(f"Credenciales incorrectas para usuario: {form_data.username}")
             raise HTTPException(
-                status_code=401,
+                status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Credenciales incorrectas"
             )
-            
+
+        # Crear token JWT
         access_token = create_access_token(data={"sub": user.username})
-        
-        # Devolver solo los campos que existen en el modelo
-        user_data = {
-            "id": user.id,
-            "username": user.username,
-            "email": user.email,
-            "full_name": user.full_name,
-            "role": user.role,
-            "must_change_password": user.must_change_password,
-            "is_active": user.is_active
-        }
-        
-        return {
+        logger.debug(f"Token JWT creado para usuario: {user.username}")
+
+        # Preparar respuesta
+        response_data = {
             "access_token": access_token,
             "token_type": "bearer",
-            "user": user_data
+            "user": {
+                "id": user.id,
+                "username": user.username,
+                "email": user.email,
+                "full_name": user.full_name,
+                "role": user.role,
+                "must_change_password": user.must_change_password,
+                "is_active": user.is_active
+            }
         }
-        
-    except Exception as e:
-        logger.error(f"Error en login: {str(e)}")
-        raise HTTPException(status_code=500, detail="Error en el servidor")
 
+        logger.info(f"Login exitoso para usuario: {user.username}")
+        return JSONResponse(content=response_data)
+        
+    except HTTPException as he:
+        logger.warning(f"Error de autenticación: {str(he)}")
+        raise
+    except Exception as e:
+        logger.error(f"Error inesperado en login: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error en el servidor"
+        )
 @router.post("/change-password")
 async def change_password(
     current_password: str,
