@@ -22,34 +22,43 @@ templates = Jinja2Templates(directory="app/templates")
 
 @router.post("/api-login")
 async def api_login(
+    request: Request,  # Añadir request para verificar headers
     username: str = Form(...),
     password: str = Form(...),
     db: Session = Depends(get_db)
 ):
     """Endpoint específico para login desde React"""
     try:
-        user_service = UserService(db)
-        user = await user_service.authenticate_user(username, password)
-        
-        if not user:
+        # Verificar si es una petición de API
+        if "application/json" in request.headers.get("accept", ""):
+            user_service = UserService(db)
+            user = await user_service.authenticate_user(username, password)
+            
+            if not user:
+                return JSONResponse(
+                    status_code=401,
+                    content={"detail": "Credenciales incorrectas"}
+                )
+                
+            access_token = create_access_token(data={"sub": user.username})
+            
             return JSONResponse(
-                status_code=401,
-                content={"detail": "Credenciales incorrectas"}
+                content={
+                    "access_token": access_token,
+                    "token_type": "bearer",
+                    "user": {
+                        "username": user.username,
+                        "must_change_password": user.must_change_password
+                    }
+                },
+                status_code=200
+            )
+        else:
+            return JSONResponse(
+                status_code=400,
+                content={"detail": "Header Accept: application/json requerido"}
             )
             
-        # Generar token y devolver respuesta JSON
-        access_token = create_access_token(data={"sub": user.username})
-        
-        # NO REDIRECCIONAR - devolver JSON directamente
-        return {
-            "access_token": access_token,
-            "token_type": "bearer",
-            "user": {
-                "username": user.username,
-                "must_change_password": user.must_change_password
-            }
-        }
-        
     except Exception as e:
         logger.error(f"Error en login API: {str(e)}")
         return JSONResponse(
