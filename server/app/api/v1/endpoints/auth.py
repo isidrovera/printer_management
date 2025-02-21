@@ -104,29 +104,36 @@ async def login(request: Request, db: Session = Depends(get_db)):
         user = await user_service.authenticate_user(username, password)
         
         if not user:
-            return templates.TemplateResponse(
-                "auth/login.html",
-                {"request": request, "error": "Credenciales incorrectas"}
+            return JSONResponse(
+                status_code=401,
+                content={"detail": "Credenciales incorrectas"}
             )
             
         access_token = create_access_token(data={"sub": user.username})
-        response = RedirectResponse(url="/auth/change-password" if user.must_change_password else "/", status_code=303)
-        response.set_cookie(
-            key="access_token",
-            value=f"Bearer {access_token}",
-            httponly=True
-        )
         
-        logger.info(f"Login exitoso: {username}")
-        return response
+        # Devolver JSON con los datos necesarios
+        return JSONResponse(
+            status_code=200,
+            content={
+                "access_token": access_token,
+                "token_type": "bearer",
+                "user": {
+                    "id": user.id,
+                    "username": user.username,
+                    "email": user.email,
+                    "full_name": user.full_name,
+                    "role": user.role,
+                    "must_change_password": user.must_change_password
+                }
+            }
+        )
         
     except Exception as e:
         logger.error(f"Error en login: {str(e)}")
-        return templates.TemplateResponse(
-            "auth/login.html",
-            {"request": request, "error": "Error en el servidor"}
+        return JSONResponse(
+            status_code=500,
+            content={"detail": "Error en el servidor"}
         )
-
 @router.get("/logout")
 async def logout():
     """Cierra la sesión del usuario"""
