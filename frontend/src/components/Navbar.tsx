@@ -1,9 +1,11 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
 import { Printer, MessageSquare, User } from 'lucide-react';
 
 const Navbar = () => {
+  const navigate = useNavigate();
+
   return (
     <nav className="bg-white shadow-sm border-b">
       <div className="container mx-auto px-4">
@@ -20,7 +22,7 @@ const Navbar = () => {
               <MessageSquare className="h-5 w-5" />
               <span>Foro</span>
             </Link>
-            <Button onClick={() => {}}>
+            <Button onClick={() => navigate('/login')}>
               <User className="h-5 w-5 mr-2" />
               Iniciar Sesión
             </Button>
