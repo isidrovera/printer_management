@@ -1,3 +1,4 @@
+// src/pages/Auth/Login.tsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -18,7 +19,7 @@ const Login = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Iniciando proceso de login para usuario:', formData.username);
+    console.log('Iniciando proceso de login');
     setError('');
     setLoading(true);
 
@@ -28,31 +29,26 @@ const Login = () => {
       formDataObj.append('password', formData.password);
 
       console.log('Enviando petición de login al servidor');
-      const response = await axios.post('/api/auth/login', formDataObj);
-      
-      console.log('Respuesta del servidor recibida:', { 
-        status: response.status,
-        user: response.data.user.username 
+      const response = await axios.post('/api/auth/login', formDataObj, {
+        withCredentials: true  // Importante para manejar cookies
       });
 
-      login(response.data.access_token, response.data.user);
+      console.log('Respuesta recibida:', response.data);
 
-      // Redireccionar según el estado del usuario
-      if (response.data.user.must_change_password) {
-        console.log('Usuario debe cambiar contraseña, redirigiendo...');
-        navigate('/change-password');
-      } else {
-        console.log('Login exitoso, redirigiendo al dashboard...');
-        navigate('/dashboard');
+      if (response.data.access_token) {
+        login(response.data.access_token, response.data.user);
+
+        if (response.data.user.must_change_password) {
+          console.log('Usuario debe cambiar contraseña');
+          navigate('/change-password');
+        } else {
+          console.log('Redirigiendo a dashboard');
+          navigate('/dashboard');
+        }
       }
       
     } catch (err: any) {
       console.error('Error de login:', err);
-      console.error('Detalles del error:', {
-        status: err.response?.status,
-        data: err.response?.data,
-        message: err.message
-      });
       setError(err.response?.data?.detail || 'Error al iniciar sesión');
     } finally {
       setLoading(false);
@@ -87,10 +83,7 @@ const Login = () => {
                 required
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 value={formData.username}
-                onChange={(e) => {
-                  console.log('Campo username actualizado');
-                  setFormData({...formData, username: e.target.value});
-                }}
+                onChange={(e) => setFormData({...formData, username: e.target.value})}
               />
             </div>
 
@@ -105,10 +98,7 @@ const Login = () => {
                 required
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 value={formData.password}
-                onChange={(e) => {
-                  console.log('Campo password actualizado');
-                  setFormData({...formData, password: e.target.value});
-                }}
+                onChange={(e) => setFormData({...formData, password: e.target.value})}
               />
             </div>
 

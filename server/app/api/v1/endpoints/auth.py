@@ -93,6 +93,7 @@ async def login_form(request: Request):
         {"request": request}
     )
 
+# server/app/api/v1/endpoints/auth.py
 @router.post("/login")
 async def login(request: Request, db: Session = Depends(get_db)):
     try:
@@ -100,33 +101,52 @@ async def login(request: Request, db: Session = Depends(get_db)):
         username = form.get("username")
         password = form.get("password")
         
+        logger.info(f"Intento de login para usuario: {username}")
+        
         user_service = UserService(db)
         user = await user_service.authenticate_user(username, password)
         
         if not user:
-            return templates.TemplateResponse(
-                "auth/login.html",
-                {"request": request, "error": "Credenciales incorrectas"}
+            logger.warning(f"Credenciales incorrectas para usuario: {username}")
+            return JSONResponse(
+                status_code=401,
+                content={"detail": "Credenciales incorrectas"}
             )
             
+        # Crear token JWT
         access_token = create_access_token(data={"sub": user.username})
-        response = RedirectResponse(url="/auth/change-password" if user.must_change_password else "/", status_code=303)
+        
+        # Preparar respuesta
+        response = JSONResponse(content={
+            "access_token": access_token,
+            "token_type": "bearer",
+            "user": {
+                "id": user.id,
+                "username": user.username,
+                "email": user.email,
+                "full_name": user.full_name,
+                "role": user.role,
+                "must_change_password": user.must_change_password,
+                "is_active": user.is_active
+            }
+        })
+        
+        # Establecer cookie
         response.set_cookie(
             key="access_token",
             value=f"Bearer {access_token}",
             httponly=True
         )
         
-        logger.info(f"Login exitoso: {username}")
+        logger.info(f"Login exitoso para usuario: {username}")
         return response
-        
+            
     except Exception as e:
         logger.error(f"Error en login: {str(e)}")
-        return templates.TemplateResponse(
-            "auth/login.html",
-            {"request": request, "error": "Error en el servidor"}
+        return JSONResponse(
+            status_code=500,
+            content={"detail": "Error en el servidor"}
         )
-
 @router.get("/logout")
 async def logout():
     """Cierra la sesión del usuario"""
