@@ -97,55 +97,62 @@ async def login_form(request: Request):
 @router.post("/login")
 async def login(request: Request, db: Session = Depends(get_db)):
     try:
+        # Log de datos recibidos
         form = await request.form()
         username = form.get("username")
         password = form.get("password")
         
-        logger.info(f"Intento de login para usuario: {username}")
+        logger.debug(f"Datos recibidos - Username: {username}, Password: {'*' * len(password)}")
         
         user_service = UserService(db)
-        user = await user_service.authenticate_user(username, password)
         
+        # Verificar si el usuario existe primero
+        user = await user_service.get_user_by_username(username)
         if not user:
-            logger.warning(f"Credenciales incorrectas para usuario: {username}")
+            logger.warning(f"Usuario no encontrado: {username}")
             return JSONResponse(
                 status_code=401,
-                content={"detail": "Credenciales incorrectas"}
+                content={"detail": "Usuario no encontrado"}
+            )
+            
+        # Log del usuario encontrado
+        logger.debug(f"Usuario encontrado: {user.username}, is_active: {user.is_active}")
+        
+        # Intentar autenticación
+        authenticated_user = await user_service.authenticate_user(username, password)
+        
+        if not authenticated_user:
+            logger.warning(f"Contraseña incorrecta para usuario: {username}")
+            return JSONResponse(
+                status_code=401,
+                content={"detail": "Contraseña incorrecta"}
             )
             
         # Crear token JWT
-        access_token = create_access_token(data={"sub": user.username})
+        access_token = create_access_token(data={"sub": authenticated_user.username})
         
-        # Preparar respuesta
-        response = JSONResponse(content={
+        response_data = {
             "access_token": access_token,
             "token_type": "bearer",
             "user": {
-                "id": user.id,
-                "username": user.username,
-                "email": user.email,
-                "full_name": user.full_name,
-                "role": user.role,
-                "must_change_password": user.must_change_password,
-                "is_active": user.is_active
+                "id": authenticated_user.id,
+                "username": authenticated_user.username,
+                "email": authenticated_user.email,
+                "full_name": authenticated_user.full_name,
+                "role": authenticated_user.role,
+                "must_change_password": authenticated_user.must_change_password,
+                "is_active": authenticated_user.is_active
             }
-        })
-        
-        # Establecer cookie
-        response.set_cookie(
-            key="access_token",
-            value=f"Bearer {access_token}",
-            httponly=True
-        )
+        }
         
         logger.info(f"Login exitoso para usuario: {username}")
-        return response
-            
+        return JSONResponse(content=response_data)
+        
     except Exception as e:
         logger.error(f"Error en login: {str(e)}")
         return JSONResponse(
             status_code=500,
-            content={"detail": "Error en el servidor"}
+            content={"detail": f"Error en el servidor: {str(e)}"}
         )
 @router.get("/logout")
 async def logout():
