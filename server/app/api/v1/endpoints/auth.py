@@ -13,58 +13,11 @@ from app.core.auth import create_access_token, get_current_user, get_current_act
 from fastapi.templating import Jinja2Templates
 from typing import Optional
 import logging
-from fastapi import Form, Response
+
 logger = logging.getLogger(__name__)
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
 # Nuevos endpoints de 2FA
-
-
-@router.post("/api-login")
-async def api_login(
-    request: Request,  # Añadir request para verificar headers
-    username: str = Form(...),
-    password: str = Form(...),
-    db: Session = Depends(get_db)
-):
-    """Endpoint específico para login desde React"""
-    try:
-        # Verificar si es una petición de API
-        if "application/json" in request.headers.get("accept", ""):
-            user_service = UserService(db)
-            user = await user_service.authenticate_user(username, password)
-            
-            if not user:
-                return JSONResponse(
-                    status_code=401,
-                    content={"detail": "Credenciales incorrectas"}
-                )
-                
-            access_token = create_access_token(data={"sub": user.username})
-            
-            return JSONResponse(
-                content={
-                    "access_token": access_token,
-                    "token_type": "bearer",
-                    "user": {
-                        "username": user.username,
-                        "must_change_password": user.must_change_password
-                    }
-                },
-                status_code=200
-            )
-        else:
-            return JSONResponse(
-                status_code=400,
-                content={"detail": "Header Accept: application/json requerido"}
-            )
-            
-    except Exception as e:
-        logger.error(f"Error en login API: {str(e)}")
-        return JSONResponse(
-            status_code=500,
-            content={"detail": str(e)}
-        )
 @router.post("/2fa/setup")
 async def setup_2fa(
     request: Request,
@@ -108,55 +61,27 @@ async def verify_2fa(
 # Rutas de API
 @router.post("/token")
 async def login_for_access_token(
-    request: Request,
-    username: str = Form(...),
-    password: str = Form(...),
+    form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db)
 ):
     """Endpoint para obtener token de acceso vía API"""
     try:
         user_service = UserService(db)
-        user = await user_service.authenticate_user(username, password)
+        user = await user_service.authenticate_user(form_data.username, form_data.password)
         
         if not user:
-            return JSONResponse(
+            raise HTTPException(
                 status_code=401,
-                content={"detail": "Credenciales incorrectas"}
+                detail="Credenciales incorrectas"
             )
             
-        # Si es una petición de la web UI, manejala con redirección
-        if "text/html" in request.headers.get("accept", ""):
-            access_token = create_access_token(data={"sub": user.username})
-            response = RedirectResponse(
-                url="/auth/change-password" if user.must_change_password else "/",
-                status_code=303
-            )
-            response.set_cookie(
-                key="access_token",
-                value=f"Bearer {access_token}",
-                httponly=True
-            )
-            return response
-            
-        # Si es una petición de API, devuelve JSON
         access_token = create_access_token(data={"sub": user.username})
-        return JSONResponse(
-            content={
-                "access_token": access_token,
-                "token_type": "bearer",
-                "user": {
-                    "username": user.username,
-                    "must_change_password": user.must_change_password
-                }
-            },
-            status_code=200
-        )
+        return {"access_token": access_token, "token_type": "bearer"}
+        
     except Exception as e:
         logger.error(f"Error en login: {str(e)}")
-        return JSONResponse(
-            status_code=500,
-            content={"detail": "Error en el servidor"}
-        )
+        raise HTTPException(status_code=500, detail="Error en el servidor")
+
 # Rutas Web
 @router.get("/login")
 async def login_form(request: Request):
