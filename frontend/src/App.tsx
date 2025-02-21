@@ -2,10 +2,10 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
+import { useAuth } from './contexts/AuthContext';
 import Login from './pages/Auth/Login';
 import ChangePassword from './pages/Auth/ChangePassword';
 import Dashboard from './pages/Dashboard';
-import { useAuth } from './contexts/AuthContext';
 
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, user } = useAuth();
@@ -21,7 +21,7 @@ const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
-function App() {
+const App = () => {
   return (
     <AuthProvider>
       <Router>
@@ -40,6 +40,6 @@ function App() {
       </Router>
     </AuthProvider>
   );
-}
+};
 
 export default App;
