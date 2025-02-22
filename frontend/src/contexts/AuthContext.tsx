@@ -1,4 +1,6 @@
+// src/contexts/AuthContext.tsx
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface User {
   id: number;
@@ -11,9 +13,10 @@ interface User {
 interface AuthContextType {
   user: User | null;
   token: string | null;
-  login: (token: string, user: User) => void;
-  logout: () => void;
+  login: (token: string, user: User) => Promise<void>;
+  logout: () => Promise<void>;
   isAuthenticated: boolean;
+  isLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -21,41 +24,69 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // Recuperar sesión almacenada
-    const storedToken = localStorage.getItem('token');
-    const storedUser = localStorage.getItem('user');
-    
-    if (storedToken && storedUser) {
+    const initializeAuth = async () => {
       try {
-        setToken(storedToken);
-        setUser(JSON.parse(storedUser));
-        console.log('Sesión restaurada');
+        const storedToken = localStorage.getItem('token');
+        const storedUser = localStorage.getItem('user');
+        
+        if (storedToken && storedUser) {
+          setToken(storedToken);
+          setUser(JSON.parse(storedUser));
+          console.log('Sesión restaurada');
+        }
       } catch (error) {
         console.error('Error al restaurar sesión:', error);
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+        await logout();
+      } finally {
+        setIsLoading(false);
       }
-    } else {
-      console.log('No hay sesión activa');
-    }
+    };
+
+    initializeAuth();
   }, []);
 
-  const login = (newToken: string, newUser: User) => {
-    setToken(newToken);
-    setUser(newUser);
-    localStorage.setItem('token', newToken);
-    localStorage.setItem('user', JSON.stringify(newUser));
-    console.log('Login exitoso:', newUser.username);
+  const login = async (newToken: string, newUser: User) => {
+    try {
+      setToken(newToken);
+      setUser(newUser);
+      localStorage.setItem('token', newToken);
+      localStorage.setItem('user', JSON.stringify(newUser));
+      console.log('Login exitoso:', newUser.username);
+
+      // Redireccionar basado en el estado del usuario
+      if (newUser.must_change_password) {
+        navigate('/change-password');
+      } else {
+        navigate('/dashboard');
+      }
+    } catch (error) {
+      console.error('Error durante el login:', error);
+      throw error;
+    }
   };
 
-  const logout = () => {
-    setToken(null);
-    setUser(null);
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    console.log('Sesión cerrada');
+  const logout = async () => {
+    try {
+      // Intentar hacer logout en el servidor
+      await fetch('/auth/logout', {
+        method: 'POST',
+        credentials: 'include',
+      }).catch(console.error); // No bloquear el logout si falla la petición
+    } finally {
+      // Limpiar estado local
+      setToken(null);
+      setUser(null);
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      console.log('Sesión cerrada');
+      
+      // Redireccionar al login
+      navigate('/login');
+    }
   };
 
   return (
@@ -64,9 +95,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       token,
       login,
       logout,
-      isAuthenticated: !!token
+      isAuthenticated: !!token && !!user,
+      isLoading
     }}>
-      {children}
+      {!isLoading && children}
     </AuthContext.Provider>
   );
 };
