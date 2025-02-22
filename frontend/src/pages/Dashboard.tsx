@@ -7,43 +7,85 @@ import {
   Network, 
   AlertTriangle,
   CheckCircle,
-  XCircle
+  XCircle,
+  Loader2
 } from 'lucide-react';
 import axios from 'axios';
 
+interface DashboardStats {
+  printers: {
+    total: number;
+    online: number;
+    error: number;
+  };
+  clients: {
+    total: number;
+    active: number;
+  };
+  agents: {
+    total: number;
+    online: number;
+    offline: number;
+  };
+  tunnels: {
+    total: number;
+    active: number;
+  };
+}
+
+const initialStats: DashboardStats = {
+  printers: { total: 0, online: 0, error: 0 },
+  clients: { total: 0, active: 0 },
+  agents: { total: 0, online: 0, offline: 0 },
+  tunnels: { total: 0, active: 0 }
+};
+
 const Dashboard = () => {
-  const [stats, setStats] = useState({
-    printers: { total: 0, online: 0, error: 0 },
-    clients: { total: 0, active: 0 },
-    agents: { total: 0, online: 0, offline: 0 },
-    tunnels: { total: 0, active: 0 }
-  });
+  const [stats, setStats] = useState<DashboardStats>(initialStats);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
+        setLoading(true);
         const response = await axios.get('/api/v1/dashboard/stats');
-        setStats(response.data);
+        if (response.data) {
+          setStats(response.data);
+        }
         setError(null);
       } catch (err) {
         console.error('Error fetching dashboard stats:', err);
         setError('Error al cargar las estadísticas');
+        // Mantener los stats anteriores en caso de error
       } finally {
         setLoading(false);
       }
     };
 
     fetchStats();
+
+    // Opcional: Actualizar cada cierto tiempo
+    const interval = setInterval(fetchStats, 30000); // Actualizar cada 30 segundos
+
+    return () => clearInterval(interval);
   }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
       <h1 className="text-3xl font-bold text-gray-900 mb-6">Dashboard</h1>
 
       {error && (
-        <div className="bg-red-50 text-red-700 p-4 rounded-lg mb-6">
+        <div className="bg-red-50 text-red-700 p-4 rounded-lg mb-6 flex items-center">
+          <AlertTriangle className="h-5 w-5 mr-2" />
           {error}
         </div>
       )}
@@ -114,7 +156,7 @@ const Dashboard = () => {
           </div>
         </Card>
 
-        {/* Alertas */}
+        {/* Túneles */}
         <Card className="p-6">
           <div className="flex items-center">
             <AlertTriangle className="h-10 w-10 text-yellow-500" />
