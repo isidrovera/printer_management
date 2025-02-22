@@ -14,13 +14,14 @@ import {
 } from "@/components/ui/table";
 import { Loader2, Plus, Search } from 'lucide-react';
 
+// Enhanced Client interface with optional properties
 interface Client {
   id: number;
   name: string;
   business_name?: string;
   tax_id?: string;
   client_type?: string;
-  status?: string;
+  status?: 'active' | 'inactive' | 'pending' | string;
 }
 
 const ClientList = () => {
@@ -32,7 +33,11 @@ const ClientList = () => {
   useEffect(() => {
     const fetchClients = async () => {
       try {
-        console.log('Fetching clients...');
+        // Reset previous error
+        setError(null);
+        setLoading(true);
+
+        // Fetch clients with comprehensive error handling
         const response = await axiosInstance.get('/api/v1/clients/', {
           headers: {
             'Accept': 'application/json',
@@ -40,17 +45,28 @@ const ClientList = () => {
           }
         });
         
-        console.log('Response:', response.data);
+        // Log full response for debugging
+        console.log('Full client response:', response);
+
+        // Handle different possible response structures
+        const clientData: Client[] = Array.isArray(response.data) 
+          ? response.data 
+          : response.data?.clients || [];
         
-        if (response.data && Array.isArray(response.data.clients)) {
-          setClients(response.data.clients);
-          setError(null);
-        } else {
-          throw new Error('Formato de respuesta inválido');
+        // Validate client data
+        if (!Array.isArray(clientData)) {
+          throw new Error('Invalid client data format');
         }
+
+        setClients(clientData);
       } catch (err: any) {
+        // Comprehensive error handling
+        const errorMessage = err.response?.data?.error 
+          || err.message 
+          || 'Error al cargar los clientes';
+        
         console.error('Error fetching clients:', err);
-        setError(err.response?.data?.error || 'Error al cargar los clientes');
+        setError(errorMessage);
         setClients([]);
       } finally {
         setLoading(false);
@@ -60,12 +76,17 @@ const ClientList = () => {
     fetchClients();
   }, []);
 
-  const filteredClients = clients.filter(client => 
-    client.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    client.business_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    client.tax_id?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Client filtering with improved null checks
+  const filteredClients = clients.filter(client => {
+    const searchTermLower = searchTerm.toLowerCase();
+    return (
+      client.name?.toLowerCase().includes(searchTermLower) ||
+      client.business_name?.toLowerCase().includes(searchTermLower) ||
+      client.tax_id?.toLowerCase().includes(searchTermLower)
+    );
+  });
 
+  // Loading state
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -87,12 +108,14 @@ const ClientList = () => {
           </Link>
         </div>
 
+        {/* Error handling */}
         {error && (
           <div className="bg-red-50 text-red-700 p-4 rounded-lg mb-6">
             {error}
           </div>
         )}
 
+        {/* Search input */}
         <div className="mb-6">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
@@ -106,6 +129,7 @@ const ClientList = () => {
           </div>
         </div>
 
+        {/* Clients table */}
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
@@ -122,13 +146,13 @@ const ClientList = () => {
               {filteredClients.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={6} className="text-center py-8">
-                    No se encontraron clientes
+                    {error ? 'No se pudieron cargar los clientes' : 'No se encontraron clientes'}
                   </TableCell>
                 </TableRow>
               ) : (
                 filteredClients.map((client) => (
                   <TableRow key={client.id}>
-                    <TableCell>{client.name}</TableCell>
+                    <TableCell>{client.name || 'N/A'}</TableCell>
                     <TableCell>{client.business_name || '-'}</TableCell>
                     <TableCell>{client.tax_id || '-'}</TableCell>
                     <TableCell>{client.client_type || '-'}</TableCell>
