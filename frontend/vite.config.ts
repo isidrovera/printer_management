@@ -1,3 +1,4 @@
+// vite.config.ts
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
@@ -8,17 +9,17 @@ export default defineConfig({
     host: '0.0.0.0',
     port: 3000,
     proxy: {
-      '/auth': {
-        target: 'http://161.132.39.159:8000',
-        changeOrigin: true,
-        secure: false,
-        rewrite: (path) => path.replace(/^\/auth/, '/auth')
-      },
       '/api': {
         target: 'http://161.132.39.159:8000',
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path.replace(/^\/api/, '/api')
+      },
+      '/auth': {
+        target: 'http://161.132.39.159:8000',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/auth/, '/auth')
       }
     }
   },
@@ -26,19 +27,5 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
-  },
-  build: {
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'ui-vendor': ['@radix-ui/react-slot', '@radix-ui/react-dialog']
-        }
-      }
-    }
-  },
-  optimizeDeps: {
-    include: ['react', 'react-dom', 'react-router-dom'],
-    exclude: []
   }
 })
