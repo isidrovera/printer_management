@@ -1,6 +1,9 @@
 // src/pages/Dashboard.tsx
 import React, { useState, useEffect } from 'react';
-import { Card } from '../components/ui/card';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import { Card } from '@/components/ui/card';
+import axiosInstance from '../lib/axios';
 import { 
   Printer, 
   Users, 
@@ -8,19 +11,22 @@ import {
   AlertTriangle,
   CheckCircle,
   XCircle,
-  Loader2
+  Loader2,
+  RefreshCcw
 } from 'lucide-react';
-import axios from 'axios';
+import { Button } from '@/components/ui/button';
 
 interface DashboardStats {
   printers: {
     total: number;
     online: number;
     offline: number;
+    error: number;
     last_updated?: string;
   };
   clients: {
     total: number;
+    active: number;
     last_updated?: string;
   };
   agents: {
@@ -37,8 +43,8 @@ interface DashboardStats {
 }
 
 const initialStats: DashboardStats = {
-  printers: { total: 0, online: 0, offline: 0 },
-  clients: { total: 0 },
+  printers: { total: 0, online: 0, offline: 0, error: 0 },
+  clients: { total: 0, active: 0 },
   agents: { total: 0, online: 0, offline: 0 },
   tunnels: { total: 0, active: 0 }
 };
@@ -47,32 +53,84 @@ const Dashboard = () => {
   const [stats, setStats] = useState<DashboardStats>(initialStats);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  const fetchStats = async (showLoading = true) => {
+    try {
+      if (showLoading) setLoading(true);
+      setRefreshing(true);
+
+      const response = await axiosInstance.get('/api/v1/dashboard/stats');
+      
+      if (response.data) {
+        // Asegurarse de que los datos tengan la estructura correcta
+        const safeStats = {
+          printers: {
+            total: response.data?.printers?.total ?? 0,
+            online: response.data?.printers?.online ?? 0,
+            offline: response.data?.printers?.offline ?? 0,
+            error: response.data?.printers?.error ?? 0
+          },
+          clients: {
+            total: response.data?.clients?.total ?? 0,
+            active: response.data?.clients?.active ?? 0
+          },
+          agents: {
+            total: response.data?.agents?.total ?? 0,
+            online: response.data?.agents?.online ?? 0,
+            offline: response.data?.agents?.offline ?? 0
+          },
+          tunnels: {
+            total: response.data?.tunnels?.total ?? 0,
+            active: response.data?.tunnels?.active ?? 0
+          }
+        };
+        setStats(safeStats);
+        setError(null);
+      }
+    } catch (err: any) {
+      console.error('Error fetching dashboard stats:', err);
+      
+      if (err.response?.status === 401 || err.response?.status === 303) {
+        await logout();
+        navigate('/login');
+        return;
+      }
+      
+      setError('Error al cargar las estadísticas del dashboard');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.get('/api/v1/dashboard/stats');
-        
-        if (response.data) {
-          setStats(response.data);
-          setError(null);
-        }
-      } catch (err) {
-        console.error('Error fetching dashboard stats:', err);
-        setError('Error al cargar las estadísticas');
-        // Mantener los stats anteriores en caso de error
-      } finally {
-        setLoading(false);
-      }
-    };
+    let mounted = true;
+    const controller = new AbortController();
 
-    fetchStats();
+    if (mounted) {
+      fetchStats();
+    }
 
     // Actualizar cada 30 segundos
-    const interval = setInterval(fetchStats, 30000);
-    return () => clearInterval(interval);
-  }, []);
+    const interval = setInterval(() => {
+      if (mounted) {
+        fetchStats(false);
+      }
+    }, 30000);
+
+    return () => {
+      mounted = false;
+      controller.abort();
+      clearInterval(interval);
+    };
+  }, [logout, navigate]);
+
+  const handleRefresh = () => {
+    fetchStats(false);
+  };
 
   if (loading) {
     return (
@@ -84,7 +142,18 @@ const Dashboard = () => {
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">Dashboard</h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+        <Button 
+          onClick={handleRefresh} 
+          variant="outline"
+          disabled={refreshing}
+          className="flex items-center gap-2"
+        >
+          <RefreshCcw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+          Actualizar
+        </Button>
+      </div>
 
       {error && (
         <div className="bg-red-50 text-red-700 p-4 rounded-lg mb-6 flex items-center">
@@ -110,6 +179,10 @@ const Dashboard = () => {
                   <span>Offline: {stats.printers.offline}</span>
                 </div>
                 <div className="flex items-center">
+                  <AlertTriangle className="h-4 w-4 text-yellow-500 mr-2" />
+                  <span>Error: {stats.printers.error}</span>
+                </div>
+                <div className="flex items-center">
                   <span className="font-medium">Total: {stats.printers.total}</span>
                 </div>
               </div>
@@ -124,6 +197,10 @@ const Dashboard = () => {
             <div className="ml-4">
               <h2 className="text-lg font-semibold">Clientes</h2>
               <div className="mt-2 space-y-1">
+                <div className="flex items-center">
+                  <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+                  <span>Activos: {stats.clients.active}</span>
+                </div>
                 <div className="flex items-center">
                   <span className="font-medium">Total: {stats.clients.total}</span>
                 </div>
