@@ -9,17 +9,20 @@ export default defineConfig({
     host: '0.0.0.0',
     port: 3000,
     proxy: {
-      '/api': {
+      '/api/v1': {
         target: 'http://161.132.39.159:8000',
         changeOrigin: true,
         secure: false,
-        rewrite: (path) => path.replace(/^\/api/, '/api')
+        rewrite: (path) => path.replace(/^\/api\/v1/, '/api/v1'),
+        headers: {
+          'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        }
       },
       '/auth': {
         target: 'http://161.132.39.159:8000',
         changeOrigin: true,
-        secure: false,
-        rewrite: (path) => path.replace(/^\/auth/, '/auth')
+        secure: false
       }
     }
   },
