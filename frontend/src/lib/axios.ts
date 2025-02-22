@@ -1,10 +1,9 @@
 // src/lib/axios.ts
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-
+// No necesitamos definir una baseURL ya que usaremos rutas relativas
+// que serán manejadas por el proxy de Vite
 const axiosInstance = axios.create({
-  baseURL: API_URL,
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
@@ -16,8 +15,10 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
     if (error.response?.status === 401 || error.response?.status === 303) {
-      // Si es un error de autenticación, redirigir al login
-      window.location.href = '/login';
+      const currentPath = window.location.pathname;
+      if (currentPath !== '/login') {
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }
