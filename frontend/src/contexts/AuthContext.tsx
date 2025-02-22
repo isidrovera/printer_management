@@ -1,6 +1,7 @@
 // src/contexts/AuthContext.tsx
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axiosInstance from '../lib/axios';
 
 interface User {
   id: number;
@@ -13,8 +14,8 @@ interface User {
 interface AuthContextType {
   user: User | null;
   token: string | null;
-  login: (token: string, user: User) => Promise<void>;
-  logout: () => Promise<void>;
+  login: (token: string, user: User) => void;
+  logout: () => void;
   isAuthenticated: boolean;
   isLoading: boolean;
 }
@@ -28,76 +29,72 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const initializeAuth = async () => {
+    const checkAuth = async () => {
       try {
         const storedToken = localStorage.getItem('token');
-        const storedUser = localStorage.getItem('user');
-        
-        if (storedToken && storedUser) {
+        if (storedToken) {
+          // Configura el token en axios
+          axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
+          
+          // Intenta obtener la información del usuario
+          const response = await axiosInstance.get('/auth/me');
+          setUser(response.data);
           setToken(storedToken);
-          setUser(JSON.parse(storedUser));
-          console.log('Sesión restaurada');
         }
       } catch (error) {
-        console.error('Error al restaurar sesión:', error);
+        console.error('Error checking auth:', error);
         await logout();
       } finally {
         setIsLoading(false);
       }
     };
 
-    initializeAuth();
+    checkAuth();
   }, []);
 
-  const login = async (newToken: string, newUser: User) => {
+  const login = async (newToken: string, userData: User) => {
     try {
       setToken(newToken);
-      setUser(newUser);
+      setUser(userData);
       localStorage.setItem('token', newToken);
-      localStorage.setItem('user', JSON.stringify(newUser));
-      console.log('Login exitoso:', newUser.username);
+      axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
 
-      // Redireccionar basado en el estado del usuario
-      if (newUser.must_change_password) {
+      if (userData.must_change_password) {
         navigate('/change-password');
       } else {
         navigate('/dashboard');
       }
     } catch (error) {
-      console.error('Error durante el login:', error);
-      throw error;
+      console.error('Error during login:', error);
+      await logout();
     }
   };
 
   const logout = async () => {
     try {
-      // Intentar hacer logout en el servidor
-      await fetch('/auth/logout', {
-        method: 'POST',
-        credentials: 'include',
-      }).catch(console.error); // No bloquear el logout si falla la petición
+      await axiosInstance.post('/auth/logout');
+    } catch (error) {
+      console.error('Error during logout:', error);
     } finally {
-      // Limpiar estado local
       setToken(null);
       setUser(null);
       localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      console.log('Sesión cerrada');
-      
-      // Redireccionar al login
+      delete axiosInstance.defaults.headers.common['Authorization'];
       navigate('/login');
     }
   };
 
   return (
-    <AuthContext.Provider value={{
-      user,
-      token,
-      login,
-      logout,
-      isAuthenticated: !!token && !!user,
-      isLoading
-    }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        token,
+        login,
+        logout,
+        isAuthenticated: !!token && !!user,
+        isLoading
+      }}
+    >
       {!isLoading && children}
     </AuthContext.Provider>
   );
