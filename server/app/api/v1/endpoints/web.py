@@ -163,6 +163,49 @@ def handle_dashboard_error(request: Request, error_message: str = "Error al carg
         }
     )
 # Rutas para el manejo de clientes
+#React
+@router.get("/api/v1/clients")
+async def list_clients(
+    request: Request, 
+    search: Optional[str] = None,
+    status: Optional[str] = None,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)  # Agregar autenticación
+):
+    """API endpoint para listado de clientes"""
+    try:
+        client_service = ClientService(db)
+        if search:
+            clients = await client_service.search_clients(search)
+        elif status:
+            clients = await client_service.get_by_status(ClientStatus(status))
+        else:
+            clients = await client_service.get_all()
+            
+        # Convertir los clientes a diccionarios
+        clients_data = [
+            {
+                "id": client.id,
+                "name": client.name,
+                "business_name": client.business_name,
+                "tax_id": client.tax_id,
+                "client_type": client.client_type.value if hasattr(client.client_type, 'value') else client.client_type,
+                "status": client.status.value if hasattr(client.status, 'value') else client.status,
+            }
+            for client in clients
+        ]
+            
+        return JSONResponse(
+            content={"clients": clients_data}
+        )
+    except Exception as e:
+        logger.error(f"Error listing clients: {str(e)}")
+        return JSONResponse(
+            status_code=500,
+            content={"error": str(e)}
+        )
+
+
 @router.get("/clients")
 async def list_clients(
     request: Request, 
