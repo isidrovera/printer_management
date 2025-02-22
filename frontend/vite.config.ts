@@ -13,7 +13,7 @@ export default defineConfig({
         changeOrigin: true,
         secure: false
       },
-      '/api/v1': {
+      '/api': {
         target: 'http://localhost:8000',
         changeOrigin: true,
         secure: false
