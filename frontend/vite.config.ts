@@ -8,7 +8,12 @@ export default defineConfig({
     host: '0.0.0.0',
     port: 3000,
     proxy: {
-      '/api/v1': {  // Cambiamos la configuración del proxy
+      '/auth': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+        secure: false
+      },
+      '/api/v1': {
         target: 'http://localhost:8000',
         changeOrigin: true,
         secure: false
