@@ -16,26 +16,29 @@ interface DashboardStats {
   printers: {
     total: number;
     online: number;
-    error: number;
+    offline: number;
+    last_updated?: string;
   };
   clients: {
     total: number;
-    active: number;
+    last_updated?: string;
   };
   agents: {
     total: number;
     online: number;
     offline: number;
+    last_updated?: string;
   };
   tunnels: {
     total: number;
     active: number;
+    last_updated?: string;
   };
 }
 
 const initialStats: DashboardStats = {
-  printers: { total: 0, online: 0, error: 0 },
-  clients: { total: 0, active: 0 },
+  printers: { total: 0, online: 0, offline: 0 },
+  clients: { total: 0 },
   agents: { total: 0, online: 0, offline: 0 },
   tunnels: { total: 0, active: 0 }
 };
@@ -50,10 +53,11 @@ const Dashboard = () => {
       try {
         setLoading(true);
         const response = await axios.get('/api/v1/dashboard/stats');
+        
         if (response.data) {
           setStats(response.data);
+          setError(null);
         }
-        setError(null);
       } catch (err) {
         console.error('Error fetching dashboard stats:', err);
         setError('Error al cargar las estadísticas');
@@ -65,9 +69,8 @@ const Dashboard = () => {
 
     fetchStats();
 
-    // Opcional: Actualizar cada cierto tiempo
-    const interval = setInterval(fetchStats, 30000); // Actualizar cada 30 segundos
-
+    // Actualizar cada 30 segundos
+    const interval = setInterval(fetchStats, 30000);
     return () => clearInterval(interval);
   }, []);
 
@@ -104,7 +107,7 @@ const Dashboard = () => {
                 </div>
                 <div className="flex items-center">
                   <XCircle className="h-4 w-4 text-red-500 mr-2" />
-                  <span>Error: {stats.printers.error}</span>
+                  <span>Offline: {stats.printers.offline}</span>
                 </div>
                 <div className="flex items-center">
                   <span className="font-medium">Total: {stats.printers.total}</span>
@@ -121,10 +124,6 @@ const Dashboard = () => {
             <div className="ml-4">
               <h2 className="text-lg font-semibold">Clientes</h2>
               <div className="mt-2 space-y-1">
-                <div className="flex items-center">
-                  <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
-                  <span>Activos: {stats.clients.active}</span>
-                </div>
                 <div className="flex items-center">
                   <span className="font-medium">Total: {stats.clients.total}</span>
                 </div>
