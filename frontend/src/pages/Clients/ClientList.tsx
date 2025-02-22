@@ -28,7 +28,7 @@ const ClientList = () => {
 
   const fetchClients = async () => {
     try {
-      const response = await axios.get('/api/v1/clients');
+      const response = await axios.get('/api/clients');
       setClients(response.data);
     } catch (err) {
       setError('Error al cargar los clientes');
