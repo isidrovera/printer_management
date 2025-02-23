@@ -205,7 +205,9 @@ class PrinterMonitorService:
                 critical_printers.append(printer)
                 
         return critical_printers
-    async def get_count(self) -> int:
+    
+
+    def get_count(self) -> int:
         """
         Obtiene el número total de impresoras.
         """
@@ -217,7 +219,7 @@ class PrinterMonitorService:
             logger.error(f"Error obteniendo conteo de impresoras: {str(e)}")
             return 0
 
-    async def get_count_by_status(self, status: str) -> int:
+    def get_count_by_status(self, status: str) -> int:
         """
         Obtiene el número de impresoras por estado específico.
         """
@@ -229,7 +231,7 @@ class PrinterMonitorService:
             logger.error(f"Error obteniendo conteo de impresoras por estado: {str(e)}")
             return 0
 
-    async def get_all(self):
+    def get_all(self):
         """
         Obtiene todas las impresoras.
         """
@@ -240,3 +242,29 @@ class PrinterMonitorService:
         except Exception as e:
             logger.error(f"Error obteniendo todas las impresoras: {str(e)}")
             return []
+
+    def count_by_status(self) -> Dict[str, int]:
+        """
+        Obtiene un conteo de impresoras por estado.
+        """
+        try:
+            statuses = ['online', 'offline', 'error']
+            counts = {status: 0 for status in statuses}
+            counts['total'] = 0
+            
+            printers = self.get_all()
+            counts['total'] = len(printers)
+            
+            for printer in printers:
+                if printer.status in statuses:
+                    counts[printer.status] += 1
+            
+            return counts
+        except Exception as e:
+            logger.error(f"Error contando impresoras por estado: {str(e)}")
+            return {
+                "total": 0,
+                "online": 0,
+                "offline": 0,
+                "error": 0
+            }
