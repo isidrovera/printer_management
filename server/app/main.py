@@ -5,53 +5,46 @@ from pathlib import Path
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
-from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 
-# Importaciones locales
+# Local imports
 from app.core.config import settings
 from app.middleware.auth_middleware import auth_middleware
 from app.middleware.first_login_middleware import first_login_middleware
 from app.services.initial_setup import InitialSetupService
-from app.api.v1.api import api_router, web_router
+from app.api.v1.api import api_router
 from app.db.session import engine, SessionLocal
 from app.db.base import Base
 
-# Configuración de logging
+# Logging configuration
 logging.basicConfig(
     level=logging.DEBUG,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
 
-# Configuración de directorios
-BASE_DIR = Path(__file__).resolve().parent.parent
-static_dir = BASE_DIR / "app" / "static"
-templates = Jinja2Templates(directory="app/templates")
-
-# Asegurar que existan los directorios necesarios
+# Ensure required directories exist
 os.makedirs(settings.DRIVERS_STORAGE_PATH, exist_ok=True)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Configuración de inicio y cierre de la aplicación"""
+    """Application startup and shutdown configuration"""
     # Startup
-    logger.info("Iniciando aplicación...")
+    logger.info("Starting application...")
     db = SessionLocal()
     try:
-        # Crear tablas en la base de datos
-        logger.info("Verificando estructura de base de datos...")
+        # Create database tables
+        logger.info("Verifying database structure...")
         Base.metadata.create_all(bind=engine)
         
-        # Ejecutar configuración inicial
-        logger.info("Ejecutando configuración inicial...")
+        # Run initial setup
+        logger.info("Running initial setup...")
         await InitialSetupService.run_initial_setup(db)
         
-        logger.info("Aplicación iniciada correctamente")
+        logger.info("Application started successfully")
     except Exception as e:
-        logger.error(f"Error en el inicio de la aplicación: {e}")
+        logger.error(f"Error during application startup: {e}")
         raise
     finally:
         db.close()
@@ -59,16 +52,15 @@ async def lifespan(app: FastAPI):
     yield
     
     # Shutdown
-    logger.info("Cerrando aplicación...")
+    logger.info("Shutting down application...")
 
-# Crear aplicación FastAPI
+# Create FastAPI application
 app = FastAPI(
     title=settings.PROJECT_NAME,
     lifespan=lifespan
 )
 
-
-# En main.py, modifica la configuración de CORS así:
+# CORS configuration
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://161.132.39.159:3000"],
@@ -78,25 +70,14 @@ app.add_middleware(
     expose_headers=["*"]
 )
 
+# Add middlewares
 app.add_middleware(BaseHTTPMiddleware, dispatch=auth_middleware)
 app.add_middleware(BaseHTTPMiddleware, dispatch=first_login_middleware)
 
-# Montar archivos estáticos
-app.mount(
-    "/static",
-    StaticFiles(directory=str(static_dir), check_dir=True),
-    name="static"
-)
-
-# Incluir routers
-app.include_router(web_router)
+# Include API router
 app.include_router(
     api_router,
     prefix=settings.API_V1_STR
 )
 
-# Configuración de templates
-templates.env.filters['numberformat'] = lambda value: "{:,}".format(value)
-templates.env.filters['default'] = lambda value, default_value: value if value is not None else default_value
-
-logger.info("Aplicación inicializada completamente")
+logger.info("Application fully initialized")
