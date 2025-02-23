@@ -2,30 +2,32 @@
 import axios from 'axios';
 
 const axiosInstance = axios.create({
-  baseURL: '/api/v1',
+  baseURL: '/api',  // Cambiamos esto para que coincida con el proxy
   headers: {
     'Accept': 'application/json',
     'Content-Type': 'application/json'
   }
 });
 
-// Interceptor para peticiones
 axiosInstance.interceptors.request.use(
   (config) => {
     console.log('📤 Request:', {
       method: config.method?.toUpperCase(),
       url: config.url,
-      headers: config.headers,
-      data: config.data
+      baseURL: config.baseURL,
+      fullPath: `${config.baseURL}${config.url}`
     });
 
-    const token = localStorage.getItem('token');
-    if (token) {
-      const tokenData = JSON.parse(token);
-      config.headers.Authorization = `Bearer ${tokenData.access_token}`;
-      console.log('🔑 Token added to request');
-    } else {
-      console.log('⚠️ No token found in localStorage');
+    const tokenStr = localStorage.getItem('token');
+    if (tokenStr) {
+      try {
+        const tokenData = JSON.parse(tokenStr);
+        config.headers.Authorization = `Bearer ${tokenData.access_token}`;
+        console.log('🔑 Token added to request');
+      } catch (error) {
+        console.error('❌ Error parsing token:', error);
+        localStorage.removeItem('token');
+      }
     }
     return config;
   },
@@ -35,13 +37,12 @@ axiosInstance.interceptors.request.use(
   }
 );
 
-// Interceptor para respuestas
 axiosInstance.interceptors.response.use(
   (response) => {
     console.log('📥 Response Success:', {
       status: response.status,
       url: response.config.url,
-      data: response.data
+      fullPath: `${response.config.baseURL}${response.config.url}`
     });
     return response;
   },
@@ -49,6 +50,7 @@ axiosInstance.interceptors.response.use(
     console.error('❌ Response Error:', {
       status: error.response?.status,
       url: error.config?.url,
+      fullPath: `${error.config?.baseURL}${error.config?.url}`,
       data: error.response?.data,
       message: error.message
     });

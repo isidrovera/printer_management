@@ -62,7 +62,7 @@ const Dashboard = () => {
       if (showLoading) setLoading(true);
       setRefreshing(true);
 
-      const response = await axiosInstance.get('/dashboard/stats');
+      const response = await axiosInstance.get('/v1/dashboard/stats');
       
       if (response.data) {
         // Asegurarse de que los datos tengan la estructura correcta
