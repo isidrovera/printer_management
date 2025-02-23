@@ -47,25 +47,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const login = async (credentials: LoginCredentials) => {
     try {
       const response = await axiosInstance.post<LoginResponse>('/auth/login', credentials);
-      const { access_token, token_type, user: userData } = response.data;
-
-      const tokenData = {
-        access_token,
-        token_type
-      };
-
-      localStorage.setItem('token', JSON.stringify(tokenData));
-      setToken(tokenData);
+      const { access_token, user: userData } = response.data;
+      
+      // Guardamos solo el token
+      localStorage.setItem('token', access_token);
+      
+      // Actualizamos el estado
+      setToken(access_token);
       setUser(userData);
-
+      
+      // Configuramos el header por defecto
       axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
-
+      
       if (userData.must_change_password) {
         navigate('/change-password');
-        return;
+      } else {
+        navigate('/dashboard');
       }
-
-      navigate('/dashboard');
     } catch (error) {
       console.error('Error en login:', error);
       throw error;

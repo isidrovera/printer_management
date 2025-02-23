@@ -1,4 +1,5 @@
 // src/types/auth.ts
+// src/types/auth.ts
 export interface LoginCredentials {
   username: string;
   password: string;
@@ -11,11 +12,6 @@ export interface User {
   full_name: string;
   role: string;
   must_change_password: boolean;
-}
-
-export interface TokenResponse {
-  access_token: string;
-  token_type: string;
 }
 
 export interface LoginResponse {
