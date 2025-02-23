@@ -102,37 +102,91 @@ def create_refresh_token(data: Dict[str, Any]) -> str:
        expires_delta=timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
    )
 
+
 async def get_current_user(request: Request) -> User:
-    token = request.cookies.get("access_token")
+    """
+    Obtiene el usuario actual del token JWT en el header Authorization
     
-    if not token:
-        logger.error("Token no encontrado")
-        raise HTTPException(status_code=401, detail="Not authenticated")
+    Args:
+        request: Request de FastAPI
         
+    Returns:
+        User: Usuario autenticado
+        
+    Raises:
+        HTTPException: Si la autenticación falla
+    """
     try:
-        token = token.replace("Bearer ", "")
-        payload = jwt.decode(
-            token, 
-            settings.SECRET_KEY, 
-            algorithms=[settings.JWT_ALGORITHM]
-        )
-        username = payload.get("sub")
-        
-        if not username:
-            raise HTTPException(status_code=401)
-            
-        db = SessionLocal()
+        auth_header = request.headers.get("Authorization")
+        if not auth_header:
+            logger.error("Token no encontrado en headers")
+            raise HTTPException(
+                status_code=401, 
+                detail="No se proporcionó token de autenticación"
+            )
+
+        # Extraer token del formato "Bearer <token>"
         try:
-            user = db.query(User).filter(User.username == username).first()
-            if not user:
-                raise HTTPException(status_code=401)
-            return user
-        finally:
-            db.close()
+            scheme, token = auth_header.split()
+            if scheme.lower() != "bearer":
+                raise HTTPException(
+                    status_code=401,
+                    detail="Token debe ser de tipo Bearer"
+                )
+        except ValueError:
+            raise HTTPException(
+                status_code=401,
+                detail="Formato de token inválido"
+            )
+
+        try:
+            payload = jwt.decode(
+                token, 
+                settings.SECRET_KEY, 
+                algorithms=[settings.JWT_ALGORITHM]
+            )
+            username = payload.get("sub")
             
-    except JWTError as e:
-        logger.error(f"Error JWT: {str(e)}")
-        raise HTTPException(status_code=401)
+            if not username:
+                raise HTTPException(
+                    status_code=401,
+                    detail="Token inválido"
+                )
+                
+            db = SessionLocal()
+            try:
+                user = db.query(User).filter(User.username == username).first()
+                if not user:
+                    logger.warning(f"Usuario no encontrado: {username}")
+                    raise HTTPException(
+                        status_code=401,
+                        detail="Usuario no encontrado"
+                    )
+                return user
+            finally:
+                db.close()
+                
+        except jwt.ExpiredSignatureError:
+            logger.error("Token expirado")
+            raise HTTPException(
+                status_code=401,
+                detail="Token expirado"
+            )
+        except jwt.JWTError as e:
+            logger.error(f"Error decodificando JWT: {str(e)}")
+            raise HTTPException(
+                status_code=401,
+                detail="Token inválido"
+            )
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error inesperado en autenticación: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail="Error interno del servidor"
+        )
 async def get_current_active_user(
    current_user: Dict[str, Any] = Depends(get_current_user)
 ) -> Dict[str, Any]:
