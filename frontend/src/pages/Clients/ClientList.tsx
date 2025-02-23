@@ -1,139 +1,140 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ClientService, Client } from '../../services/ClientService';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { useToast } from "@/components/ui/use-toast";
-import { Loader2, Plus, Search, MoreVertical, Edit, Trash, Eye } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
 
 const ClientList = () => {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const { toast } = useToast();
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  // Cargar clientes
   useEffect(() => {
-    const loadClients = async () => {
-      try {
-        setLoading(true);
-        const data = await ClientService.getClients(searchTerm);
-        setClients(data);
-      } catch (err) {
-        toast({
-          variant: "destructive",
-          title: "Error al cargar los clientes"
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-
     loadClients();
   }, [searchTerm]);
 
-  // Eliminar cliente
+  const loadClients = async () => {
+    try {
+      setLoading(true);
+      const data = await ClientService.getClients(searchTerm);
+      setClients(data);
+    } catch (error) {
+      alert('Error al cargar los clientes');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleDelete = async () => {
     if (!selectedClient?.id) return;
     try {
       await ClientService.deleteClient(selectedClient.id);
       setClients(clients.filter(c => c.id !== selectedClient.id));
-      toast({ title: "Cliente eliminado exitosamente" });
-      setDeleteDialogOpen(false);
-    } catch (err) {
-      toast({ variant: "destructive", title: "Error al eliminar el cliente" });
+      alert('Cliente eliminado exitosamente');
+      setShowDeleteModal(false);
+    } catch (error) {
+      alert('Error al eliminar el cliente');
     }
   };
 
   if (loading) {
-    return <div className="flex justify-center p-8"><Loader2 className="animate-spin" /></div>;
+    return <div>Cargando...</div>;
   }
 
   return (
-    <div className="container p-6">
-      <Card className="p-6">
-        {/* Header */}
-        <div className="flex justify-between mb-6">
-          <h1 className="text-2xl font-bold">Clientes</h1>
-          <Link to="/clients/create">
-            <Button><Plus className="mr-2" /> Nuevo Cliente</Button>
-          </Link>
-        </div>
+    <div className="p-4">
+      <div className="mb-4 flex justify-between items-center">
+        <h1 className="text-2xl font-bold">Clientes</h1>
+        <Link to="/clients/create" className="bg-blue-500 text-white px-4 py-2 rounded">
+          Nuevo Cliente
+        </Link>
+      </div>
 
-        {/* Buscador */}
-        <div className="mb-6">
-          <Input
-            type="text"
-            placeholder="Buscar clientes..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="max-w-sm"
-          />
-        </div>
+      <input
+        type="text"
+        placeholder="Buscar clientes..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        className="w-full p-2 border rounded mb-4"
+      />
 
-        {/* Tabla */}
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Nombre</TableHead>
-              <TableHead>RUC/DNI</TableHead>
-              <TableHead>Estado</TableHead>
-              <TableHead className="text-right">Acciones</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
+      <div className="overflow-x-auto">
+        <table className="w-full border-collapse border">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="border p-2 text-left">Nombre</th>
+              <th className="border p-2 text-left">RUC/DNI</th>
+              <th className="border p-2 text-left">Estado</th>
+              <th className="border p-2 text-right">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
             {clients.map((client) => (
-              <TableRow key={client.id}>
-                <TableCell>{client.name}</TableCell>
-                <TableCell>{client.tax_id || '-'}</TableCell>
-                <TableCell>
-                  <Badge>{client.status}</Badge>
-                </TableCell>
-                <TableCell className="text-right">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm"><MoreVertical /></Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      <DropdownMenuItem asChild>
-                        <Link to={`/clients/${client.id}`}><Eye className="mr-2" /> Ver</Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link to={`/clients/${client.id}/edit`}><Edit className="mr-2" /> Editar</Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => {
+              <tr key={client.id} className="hover:bg-gray-50">
+                <td className="border p-2">{client.name}</td>
+                <td className="border p-2">{client.tax_id || '-'}</td>
+                <td className="border p-2">
+                  <span className={`px-2 py-1 rounded ${
+                    client.status === 'active' ? 'bg-green-100 text-green-800' : 
+                    client.status === 'inactive' ? 'bg-red-100 text-red-800' : 
+                    'bg-gray-100 text-gray-800'
+                  }`}>
+                    {client.status}
+                  </span>
+                </td>
+                <td className="border p-2 text-right">
+                  <div className="flex justify-end gap-2">
+                    <Link 
+                      to={`/clients/${client.id}`}
+                      className="text-blue-600 hover:text-blue-800"
+                    >
+                      Ver
+                    </Link>
+                    <Link 
+                      to={`/clients/${client.id}/edit`}
+                      className="text-green-600 hover:text-green-800"
+                    >
+                      Editar
+                    </Link>
+                    <button
+                      onClick={() => {
                         setSelectedClient(client);
-                        setDeleteDialogOpen(true);
-                      }}>
-                        <Trash className="mr-2" /> Eliminar
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
+                        setShowDeleteModal(true);
+                      }}
+                      className="text-red-600 hover:text-red-800"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
+                </td>
+              </tr>
             ))}
-          </TableBody>
-        </Table>
-      </Card>
+          </tbody>
+        </table>
+      </div>
 
-      {/* Diálogo de confirmación */}
-      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogTitle>¿Eliminar cliente?</AlertDialogTitle>
-          <AlertDialogDescription>Esta acción no se puede deshacer.</AlertDialogDescription>
-          <AlertDialogFooter>
-            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>Cancelar</Button>
-            <Button variant="destructive" onClick={handleDelete}>Eliminar</Button>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg">
+            <h2 className="text-xl mb-4">¿Eliminar cliente?</h2>
+            <p className="mb-4">Esta acción no se puede deshacer.</p>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                className="px-4 py-2 border rounded"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleDelete}
+                className="px-4 py-2 bg-red-500 text-white rounded"
+              >
+                Eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
