@@ -23,40 +23,49 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     const initializeAuth = async () => {
-      const storedToken = localStorage.getItem('token');
-      if (storedToken) {
-        try {
-          const tokenData: TokenResponse = JSON.parse(storedToken);
-          setToken(tokenData);
-          axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${tokenData.access_token}`;
-          
-          const response = await axiosInstance.get<User>('/auth/me');
-          setUser(response.data);
-        } catch (error) {
-          console.error('Error en la inicialización de auth:', error);
-          await logout();
+      try {
+        const storedToken = localStorage.getItem('token');
+        if (!storedToken) {
+          setIsLoading(false);
+          return;
         }
+
+        const tokenData: TokenResponse = JSON.parse(storedToken);
+        if (!tokenData || !tokenData.access_token) {
+          throw new Error('Token inválido');
+        }
+
+        setToken(tokenData);
+        axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${tokenData.access_token}`;
+        
+        const response = await axiosInstance.get<User>('/auth/me');
+        setUser(response.data);
+      } catch (error) {
+        console.error('Error en la inicialización de auth:', error);
+        await logout();
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     };
 
     initializeAuth();
   }, []);
 
-  // src/contexts/AuthContext.tsx
   const login = async (credentials: LoginCredentials) => {
     try {
       const response = await axiosInstance.post<LoginResponse>('/auth/login', credentials);
-      const { access_token, user: userData } = response.data;
+      const { access_token, token_type, user: userData } = response.data;
       
-      // Guardamos solo el token
-      localStorage.setItem('token', access_token);
+      const tokenData: TokenResponse = {
+        access_token,
+        token_type
+      };
+
+      localStorage.setItem('token', JSON.stringify(tokenData));
       
-      // Actualizamos el estado
-      setToken(access_token);
+      setToken(tokenData);
       setUser(userData);
       
-      // Configuramos el header por defecto
       axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
       
       if (userData.must_change_password) {
@@ -64,9 +73,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       } else {
         navigate('/dashboard');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error en login:', error);
-      throw error;
+      throw new Error(
+        error.response?.data?.message || 
+        'Error al iniciar sesión. Por favor, verifica tus credenciales.'
+      );
     }
   };
 
@@ -92,7 +104,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       token,
       login,
       logout,
-      isAuthenticated: !!token,
+      isAuthenticated: !!token?.access_token,
       isLoading
     }}>
       {children}
