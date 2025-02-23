@@ -12,10 +12,40 @@ class ClientService:
     def __init__(self, db: Session):
         self.db = db
 
-    async def get_all(self) -> List[Client]:
+    def get_all(self) -> List[Client]:
         """Obtiene todos los clientes."""
-        return self.db.query(Client).all()
+        try:
+            return self.db.query(Client).filter(Client.is_active == True).all()
+        except Exception as e:
+            logger.error(f"Error obteniendo todos los clientes: {str(e)}")
+            return []
 
+    def count_by_status(self) -> Dict[str, int]:
+        """Obtiene conteo de clientes por estado"""
+        try:
+            counts = {
+                "total": 0,
+                "active": 0,
+                "inactive": 0
+            }
+            
+            clients = self.get_all()
+            counts["total"] = len(clients)
+            
+            for client in clients:
+                if client.is_active:
+                    counts["active"] += 1
+                else:
+                    counts["inactive"] += 1
+                    
+            return counts
+        except Exception as e:
+            logger.error(f"Error contando clientes por estado: {str(e)}")
+            return {
+                "total": 0,
+                "active": 0,
+                "inactive": 0
+            }
     async def get_by_id(self, client_id: int) -> Optional[Client]:
         """Obtiene un cliente por su ID."""
         return self.db.query(Client).filter(Client.id == client_id).first()
@@ -116,13 +146,7 @@ class ClientService:
             logger.error(f"Error eliminando cliente {client_id}: {str(e)}")
             raise
 
-    async def get_count(self) -> int:
-        """Obtiene el número total de clientes."""
-        try:
-            return self.db.query(Client).count()
-        except Exception as e:
-            logger.error(f"Error obteniendo conteo de clientes: {str(e)}")
-            return 0
+    
 
     async def get_by_status(self, status: ClientStatus) -> List[Client]:
         """Obtiene clientes por estado."""
@@ -209,12 +233,4 @@ class ClientService:
                 "error": str(e)
             }
 
-    async def get_count_by_status(self, status: ClientStatus) -> int:
-        """
-        Obtiene el número de clientes por estado.
-        """
-        try:
-            return self.db.query(Client).filter(Client.status == status).count()
-        except Exception as e:
-            logger.error(f"Error obteniendo conteo de clientes por estado {status}: {str(e)}")
-            return 0
+    

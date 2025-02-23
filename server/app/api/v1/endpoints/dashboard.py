@@ -63,17 +63,14 @@ def get_dashboard_stats(
 
         # Obtener estadísticas de clientes
         try:
-            clients = services["client"].get_all()
-            recent_threshold = datetime.now() - timedelta(days=30)
-            stats["clients"]["total"] = len(clients)
-            stats["clients"]["active"] = len([
-                c for c in clients 
-                if getattr(c, 'is_active', False) or 
-                   (getattr(c, 'created_at', datetime.min) > recent_threshold)
-            ])
+            client_service = ClientService(db)
+            stats = client_service.count_by_status()
+            return stats
         except Exception as e:
-            logger.warning(f"Error en estadísticas de clientes: {str(e)}")
-
+            raise HTTPException(
+                status_code=500,
+                detail=f"Error obteniendo estadísticas: {str(e)}"
+            )
         # Obtener estadísticas de agentes
         try:
             agents = services["agent"].get_all()
