@@ -1,4 +1,5 @@
 // src/contexts/AuthContext.tsx
+// src/contexts/AuthContext.tsx
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../lib/axios';
@@ -48,21 +49,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const response = await axiosInstance.post<LoginResponse>('/auth/login', credentials);
       const { user: userData, token: tokenData } = response.data;
 
-      // Guardar token
       localStorage.setItem('token', JSON.stringify(tokenData));
       setToken(tokenData);
       setUser(userData);
 
-      // Configurar token para futuras solicitudes
       axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${tokenData.access_token}`;
 
-      // Manejar flujo de 2FA si es necesario
       if (response.data.requires_2fa) {
         navigate('/2fa-verify');
         return;
       }
 
-      // Manejar cambio de contraseña obligatorio
       if (userData.must_change_password) {
         navigate('/change-password');
         return;
@@ -71,27 +68,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       navigate('/dashboard');
     } catch (error) {
       console.error('Error en login:', error);
-      throw error;
-    }
-  };
-
-  const refreshToken = async () => {
-    try {
-      if (!token?.refresh_token) throw new Error('No hay refresh token');
-
-      const response = await axiosInstance.post<TokenResponse>('/auth/refresh', {
-        refresh_token: token.refresh_token
-      });
-
-      const newToken = response.data;
-      localStorage.setItem('token', JSON.stringify(newToken));
-      setToken(newToken);
-      axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${newToken.access_token}`;
-
-      return newToken;
-    } catch (error) {
-      console.error('Error refrescando token:', error);
-      await logout();
       throw error;
     }
   };
