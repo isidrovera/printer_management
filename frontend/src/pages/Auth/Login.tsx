@@ -21,11 +21,13 @@ const Login = () => {
     setLoading(true);
 
     try {
+      // Registro de intento de inicio de sesión
       console.log('Iniciando login con:', {
         username: formData.username,
         password: '********'
       });
       
+      // Mantener la lógica original de solicitud
       const response = await fetch('/auth/login', {
         method: 'POST',
         headers: {
@@ -43,21 +45,35 @@ const Login = () => {
       const contentType = response.headers.get("content-type");
       console.log('Content-Type:', contentType);
 
+      // Manejo de errores
       if (!response.ok) {
         const errorData = contentType?.includes('application/json') 
           ? await response.json()
           : await response.text();
         console.error('Error response:', errorData);
-        throw new Error(typeof errorData === 'object' ? errorData.detail : 'Error al iniciar sesión');
+        
+        // Extraer mensaje de error de manera más robusta
+        const errorMessage = 
+          typeof errorData === 'object' 
+            ? (errorData.detail || errorData.message || 'Error al iniciar sesión')
+            : errorData || 'Error al iniciar sesión';
+        
+        throw new Error(errorMessage);
       }
 
+      // Parsear respuesta JSON
       const data = await response.json();
       console.log('Login exitoso:', data);
 
-      // Guardar el token y datos del usuario
+      // Validar estructura de respuesta
+      if (!data.access_token || !data.user) {
+        throw new Error('Respuesta de inicio de sesión inválida');
+      }
+
+      // Iniciar sesión con token y datos de usuario
       login(data.access_token, data.user);
 
-      // Redireccionar según el estado del usuario
+      // Redirección basada en estado de contraseña
       if (data.user.must_change_password) {
         navigate('/change-password');
       } else {
@@ -66,12 +82,17 @@ const Login = () => {
 
     } catch (err) {
       console.error('Error completo:', err);
-      setError(err instanceof Error ? err.message : 'Error al iniciar sesión');
+      setError(
+        err instanceof Error 
+          ? err.message 
+          : 'Error al iniciar sesión'
+      );
     } finally {
       setLoading(false);
     }
   };
 
+  // El resto del componente permanece igual
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       {/* Hero Section */}

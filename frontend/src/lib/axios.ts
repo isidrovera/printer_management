@@ -2,35 +2,21 @@
 import axios from 'axios';
 
 const axiosInstance = axios.create({
-  baseURL: '/api/v1', // Cambiado para usar la ruta base de la API
-  withCredentials: true,
+  baseURL: import.meta.env.VITE_API_BASE_URL || '', // URL base de tu API
+  withCredentials: true, // Importante para manejar cookies/credenciales
   headers: {
-    'Content-Type': 'application/json',
     'Accept': 'application/json',
-    'X-Requested-With': 'XMLHttpRequest' // Importante para diferenciar peticiones AJAX
+    'Content-Type': 'application/json'
   }
 });
 
-// Interceptor para agregar el token de autenticación
-axiosInstance.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-
-// Interceptor para manejar errores de autenticación
+// Interceptor para manejar errores de autorización
 axiosInstance.interceptors.response.use(
   (response) => response,
-  async (error) => {
-    if (error.response?.status === 401 || error.response?.status === 303) {
-      localStorage.removeItem('token');
+  (error) => {
+    // Manejar específicamente errores de autorización
+    if (error.response?.status === 401) {
+      // Redirigir al login o cerrar sesión
       window.location.href = '/login';
     }
     return Promise.reject(error);
