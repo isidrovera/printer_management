@@ -9,20 +9,26 @@ export default defineConfig({
     host: '0.0.0.0',
     port: 3000,
     proxy: {
-      '/api': {
+      '/api/v1': {
         target: 'http://161.132.39.159:8000',
         changeOrigin: true,
         secure: false,
-        rewrite: (path) => path,
         configure: (proxy, _options) => {
           proxy.on('error', (err, _req, _res) => {
             console.log('🔴 proxy error', err);
           });
           proxy.on('proxyReq', (proxyReq, req, _res) => {
-            console.log('🔄 Proxy Request:', req.method, req.url);
+            console.log('🔄 Proxy Request:', {
+              method: req.method,
+              url: req.url,
+              targetUrl: proxyReq.path
+            });
           });
           proxy.on('proxyRes', (proxyRes, req, _res) => {
-            console.log('✅ Proxy Response:', proxyRes.statusCode, req.url);
+            console.log('✅ Proxy Response:', {
+              statusCode: proxyRes.statusCode,
+              url: req.url
+            });
           });
         }
       }

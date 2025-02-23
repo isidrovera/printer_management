@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 const axiosInstance = axios.create({
-  baseURL: '/api',  // Cambiamos esto para que coincida con el proxy
+  baseURL: '/api/v1',  // Cambiamos a incluir /v1
   headers: {
     'Accept': 'application/json',
     'Content-Type': 'application/json'
@@ -14,8 +14,7 @@ axiosInstance.interceptors.request.use(
     console.log('📤 Request:', {
       method: config.method?.toUpperCase(),
       url: config.url,
-      baseURL: config.baseURL,
-      fullPath: `${config.baseURL}${config.url}`
+      fullUrl: `${config.baseURL}${config.url}`
     });
 
     const tokenStr = localStorage.getItem('token');
@@ -42,7 +41,7 @@ axiosInstance.interceptors.response.use(
     console.log('📥 Response Success:', {
       status: response.status,
       url: response.config.url,
-      fullPath: `${response.config.baseURL}${response.config.url}`
+      data: response.data
     });
     return response;
   },
@@ -50,13 +49,11 @@ axiosInstance.interceptors.response.use(
     console.error('❌ Response Error:', {
       status: error.response?.status,
       url: error.config?.url,
-      fullPath: `${error.config?.baseURL}${error.config?.url}`,
       data: error.response?.data,
       message: error.message
     });
 
     if (error.response?.status === 401) {
-      console.log('🚫 Unauthorized - Redirecting to login');
       localStorage.removeItem('token');
       window.location.href = '/login';
     }

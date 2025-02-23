@@ -53,7 +53,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const login = async (credentials: LoginCredentials) => {
     try {
-      const response = await axiosInstance.post<LoginResponse>('/auth/login', credentials);
+      console.log('🔄 Iniciando login:', credentials.username);
+      const response = await axiosInstance.post('/auth/login', credentials);
       const { access_token, token_type, user: userData } = response.data;
       
       const tokenData: TokenResponse = {
