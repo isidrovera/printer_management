@@ -1,5 +1,5 @@
 # server/app/api/v1/endpoints/tunnels.py
-from fastapi import APIRouter, Depends, HTTPException, WebSocket
+from fastapi import APIRouter, Depends, HTTPException, WebSocket, List
 from sqlalchemy.orm import Session
 from typing import Optional, Dict
 from ....db.session import get_db
