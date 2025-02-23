@@ -1,25 +1,53 @@
 // src/components/ui/alert.tsx
-import React from 'react';
+import * as React from "react"
+import { cn } from "@/lib/utils"
+import { AlertCircle } from "lucide-react"
 
-interface AlertProps {
-  children: React.ReactNode;
-  variant?: 'default' | 'destructive';
-  className?: string;
+interface AlertProps extends React.HTMLAttributes<HTMLDivElement> {
+  variant?: "default" | "destructive"
 }
 
-export const Alert = ({ 
-  children, 
-  variant = 'default',
-  className = '' 
-}: AlertProps) => {
-  const variantStyles = {
-    default: 'bg-blue-50 text-blue-700 border-blue-200',
-    destructive: 'bg-red-50 text-red-700 border-red-200'
-  };
+const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
+  ({ className, variant = "default", ...props }, ref) => (
+    <div
+      ref={ref}
+      role="alert"
+      className={cn(
+        "relative w-full rounded-lg border p-4",
+        {
+          "bg-background text-foreground": variant === "default",
+          "bg-destructive/15 text-destructive border-destructive/50": variant === "destructive",
+        },
+        className
+      )}
+      {...props}
+    />
+  )
+)
+Alert.displayName = "Alert"
 
-  return (
-    <div className={`p-4 rounded-md border ${variantStyles[variant]} ${className}`}>
-      {children}
-    </div>
-  );
-};
+const AlertTitle = React.forwardRef
+  HTMLParagraphElement,
+  React.HTMLAttributes<HTMLHeadingElement>
+>(({ className, ...props }, ref) => (
+  <h5
+    ref={ref}
+    className={cn("mb-1 font-medium leading-none tracking-tight", className)}
+    {...props}
+  />
+))
+AlertTitle.displayName = "AlertTitle"
+
+const AlertDescription = React.forwardRef
+  HTMLParagraphElement,
+  React.HTMLAttributes<HTMLParagraphElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("text-sm [&_p]:leading-relaxed", className)}
+    {...props}
+  />
+))
+AlertDescription.displayName = "AlertDescription"
+
+export { Alert, AlertTitle, AlertDescription }
