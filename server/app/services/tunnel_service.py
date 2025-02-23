@@ -1,6 +1,7 @@
 # server/app/services/tunnel_service.py
 from fastapi import HTTPException
 from fastapi.responses import JSONResponse
+from typing import List
 from sqlalchemy.orm import Session
 from ..db.models.tunnel import Tunnel
 from ..db.models.agent import Agent
