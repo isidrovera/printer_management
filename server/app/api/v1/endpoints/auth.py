@@ -1,5 +1,4 @@
 # server/app/api/v1/endpoints/auth.py
-# server/app/api/v1/endpoints/auth.py
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.responses import JSONResponse

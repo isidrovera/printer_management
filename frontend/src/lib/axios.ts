@@ -2,8 +2,8 @@
 import axios from 'axios';
 
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || '', // URL base de tu API
-  withCredentials: true, // Importante para manejar cookies/credenciales
+  baseURL: '/api/v1', // Directamente usando la ruta del proxy
+  withCredentials: true,
   headers: {
     'Accept': 'application/json',
     'Content-Type': 'application/json'
@@ -14,9 +14,7 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
-    // Manejar específicamente errores de autorización
     if (error.response?.status === 401) {
-      // Redirigir al login o cerrar sesión
       window.location.href = '/login';
     }
     return Promise.reject(error);
