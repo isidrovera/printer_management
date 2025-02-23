@@ -243,21 +243,15 @@ class AgentService:
             logger.error(f"Error actualizando estado del agente: {str(e)}")
             return None
 
-    async def get_agents(self, skip: int = 0, limit: int = 100) -> List[Agent]:
-        """Obtiene todos los agentes registrados y actualiza sus estados"""
-        await self.update_agents_status()
-        agents = self.db.query(Agent)\
-                      .filter(Agent.is_active == True)\
-                      .offset(skip)\
-                      .limit(limit)\
-                      .all()
-        
-        # Actualizar el estado de cada agente basado en su último heartbeat
-        for agent in agents:
-            agent.status = await self.check_agent_status(agent)
-        
-        self.db.commit()
-        return agents
+    def get_all(self) -> List[Agent]:
+        """Obtiene la lista de agentes"""
+        try:
+            return self.db.query(Agent)\
+                        .filter(Agent.is_active == True)\
+                        .all()
+        except Exception as e:
+            logger.error(f"Error obteniendo todos los agentes: {str(e)}")
+            return []
 
     async def get_agent(self, agent_id: int) -> Optional[Agent]:
         """Obtiene un agente específico por ID y actualiza su estado"""
@@ -345,24 +339,32 @@ class AgentService:
             logger.error(f"Error en heartbeat del agente: {str(e)}")
             return False
 
-    async def get_count(self) -> int:
-        """Obtiene el número total de agentes activos"""
+    def count_by_status(self) -> Dict[str, int]:
+        """Obtiene conteo de agentes por estado"""
         try:
-            return self.db.query(Agent).filter(Agent.is_active == True).count()
+            counts = {
+                "total": 0,
+                "online": 0,
+                "offline": 0
+            }
+            
+            agents = self.get_all()
+            counts["total"] = len(agents)
+            
+            for agent in agents:
+                if agent.status == AgentStatus.ONLINE:
+                    counts["online"] += 1
+                elif agent.status == AgentStatus.OFFLINE:
+                    counts["offline"] += 1
+                    
+            return counts
         except Exception as e:
-            logger.error(f"Error obteniendo conteo de agentes: {str(e)}")
-            return 0
-
-    async def get_count_by_status(self, status: str) -> int:
-        """Obtiene el número de agentes por estado, actualizando previamente los estados"""
-        try:
-            await self.update_agents_status()  # Actualizar estados antes de contar
-            return self.db.query(Agent)\
-                .filter(Agent.status == status, Agent.is_active == True)\
-                .count()
-        except Exception as e:
-            logger.error(f"Error obteniendo conteo de agentes por estado: {str(e)}")
-            return 0
+            logger.error(f"Error contando agentes por estado: {str(e)}")
+            return {
+                "total": 0,
+                "online": 0,
+                "offline": 0
+            }    
 
     async def _update_agent_info(self):
         """Actualiza la información del sistema y el estado del agente"""
