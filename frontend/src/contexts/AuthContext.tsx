@@ -1,5 +1,4 @@
 // src/contexts/AuthContext.tsx
-// src/contexts/AuthContext.tsx
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../lib/axios';
@@ -44,21 +43,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     initializeAuth();
   }, []);
 
+  // src/contexts/AuthContext.tsx
   const login = async (credentials: LoginCredentials) => {
     try {
       const response = await axiosInstance.post<LoginResponse>('/auth/login', credentials);
-      const { user: userData, token: tokenData } = response.data;
+      const { access_token, token_type, user: userData } = response.data;
+
+      const tokenData = {
+        access_token,
+        token_type
+      };
 
       localStorage.setItem('token', JSON.stringify(tokenData));
       setToken(tokenData);
       setUser(userData);
 
-      axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${tokenData.access_token}`;
-
-      if (response.data.requires_2fa) {
-        navigate('/2fa-verify');
-        return;
-      }
+      axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
 
       if (userData.must_change_password) {
         navigate('/change-password');
