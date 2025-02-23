@@ -1,8 +1,10 @@
 // src/pages/Clients/ClientList.tsx
+// src/pages/Clients/ClientList.tsx
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axiosInstance from '../../lib/axios';
+import { ClientService, Client } from '../../services/ClientService';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import {
   Table,
@@ -12,81 +14,129 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Loader2, Plus, Search } from 'lucide-react';
-
-// Enhanced Client interface with optional properties
-interface Client {
-  id: number;
-  name: string;
-  business_name?: string;
-  tax_id?: string;
-  client_type?: string;
-  status?: 'active' | 'inactive' | 'pending' | string;
-}
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { useToast } from "@/components/ui/use-toast";
+import { 
+  Loader2, 
+  Plus, 
+  Search, 
+  Filter,
+  MoreVertical, 
+  Edit, 
+  Trash,
+  Eye,
+  RefreshCw
+} from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { useDebounce } from '@/hooks/useDebounce';
 
 const ClientList = () => {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+
+  const debouncedSearch = useDebounce(searchTerm, 300);
+  const { toast } = useToast();
+
+  const fetchClients = async (showLoading = true) => {
+    try {
+      if (showLoading) setLoading(true);
+      setError(null);
+      setRefreshing(true);
+
+      const fetchedClients = await ClientService.getClients(
+        debouncedSearch || undefined,
+        statusFilter !== 'all' ? statusFilter : undefined
+      );
+
+      setClients(fetchedClients);
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.detail || 
+        err.message || 
+        'Error al cargar los clientes';
+      
+      setError(errorMessage);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: errorMessage,
+      });
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchClients = async () => {
-      try {
-        // Reset previous error
-        setError(null);
-        setLoading(true);
+    fetchClients();
+  }, [debouncedSearch, statusFilter]);
 
-        // Fetch clients with comprehensive error handling
-        const response = await axiosInstance.get('/api/v1/clients/', {
-          headers: {
-            'Accept': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest'
-          }
-        });
-        
-        // Log full response for debugging
-        console.log('Full client response:', response);
+  const handleDeleteClick = (client: Client) => {
+    setSelectedClient(client);
+    setDeleteDialogOpen(true);
+  };
 
-        // Handle different possible response structures
-        const clientData: Client[] = Array.isArray(response.data) 
-          ? response.data 
-          : response.data?.clients || [];
-        
-        // Validate client data
-        if (!Array.isArray(clientData)) {
-          throw new Error('Invalid client data format');
-        }
+  const handleDeleteConfirm = async () => {
+    if (!selectedClient?.id) return;
 
-        setClients(clientData);
-      } catch (err: any) {
-        // Comprehensive error handling
-        const errorMessage = err.response?.data?.error 
-          || err.message 
-          || 'Error al cargar los clientes';
-        
-        console.error('Error fetching clients:', err);
-        setError(errorMessage);
-        setClients([]);
-      } finally {
-        setLoading(false);
-      }
+    try {
+      await ClientService.deleteClient(selectedClient.id);
+      setClients(clients.filter(c => c.id !== selectedClient.id));
+      toast({
+        title: "Cliente eliminado",
+        description: "El cliente ha sido eliminado exitosamente.",
+      });
+    } catch (err) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "No se pudo eliminar el cliente.",
+      });
+    } finally {
+      setDeleteDialogOpen(false);
+      setSelectedClient(null);
+    }
+  };
+
+  const getStatusBadge = (status?: string) => {
+    const statusConfig = {
+      active: { class: 'bg-green-100 text-green-800', text: 'Activo' },
+      inactive: { class: 'bg-red-100 text-red-800', text: 'Inactivo' },
+      pending: { class: 'bg-yellow-100 text-yellow-800', text: 'Pendiente' }
     };
 
-    fetchClients();
-  }, []);
+    const config = statusConfig[status as keyof typeof statusConfig] || 
+      { class: 'bg-gray-100 text-gray-800', text: status || 'N/A' };
 
-  // Client filtering with improved null checks
-  const filteredClients = clients.filter(client => {
-    const searchTermLower = searchTerm.toLowerCase();
     return (
-      client.name?.toLowerCase().includes(searchTermLower) ||
-      client.business_name?.toLowerCase().includes(searchTermLower) ||
-      client.tax_id?.toLowerCase().includes(searchTermLower)
+      <Badge variant="outline" className={config.class}>
+        {config.text}
+      </Badge>
     );
-  });
+  };
 
-  // Loading state
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -98,90 +148,159 @@ const ClientList = () => {
   return (
     <div className="container mx-auto p-6">
       <Card className="p-6">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Clientes</h1>
-          <Link to="/clients/create">
-            <Button className="flex items-center gap-2">
-              <Plus className="h-4 w-4" />
-              Nuevo Cliente
-            </Button>
-          </Link>
-        </div>
-
-        {/* Error handling */}
-        {error && (
-          <div className="bg-red-50 text-red-700 p-4 rounded-lg mb-6">
-            {error}
+        <div className="flex flex-col gap-6">
+          {/* Header */}
+          <div className="flex justify-between items-center">
+            <h1 className="text-2xl font-bold text-gray-900">Clientes</h1>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => fetchClients(false)}
+                disabled={refreshing}
+              >
+                <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+                Actualizar
+              </Button>
+              <Link to="/clients/create">
+                <Button size="sm" className="flex items-center gap-2">
+                  <Plus className="h-4 w-4" />
+                  Nuevo Cliente
+                </Button>
+              </Link>
+            </div>
           </div>
-        )}
 
-        {/* Search input */}
-        <div className="mb-6">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-            <input
-              type="text"
-              placeholder="Buscar clientes..."
-              className="pl-10 pr-4 py-2 w-full border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+          {/* Search and Filters */}
+          <div className="flex gap-4 items-center">
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Input
+                type="text"
+                placeholder="Buscar clientes..."
+                className="pl-9"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="icon">
+                  <Filter className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuLabel>Filtrar por estado</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => setStatusFilter('all')}>
+                  Todos
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setStatusFilter('active')}>
+                  Activos
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setStatusFilter('inactive')}>
+                  Inactivos
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
-        </div>
 
-        {/* Clients table */}
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Nombre</TableHead>
-                <TableHead>Razón Social</TableHead>
-                <TableHead>RUC/DNI</TableHead>
-                <TableHead>Tipo</TableHead>
-                <TableHead>Estado</TableHead>
-                <TableHead>Acciones</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredClients.length === 0 ? (
+          {/* Error Message */}
+          {error && (
+            <div className="bg-red-50 text-red-700 p-4 rounded-lg">
+              {error}
+            </div>
+          )}
+
+          {/* Table */}
+          <div className="overflow-x-auto rounded-lg border">
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8">
-                    {error ? 'No se pudieron cargar los clientes' : 'No se encontraron clientes'}
-                  </TableCell>
+                  <TableHead>Nombre</TableHead>
+                  <TableHead>Razón Social</TableHead>
+                  <TableHead>RUC/DNI</TableHead>
+                  <TableHead>Tipo</TableHead>
+                  <TableHead>Estado</TableHead>
+                  <TableHead className="text-right">Acciones</TableHead>
                 </TableRow>
-              ) : (
-                filteredClients.map((client) => (
-                  <TableRow key={client.id}>
-                    <TableCell>{client.name || 'N/A'}</TableCell>
-                    <TableCell>{client.business_name || '-'}</TableCell>
-                    <TableCell>{client.tax_id || '-'}</TableCell>
-                    <TableCell>{client.client_type || '-'}</TableCell>
-                    <TableCell>
-                      <span className={`px-2 py-1 rounded-full text-xs ${
-                        client.status === 'active' ? 'bg-green-100 text-green-800' :
-                        client.status === 'inactive' ? 'bg-red-100 text-red-800' :
-                        'bg-gray-100 text-gray-800'
-                      }`}>
-                        {client.status || 'N/A'}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-2">
-                        <Link to={`/clients/${client.id}`}>
-                          <Button variant="outline" size="sm">Ver</Button>
-                        </Link>
-                        <Link to={`/clients/${client.id}/edit`}>
-                          <Button variant="outline" size="sm">Editar</Button>
-                        </Link>
-                      </div>
+              </TableHeader>
+              <TableBody>
+                {clients.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-8 text-gray-500">
+                      No se encontraron clientes
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+                ) : (
+                  clients.map((client) => (
+                    <TableRow key={client.id}>
+                      <TableCell className="font-medium">{client.name}</TableCell>
+                      <TableCell>{client.business_name || '-'}</TableCell>
+                      <TableCell>{client.tax_id || '-'}</TableCell>
+                      <TableCell>{client.client_type || '-'}</TableCell>
+                      <TableCell>{getStatusBadge(client.status)}</TableCell>
+                      <TableCell className="text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem asChild>
+                              <Link to={`/clients/${client.id}`} className="flex items-center">
+                                <Eye className="h-4 w-4 mr-2" />
+                                Ver detalles
+                              </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                              <Link to={`/clients/${client.id}/edit`} className="flex items-center">
+                                <Edit className="h-4 w-4 mr-2" />
+                                Editar
+                              </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem 
+                              className="text-red-600"
+                              onClick={() => handleDeleteClick(client)}
+                            >
+                              <Trash className="h-4 w-4 mr-2" />
+                              Eliminar
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </div>
       </Card>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Está seguro?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción no se puede deshacer. Esto eliminará permanentemente el cliente
+              {selectedClient?.name && ` "${selectedClient.name}"`} y todos sus datos asociados.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleDeleteConfirm}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

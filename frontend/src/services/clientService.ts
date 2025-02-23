@@ -1,6 +1,5 @@
-import axios from "axios";
-
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+// src/services/ClientService.ts
+import axiosInstance from '../lib/axios';
 
 export interface Client {
   id?: number;
@@ -17,10 +16,10 @@ export interface Client {
 export class ClientService {
   static async getClients(search?: string, status?: string): Promise<Client[]> {
     try {
-      const response = await axios.get(`${API_URL}/clients`, {
+      const response = await axiosInstance.get('/clients', {
         params: { search, status },
       });
-      return response.data.clients || [];
+      return response.data || [];
     } catch (error) {
       console.error("Error fetching clients:", error);
       throw error;
@@ -29,7 +28,7 @@ export class ClientService {
 
   static async getClientById(clientId: number): Promise<Client | null> {
     try {
-      const response = await axios.get(`${API_URL}/clients/${clientId}/details`);
+      const response = await axiosInstance.get(`/clients/${clientId}`);
       return response.data;
     } catch (error) {
       console.error(`Error fetching client ${clientId}:`, error);
@@ -39,7 +38,7 @@ export class ClientService {
 
   static async createClient(clientData: Client): Promise<Client> {
     try {
-      const response = await axios.post(`${API_URL}/clients/create`, clientData);
+      const response = await axiosInstance.post('/clients', clientData);
       return response.data;
     } catch (error) {
       console.error("Error creating client:", error);
@@ -47,9 +46,9 @@ export class ClientService {
     }
   }
 
-  static async updateClient(clientId: number, clientData: Client): Promise<Client> {
+  static async updateClient(clientId: number, clientData: Partial<Client>): Promise<Client> {
     try {
-      const response = await axios.post(`${API_URL}/clients/${clientId}/edit`, clientData);
+      const response = await axiosInstance.put(`/clients/${clientId}`, clientData);
       return response.data;
     } catch (error) {
       console.error(`Error updating client ${clientId}:`, error);
@@ -59,11 +58,21 @@ export class ClientService {
 
   static async deleteClient(clientId: number): Promise<boolean> {
     try {
-      const response = await axios.delete(`${API_URL}/clients/${clientId}`);
-      return response.data.success;
+      await axiosInstance.delete(`/clients/${clientId}`);
+      return true;
     } catch (error) {
       console.error(`Error deleting client ${clientId}:`, error);
       return false;
+    }
+  }
+
+  static async searchClients(searchTerm: string): Promise<Client[]> {
+    try {
+      const response = await axiosInstance.get(`/clients/search/${searchTerm}`);
+      return response.data || [];
+    } catch (error) {
+      console.error("Error searching clients:", error);
+      throw error;
     }
   }
 }
