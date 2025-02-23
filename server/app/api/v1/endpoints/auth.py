@@ -164,3 +164,24 @@ async def change_password(
             status_code=500,
             detail="Error en el servidor"
         )
+
+@router.get("/me", response_model=dict)
+async def get_current_user_info(
+    current_user: UserInDB = Depends(get_current_active_user)
+):
+    """Endpoint para obtener información del usuario actual"""
+    try:
+        return {
+            "id": current_user.id,
+            "username": current_user.username,
+            "email": current_user.email,
+            "full_name": current_user.full_name,
+            "role": current_user.role,
+            "must_change_password": current_user.must_change_password
+        }
+    except Exception as e:
+        logger.error(f"Error obteniendo información del usuario: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail="Error obteniendo información del usuario"
+        )
