@@ -3,7 +3,7 @@ from fastapi import APIRouter
 from app.api.v1.endpoints import (
     agents, websocket, printers, drivers,
     tunnels, monitor_printers, printer_oids,
-    dashboard, auth, users
+    dashboard, auth, users, clients
 )
 
 # Main API router definition
@@ -22,7 +22,11 @@ api_router.include_router(
     prefix="/dashboard",
     tags=["dashboard"]
 )
-
+api_router.include_router(
+    clients.router,
+    prefix="/clients",
+    tags=["clients"]
+)
 # User routes
 api_router.include_router(
     users.router,

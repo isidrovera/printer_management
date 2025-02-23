@@ -1,4 +1,5 @@
 # server/app/schemas/auth.py
+# server/app/schemas/auth.py
 from pydantic import BaseModel, EmailStr
 from typing import Optional
 from enum import Enum
@@ -51,3 +52,25 @@ class LoginResponse(BaseModel):
     token: TokenResponse
     requires_2fa: bool = False
     two_factor_enabled: bool = False
+
+# Nuevo esquema para cambio de contraseña
+class ChangePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str
+    confirm_password: str
+
+# Nuevo esquema para la respuesta detallada del usuario al iniciar sesión
+class UserLoginResponse(BaseModel):
+    id: int
+    username: str
+    email: EmailStr
+    full_name: str
+    role: str
+    must_change_password: bool
+    access_token: str
+    token_type: str = "bearer"
+
+# Nuevo esquema para respuestas genéricas
+class MessageResponse(BaseModel):
+    message: str
+    success: bool = True
