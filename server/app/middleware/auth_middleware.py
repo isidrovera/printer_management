@@ -1,6 +1,6 @@
 # server/app/middleware/auth_middleware.py
-from fastapi import Request
-from fastapi.responses import RedirectResponse
+from fastapi import Request, HTTPException
+from fastapi.responses import JSONResponse
 import logging
 from app.core.auth import get_current_user
 import jwt
@@ -12,31 +12,60 @@ logger = logging.getLogger(__name__)
 async def auth_middleware(request: Request, call_next):
     logger.debug(f"[AUTH] Inicio: {request.url.path}")
 
-    # Excluir WebSockets de autenticación
-    if request.scope["type"] == "websocket":
+    # Lista de rutas públicas
+    public_paths = {
+        "/api/v1/auth/login",
+        "/api/v1/auth/token",
+        "/api/v1/ws/agent/",
+        "/api/v1/monitor/printers",
+        "/api/v1/printer-oids/",
+        "/api/v1/agents/register",
+        "/api/v1/monitor/printers/update/",
+        "/api/v1/agents/drivers/download/",
+        "/api/v1/drivers/download/",
+        "/favicon.ico",
+        "/static/"
+    }
+
+    # Verificar si la ruta es pública
+    if any(request.url.path.startswith(path) for path in public_paths):
+        logger.debug(f"[AUTH] Ruta pública: {request.url.path}")
         return await call_next(request)
 
-    # Excluir rutas específicas para agentes
-    if request.url.path.startswith((
-        "/auth/login", "/static/", "/favicon.ico", 
-        "/api/v1/ws/agent/", "/api/v1/monitor/printers", "/api/v1/printer-oids/", "/api/v1/agents/register",
-         "/api/v1/monitor/printers/update/", "/api/v1/agents/drivers/download/",  # Agregar esta línea
-    "/api/v1/drivers/download/", "/drivers/", "/api/v1/auth/login"
-    )):
-        return await call_next(request)
-
-    token = request.cookies.get("access_token")
-    if not token:
-        return RedirectResponse(url="/auth/login", status_code=303)
+    # Obtener token del header Authorization
+    auth_header = request.headers.get("Authorization")
+    if not auth_header:
+        logger.warning(f"[AUTH] No se encontró token de autorización para: {request.url.path}")
+        return JSONResponse(
+            status_code=401,
+            content={"detail": "No se proporcionó token de autenticación"}
+        )
 
     try:
-        user = await get_current_user(request)
+        # Extraer token del header "Bearer <token>"
+        token = auth_header.split(" ")[1]
+        user = await get_current_user(token)
         request.state.user = user
 
-        if user.must_change_password and not request.url.path.startswith("/auth/change-password"):
-            return RedirectResponse(url="/auth/change-password", status_code=303)
-    except Exception as e:
-        logger.error(f"[AUTH] Error: {str(e)}")
-        return RedirectResponse(url="/auth/login", status_code=303)
+        if user.must_change_password and not request.url.path.startswith("/api/v1/auth/change-password"):
+            logger.warning(f"[AUTH] Usuario debe cambiar contraseña: {user.username}")
+            return JSONResponse(
+                status_code=403,
+                content={"detail": "Debe cambiar su contraseña"}
+            )
 
-    return await call_next(request)
+        logger.debug(f"[AUTH] Usuario autenticado: {user.username}")
+        return await call_next(request)
+
+    except (jwt.ExpiredSignatureError, jwt.InvalidTokenError) as e:
+        logger.error(f"[AUTH] Error de token: {str(e)}")
+        return JSONResponse(
+            status_code=401,
+            content={"detail": "Token inválido o expirado"}
+        )
+    except Exception as e:
+        logger.error(f"[AUTH] Error inesperado: {str(e)}")
+        return JSONResponse(
+            status_code=500,
+            content={"detail": "Error interno del servidor"}
+        )
