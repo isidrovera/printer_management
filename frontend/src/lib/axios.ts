@@ -1,8 +1,9 @@
 // src/lib/axios.ts
+// src/lib/axios.ts
 import axios from 'axios';
 
 const axiosInstance = axios.create({
-  baseURL: '/api/v1',
+  baseURL: '/api/v1', // Usamos la ruta relativa para trabajar con el proxy de Vite
   withCredentials: true,
   headers: {
     'Accept': 'application/json',
@@ -15,8 +16,14 @@ axiosInstance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
     if (token) {
-      const parsedToken = JSON.parse(token);
-      config.headers.Authorization = `Bearer ${parsedToken.access_token}`;
+      try {
+        // Intentamos parsear el token como JSON primero
+        const parsedToken = JSON.parse(token);
+        config.headers.Authorization = `Bearer ${parsedToken.access_token}`;
+      } catch {
+        // Si no es JSON, lo usamos directamente
+        config.headers.Authorization = `Bearer ${token}`;
+      }
     }
     return config;
   },
@@ -31,7 +38,7 @@ axiosInstance.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
-      window.location.href = '/login';
+      window.location.href = '/login'; // Usamos /login en lugar de /auth/login
     }
     return Promise.reject(error);
   }

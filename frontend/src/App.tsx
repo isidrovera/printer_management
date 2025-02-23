@@ -1,4 +1,5 @@
 // src/App.tsx
+// src/App.tsx
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
@@ -6,44 +7,7 @@ import { useAuth } from './contexts/AuthContext';
 import Navbar from './components/Navbar';
 import { Loader2 } from 'lucide-react';
 
-// Páginas públicas
-import Home from './pages/Home';
-import Forum from './pages/Forum/Forum';
-import Login from './pages/Auth/Login';
-
-// Páginas de autenticación
-import ChangePassword from './pages/Auth/ChangePassword';
-
-// Páginas del dashboard
-import Dashboard from './pages/Dashboard';
-
-// Páginas de clientes
-import ClientList from './pages/Clients/ClientList';
-import ClientCreate from './pages/Clients/ClientCreate';
-import ClientEdit from './pages/Clients/ClientEdit';
-import ClientDetails from './pages/Clients/ClientDetails';
-
-// Páginas de agentes
-import AgentList from './pages/Agents/AgentList';
-import AgentDetails from './pages/Agents/AgentDetails';
-
-// Páginas de drivers
-import DriverList from './pages/Drivers/DriverList';
-import DriverCreate from './pages/Drivers/DriverCreate';
-import DriverEdit from './pages/Drivers/DriverEdit';
-
-// Páginas de monitoreo de impresoras
-import PrinterMonitor from './pages/Printers/PrinterMonitor';
-import PrinterDetails from './pages/Printers/PrinterDetails';
-import PrinterReport from './pages/Printers/PrinterReport';
-
-// Páginas de OIDs
-import OIDList from './pages/OIDs/OIDList';
-import OIDCreate from './pages/OIDs/OIDCreate';
-import OIDEdit from './pages/OIDs/OIDEdit';
-
-// Páginas de túneles
-import TunnelList from './pages/Tunnels/TunnelList';
+// Importaciones de páginas (mantenlas igual)...
 
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, user, isLoading } = useAuth();
@@ -56,73 +20,111 @@ const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
       </div>
     );
   }
-  
-  if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
-  }
-  
-  if (user?.must_change_password && location.pathname !== '/change-password') {
-    return <Navigate to="/change-password" replace />;
-  }
-  
-  return <>{children}</>;
-};
 
-const AppRoutes = () => {
-  const { isAuthenticated } = useAuth();
+  if (!isAuthenticated) {
+    // Guardamos la ubicación actual para redireccionar después del login
+    return <Navigate to="/login" state={{ from: location.pathname }} replace />;
+  }
+
+  if (user?.must_change_password && location.pathname !== '/change-password') {
+    return <Navigate to="/change-password" state={{ from: location.pathname }} replace />;
+  }
 
   return (
     <>
       <Navbar />
-      <Routes>
-        {/* Rutas públicas */}
-        <Route path="/" element={<Home />} />
-        <Route path="/forum" element={<Forum />} />
-        <Route path="/login" element={
-          isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login />
-        } />
-        
-        {/* Rutas de autenticación */}
-        <Route path="/change-password" element={
+      {children}
+    </>
+  );
+};
+
+const PublicRoute = ({ children }: { children: React.ReactNode }) => {
+  const { isAuthenticated } = useAuth();
+  const location = useLocation();
+  const from = location.state?.from || '/dashboard';
+
+  if (isAuthenticated) {
+    return <Navigate to={from} replace />;
+  }
+
+  return <>{children}</>;
+};
+
+const AppRoutes = () => {
+  return (
+    <Routes>
+      {/* Rutas públicas */}
+      <Route path="/" element={<Home />} />
+      <Route path="/forum" element={<Forum />} />
+      <Route 
+        path="/login" 
+        element={
+          <PublicRoute>
+            <Login />
+          </PublicRoute>
+        } 
+      />
+
+      {/* Rutas protegidas */}
+      <Route 
+        path="/change-password" 
+        element={
           <PrivateRoute>
             <ChangePassword />
           </PrivateRoute>
-        } />
-        
-        {/* Rutas protegidas */}
-        <Route path="/dashboard" element={
+        } 
+      />
+
+      <Route
+        path="/dashboard"
+        element={
           <PrivateRoute>
             <Dashboard />
           </PrivateRoute>
-        } />
-        
-        {/* Rutas de clientes */}
-        <Route path="/clients" element={
-          <PrivateRoute>
-            <ClientList />
-          </PrivateRoute>
-        } />
-        <Route path="/clients/create" element={
-          <PrivateRoute>
-            <ClientCreate />
-          </PrivateRoute>
-        } />
-        <Route path="/clients/:id/edit" element={
-          <PrivateRoute>
-            <ClientEdit />
-          </PrivateRoute>
-        } />
-        <Route path="/clients/:id" element={
-          <PrivateRoute>
-            <ClientDetails />
-          </PrivateRoute>
-        } />
+        }
+      />
 
-       
-        {/* Ruta para manejar páginas no encontradas */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </>
+      {/* Rutas de clientes */}
+      <Route path="/clients">
+        <Route 
+          index 
+          element={
+            <PrivateRoute>
+              <ClientList />
+            </PrivateRoute>
+          } 
+        />
+        <Route 
+          path="create" 
+          element={
+            <PrivateRoute>
+              <ClientCreate />
+            </PrivateRoute>
+          } 
+        />
+        <Route 
+          path=":id/edit" 
+          element={
+            <PrivateRoute>
+              <ClientEdit />
+            </PrivateRoute>
+          } 
+        />
+        <Route 
+          path=":id" 
+          element={
+            <PrivateRoute>
+              <ClientDetails />
+            </PrivateRoute>
+          } 
+        />
+      </Route>
+
+      {/* Otras rutas anidadas siguiendo el mismo patrón... */}
+
+      {/* Ruta para manejar páginas no encontradas */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 };
 
