@@ -24,9 +24,9 @@ class LoginRequest(BaseModel):
     code_2fa: Optional[str] = None
 
 class OAuth2Login(BaseModel):
-    provider: OAuthProvider
-    code: str
-    redirect_uri: str
+    username: str
+    password: str
+    code_2fa: Optional[str] = None
 
 class TwoFactorSetup(BaseModel):
     secret: str
