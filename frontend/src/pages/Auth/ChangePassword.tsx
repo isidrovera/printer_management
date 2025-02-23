@@ -30,7 +30,7 @@ const ChangePassword = () => {
     setLoading(true);
 
     try {
-      await axios.post('/api/auth/change-password', {
+      await axiosInstance.post('/auth/change-password', {
         current_password: formData.currentPassword,
         new_password: formData.newPassword,
       });
