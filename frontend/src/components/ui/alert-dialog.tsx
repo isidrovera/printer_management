@@ -3,12 +3,10 @@ import * as React from "react"
 import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog"
 import { cn } from "@/lib/utils"
 
-// Componentes base
 const AlertDialog = AlertDialogPrimitive.Root
 const AlertDialogTrigger = AlertDialogPrimitive.Trigger
 const AlertDialogPortal = AlertDialogPrimitive.Portal
 
-// Overlay component
 const AlertDialogOverlay = React.forwardRef<any, any>(
   (props, ref) => (
     <AlertDialogPrimitive.Overlay
@@ -19,7 +17,6 @@ const AlertDialogOverlay = React.forwardRef<any, any>(
   )
 )
 
-// Content component
 const AlertDialogContent = React.forwardRef<any, any>(
   (props, ref) => (
     <AlertDialogPortal>
@@ -36,7 +33,30 @@ const AlertDialogContent = React.forwardRef<any, any>(
   )
 )
 
-// Title component
+// Agregando AlertDialogHeader
+const AlertDialogHeader = ({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    className={cn("flex flex-col space-y-2 text-center sm:text-left", className)}
+    {...props}
+  />
+)
+AlertDialogHeader.displayName = "AlertDialogHeader"
+
+// Agregando AlertDialogFooter
+const AlertDialogFooter = ({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    className={cn("flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2", className)}
+    {...props}
+  />
+)
+AlertDialogFooter.displayName = "AlertDialogFooter"
+
 const AlertDialogTitle = React.forwardRef<any, any>(
   (props, ref) => (
     <AlertDialogPrimitive.Title
@@ -47,7 +67,6 @@ const AlertDialogTitle = React.forwardRef<any, any>(
   )
 )
 
-// Description component
 const AlertDialogDescription = React.forwardRef<any, any>(
   (props, ref) => (
     <AlertDialogPrimitive.Description
@@ -58,7 +77,6 @@ const AlertDialogDescription = React.forwardRef<any, any>(
   )
 )
 
-// Action component
 const AlertDialogAction = React.forwardRef<any, any>(
   (props, ref) => (
     <AlertDialogPrimitive.Action
@@ -72,7 +90,6 @@ const AlertDialogAction = React.forwardRef<any, any>(
   )
 )
 
-// Cancel component
 const AlertDialogCancel = React.forwardRef<any, any>(
   (props, ref) => (
     <AlertDialogPrimitive.Cancel
@@ -98,6 +115,8 @@ export {
   AlertDialog,
   AlertDialogTrigger,
   AlertDialogContent,
+  AlertDialogHeader,    // Exportando el nuevo componente
+  AlertDialogFooter,    // Exportando el nuevo componente
   AlertDialogTitle,
   AlertDialogDescription,
   AlertDialogAction,
