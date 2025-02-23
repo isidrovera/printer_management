@@ -26,12 +26,12 @@ async def close_tunnel(
     return await tunnel_service.close_tunnel(tunnel_id)
 
 @router.get("/list")
-async def list_tunnels(
+def list_tunnels(
     db: Session = Depends(get_db)
 ):
     """Lista todos los túneles activos."""
     tunnel_service = TunnelService(db)
-    return await tunnel_service.list_tunnels()
+    return tunnel_service.get_all()
 @router.delete("/{tunnel_id}")
 async def close_tunnel(
     tunnel_id: str,

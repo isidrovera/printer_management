@@ -241,51 +241,32 @@ class TunnelService:
                 status_code=500,
                 detail=f"Error obteniendo información del túnel: {str(e)}"
             )
-
-   async def get_count(self) -> int:
-       """Obtiene el número total de túneles."""
-       try:
-           logger.debug("Contando total de túneles")
-           count = self.db.query(Tunnel).count()
-           logger.info(f"Total de túneles encontrados: {count}")
-           return count
-       except Exception as e:
-           logger.error(f"Error obteniendo conteo de túneles: {str(e)}")
-           return 0
-
-   async def get_count_by_status(self, status: str) -> int:
-       """Obtiene el número de túneles por estado específico."""
-       try:
-           logger.debug(f"Contando túneles con estado: {status}")
-           count = self.db.query(Tunnel).filter(Tunnel.status == status).count()
-           logger.info(f"Total de túneles con estado {status}: {count}")
-           return count
-       except Exception as e:
-           logger.error(f"Error obteniendo conteo de túneles por estado: {str(e)}")
-           return 0
-
-   async def list_tunnels(self):
-        """
-        Lista todos los túneles
-        """
+   def get_all(self) -> List[Tunnel]:
+        """Obtiene todos los túneles"""
         try:
-            # Usando query en lugar de select para mantener compatibilidad
-            tunnels = self.db.query(Tunnel).all()
-            logger.info(f"Se encontraron {len(tunnels)} túneles")
-            return tunnels
-        except Exception as e:
-            logger.error(f"Error al listar túneles: {e}")
-            return []
-
-   async def get_all(self):
-        """
-        Obtiene todos los túneles (método usado por el dashboard)
-        """
-        try:
-            # Usando query en lugar de select para mantener compatibilidad
             tunnels = self.db.query(Tunnel).all()
             logger.info(f"Se obtuvieron {len(tunnels)} túneles")
             return tunnels
         except Exception as e:
-            logger.error(f"Error al obtener todos los túneles: {e}")
+            logger.error(f"Error al obtener túneles: {str(e)}")
             return []
+
+   def count_by_status(self) -> Dict[str, int]:
+        """Obtiene conteo de túneles por estado"""
+        try:
+            counts = {
+                "total": 0,
+                "active": 0
+            }
+            
+            tunnels = self.get_all()
+            counts["total"] = len(tunnels)
+            counts["active"] = len([t for t in tunnels if t.status == 'active'])
+            
+            return counts
+        except Exception as e:
+            logger.error(f"Error contando túneles por estado: {str(e)}")
+            return {
+                "total": 0,
+                "active": 0
+            }
