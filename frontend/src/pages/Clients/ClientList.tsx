@@ -1,7 +1,7 @@
 // src/pages/Clients/ClientList.tsx
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ClientService, Client } from '../../services/clientService';
+import { ClientService, Client } from '../../services/ClientService';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
