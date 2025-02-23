@@ -103,12 +103,14 @@ def create_refresh_token(data: Dict[str, Any]) -> str:
    )
 
 
-async def get_current_user(request: Request) -> User:
+
+# server/app/core/auth.py
+async def get_current_user(token: str) -> User:
     """
-    Obtiene el usuario actual del token JWT en el header Authorization
+    Obtiene el usuario actual basado en el token JWT
     
     Args:
-        request: Request de FastAPI
+        token: Token JWT
         
     Returns:
         User: Usuario autenticado
@@ -117,28 +119,7 @@ async def get_current_user(request: Request) -> User:
         HTTPException: Si la autenticación falla
     """
     try:
-        auth_header = request.headers.get("Authorization")
-        if not auth_header:
-            logger.error("Token no encontrado en headers")
-            raise HTTPException(
-                status_code=401, 
-                detail="No se proporcionó token de autenticación"
-            )
-
-        # Extraer token del formato "Bearer <token>"
-        try:
-            scheme, token = auth_header.split()
-            if scheme.lower() != "bearer":
-                raise HTTPException(
-                    status_code=401,
-                    detail="Token debe ser de tipo Bearer"
-                )
-        except ValueError:
-            raise HTTPException(
-                status_code=401,
-                detail="Formato de token inválido"
-            )
-
+        # Decodificar el token
         try:
             payload = jwt.decode(
                 token, 
@@ -148,11 +129,13 @@ async def get_current_user(request: Request) -> User:
             username = payload.get("sub")
             
             if not username:
+                logger.error("Token sin username")
                 raise HTTPException(
                     status_code=401,
                     detail="Token inválido"
                 )
                 
+            # Obtener usuario de la base de datos
             db = SessionLocal()
             try:
                 user = db.query(User).filter(User.username == username).first()
