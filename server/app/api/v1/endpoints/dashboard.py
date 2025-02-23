@@ -7,8 +7,9 @@ from app.services.client_service import ClientService
 from app.services.agent_service import AgentService
 from app.services.tunnel_service import TunnelService
 from app.services.monitor_service import PrinterMonitorService
-from datetime import datetime
+from datetime import datetime, timedelta
 import logging
+from typing import Dict, Any
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -17,20 +18,34 @@ router = APIRouter()
 def get_dashboard_stats(
     request: Request,
     db: Session = Depends(get_db)
-):
+) -> Dict[str, Any]:
     """
-    Endpoint que devuelve las estadísticas para el dashboard
+    Endpoint para obtener estadísticas del dashboard con manejo robusto de errores
+    
+    Returns:
+        Un diccionario con estadísticas de clientes, agentes, túneles e impresoras
     """
     try:
-        # Inicializar servicios
-        client_service = ClientService(db)
-        agent_service = AgentService(db)
-        tunnel_service = TunnelService(db)
+        # Servicios 
+        services = {
+            "client": ClientService(db),
+            "agent": AgentService(db),
+            "tunnel": TunnelService(db),
+            "printer": PrinterMonitorService(db)
+        }
 
-        # Obtener estadísticas básicas
+        # Estructura de estadísticas predeterminada
         stats = {
+            "printers": {
+                "total": 0,
+                "online": 0,
+                "offline": 0,
+                "error": 0,
+                "last_updated": datetime.now().isoformat()
+            },
             "clients": {
-                "total": len(client_service.get_all()) if hasattr(client_service, 'get_all') else 0,
+                "total": 0,
+                "active": 0,
                 "last_updated": datetime.now().isoformat()
             },
             "agents": {
@@ -43,53 +58,75 @@ def get_dashboard_stats(
                 "total": 0,
                 "active": 0,
                 "last_updated": datetime.now().isoformat()
-            },
-            "printers": {
-                "total": 0,
-                "online": 0,
-                "offline": 0,
-                "last_updated": datetime.now().isoformat()
             }
         }
 
-        # Intentar obtener estadísticas de agentes
+        # Obtener estadísticas de clientes
         try:
-            agents = agent_service.get_all() if hasattr(agent_service, 'get_all') else []
+            clients = services["client"].get_all()
+            recent_threshold = datetime.now() - timedelta(days=30)
+            stats["clients"]["total"] = len(clients)
+            stats["clients"]["active"] = len([
+                c for c in clients 
+                if getattr(c, 'is_active', False) or 
+                   (getattr(c, 'created_at', datetime.min) > recent_threshold)
+            ])
+        except Exception as e:
+            logger.warning(f"Error en estadísticas de clientes: {str(e)}")
+
+        # Obtener estadísticas de agentes
+        try:
+            agents = services["agent"].get_all()
             stats["agents"]["total"] = len(agents)
-            stats["agents"]["online"] = len([a for a in agents if getattr(a, 'status', None) == 'online'])
+            stats["agents"]["online"] = len([
+                a for a in agents 
+                if getattr(a, 'status', '').lower() == 'online'
+            ])
             stats["agents"]["offline"] = stats["agents"]["total"] - stats["agents"]["online"]
         except Exception as e:
-            logger.warning(f"Error al obtener estadísticas de agentes: {str(e)}")
+            logger.warning(f"Error en estadísticas de agentes: {str(e)}")
 
-        # Intentar obtener estadísticas de túneles
+        # Obtener estadísticas de túneles
         try:
-            tunnels = tunnel_service.get_all() if hasattr(tunnel_service, 'get_all') else []
+            tunnels = services["tunnel"].get_all()
             stats["tunnels"]["total"] = len(tunnels)
-            stats["tunnels"]["active"] = len([t for t in tunnels if getattr(t, 'status', None) == 'active'])
+            stats["tunnels"]["active"] = len([
+                t for t in tunnels 
+                if getattr(t, 'status', '').lower() == 'active'
+            ])
         except Exception as e:
-            logger.warning(f"Error al obtener estadísticas de túneles: {str(e)}")
+            logger.warning(f"Error en estadísticas de túneles: {str(e)}")
 
-        # Intentar obtener estadísticas de impresoras
+        # Obtener estadísticas de impresoras
         try:
-            printer_service = PrinterMonitorService(db)
-            printers = printer_service.get_all() if hasattr(printer_service, 'get_all') else []
+            printers = services["printer"].get_all()
             stats["printers"]["total"] = len(printers)
-            stats["printers"]["online"] = len([p for p in printers if getattr(p, 'status', None) == 'online'])
-            stats["printers"]["offline"] = stats["printers"]["total"] - stats["printers"]["online"]
+            stats["printers"]["online"] = len([
+                p for p in printers 
+                if getattr(p, 'status', '').lower() == 'online'
+            ])
+            stats["printers"]["offline"] = len([
+                p for p in printers 
+                if getattr(p, 'status', '').lower() == 'offline'
+            ])
+            stats["printers"]["error"] = len([
+                p for p in printers 
+                if getattr(p, 'status', '').lower() == 'error'
+            ])
         except Exception as e:
-            logger.warning(f"Error al obtener estadísticas de impresoras: {str(e)}")
+            logger.warning(f"Error en estadísticas de impresoras: {str(e)}")
 
         return stats
 
     except SQLAlchemyError as e:
         logger.error(f"Error de base de datos: {str(e)}")
         raise HTTPException(
-            status_code=500,
-            detail="Error de base de datos al cargar estadísticas"
+            status_code=500, 
+            detail="Error al cargar estadísticas de base de datos"
         )
     except Exception as e:
         logger.error(f"Error inesperado: {str(e)}")
         raise HTTPException(
-            status_code=500,
-            detail="Error inesperado al cargar estadísticas"
+            status_code=500, 
+            detail="Error interno al procesar estadísticas"
         )
