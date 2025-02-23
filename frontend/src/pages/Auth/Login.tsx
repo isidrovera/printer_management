@@ -1,5 +1,4 @@
 // src/pages/auth/Login.tsx
-// src/pages/Auth/Login.tsx
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 
