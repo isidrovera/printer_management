@@ -1,10 +1,9 @@
 # server/app/middleware/auth_middleware.py
+# server/app/middleware/auth_middleware.py
 from fastapi import Request
 from fastapi.responses import JSONResponse
 import logging
-from app.core.auth import get_current_user
 import jwt
-from jose import JWTError
 from app.core.config import settings
 
 logger = logging.getLogger(__name__)
@@ -16,6 +15,7 @@ async def auth_middleware(request: Request, call_next):
     public_paths = [
         "/api/v1/auth/login",
         "/api/v1/auth/token",
+        "/api/v1/auth/refresh",  # Añadir ruta para refresh token
         "/api/v1/ws/agent",
         "/api/v1/monitor/printers",
         "/api/v1/printer-oids",
@@ -24,7 +24,9 @@ async def auth_middleware(request: Request, call_next):
         "/api/v1/agents/drivers/download",
         "/api/v1/drivers/download",
         "/favicon.ico",
-        "/static"
+        "/static",
+        "/docs",  # Para Swagger UI
+        "/openapi.json"  # Para la especificación OpenAPI
     ]
 
     # Verificar si la ruta es pública
@@ -42,44 +44,38 @@ async def auth_middleware(request: Request, call_next):
                 content={"detail": "Token de autenticación no proporcionado o inválido"}
             )
 
-        # Extraer el token
         token = auth_header.split(" ")[1]
         
         try:
-            # Validar token y obtener usuario
-            current_user = await get_current_user(token)
+            # Decodificar el token
+            payload = jwt.decode(
+                token,
+                settings.SECRET_KEY,
+                algorithms=[settings.JWT_ALGORITHM]
+            )
             
-            # Guardar usuario en el estado de la request
-            request.state.user = current_user
+            # Añadir el usuario al scope de la petición para usarlo en los endpoints
+            request.state.user = payload
             
-            logger.debug(f"[AUTH] Usuario autenticado correctamente: {current_user.username}")
-            
-            # Verificar si necesita cambiar contraseña
-            if current_user.must_change_password and not request.url.path.startswith("/api/v1/auth/change-password"):
-                logger.warning(f"[AUTH] Usuario debe cambiar contraseña: {current_user.username}")
-                return JSONResponse(
-                    status_code=403,
-                    content={"detail": "Debe cambiar su contraseña antes de continuar"}
-                )
-
-            return await call_next(request)
-
         except jwt.ExpiredSignatureError:
-            logger.warning("[AUTH] Token expirado")
+            logger.error("Token expirado")
             return JSONResponse(
                 status_code=401,
                 content={"detail": "Token expirado"}
             )
-        except (jwt.InvalidTokenError, JWTError):
-            logger.warning("[AUTH] Token inválido")
+        except jwt.InvalidTokenError:
+            logger.error("Token inválido")
             return JSONResponse(
                 status_code=401,
                 content={"detail": "Token inválido"}
             )
-
+            
+        # Continuar con la petición
+        return await call_next(request)
+        
     except Exception as e:
         logger.error(f"[AUTH] Error inesperado: {str(e)}")
         return JSONResponse(
             status_code=500,
-            content={"detail": "Error interno del servidor"}
+            content={"detail": f"Error interno del servidor: {str(e)}"}
         )
