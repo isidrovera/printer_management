@@ -2,34 +2,58 @@
 import axios from 'axios';
 
 const axiosInstance = axios.create({
-  baseURL: '/api/v1', // Cambiado para usar la ruta base de la API
-  withCredentials: true,
+  baseURL: '/api/v1',  // Cambiamos a incluir /v1
   headers: {
-    'Content-Type': 'application/json',
     'Accept': 'application/json',
-    'X-Requested-With': 'XMLHttpRequest' // Importante para diferenciar peticiones AJAX
+    'Content-Type': 'application/json'
   }
 });
 
-// Interceptor para agregar el token de autenticación
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    console.log('📤 Request:', {
+      method: config.method?.toUpperCase(),
+      url: config.url,
+      fullUrl: `${config.baseURL}${config.url}`
+    });
+
+    const tokenStr = localStorage.getItem('token');
+    if (tokenStr) {
+      try {
+        const tokenData = JSON.parse(tokenStr);
+        config.headers.Authorization = `Bearer ${tokenData.access_token}`;
+        console.log('🔑 Token added to request');
+      } catch (error) {
+        console.error('❌ Error parsing token:', error);
+        localStorage.removeItem('token');
+      }
     }
     return config;
   },
   (error) => {
+    console.error('❌ Request Error:', error);
     return Promise.reject(error);
   }
 );
 
-// Interceptor para manejar errores de autenticación
 axiosInstance.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    if (error.response?.status === 401 || error.response?.status === 303) {
+  (response) => {
+    console.log('📥 Response Success:', {
+      status: response.status,
+      url: response.config.url,
+      data: response.data
+    });
+    return response;
+  },
+  (error) => {
+    console.error('❌ Response Error:', {
+      status: error.response?.status,
+      url: error.config?.url,
+      data: error.response?.data,
+      message: error.message
+    });
+
+    if (error.response?.status === 401) {
       localStorage.removeItem('token');
       window.location.href = '/login';
     }

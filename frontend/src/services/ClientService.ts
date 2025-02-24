@@ -16,7 +16,7 @@ export interface Client {
 export class ClientService {
   static async getClients(search?: string, status?: string): Promise<Client[]> {
     try {
-      const response = await axiosInstance.get('/clients/', {
+      const response = await axiosInstance.get('/clients', {
         params: { search, status },
       });
       return response.data || [];
@@ -28,7 +28,7 @@ export class ClientService {
 
   static async getClientById(clientId: number): Promise<Client | null> {
     try {
-      const response = await axiosInstance.get(`/clients/${clientId}/`);
+      const response = await axiosInstance.get(`/clients/${clientId}`);
       return response.data;
     } catch (error) {
       console.error(`Error fetching client ${clientId}:`, error);
@@ -38,7 +38,7 @@ export class ClientService {
 
   static async createClient(clientData: Client): Promise<Client> {
     try {
-      const response = await axiosInstance.post('/clients/', clientData);
+      const response = await axiosInstance.post('/clients', clientData);
       return response.data;
     } catch (error) {
       console.error("Error creating client:", error);
@@ -48,7 +48,7 @@ export class ClientService {
 
   static async updateClient(clientId: number, clientData: Partial<Client>): Promise<Client> {
     try {
-      const response = await axiosInstance.put(`/clients/${clientId}/`, clientData);
+      const response = await axiosInstance.put(`/clients/${clientId}`, clientData);
       return response.data;
     } catch (error) {
       console.error(`Error updating client ${clientId}:`, error);
@@ -58,7 +58,7 @@ export class ClientService {
 
   static async deleteClient(clientId: number): Promise<boolean> {
     try {
-      await axiosInstance.delete(`/clients/${clientId}/`);
+      await axiosInstance.delete(`/clients/${clientId}`);
       return true;
     } catch (error) {
       console.error(`Error deleting client ${clientId}:`, error);
@@ -68,7 +68,7 @@ export class ClientService {
 
   static async searchClients(searchTerm: string): Promise<Client[]> {
     try {
-      const response = await axiosInstance.get(`/clients/search/${searchTerm}/`);
+      const response = await axiosInstance.get(`/clients/search/${searchTerm}`);
       return response.data || [];
     } catch (error) {
       console.error("Error searching clients:", error);
