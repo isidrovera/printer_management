@@ -36,15 +36,10 @@ axiosInstance.interceptors.request.use(
       fullUrl: `${config.baseURL}${config.url}`
     });
 
-    const tokenStr = localStorage.getItem('token');
-    if (tokenStr) {
-      try {
-        config.headers.Authorization = `Bearer ${tokenStr}`;
-        console.log('🔑 Token added to request');
-      } catch (error) {
-        console.error('❌ Error applying token:', error);
-        localStorage.removeItem('token');
-      }
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+      console.log('🔑 Token added to request:', token.substring(0, 10) + '...');
     }
     return config;
   },
