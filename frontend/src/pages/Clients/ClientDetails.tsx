@@ -37,7 +37,7 @@ import {
   DialogFooter,
   DialogClose
 } from "@/components/ui/dialog";
-import clientService, { Client } from '../../services/clientService';
+import ClientService, { Client } from '../../services/ClientService';
 import { useToast } from '@/components/ui/use-toast';
 
 const ClientDetails = () => {
@@ -56,7 +56,7 @@ const ClientDetails = () => {
     try {
       setLoading(true);
       setError(null);
-      const data = await clientService.getClientById(id);
+      const data = await ClientService.getClientById(id);
       setClient(data);
     } catch (err: any) {
       console.error('Error fetching client:', err);
@@ -84,7 +84,7 @@ const ClientDetails = () => {
     
     try {
       setDeleteLoading(true);
-      await clientService.deleteClient(id);
+      await ClientService.deleteClient(id);
       toast({
         title: "Cliente eliminado",
         description: "El cliente ha sido eliminado correctamente",

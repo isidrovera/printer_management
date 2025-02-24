@@ -27,7 +27,7 @@ import {
 } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { AlertCircle, Loader2, Plus, Search, RefreshCw } from 'lucide-react';
-import clientService, { Client } from '../../services/clientService';
+import ClientService, { Client } from '../../services/ClientService';
 import { useToast } from '@/components/ui/use-toast';
 
 const ClientList = () => {
@@ -47,7 +47,7 @@ const ClientList = () => {
       setRefreshing(true);
       setError(null);
       
-      const data = await clientService.getAllClients();
+      const data = await ClientService.getAllClients();
       setClients(data);
       // Aplicar filtros actuales
       applyFilters(data, searchTerm, statusFilter);

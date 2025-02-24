@@ -59,7 +59,7 @@ export interface ClientDashboardStats {
   last_updated: string;
 }
 
-const clientService = {
+const ClientService = {
   // Obtener todos los clientes
   getAllClients: async (): Promise<Client[]> => {
     try {
@@ -161,4 +161,4 @@ const clientService = {
   }
 };
 
-export default clientService;
+export default ClientService;
