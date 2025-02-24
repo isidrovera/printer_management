@@ -1,4 +1,5 @@
 # server/app/schemas/auth.py
+# server/app/schemas/auth.py
 from pydantic import BaseModel, EmailStr
 from typing import Optional
 from enum import Enum
