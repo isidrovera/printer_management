@@ -39,4 +39,47 @@ async def auth_middleware(request: Request, call_next):
             logger.warning(f"[AUTH] Token no proporcionado o formato inválido: {request.url.path}")
             return JSONResponse(
                 status_code=401,
-                content={"detail": "Token de autenticación no proporcionado o inválido"})
+                content={"detail": "Token de autenticación no proporcionado o inválido"}
+            )
+
+        # Extraer el token
+        token = auth_header.split(" ")[1]
+        
+        try:
+            # Validar token y obtener usuario
+            current_user = await get_current_user(token)
+            
+            # Guardar usuario en el estado de la request
+            request.state.user = current_user
+            
+            logger.debug(f"[AUTH] Usuario autenticado correctamente: {current_user.username}")
+            
+            # Verificar si necesita cambiar contraseña
+            if current_user.must_change_password and not request.url.path.startswith("/api/v1/auth/change-password"):
+                logger.warning(f"[AUTH] Usuario debe cambiar contraseña: {current_user.username}")
+                return JSONResponse(
+                    status_code=403,
+                    content={"detail": "Debe cambiar su contraseña antes de continuar"}
+                )
+
+            return await call_next(request)
+
+        except jwt.ExpiredSignatureError:
+            logger.warning("[AUTH] Token expirado")
+            return JSONResponse(
+                status_code=401,
+                content={"detail": "Token expirado"}
+            )
+        except (jwt.InvalidTokenError, JWTError):
+            logger.warning("[AUTH] Token inválido")
+            return JSONResponse(
+                status_code=401,
+                content={"detail": "Token inválido"}
+            )
+
+    except Exception as e:
+        logger.error(f"[AUTH] Error inesperado: {str(e)}")
+        return JSONResponse(
+            status_code=500,
+            content={"detail": "Error interno del servidor"}
+        )
