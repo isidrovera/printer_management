@@ -1,78 +1,164 @@
-// src/services/ClientService.ts
+// src/services/clientService.ts
 import axiosInstance from '../lib/axios';
 
 export interface Client {
-  id?: number;
+  id: number;
   name: string;
   business_name?: string;
   tax_id?: string;
-  client_type?: string;
-  contact_name?: string;
+  client_code?: string;
   contact_email?: string;
   contact_phone?: string;
-  status?: string;
+  address?: string;
+  city?: string;
+  country?: string;
+  postal_code?: string;
+  account_manager?: string;
+  service_level?: string;
+  client_type: string;
+  status: string;
+  is_active: boolean;
+  notes?: string;
+  contract_start_date?: string;
+  contract_end_date?: string;
+  last_contact_date?: string;
+  token?: string;
+  created_at: string;
+  updated_at: string;
 }
 
-export class ClientService {
-  static async getClients(search?: string, status?: string): Promise<Client[]> {
-    try {
-      const response = await axiosInstance.get('/clients', {
-        params: { search, status },
-      });
-      return response.data || [];
-    } catch (error) {
-      console.error("Error fetching clients:", error);
-      throw error;
-    }
-  }
+export interface ClientCreate {
+  name: string;
+  business_name?: string;
+  tax_id?: string;
+  client_code?: string;
+  contact_email?: string;
+  contact_phone?: string;
+  address?: string;
+  city?: string;
+  country?: string;
+  postal_code?: string;
+  account_manager?: string;
+  service_level?: string;
+  client_type: string;
+  status: string;
+  is_active: boolean;
+  notes?: string;
+  contract_start_date?: string;
+  contract_end_date?: string;
+}
 
-  static async getClientById(clientId: number): Promise<Client | null> {
+export interface ClientUpdate extends Partial<ClientCreate> {}
+
+export interface ClientDashboardStats {
+  total: number;
+  active: number;
+  inactive: number;
+  by_type: Record<string, number>;
+  active_contracts: number;
+  last_updated: string;
+}
+
+const clientService = {
+  // Obtener todos los clientes
+  getAllClients: async (): Promise<Client[]> => {
     try {
-      const response = await axiosInstance.get(`/clients/${clientId}`);
+      const response = await axiosInstance.get('/clients');
       return response.data;
     } catch (error) {
-      console.error(`Error fetching client ${clientId}:`, error);
-      return null;
+      throw error;
     }
-  }
+  },
 
-  static async createClient(clientData: Client): Promise<Client> {
+  // Obtener un cliente por ID
+  getClientById: async (id: number | string): Promise<Client> => {
+    try {
+      const response = await axiosInstance.get(`/clients/${id}`);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  // Crear un nuevo cliente
+  createClient: async (clientData: ClientCreate): Promise<Client> => {
     try {
       const response = await axiosInstance.post('/clients', clientData);
       return response.data;
     } catch (error) {
-      console.error("Error creating client:", error);
       throw error;
     }
-  }
+  },
 
-  static async updateClient(clientId: number, clientData: Partial<Client>): Promise<Client> {
+  // Actualizar un cliente existente
+  updateClient: async (id: number | string, clientData: ClientUpdate): Promise<Client> => {
     try {
-      const response = await axiosInstance.put(`/clients/${clientId}`, clientData);
+      const response = await axiosInstance.put(`/clients/${id}`, clientData);
       return response.data;
     } catch (error) {
-      console.error(`Error updating client ${clientId}:`, error);
       throw error;
     }
-  }
+  },
 
-  static async deleteClient(clientId: number): Promise<boolean> {
+  // Eliminar un cliente
+  deleteClient: async (id: number | string): Promise<{ message: string }> => {
     try {
-      await axiosInstance.delete(`/clients/${clientId}`);
-      return true;
+      const response = await axiosInstance.delete(`/clients/${id}`);
+      return response.data;
     } catch (error) {
-      console.error(`Error deleting client ${clientId}:`, error);
-      return false;
+      throw error;
     }
-  }
+  },
 
-  static async searchClients(searchTerm: string): Promise<Client[]> {
+  // Buscar clientes
+  searchClients: async (searchTerm: string): Promise<Client[]> => {
     try {
       const response = await axiosInstance.get(`/clients/search/${searchTerm}`);
-      return response.data || [];
+      return response.data;
     } catch (error) {
-      console.error("Error searching clients:", error);
+      throw error;
+    }
+  },
+
+  // Obtener clientes por estado
+  getClientsByStatus: async (status: string): Promise<Client[]> => {
+    try {
+      const response = await axiosInstance.get(`/clients/status/${status}`);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  // Obtener clientes por nivel de servicio
+  getClientsByServiceLevel: async (serviceLevel: string): Promise<Client[]> => {
+    try {
+      const response = await axiosInstance.get(`/clients/service-level/${serviceLevel}`);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  // Obtener clientes por ejecutivo de cuenta
+  getClientsByManager: async (manager: string): Promise<Client[]> => {
+    try {
+      const response = await axiosInstance.get(`/clients/manager/${manager}`);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  // Obtener estadísticas del dashboard de clientes
+  getDashboardStats: async (): Promise<ClientDashboardStats> => {
+    try {
+      const response = await axiosInstance.get('/clients/dashboard/stats');
+      return response.data;
+    } catch (error) {
       throw error;
     }
   }
-}
+};
+
+export default clientService;
