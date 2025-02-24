@@ -13,6 +13,9 @@ from app.schemas.auth import (
     RefreshTokenRequest,
     ChangePasswordRequest
 )
+from app.core.config import settings
+from app.core.auth import create_refresh_token
+import jwt
 from app.schemas.user import UserCreate, UserUpdate, UserInDB
 import pyotp
 import logging
@@ -73,10 +76,13 @@ async def login(
                 detail="Credenciales incorrectas"
             )
             
+        # Generar tokens
         access_token = create_access_token(data={"sub": user.username})
+        refresh_token = create_refresh_token(data={"sub": user.username})
         
         return {
             "access_token": access_token,
+            "refresh_token": refresh_token,  # Añadir refresh token
             "token_type": "bearer",
             "user": {
                 "id": user.id,
@@ -114,8 +120,15 @@ async def get_access_token(
                 detail="Credenciales incorrectas"
             )
             
+        # Generar tokens
         access_token = create_access_token(data={"sub": user.username})
-        return {"access_token": access_token, "token_type": "bearer"}
+        refresh_token = create_refresh_token(data={"sub": user.username})
+        
+        return {
+            "access_token": access_token,
+            "refresh_token": refresh_token,  # Añadir refresh token
+            "token_type": "bearer"
+        }
         
     except Exception as e:
         logger.error(f"Error generando token: {str(e)}")
@@ -123,7 +136,71 @@ async def get_access_token(
             status_code=500,
             detail="Error en el servidor"
         )
-
+@router.post("/refresh", response_model=dict)
+async def refresh_access_token(
+    refresh_request: RefreshTokenRequest,
+    db: Session = Depends(get_db)
+):
+    """Endpoint para renovar el token de acceso usando un refresh token"""
+    try:
+        # Verificar el refresh token
+        try:
+            payload = jwt.decode(
+                refresh_request.refresh_token,
+                settings.SECRET_KEY,
+                algorithms=[settings.JWT_ALGORITHM]
+            )
+            
+            username = payload.get("sub")
+            if not username:
+                logger.error("Token sin username")
+                raise HTTPException(
+                    status_code=401,
+                    detail="Token inválido"
+                )
+                
+            # Verificar que el usuario existe
+            user_service = UserService(db)
+            user = await user_service.get_by_username(username)
+            
+            if not user:
+                logger.warning(f"Usuario no encontrado: {username}")
+                raise HTTPException(
+                    status_code=401,
+                    detail="Usuario no encontrado"
+                )
+                
+            # Generar nuevos tokens
+            access_token = create_access_token(data={"sub": username})
+            refresh_token = create_refresh_token(data={"sub": username})
+            
+            return {
+                "access_token": access_token,
+                "refresh_token": refresh_token,
+                "token_type": "bearer"
+            }
+            
+        except jwt.ExpiredSignatureError:
+            logger.error("Refresh token expirado")
+            raise HTTPException(
+                status_code=401,
+                detail="Refresh token expirado"
+            )
+        except jwt.InvalidTokenError:
+            logger.error("Token inválido")
+            raise HTTPException(
+                status_code=401,
+                detail="Token inválido"
+            )
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error en refresh token: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error en el servidor: {str(e)}"
+        )
 @router.post("/logout")
 async def logout():
     """Endpoint para cerrar sesión"""
