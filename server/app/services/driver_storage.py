@@ -2,7 +2,7 @@
 import os
 from pathlib import Path
 from fastapi import HTTPException
-from app.core.config import settings
+from server.app.core.config import settings
 
 class DriverStorage:
     def __init__(self):

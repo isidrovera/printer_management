@@ -1,10 +1,10 @@
 # server/app/services/monitor_service.py
 from typing import Dict, Any, List
 from sqlalchemy.orm import Session
-from app.db.models.printer import Printer
-from app.db.models.agent import Agent
+from server.app.db.models.printer import Printer
+from server.app.db.models.agent import Agent
 from datetime import datetime, timedelta
-from app.core.logging import logger
+from server.app.core.logging import logger
 
 class PrinterMonitorService:
     def __init__(self, db: Session):

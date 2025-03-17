@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import and_
 import json
 import socket
-from app.core.logging import logger
+from server.app.core.logging import logger
 class AgentStatus:
     ONLINE = "online"
     OFFLINE = "offline"  # PC apagada normalmente

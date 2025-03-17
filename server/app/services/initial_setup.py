@@ -1,7 +1,7 @@
 # server/app/services/initial_setup.py
 from sqlalchemy.orm import Session
-from app.db.models.user import User, UserRole, UserDepartment, UserStatus, Permission
-from app.schemas.user import UserCreate
+from server.app.db.models.user import User, UserRole, UserDepartment, UserStatus, Permission
+from server.app.schemas.user import UserCreate
 from datetime import datetime, timedelta
 import logging
 from typing import Optional, Tuple, Dict, Any
