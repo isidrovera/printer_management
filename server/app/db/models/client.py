@@ -1,6 +1,6 @@
 # server/app/db/models/client.py
 
-from app.db.base import BaseModel
+from server.app.db.base import BaseModel
 from sqlalchemy import Column, String, Boolean, DateTime, Text, Enum, Integer, TIMESTAMP
 from sqlalchemy.orm import relationship
 import uuid

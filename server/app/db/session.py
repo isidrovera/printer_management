@@ -1,7 +1,7 @@
 # server/app/db/session.py
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
-from app.core.config import settings
+from server.app.core.config import settings
 import psycopg2
 from urllib.parse import urlparse
 

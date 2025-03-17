@@ -1,5 +1,5 @@
 # server/app/db/models/agent.py
-from app.db.base import BaseModel
+from server.app.db.base import BaseModel
 from sqlalchemy import Column, String, Boolean, ForeignKey, JSON, Integer, Float, DateTime, TIMESTAMP
 from sqlalchemy.orm import relationship
 import uuid
