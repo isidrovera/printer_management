@@ -49,7 +49,8 @@ class ClientResponse(ClientBase):
     last_contact_date: Optional[datetime]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
+
 
 class ClientSearch(BaseModel):
     search_term: str

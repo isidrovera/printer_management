@@ -111,7 +111,8 @@ class PrinterOIDsResponse(PrinterOIDsBase):
     id: int
     
     class Config:
-        orm_mode = True
+        from_attributes = True
+
 
 class BrandResponse(BaseModel):
     """Schema para la respuesta de marcas y familias de modelos."""

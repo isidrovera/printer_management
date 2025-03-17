@@ -8,14 +8,14 @@ pyotp
 qrcode
 pydantic_settings
 sqlalchemy
-passlib
+passlib==1.7.4
 pydantic[email]
 email-validator
 psycopg2
 jinja2
 python-multipart
 pyjwt
-bcrypt
+bcrypt==4.0.1
 python-jose[cryptography]
 websockets
 uvicorn[standard]
