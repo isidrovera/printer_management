@@ -8,7 +8,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 
-# Modificar estas importaciones para usar rutas absolutas
+# Local imports (corrigiendo la ruta)
 from server.app.core.config import settings
 from server.app.middleware.auth_middleware import auth_middleware
 from server.app.middleware.first_login_middleware import first_login_middleware
