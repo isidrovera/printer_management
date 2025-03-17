@@ -4,9 +4,9 @@ import logging
 import traceback
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends, HTTPException
 from sqlalchemy.orm import Session
-from app.db.session import get_db
-from app.services.agent_service import AgentService
-from app.db.models import Client
+from server.app.db.session import get_db
+from server.app.services.agent_service import AgentService
+from server.app.db.models import Client
 from typing import Dict
 import base64
 

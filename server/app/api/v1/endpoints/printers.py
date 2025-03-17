@@ -1,11 +1,11 @@
 # server/app/api/v1/endpoints/printers.py
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from app.db.session import get_db
-from app.services.driver_service import DriverService  # Actualizamos el import
-from app.api.v1.endpoints.websocket import manager
+from server.app.db.session import get_db
+from server.app.services.driver_service import DriverService  # Actualizamos el import
+from server.app.api.v1.endpoints.websocket import manager
 from typing import List, Dict, Any
-from app.db.models.printer import Printer
+from server.app.db.models.printer import Printer
 from pydantic import BaseModel
 import logging
 

@@ -2,9 +2,9 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List, Optional
-from app.db.session import get_db
-from app.services.client_service import ClientService
-from app.schemas.client import (
+from server.app.db.session import get_db
+from server.app.services.client_service import ClientService
+from server.app.schemas.client import (
     ClientCreate, 
     ClientUpdate, 
     ClientResponse, 

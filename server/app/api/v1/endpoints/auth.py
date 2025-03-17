@@ -3,9 +3,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
-from app.db.session import get_db
-from app.services.user_service import UserService
-from app.schemas.auth import (
+from server.app.db.session import get_db
+from server.app.services.user_service import UserService
+from server.app.schemas.auth import (
     TwoFactorSetup, 
     TwoFactorVerify, 
     OAuth2Login, 

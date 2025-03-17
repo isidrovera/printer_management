@@ -2,12 +2,12 @@
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 from typing import Dict, Any, List, Optional
-from app.db.models.printer import Printer
+from server.app.db.models.printer import Printer
 from datetime import datetime
 
-from app.db.session import get_db
-from app.services.monitor_service import PrinterMonitorService
-from app.core.logging import logger
+from server.app.db.session import get_db
+from server.app.services.monitor_service import PrinterMonitorService
+from server.app.core.logging import logger
 
 router = APIRouter()
 

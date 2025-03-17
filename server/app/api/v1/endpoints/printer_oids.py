@@ -2,10 +2,10 @@
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from app.db.session import get_db
-from app.db.models.printer_oids import PrinterOIDs
-from app.services.printer_oids import PrinterOIDsService
-from app.schemas.printer_oids import (
+from server.app.db.session import get_db
+from server.app.db.models.printer_oids import PrinterOIDs
+from server.app.services.printer_oids import PrinterOIDsService
+from server.app.schemas.printer_oids import (
     PrinterOIDsCreate,
     PrinterOIDsUpdate,
     PrinterOIDsResponse,

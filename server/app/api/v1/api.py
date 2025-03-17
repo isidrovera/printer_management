@@ -1,6 +1,6 @@
 # server/app/api/v1/api.py
 from fastapi import APIRouter
-from app.api.v1.endpoints import (
+from server.app.api.v1.endpoints import (
     agents, websocket, printers, drivers,
     tunnels, monitor_printers, printer_oids,
     dashboard, auth, users, clients

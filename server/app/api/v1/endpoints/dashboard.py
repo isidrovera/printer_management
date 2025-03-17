@@ -3,10 +3,10 @@ from fastapi import APIRouter, Request, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.db.session import get_db
 from sqlalchemy.exc import SQLAlchemyError
-from app.services.client_service import ClientService
-from app.services.agent_service import AgentService
-from app.services.tunnel_service import TunnelService
-from app.services.monitor_service import PrinterMonitorService
+from server.app.services.client_service import ClientService
+from server.app.services.agent_service import AgentService
+from server.app.services.tunnel_service import TunnelService
+from server.app.services.monitor_service import PrinterMonitorService
 from datetime import datetime, timedelta
 import logging
 from typing import Dict, Any

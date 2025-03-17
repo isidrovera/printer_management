@@ -4,9 +4,9 @@ from fastapi import APIRouter, Depends, Request, HTTPException, status
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
-from app.db.session import get_db
-from app.services.agent_service import AgentService
-from app.schemas.agent import AgentCreate, Agent, AgentUpdate
+from server.app.db.session import get_db
+from server.app.services.agent_service import AgentService
+from server.app.schemas.agent import AgentCreate, Agent, AgentUpdate
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")  # Ajusta si usas otra ruta
