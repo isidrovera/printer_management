@@ -8,14 +8,14 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 
-# Local imports
-from app.core.config import settings
-from app.middleware.auth_middleware import auth_middleware
-from app.middleware.first_login_middleware import first_login_middleware
-from app.services.initial_setup import InitialSetupService
-from app.api.v1.api import api_router
-from app.db.session import engine, SessionLocal
-from app.db.base import Base
+# Modificar estas importaciones para usar rutas absolutas
+from server.app.core.config import settings
+from server.app.middleware.auth_middleware import auth_middleware
+from server.app.middleware.first_login_middleware import first_login_middleware
+from server.app.services.initial_setup import InitialSetupService
+from server.app.api.v1.api import api_router
+from server.app.db.session import engine, SessionLocal
+from server.app.db.base import Base
 
 # Logging configuration
 logging.basicConfig(
