@@ -9,10 +9,10 @@ from dotenv import load_dotenv
 BASE_DIR = Path(__file__).resolve().parent.parent.parent  # server/app/
 
 # Ruta absoluta del archivo .env
-ENV_FILE_PATH = BASE_DIR / ".env"
+ENV_FILE_PATH = str(BASE_DIR / "server" / ".env")  # Convertimos a string para evitar errores con Pydantic
 
 # Cargar las variables de entorno desde .env antes de inicializar Settings
-if ENV_FILE_PATH.exists():
+if os.path.exists(ENV_FILE_PATH):
     load_dotenv(ENV_FILE_PATH)
 else:
     print(f"⚠️ Archivo .env no encontrado en {ENV_FILE_PATH}. Verifica su existencia.")
@@ -86,7 +86,7 @@ class Settings(BaseSettings):
         return f"{self.SERVER_URL}{self.API_V1_STR}{path}"
 
     class Config:
-        env_file = ENV_FILE_PATH  # Cargar archivo .env desde la ubicación correcta
+        env_file = ENV_FILE_PATH  # Ahora es un string, para que Pydantic lo reconozca
         case_sensitive = True
 
     def __init__(self, **kwargs):
