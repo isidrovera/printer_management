@@ -1,258 +1,140 @@
-// src/pages/Clients/ClientList.tsx
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from '@/components/ui/table';
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
-  CardTitle 
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { AlertCircle, Loader2, Plus, Search, RefreshCw } from 'lucide-react';
-import ClientService, { Client } from '../../services/ClientService';
-import { useToast } from '@/components/ui/use-toast';
+import { Link } from 'react-router-dom';
+import { ClientService, Client } from '../../services/ClientService';
 
 const ClientList = () => {
   const [clients, setClients] = useState<Client[]>([]);
-  const [filteredClients, setFilteredClients] = useState<Client[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [refreshing, setRefreshing] = useState(false);
-  const navigate = useNavigate();
-  const { toast } = useToast();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  const fetchClients = async (showLoading = true) => {
+  useEffect(() => {
+    loadClients();
+  }, [searchTerm]);
+
+  const loadClients = async () => {
     try {
-      if (showLoading) setLoading(true);
-      setRefreshing(true);
-      setError(null);
-      
-      const data = await ClientService.getAllClients();
+      setLoading(true);
+      const data = await ClientService.getClients(searchTerm);
       setClients(data);
-      // Aplicar filtros actuales
-      applyFilters(data, searchTerm, statusFilter);
-    } catch (err: any) {
-      console.error('Error fetching clients:', err);
-      setError(err.response?.data?.detail || 'Error al cargar los clientes');
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "No se pudieron cargar los clientes",
-      });
+    } catch (error) {
+      alert('Error al cargar los clientes');
     } finally {
       setLoading(false);
-      setRefreshing(false);
     }
   };
 
-  const applyFilters = (clientList: Client[], search: string, status: string) => {
-    let filtered = [...clientList];
-    
-    // Aplicar filtro de búsqueda
-    if (search.trim()) {
-      const searchLower = search.toLowerCase();
-      filtered = filtered.filter(client => 
-        client.name.toLowerCase().includes(searchLower) ||
-        (client.business_name && client.business_name.toLowerCase().includes(searchLower)) ||
-        (client.client_code && client.client_code.toLowerCase().includes(searchLower)) ||
-        (client.contact_email && client.contact_email.toLowerCase().includes(searchLower))
-      );
+  const handleDelete = async () => {
+    if (!selectedClient?.id) return;
+    try {
+      await ClientService.deleteClient(selectedClient.id);
+      setClients(clients.filter(c => c.id !== selectedClient.id));
+      alert('Cliente eliminado exitosamente');
+      setShowDeleteModal(false);
+    } catch (error) {
+      alert('Error al eliminar el cliente');
     }
-    
-    // Aplicar filtro de estado
-    if (status !== 'all') {
-      const isActive = status === 'active';
-      filtered = filtered.filter(client => client.is_active === isActive);
-    }
-    
-    setFilteredClients(filtered);
-  };
-
-  useEffect(() => {
-    let isSubscribed = true;
-    
-    if (isSubscribed) {
-      fetchClients();
-    }
-    
-    return () => {
-      isSubscribed = false;
-    };
-  }, []);
-  
-  useEffect(() => {
-    applyFilters(clients, searchTerm, statusFilter);
-  }, [searchTerm, statusFilter, clients]);
-
-  const handleCreateClient = () => {
-    navigate('/clients/create');
-  };
-
-  const handleViewClient = (id: number) => {
-    navigate(`/clients/${id}`);
-  };
-
-  const handleRefresh = () => {
-    fetchClients(false);
-  };
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
-  };
-
-  const handleStatusFilterChange = (value: string) => {
-    setStatusFilter(value);
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-      </div>
-    );
+    return <div>Cargando...</div>;
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Clientes</h1>
-        <Button 
-          onClick={handleCreateClient} 
-          className="flex items-center gap-2"
-        >
-          <Plus className="h-4 w-4" />
+    <div className="p-4">
+      <div className="mb-4 flex justify-between items-center">
+        <h1 className="text-2xl font-bold">Clientes</h1>
+        <Link to="/clients/create" className="bg-blue-500 text-white px-4 py-2 rounded">
           Nuevo Cliente
-        </Button>
+        </Link>
       </div>
 
-      {error && (
-        <div className="bg-red-50 text-red-700 p-4 rounded-lg mb-6 flex items-center">
-          <AlertCircle className="h-5 w-5 mr-2" />
-          {error}
+      <input
+        type="text"
+        placeholder="Buscar clientes..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        className="w-full p-2 border rounded mb-4"
+      />
+
+      <div className="overflow-x-auto">
+        <table className="w-full border-collapse border">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="border p-2 text-left">Nombre</th>
+              <th className="border p-2 text-left">RUC/DNI</th>
+              <th className="border p-2 text-left">Estado</th>
+              <th className="border p-2 text-right">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {clients.map((client) => (
+              <tr key={client.id} className="hover:bg-gray-50">
+                <td className="border p-2">{client.name}</td>
+                <td className="border p-2">{client.tax_id || '-'}</td>
+                <td className="border p-2">
+                  <span className={`px-2 py-1 rounded ${
+                    client.status === 'active' ? 'bg-green-100 text-green-800' : 
+                    client.status === 'inactive' ? 'bg-red-100 text-red-800' : 
+                    'bg-gray-100 text-gray-800'
+                  }`}>
+                    {client.status}
+                  </span>
+                </td>
+                <td className="border p-2 text-right">
+                  <div className="flex justify-end gap-2">
+                    <Link 
+                      to={`/clients/${client.id}`}
+                      className="text-blue-600 hover:text-blue-800"
+                    >
+                      Ver
+                    </Link>
+                    <Link 
+                      to={`/clients/${client.id}/edit`}
+                      className="text-green-600 hover:text-green-800"
+                    >
+                      Editar
+                    </Link>
+                    <button
+                      onClick={() => {
+                        setSelectedClient(client);
+                        setShowDeleteModal(true);
+                      }}
+                      className="text-red-600 hover:text-red-800"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg">
+            <h2 className="text-xl mb-4">¿Eliminar cliente?</h2>
+            <p className="mb-4">Esta acción no se puede deshacer.</p>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                className="px-4 py-2 border rounded"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleDelete}
+                className="px-4 py-2 bg-red-500 text-white rounded"
+              >
+                Eliminar
+              </button>
+            </div>
+          </div>
         </div>
       )}
-
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>Filtros</CardTitle>
-          <CardDescription>Filtrar y buscar clientes</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="relative w-full sm:w-2/3">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-              <Input
-                type="text"
-                placeholder="Buscar por nombre, código, email..."
-                value={searchTerm}
-                onChange={handleSearchChange}
-                className="pl-8"
-              />
-            </div>
-            <div className="w-full sm:w-1/3">
-              <Select 
-                value={statusFilter} 
-                onValueChange={handleStatusFilterChange}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Filtrar por estado" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todos</SelectItem>
-                  <SelectItem value="active">Activos</SelectItem>
-                  <SelectItem value="inactive">Inactivos</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <div className="mt-4 flex justify-end">
-            <Button 
-              variant="outline" 
-              onClick={handleRefresh} 
-              disabled={refreshing}
-              className="flex items-center gap-2"
-            >
-              <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
-              Actualizar
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Código</TableHead>
-                  <TableHead>Nombre</TableHead>
-                  <TableHead>Razón Social</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Tipo</TableHead>
-                  <TableHead>Estado</TableHead>
-                  <TableHead>Acciones</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredClients.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center py-6 text-gray-500">
-                      No se encontraron clientes
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  filteredClients.map((client) => (
-                    <TableRow key={client.id}>
-                      <TableCell>{client.client_code || '-'}</TableCell>
-                      <TableCell className="font-medium">{client.name}</TableCell>
-                      <TableCell>{client.business_name || '-'}</TableCell>
-                      <TableCell>{client.contact_email || '-'}</TableCell>
-                      <TableCell>{client.client_type}</TableCell>
-                      <TableCell>
-                        <Badge 
-                          variant={client.is_active ? "success" : "destructive"}
-                        >
-                          {client.is_active ? 'Activo' : 'Inactivo'}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleViewClient(client.id)}
-                        >
-                          Ver
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 };
