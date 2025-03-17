@@ -13,10 +13,10 @@ from server.app.schemas.auth import (
     RefreshTokenRequest,
     ChangePasswordRequest
 )
-from app.schemas.user import UserCreate, UserUpdate, UserInDB
+from server.app.schemas.user import UserCreate, UserUpdate, UserInDB
 import pyotp
 import logging
-from app.core.auth import create_access_token, get_current_user, get_current_active_user
+from server.app.core.auth import create_access_token, get_current_user, get_current_active_user
 
 logger = logging.getLogger(__name__)
 router = APIRouter()

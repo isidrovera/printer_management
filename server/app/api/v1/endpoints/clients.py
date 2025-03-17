@@ -11,8 +11,8 @@ from server.app.schemas.client import (
     ClientSearch,
     ClientDashboardStats
 )
-from app.db.models import ClientStatus, ClientType
-from app.core.auth import get_current_active_user
+from server.app.db.models import ClientStatus, ClientType
+from server.app.core.auth import get_current_active_user
 
 router = APIRouter()
 
