@@ -2,10 +2,12 @@
 from fastapi import Request
 from fastapi.responses import JSONResponse
 import logging
-from app.core.auth import get_current_user
+
 import jwt
 from jose import JWTError
-from app.core.config import settings
+from server.app.core.auth import get_current_user
+from server.app.core.config import settings
+
 
 logger = logging.getLogger(__name__)
 
