@@ -1,7 +1,7 @@
 # server/app/api/v1/endpoints/dashboard.py
 from fastapi import APIRouter, Request, Depends, HTTPException
 from sqlalchemy.orm import Session
-from app.db.session import get_db
+from server.app.db.session import get_db
 from sqlalchemy.exc import SQLAlchemyError
 from server.app.services.client_service import ClientService
 from server.app.services.agent_service import AgentService
