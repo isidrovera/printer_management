@@ -1,5 +1,5 @@
 # server/app/api/v1/endpoints/clients.py
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException,Query
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from app.db.session import get_db
