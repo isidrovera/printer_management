@@ -12,13 +12,13 @@ from starlette.middleware.base import BaseHTTPMiddleware
 os.environ["STARLETTE_ENV_FILE"] = ""
 
 # Local imports (corrigiendo la ruta)
-from server.app.core.config import settings
-from server.app.middleware.auth_middleware import auth_middleware
-from server.app.middleware.first_login_middleware import first_login_middleware
-from server.app.services.initial_setup import InitialSetupService
-from server.app.api.v1.api import api_router
-from server.app.db.session import engine, SessionLocal
-from server.app.db.base import Base
+from app.core.config import settings
+from app.middleware.auth_middleware import auth_middleware
+from app.middleware.first_login_middleware import first_login_middleware
+from app.services.initial_setup import InitialSetupService
+from app.api.v1.api import api_router
+from app.db.session import engine, SessionLocal
+from app.db.base import Base
 
 # Logging configuration
 logging.basicConfig(

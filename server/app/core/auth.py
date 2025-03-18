@@ -6,16 +6,16 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.responses import JSONResponse
 from authlib.integrations.starlette_client import OAuth
 from starlette.config import Config
-from server.app.db.models.user import User
+from app.db.models.user import User
 import jwt
 from jose import JWTError
 import pyotp
 import qrcode
 import base64
 from io import BytesIO
-from server.app.core.config import settings
-from server.app.services.user_service import UserService
-from server.app.db.session import get_db, SessionLocal
+from app.core.config import settings
+from app.services.user_service import UserService
+from app.db.session import get_db, SessionLocal
 from sqlalchemy.orm import Session
 import logging
 

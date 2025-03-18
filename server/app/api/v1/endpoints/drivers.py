@@ -1,12 +1,12 @@
 # app/api/v1/endpoints/drivers.py
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from server.app.db.session import get_db
-from server.app.services.driver_service import DriverService
+from app.db.session import get_db
+from app.services.driver_service import DriverService
 from typing import List
 import os
 from fastapi.responses import FileResponse  # Agregar este import
-from server.app.core.config import settings
+from app.core.config import settings
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 

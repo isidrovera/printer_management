@@ -1,12 +1,12 @@
 # server/app/api/v1/endpoints/dashboard.py
 from fastapi import APIRouter, Request, Depends, HTTPException
 from sqlalchemy.orm import Session
-from server.app.db.session import get_db
+from app.db.session import get_db
 from sqlalchemy.exc import SQLAlchemyError
-from server.app.services.client_service import ClientService
-from server.app.services.agent_service import AgentService
-from server.app.services.tunnel_service import TunnelService
-from server.app.services.monitor_service import PrinterMonitorService
+from app.services.client_service import ClientService
+from app.services.agent_service import AgentService
+from app.services.tunnel_service import TunnelService
+from app.services.monitor_service import PrinterMonitorService
 from datetime import datetime, timedelta
 import logging
 from typing import Dict, Any

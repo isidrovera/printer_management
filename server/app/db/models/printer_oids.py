@@ -1,5 +1,5 @@
 # server/app/db/models/printer_oids.py
-from server.app.db.base import BaseModel
+from app.db.base import BaseModel
 from sqlalchemy import Column, String, Integer, ForeignKey
 from sqlalchemy.orm import relationship
 

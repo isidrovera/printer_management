@@ -1,8 +1,8 @@
 # server/app/api/v1/endpoints/initial_setup.py
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from server.app.db.session import get_db
-from server.app.services.initial_setup import InitialSetupService
+from app.db.session import get_db
+from app.services.initial_setup import InitialSetupService
 
 router = APIRouter()
 

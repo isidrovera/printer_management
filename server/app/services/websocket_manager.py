@@ -1,7 +1,7 @@
 # server/app/services/websocket_manager.py
 from fastapi import WebSocket
 from typing import Dict
-from server.app.core.config import settings
+from app.core.config import settings
 
 class WebSocketManager:
     def __init__(self):

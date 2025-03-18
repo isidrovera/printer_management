@@ -5,8 +5,8 @@ import logging
 
 import jwt
 from jose import JWTError
-from server.app.core.auth import get_current_user
-from server.app.core.config import settings
+from app.core.auth import get_current_user
+from app.core.config import settings
 
 
 logger = logging.getLogger(__name__)

@@ -1,7 +1,7 @@
 # server/app/db/models/tunnel.py
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, func
 from sqlalchemy.orm import relationship
-from server.app.db.base import Base
+from app.db.base import Base
 
 class Tunnel(Base):
     __tablename__ = "tunnels"

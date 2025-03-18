@@ -1,5 +1,5 @@
 # server/app/db/models/user.py
-from server.app.db.base import BaseModel
+from app.db.base import BaseModel
 from sqlalchemy import Column, String, Boolean, DateTime, Text, Enum, Integer, TIMESTAMP, ForeignKey, Table
 from sqlalchemy.orm import relationship, foreign, remote, backref
 from datetime import datetime

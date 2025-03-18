@@ -1,9 +1,9 @@
 #server\app\services\printer_oids.py
 from typing import List, Optional, Union, Tuple, Dict
 from sqlalchemy.orm import Session
-from server.app.db.models.printer_oids import PrinterOIDs
-from server.app.schemas.printer_oids import PrinterOIDsCreate, PrinterOIDsUpdate
-from server.app.core.logging import logger
+from app.db.models.printer_oids import PrinterOIDs
+from app.schemas.printer_oids import PrinterOIDsCreate, PrinterOIDsUpdate
+from app.core.logging import logger
 
 class PrinterOIDsService:
    def __init__(self, db: Session):

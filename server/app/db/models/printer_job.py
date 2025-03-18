@@ -1,5 +1,5 @@
 # server/app/db/models/printer_job.py
-from server.app.db.base import BaseModel
+from app.db.base import BaseModel
 from sqlalchemy import Column, String, Integer, ForeignKey, JSON
 from sqlalchemy.orm import relationship
 
