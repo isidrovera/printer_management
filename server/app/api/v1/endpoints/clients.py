@@ -1,5 +1,5 @@
 # server/app/api/v1/endpoints/clients.py
-from fastapi import APIRouter, Depends, HTTPException,Query
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from app.db.session import get_db
@@ -19,27 +19,20 @@ router = APIRouter()
 @router.get("/", response_model=List[ClientResponse])
 async def get_all_clients(
     db: Session = Depends(get_db),
-    search: Optional[str] = Query(None),
-    status: Optional[str] = Query(None),
-    current_user: dict = Depends(get_current_active_user)
+    current_user: dict = Depends(get_current_active_user),
+    search: Optional[str] = None,
+    status: Optional[str] = None
 ):
-    """Obtiene todos los clientes, con filtros opcionales."""
+    """Obtiene todos los clientes, con opción de filtrar por búsqueda o estado"""
     try:
         client_service = ClientService(db)
-        
-        if search and status:
-            # Filtrar por search y por status
-            return await client_service.filter_clients(search=search, status=status)
-        elif search:
-            # Filtrar solo por search
-            return await client_service.search_clients(search)
+        if search:
+            clients = await client_service.search_clients(search)
         elif status:
-            # Filtrar solo por status
-            return await client_service.get_by_status(status)
+            clients = await client_service.get_by_status(status)
         else:
-            # Si no vienen filtros, devolver todos
-            return await client_service.get_all()
-
+            clients = await client_service.get_all()
+        return clients
     except Exception as e:
         raise HTTPException(
             status_code=500,
