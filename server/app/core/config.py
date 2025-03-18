@@ -6,17 +6,36 @@ from typing import Optional, Dict, Any
 from dotenv import load_dotenv
 
 # Obtener el directorio base del proyecto (raíz)
-BASE_DIR = Path(__file__).resolve().parent.parent.parent  # server/app/
+BASE_DIR = Path(__file__).resolve().parent.parent.parent  # server/
 
-# Ruta absoluta del archivo .env
-ENV_FILE_PATH = str(Path(__file__).resolve().parent.parent.parent / ".env")
- # Convertimos a string para evitar errores con Pydantic
+# Directorio raíz del proyecto (un nivel arriba)
+PROJECT_ROOT = BASE_DIR.parent  # printer_management/
 
-# Cargar las variables de entorno desde .env antes de inicializar Settings
-if os.path.exists(ENV_FILE_PATH):
-    load_dotenv(ENV_FILE_PATH)
-else:
-    print(f"⚠️ Archivo .env no encontrado en {ENV_FILE_PATH}. Verifica su existencia.")
+# Intenta varias ubicaciones posibles para el archivo .env
+locations_to_try = [
+    str(BASE_DIR / ".env"),                # server/.env
+    str(PROJECT_ROOT / ".env"),            # printer_management/.env
+    str(PROJECT_ROOT / "server" / ".env"), # printer_management/server/.env
+    str(Path.cwd() / ".env"),              # Directorio de trabajo actual/.env
+    str(Path.cwd() / "server" / ".env")    # Directorio de trabajo actual/server/.env
+]
+
+# Buscar y cargar .env de cualquiera de las ubicaciones
+env_loaded = False
+env_file_path = None
+
+for loc in locations_to_try:
+    if os.path.exists(loc):
+        print(f"✅ Archivo .env encontrado en {loc}")
+        load_dotenv(loc)
+        env_file_path = loc
+        env_loaded = True
+        break
+
+if not env_loaded:
+    print(f"⚠️ Archivo .env no encontrado. Ubicaciones probadas: {locations_to_try}")
+    # Valor predeterminado para evitar errores
+    env_file_path = str(BASE_DIR / ".env")
 
 class Settings(BaseSettings):
     # Configuración básica del proyecto
@@ -26,13 +45,13 @@ class Settings(BaseSettings):
     DESCRIPTION: str = "Sistema de gestión remota de impresoras"
 
     # Configuración de la base de datos
-    DATABASE_URL: str
+    DATABASE_URL: str = "postgresql://postgres:postgres@localhost/printer_management"
     DATABASE_CONNECT_DICT: Dict[str, Any] = {}
 
     # Configuración de seguridad
-    SECRET_KEY: str
+    SECRET_KEY: str = "tu_clave_secreta_aqui"
     JWT_ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440  # 24 horas en lugar de 60 minutos
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
     # Configuración de almacenamiento
@@ -87,7 +106,7 @@ class Settings(BaseSettings):
         return f"{self.SERVER_URL}{self.API_V1_STR}{path}"
 
     class Config:
-        env_file = ENV_FILE_PATH  # Ahora es un string, para que Pydantic lo reconozca
+        env_file = env_file_path  # Usa la ruta encontrada
         case_sensitive = True
 
     def __init__(self, **kwargs):
