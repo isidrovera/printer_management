@@ -1,18 +1,15 @@
 # server/main.py
 import logging
 import os
-from pathlib import Path
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.responses import Response
 
-# Evita la advertencia de Starlette al no encontrar .env
+# Evita advertencias de Starlette
 os.environ["STARLETTE_ENV_FILE"] = ""
 
-# Local imports (corrigiendo la ruta)
 from app.core.config import settings
 from app.middleware.auth_middleware import auth_middleware
 from app.middleware.first_login_middleware import first_login_middleware
@@ -21,80 +18,62 @@ from app.api.v1.api import api_router
 from app.db.session import engine, SessionLocal
 from app.db.base import Base
 
-# Logging configuration
+# Configuración del logging
 logging.basicConfig(
     level=logging.DEBUG,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
 
-# Ensure required directories exist
+# Crear directorios necesarios
 os.makedirs(settings.DRIVERS_STORAGE_PATH, exist_ok=True)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    logger.info("🔄 [LIFESPAN] Starting application...")
+    logger.info("🔄 [LIFESPAN] Iniciando aplicación...")
     db = SessionLocal()
     try:
-        logger.info("🔍 [LIFESPAN] Verifying database structure...")
+        logger.info("🔍 [LIFESPAN] Verificando estructura DB...")
         Base.metadata.create_all(bind=engine)
 
-        logger.info("🚀 [LIFESPAN] Running initial setup...")
+        logger.info("🚀 [LIFESPAN] Ejecutando setup inicial...")
         await InitialSetupService.run_initial_setup(db)
 
-        logger.info("✅ [LIFESPAN] Application started successfully")
+        logger.info("✅ [LIFESPAN] Aplicación iniciada con éxito")
     except Exception as e:
-        logger.error(f"❌ [LIFESPAN] Error during application startup: {e}")
+        logger.error(f"❌ [LIFESPAN] Error en arranque: {e}")
         raise
     finally:
         db.close()
 
     yield
 
-    logger.info("🛑 [LIFESPAN] Shutting down application...")
+    logger.info("🛑 [LIFESPAN] Cerrando aplicación...")
 
-# Create FastAPI application
 app = FastAPI(
     title=settings.PROJECT_NAME,
     lifespan=lifespan
 )
 
-# CORS configuration definitiva (ajustar luego al origen específico)
-logger.info("🔧 [CONFIG] Aplicando configuración de CORS")
+# 👇 Middleware CORS siempre primero (fundamental)
+logger.info("🔧 [CONFIG] Configurando middleware CORS")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],             # 👈 permite cualquier origen temporalmente
+    allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["*"],             # 👈 permite todos los métodos
-    allow_headers=["*"],             # 👈 permite todas las cabeceras
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
-# Middleware personalizado con manejo explícito de OPTIONS
-async def middleware_wrapper(request: Request, call_next, middleware_func):
-    if request.method == "OPTIONS":
-        logger.debug(f"🌐 [MIDDLEWARE] OPTIONS request permitido automáticamente para ruta {request.url.path}")
-        return Response(status_code=200)
-    return await middleware_func(request, call_next)
+# 👇 Middlewares personalizados directamente (sin wrapper adicional)
+logger.info("🔐 [CONFIG] Agregando middleware de autenticación")
+app.add_middleware(BaseHTTPMiddleware, dispatch=auth_middleware)
 
-# Middleware de autenticación con logs detallados
-async def custom_auth_middleware(request: Request, call_next):
-    logger.debug(f"🔐 [AUTH MIDDLEWARE] Ruta solicitada: {request.url.path}")
-    return await middleware_wrapper(request, call_next, auth_middleware)
+logger.info("🔄 [CONFIG] Agregando middleware primer login")
+app.add_middleware(BaseHTTPMiddleware, dispatch=first_login_middleware)
 
-# Middleware para primer inicio de sesión con logs detallados
-async def custom_first_login_middleware(request: Request, call_next):
-    logger.debug(f"🔄 [FIRST LOGIN MIDDLEWARE] Ruta solicitada: {request.url.path}")
-    return await middleware_wrapper(request, call_next, first_login_middleware)
+# Rutas API
+logger.info("📡 [CONFIG] Incluyendo rutas API")
+app.include_router(api_router, prefix=settings.API_V1_STR)
 
-# Agregar middlewares personalizados (con manejo OPTIONS integrado)
-app.add_middleware(BaseHTTPMiddleware, dispatch=custom_auth_middleware)
-app.add_middleware(BaseHTTPMiddleware, dispatch=custom_first_login_middleware)
-
-# Include API router
-logger.info("📡 [CONFIG] Incluyendo API router")
-app.include_router(
-    api_router,
-    prefix=settings.API_V1_STR
-)
-
-logger.info("🚀 [CONFIG] Application fully initialized")
+logger.info("🚀 [CONFIG] Aplicación completamente inicializada")
