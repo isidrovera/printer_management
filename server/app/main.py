@@ -8,6 +8,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 
+# Evita la advertencia de Starlette al no encontrar .env
+os.environ["STARLETTE_ENV_FILE"] = ""
+
 # Local imports (corrigiendo la ruta)
 from server.app.core.config import settings
 from server.app.middleware.auth_middleware import auth_middleware
