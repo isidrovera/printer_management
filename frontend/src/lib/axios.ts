@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 const axiosInstance = axios.create({
-  baseURL: '/api/v1',  // Cambiamos a incluir /v1
+  baseURL: 'http://161.132.39.159:8000/api/v1',  // 👈 URL completa del backend
   headers: {
     'Accept': 'application/json',
     'Content-Type': 'application/json'
