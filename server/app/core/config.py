@@ -106,7 +106,6 @@ class Settings(BaseSettings):
         return f"{self.SERVER_URL}{self.API_V1_STR}{path}"
 
     class Config:
-        #env_file = env_file_path  # Usa la ruta encontrada
         case_sensitive = True
 
     def __init__(self, **kwargs):
@@ -139,6 +138,9 @@ class Settings(BaseSettings):
         }
         base_path = storage_map.get(storage_type, self.TEMP_STORAGE_PATH)
         return Path(base_path) / filename
+
+# Indica explícitamente a pydantic_settings la ubicación del archivo .env encontrado
+Settings.Config.env_file = env_file_path
 
 # Instancia global de configuración
 settings = Settings()
