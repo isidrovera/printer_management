@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 BASE_DIR = Path(__file__).resolve().parent.parent.parent  # server/app/
 
 # Ruta absoluta del archivo .env
-ENV_FILE_PATH = str(BASE_DIR / ".env")
+ENV_FILE_PATH = str(Path(__file__).resolve().parent.parent.parent / ".env")
  # Convertimos a string para evitar errores con Pydantic
 
 # Cargar las variables de entorno desde .env antes de inicializar Settings
