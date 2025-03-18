@@ -1,6 +1,6 @@
 # server/app/middleware/auth_middleware.py
 from fastapi import Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 import logging
 
 import jwt
@@ -8,11 +8,15 @@ from jose import JWTError
 from app.core.auth import get_current_user
 from app.core.config import settings
 
-
 logger = logging.getLogger(__name__)
 
 async def auth_middleware(request: Request, call_next):
     logger.debug(f"[AUTH] Iniciando middleware para ruta: {request.url.path}")
+
+    # 👇 Permite siempre peticiones OPTIONS para solucionar CORS
+    if request.method == "OPTIONS":
+        logger.debug("[AUTH] Solicitud OPTIONS permitida automáticamente")
+        return Response(status_code=200)
 
     # Lista de rutas públicas que no requieren autenticación
     public_paths = [
@@ -46,16 +50,16 @@ async def auth_middleware(request: Request, call_next):
 
         # Extraer el token
         token = auth_header.split(" ")[1]
-        
+
         try:
             # Validar token y obtener usuario
             current_user = await get_current_user(token)
-            
+
             # Guardar usuario en el estado de la request
             request.state.user = current_user
-            
+
             logger.debug(f"[AUTH] Usuario autenticado correctamente: {current_user.username}")
-            
+
             # Verificar si necesita cambiar contraseña
             if current_user.must_change_password and not request.url.path.startswith("/api/v1/auth/change-password"):
                 logger.warning(f"[AUTH] Usuario debe cambiar contraseña: {current_user.username}")
