@@ -22,23 +22,36 @@ const ChangePassword = () => {
     e.preventDefault();
     setError('');
     console.log('🔄 Formulario enviado', formData);
-
+  
     if (formData.newPassword !== formData.confirmPassword) {
       setError('Las contraseñas no coinciden');
       console.error('❌ Error: Las contraseñas no coinciden');
       return;
     }
-
+  
     setLoading(true);
     console.log('🔄 Petición al backend iniciada');
-
+  
     try {
-      const response = await axiosInstance.post('/auth/change-password', {
+      // Obtener el token del localStorage
+      const tokenStr = localStorage.getItem('token');
+      let token = '';
+      
+      if (tokenStr) {
+        try {
+          const tokenData = JSON.parse(tokenStr);
+          token = tokenData.access_token;
+        } catch (error) {
+          console.error('❌ Error parsing token:', error);
+        }
+      }
+      
+      const response = await axiosInstance.post(`/auth/change-password?token=${token}`, {
         current_password: formData.currentPassword,
         new_password: formData.newPassword,
-        confirm_password: formData.confirmPassword, // Campo faltante agregado
+        confirm_password: formData.confirmPassword,
       });
-
+  
       console.log('✅ Contraseña cambiada correctamente:', response.data);
       navigate('/');
     } catch (err: any) {
