@@ -64,14 +64,15 @@ app = FastAPI(
 )
 
 # CORS configuration corregida definitivamente
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://161.132.39.159:3000"],
+    allow_origins=["*"],             # 👈 permite cualquier origen
     allow_credentials=True,
-    allow_methods=["*"],  # 👈 Cambia aquí: acepta explícitamente todos los métodos
-    allow_headers=["Authorization", "Content-Type", "Accept"],  # 👈 ajusta cabeceras explícitas
-    expose_headers=["*"]
+    allow_methods=["*"],             # 👈 permite todos los métodos
+    allow_headers=["*"],             # 👈 permite todas las cabeceras
 )
+
 
 
 # Add middlewares
