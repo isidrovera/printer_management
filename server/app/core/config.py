@@ -106,7 +106,7 @@ class Settings(BaseSettings):
         return f"{self.SERVER_URL}{self.API_V1_STR}{path}"
 
     class Config:
-        env_file = env_file_path  # Usa la ruta encontrada
+        #env_file = env_file_path  # Usa la ruta encontrada
         case_sensitive = True
 
     def __init__(self, **kwargs):
