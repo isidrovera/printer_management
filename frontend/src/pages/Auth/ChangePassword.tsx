@@ -5,7 +5,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../../components/ui/button';
 import { Card } from '../../components/ui/card';
 import { Alert } from '../../components/ui/alert';
-import axios from 'axios';
+import axiosInstance from '../../lib/axios';  // <-- asegúrate que sea esta ruta exacta
 
 const ChangePassword = () => {
   const navigate = useNavigate();
@@ -21,25 +21,34 @@ const ChangePassword = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    
+    console.log('🔄 Formulario enviado', formData);
 
     if (formData.newPassword !== formData.confirmPassword) {
       setError('Las contraseñas no coinciden');
+      console.error('❌ Error: Las contraseñas no coinciden');
       return;
     }
 
     setLoading(true);
+    console.log('🔄 Iniciando petición al backend para cambiar contraseña');
 
     try {
-      await axiosInstance.post('/auth/change-password', {
+      const response = await axiosInstance.post('/auth/change-password', {
         current_password: formData.currentPassword,
         new_password: formData.newPassword,
       });
 
+      console.log('✅ Respuesta exitosa del backend:', response.data);
+
       navigate('/');
+      console.log('🚀 Usuario redirigido a página principal');
     } catch (err: any) {
+      console.error('❌ Error al cambiar contraseña:', err.response?.data);
       setError(err.response?.data?.detail || 'Error al cambiar la contraseña');
     } finally {
       setLoading(false);
+      console.log('🔄 Fin del proceso de cambio de contraseña');
     }
   };
 
@@ -73,9 +82,9 @@ const ChangePassword = () => {
                 id="currentPassword"
                 type="password"
                 required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
                 value={formData.currentPassword}
-                onChange={(e) => setFormData({...formData, currentPassword: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, currentPassword: e.target.value })}
               />
             </div>
 
@@ -87,9 +96,9 @@ const ChangePassword = () => {
                 id="newPassword"
                 type="password"
                 required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
                 value={formData.newPassword}
-                onChange={(e) => setFormData({...formData, newPassword: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, newPassword: e.target.value })}
               />
             </div>
 
@@ -101,17 +110,13 @@ const ChangePassword = () => {
                 id="confirmPassword"
                 type="password"
                 required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
                 value={formData.confirmPassword}
-                onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
               />
             </div>
 
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={loading}
-            >
+            <Button type="submit" className="w-full" disabled={loading}>
               {loading ? 'Cambiando contraseña...' : 'Cambiar Contraseña'}
             </Button>
           </form>
