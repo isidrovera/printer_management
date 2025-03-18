@@ -7,7 +7,6 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 
-# Evita advertencias de Starlette
 os.environ["STARLETTE_ENV_FILE"] = ""
 
 from app.core.config import settings
@@ -18,14 +17,12 @@ from app.api.v1.api import api_router
 from app.db.session import engine, SessionLocal
 from app.db.base import Base
 
-# Configuración del logging
 logging.basicConfig(
     level=logging.DEBUG,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
 
-# Crear directorios necesarios
 os.makedirs(settings.DRIVERS_STORAGE_PATH, exist_ok=True)
 
 @asynccontextmanager
@@ -55,17 +52,17 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# 👇 Middleware CORS siempre primero (fundamental)
+# Middleware CORS absolutamente primero
 logger.info("🔧 [CONFIG] Configurando middleware CORS")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"],
+    allow_headers=["*"]
 )
 
-# 👇 Middlewares personalizados directamente (sin wrapper adicional)
+# Middlewares personalizados
 logger.info("🔐 [CONFIG] Agregando middleware de autenticación")
 app.add_middleware(BaseHTTPMiddleware, dispatch=auth_middleware)
 
