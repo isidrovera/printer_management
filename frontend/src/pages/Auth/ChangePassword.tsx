@@ -5,7 +5,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../../components/ui/button';
 import { Card } from '../../components/ui/card';
 import { Alert } from '../../components/ui/alert';
-import axiosInstance from '../../lib/axios';  // <-- asegúrate que sea esta ruta exacta
+import axiosInstance from '../../lib/axios';
 
 const ChangePassword = () => {
   const navigate = useNavigate();
@@ -21,7 +21,6 @@ const ChangePassword = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    
     console.log('🔄 Formulario enviado', formData);
 
     if (formData.newPassword !== formData.confirmPassword) {
@@ -31,7 +30,7 @@ const ChangePassword = () => {
     }
 
     setLoading(true);
-    console.log('🔄 Iniciando petición al backend para cambiar contraseña');
+    console.log('🔄 Petición al backend iniciada');
 
     try {
       const response = await axiosInstance.post('/auth/change-password', {
@@ -39,13 +38,18 @@ const ChangePassword = () => {
         new_password: formData.newPassword,
       });
 
-      console.log('✅ Respuesta exitosa del backend:', response.data);
-
+      console.log('✅ Contraseña cambiada correctamente:', response.data);
       navigate('/');
-      console.log('🚀 Usuario redirigido a página principal');
     } catch (err: any) {
-      console.error('❌ Error al cambiar contraseña:', err.response?.data);
-      setError(err.response?.data?.detail || 'Error al cambiar la contraseña');
+      console.error('❌ Error del backend:', err.response?.data);
+      const detail = err.response?.data?.detail;
+      if (Array.isArray(detail)) {
+        setError(detail.map((d: any) => d.msg).join(', '));
+      } else if (typeof detail === 'string') {
+        setError(detail);
+      } else {
+        setError('Error inesperado al cambiar la contraseña');
+      }
     } finally {
       setLoading(false);
       console.log('🔄 Fin del proceso de cambio de contraseña');
@@ -75,11 +79,8 @@ const ChangePassword = () => {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700">
-                Contraseña Actual
-              </label>
+              <label className="block text-sm font-medium text-gray-700">Contraseña Actual</label>
               <input
-                id="currentPassword"
                 type="password"
                 required
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
@@ -89,11 +90,8 @@ const ChangePassword = () => {
             </div>
 
             <div>
-              <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700">
-                Nueva Contraseña
-              </label>
+              <label className="block text-sm font-medium text-gray-700">Nueva Contraseña</label>
               <input
-                id="newPassword"
                 type="password"
                 required
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
@@ -103,11 +101,8 @@ const ChangePassword = () => {
             </div>
 
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                Confirmar Nueva Contraseña
-              </label>
+              <label className="block text-sm font-medium text-gray-700">Confirmar Nueva Contraseña</label>
               <input
-                id="confirmPassword"
                 type="password"
                 required
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
