@@ -19,18 +19,33 @@ router = APIRouter()
 @router.get("/", response_model=List[ClientResponse])
 async def get_all_clients(
     db: Session = Depends(get_db),
+    search: Optional[str] = Query(None),
+    status: Optional[str] = Query(None),
     current_user: dict = Depends(get_current_active_user)
 ):
-    """Obtiene todos los clientes"""
+    """Obtiene todos los clientes, con filtros opcionales."""
     try:
         client_service = ClientService(db)
-        clients = await client_service.get_all()
-        return clients
+        
+        if search and status:
+            # Filtrar por search y por status
+            return await client_service.filter_clients(search=search, status=status)
+        elif search:
+            # Filtrar solo por search
+            return await client_service.search_clients(search)
+        elif status:
+            # Filtrar solo por status
+            return await client_service.get_by_status(status)
+        else:
+            # Si no vienen filtros, devolver todos
+            return await client_service.get_all()
+
     except Exception as e:
         raise HTTPException(
             status_code=500,
             detail=f"Error obteniendo clientes: {str(e)}"
         )
+
 
 @router.get("/{client_id}", response_model=ClientResponse)
 async def get_client(
