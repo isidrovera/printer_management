@@ -63,15 +63,16 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# CORS configuration
+# CORS configuration corregida definitivamente
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://161.132.39.159:3000"],
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allow_headers=["*"],
+    allow_methods=["*"],  # 👈 Cambia aquí: acepta explícitamente todos los métodos
+    allow_headers=["Authorization", "Content-Type", "Accept"],  # 👈 ajusta cabeceras explícitas
     expose_headers=["*"]
 )
+
 
 # Add middlewares
 app.add_middleware(BaseHTTPMiddleware, dispatch=auth_middleware)
