@@ -36,6 +36,7 @@ const ChangePassword = () => {
       const response = await axiosInstance.post('/auth/change-password', {
         current_password: formData.currentPassword,
         new_password: formData.newPassword,
+        confirm_password: formData.confirmPassword, // Campo faltante agregado
       });
 
       console.log('✅ Contraseña cambiada correctamente:', response.data);
