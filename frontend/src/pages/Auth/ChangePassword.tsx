@@ -42,15 +42,23 @@ const ChangePassword = () => {
       console.log('✅ Contraseña cambiada correctamente:', response.data);
       navigate('/');
     } catch (err: any) {
-      console.error('❌ Error del backend:', err.response?.data);
+      console.error('❌ Error detallado del backend:', err.response?.data);
+    
+      // Extrae el mensaje detallado del error
       const detail = err.response?.data?.detail;
+    
       if (Array.isArray(detail)) {
-        setError(detail.map((d: any) => d.msg).join(', '));
+        // Si es una lista, muestra cada mensaje de error
+        const errorMsg = detail.map((d: any) => `${d.loc?.join('.')}: ${d.msg}`).join(', ');
+        setError(errorMsg);
+        console.error('🔴 Detalle del error:', errorMsg);
       } else if (typeof detail === 'string') {
         setError(detail);
+        console.error('🔴 Detalle del error:', detail);
       } else {
         setError('Error inesperado al cambiar la contraseña');
       }
+        
     } finally {
       setLoading(false);
       console.log('🔄 Fin del proceso de cambio de contraseña');
