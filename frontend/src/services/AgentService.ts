@@ -34,8 +34,8 @@ export class AgentService {
   static async getAgents(search?: string): Promise<Agent[]> {
     try {
       const endpoint = search && search.trim() !== '' 
-        ? `/api/v1/agents/search/${encodeURIComponent(search)}` 
-        : '/api/v1/agents/';
+        ? `/agents/search/${encodeURIComponent(search)}` 
+        : '/agents/';
       
       const response = await axiosInstance.get(endpoint);
       return response.data?.agents || [];
