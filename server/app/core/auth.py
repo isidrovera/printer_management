@@ -105,7 +105,7 @@ def create_refresh_token(data: Dict[str, Any]) -> str:
 
 
 # server/app/core/auth.py
-async def get_current_user(token: str) -> User:
+async def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
     """
     Obtiene el usuario actual basado en el token JWT
     
