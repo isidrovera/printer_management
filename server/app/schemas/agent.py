@@ -1,6 +1,6 @@
 # server/app/schemas/agent.py
 from pydantic import BaseModel
-from typing import Dict, Optional
+from typing import Dict, Optional, List
 
 class AgentBase(BaseModel):
     hostname: str
@@ -18,7 +18,7 @@ class Agent(AgentBase):
     status: str
 
     class Config:
-        orm_mode = True  # Permite que Pydantic trabaje con modelos ORM
+        orm_mode = True  # Permite que Pydantic convierta instancias ORM
 
 class AgentUpdate(BaseModel):
     agent_token: str  # Se utiliza para identificar el agente
@@ -27,3 +27,11 @@ class AgentUpdate(BaseModel):
     ip_address: Optional[str] = None
     device_type: Optional[str] = None
     system_info: Optional[Dict] = None
+
+class AgentsResponse(BaseModel):
+    agents: List[Agent]
+    drivers: List[Dict]  # Si tienes un esquema específico para drivers, puedes reemplazar Dict por ese esquema
+
+    class Config:
+        orm_mode = True
+

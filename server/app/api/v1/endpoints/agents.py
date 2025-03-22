@@ -4,21 +4,21 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.services.agent_service import AgentService
-from app.schemas.agent import AgentCreate, Agent, AgentUpdate
+from app.schemas.agent import AgentCreate, Agent, AgentUpdate, AgentsResponse
 
 router = APIRouter()
 
-@router.get("/", response_model=Dict[str, Any])
+@router.get("/", response_model=AgentsResponse)
 async def list_agents(db: Session = Depends(get_db)):
     """
     Devuelve la lista de agentes y drivers en formato JSON.
-    Se mantiene la lógica completa, utilizando get_all() en lugar de get_agents().
+    Se utiliza el esquema AgentsResponse para serializar instancias SQLAlchemy.
     """
     agent_service = AgentService(db)
-    # Utilizamos el método existente get_all() para obtener los agentes
-    agents = agent_service.get_all()
-    drivers = await agent_service.get_drivers()  # Retorna la lista de drivers (actualmente vacía)
-    return {"agents": agents, "drivers": drivers}
+    # Se utiliza el método get_all() para obtener la lista de agentes (ya que get_agents no está definido)
+    agents = agent_service.get_all()  # Retorna una lista de instancias del modelo SQLAlchemy
+    drivers = await agent_service.get_drivers()  # Actualmente retorna una lista vacía o la lógica que implementes
+    return AgentsResponse(agents=agents, drivers=drivers)
 
 @router.post("/", response_model=Agent, status_code=status.HTTP_201_CREATED)
 async def create_agent(data: AgentCreate, db: Session = Depends(get_db)):
@@ -34,7 +34,7 @@ async def create_agent(data: AgentCreate, db: Session = Depends(get_db)):
 @router.delete("/{agent_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_agent(agent_id: int, db: Session = Depends(get_db)):
     """
-    Desactiva un agente dado su ID.
+    Desactiva (elimina lógicamente) un agente dado su ID.
     """
     agent_service = AgentService(db)
     if not await agent_service.delete_agent(agent_id):
@@ -46,14 +46,13 @@ async def update_agent_info(data: AgentUpdate, db: Session = Depends(get_db)):
     Actualiza la información de un agente existente.
     """
     agent_service = AgentService(db)
-    # Buscar el agente en la base de datos por su token
+    # Se busca el agente en la base de datos mediante su token
     existing_agent = await agent_service.get_agent_by_token(data.agent_token)
     if not existing_agent:
         raise HTTPException(status_code=404, detail="Agent not found")
 
-    # Actualizar la información del agente
+    # Se actualiza la información del agente, excluyendo los valores no enviados
     updated_agent = await agent_service.update_agent(existing_agent.id, data.dict(exclude_unset=True))
-    
     if not updated_agent:
         raise HTTPException(status_code=400, detail="Error updating agent")
     
@@ -66,13 +65,12 @@ async def get_agent(agent_id: int, db: Session = Depends(get_db)):
     """
     agent_service = AgentService(db)
     agent = await agent_service.get_agent(agent_id)
-    
     if not agent:
         raise HTTPException(status_code=404, detail="Agent not found")
     
     return agent
 
-@router.post("/register")
+@router.post("/register", response_model=Agent)
 async def register_agent(data: AgentCreate, db: Session = Depends(get_db)):
     """
     Registra un nuevo agente en el sistema.
