@@ -18,10 +18,10 @@ class Agent(AgentBase):
     status: str
 
     class Config:
-        from_attributes = True
+        orm_mode = True  # Permite que Pydantic trabaje con modelos ORM
 
 class AgentUpdate(BaseModel):
-    agent_token: str  # ✅ Se agrega agent_token para identificar el agente
+    agent_token: str  # Se utiliza para identificar el agente
     hostname: Optional[str] = None
     username: Optional[str] = None
     ip_address: Optional[str] = None
