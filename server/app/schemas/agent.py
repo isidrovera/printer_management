@@ -18,7 +18,7 @@ class Agent(AgentBase):
     status: str
 
     class Config:
-        orm_mode = True  # Permite que Pydantic convierta instancias ORM
+        orm_mode = True  # Habilita la conversión desde instancias ORM
 
 class AgentUpdate(BaseModel):
     agent_token: str  # Se utiliza para identificar el agente
@@ -30,8 +30,7 @@ class AgentUpdate(BaseModel):
 
 class AgentsResponse(BaseModel):
     agents: List[Agent]
-    drivers: List[Dict]  # Si tienes un esquema específico para drivers, puedes reemplazar Dict por ese esquema
+    drivers: List[Dict]  # Si tienes un esquema para drivers, reemplaza Dict por ese esquema
 
     class Config:
         orm_mode = True
-

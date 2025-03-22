@@ -1,5 +1,5 @@
 # server/app/api/v1/endpoints/agents.py
-from typing import Dict, Any
+from typing import Dict
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.db.session import get_db
@@ -12,13 +12,15 @@ router = APIRouter()
 async def list_agents(db: Session = Depends(get_db)):
     """
     Devuelve la lista de agentes y drivers en formato JSON.
-    Se utiliza el esquema AgentsResponse para serializar instancias SQLAlchemy.
+    Se realiza la conversión explícita de las instancias ORM a modelos Pydantic.
     """
     agent_service = AgentService(db)
-    # Se utiliza el método get_all() para obtener la lista de agentes (ya que get_agents no está definido)
-    agents = agent_service.get_all()  # Retorna una lista de instancias del modelo SQLAlchemy
+    agents = agent_service.get_all()  # Retorna una lista de instancias SQLAlchemy
     drivers = await agent_service.get_drivers()  # Actualmente retorna una lista vacía o la lógica que implementes
-    return AgentsResponse(agents=agents, drivers=drivers)
+
+    # Convertir cada agente a un modelo Pydantic usando from_orm
+    agents_data = [Agent.from_orm(agent) for agent in agents]
+    return AgentsResponse(agents=agents_data, drivers=drivers)
 
 @router.post("/", response_model=Agent, status_code=status.HTTP_201_CREATED)
 async def create_agent(data: AgentCreate, db: Session = Depends(get_db)):
@@ -27,7 +29,8 @@ async def create_agent(data: AgentCreate, db: Session = Depends(get_db)):
     """
     agent_service = AgentService(db)
     try:
-        return await agent_service.create_agent(data)
+        agent = await agent_service.create_agent(data)
+        return Agent.from_orm(agent)
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -46,17 +49,17 @@ async def update_agent_info(data: AgentUpdate, db: Session = Depends(get_db)):
     Actualiza la información de un agente existente.
     """
     agent_service = AgentService(db)
-    # Se busca el agente en la base de datos mediante su token
+    # Buscar el agente en la base de datos mediante su token
     existing_agent = await agent_service.get_agent_by_token(data.agent_token)
     if not existing_agent:
         raise HTTPException(status_code=404, detail="Agent not found")
 
-    # Se actualiza la información del agente, excluyendo los valores no enviados
+    # Actualizar la información del agente (excluyendo valores no enviados)
     updated_agent = await agent_service.update_agent(existing_agent.id, data.dict(exclude_unset=True))
     if not updated_agent:
         raise HTTPException(status_code=400, detail="Error updating agent")
     
-    return updated_agent
+    return Agent.from_orm(updated_agent)
 
 @router.get("/{agent_id}", response_model=Agent)
 async def get_agent(agent_id: int, db: Session = Depends(get_db)):
@@ -68,7 +71,7 @@ async def get_agent(agent_id: int, db: Session = Depends(get_db)):
     if not agent:
         raise HTTPException(status_code=404, detail="Agent not found")
     
-    return agent
+    return Agent.from_orm(agent)
 
 @router.post("/register", response_model=Agent)
 async def register_agent(data: AgentCreate, db: Session = Depends(get_db)):
@@ -76,7 +79,7 @@ async def register_agent(data: AgentCreate, db: Session = Depends(get_db)):
     Registra un nuevo agente en el sistema.
     """
     agent_service = AgentService(db)
-    return await agent_service.register_agent(
+    agent = await agent_service.register_agent(
         client_token=data.client_token,
         hostname=data.hostname,
         username=data.username,
@@ -84,3 +87,4 @@ async def register_agent(data: AgentCreate, db: Session = Depends(get_db)):
         device_type=data.device_type,
         system_info=data.system_info
     )
+    return Agent.from_orm(agent)
