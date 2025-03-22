@@ -16,17 +16,31 @@ export interface Client {
 export class ClientService {
   static async getClients(search?: string, status?: string): Promise<Client[]> {
     try {
-      // Construir URL base (asegurarse de que termine con slash)
-      const url = '/clients/';
-      
-      // Construir parámetros de consulta
-      const params: Record<string, string> = {};
-      if (search) params.search = search;
-      if (status) params.status = status;
-      
-      // Realizar la solicitud con los parámetros adecuados
-      const response = await axiosInstance.get(url, { params });
-      return response.data || [];
+      // Usar el endpoint de búsqueda específico si hay un término
+      if (search && search.trim() !== '') {
+        console.log(`Usando endpoint de búsqueda con término: ${search}`);
+        const response = await axiosInstance.get(`/clients/search/${encodeURIComponent(search)}`);
+        return response.data || [];
+      } 
+      // Usar el endpoint de estado específico si hay un filtro de estado
+      else if (status && status.trim() !== '') {
+        console.log(`Usando endpoint de estado con valor: ${status}`);
+        const response = await axiosInstance.get(`/clients/status/${encodeURIComponent(status)}`);
+        return response.data || [];
+      } 
+      // Para obtener todos los clientes, usamos un enfoque alternativo
+      else {
+        console.log('Obteniendo todos los clientes sin filtros');
+        
+        // Intentar con un valor dummy para el parámetro search (esto podría evitar la validación 422)
+        const response = await axiosInstance.get('/clients/', { 
+          params: { 
+            dummy: 'all' 
+          } 
+        });
+        
+        return response.data || [];
+      }
     } catch (error) {
       console.error("Error fetching clients:", error);
       throw error;
