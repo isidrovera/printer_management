@@ -11,7 +11,7 @@ from app.schemas.client import (
     ClientSearch,
     ClientDashboardStats
 )
-from app.db.models import ClientStatus, ClientType
+from app.db.models import ClientStatus
 from app.core.auth import get_current_active_user
 
 router = APIRouter()
@@ -23,15 +23,18 @@ async def get_all_clients(
     search: Optional[str] = None,
     status: Optional[str] = None
 ):
-    """Obtiene todos los clientes, con opción de filtrar por búsqueda o estado"""
+    """
+    Obtiene todos los clientes, con opción de filtrar por búsqueda o estado.
+    Nota: No usamos 'await' porque los métodos del servicio son síncronos.
+    """
     try:
         client_service = ClientService(db)
         if search:
-            clients = await client_service.search_clients(search)
+            clients = client_service.search_clients(search)
         elif status:
-            clients = await client_service.get_by_status(status)
+            clients = client_service.get_by_status(status)
         else:
-            clients = await client_service.get_all()
+            clients = client_service.get_all()
         return clients
     except Exception as e:
         raise HTTPException(
@@ -39,17 +42,16 @@ async def get_all_clients(
             detail=f"Error obteniendo clientes: {str(e)}"
         )
 
-
 @router.get("/{client_id}", response_model=ClientResponse)
 async def get_client(
     client_id: int,
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_active_user)
 ):
-    """Obtiene un cliente por su ID"""
+    """Obtiene un cliente por su ID (síncrono)."""
     try:
         client_service = ClientService(db)
-        client = await client_service.get_by_id(client_id)
+        client = client_service.get_by_id(client_id)
         if not client:
             raise HTTPException(
                 status_code=404,
@@ -70,10 +72,10 @@ async def create_client(
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_active_user)
 ):
-    """Crea un nuevo cliente"""
+    """Crea un nuevo cliente (síncrono)."""
     try:
         client_service = ClientService(db)
-        client = await client_service.create(client_data.dict())
+        client = client_service.create(client_data.dict())
         return client
     except Exception as e:
         raise HTTPException(
@@ -88,10 +90,10 @@ async def update_client(
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_active_user)
 ):
-    """Actualiza un cliente existente"""
+    """Actualiza un cliente existente (síncrono)."""
     try:
         client_service = ClientService(db)
-        updated_client = await client_service.update(client_id, client_data.dict(exclude_unset=True))
+        updated_client = client_service.update(client_id, client_data.dict(exclude_unset=True))
         if not updated_client:
             raise HTTPException(
                 status_code=404,
@@ -112,10 +114,10 @@ async def delete_client(
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_active_user)
 ):
-    """Elimina un cliente"""
+    """Elimina un cliente (síncrono)."""
     try:
         client_service = ClientService(db)
-        success = await client_service.delete(client_id)
+        success = client_service.delete(client_id)
         if not success:
             raise HTTPException(
                 status_code=404,
@@ -136,10 +138,10 @@ async def search_clients(
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_active_user)
 ):
-    """Busca clientes por término de búsqueda"""
+    """Busca clientes por término de búsqueda (síncrono)."""
     try:
         client_service = ClientService(db)
-        clients = await client_service.search_clients(search_term)
+        clients = client_service.search_clients(search_term)
         return clients
     except Exception as e:
         raise HTTPException(
@@ -153,10 +155,10 @@ async def get_clients_by_status(
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_active_user)
 ):
-    """Obtiene clientes por estado"""
+    """Obtiene clientes por estado (síncrono)."""
     try:
         client_service = ClientService(db)
-        clients = await client_service.get_by_status(status)
+        clients = client_service.get_by_status(status)
         return clients
     except Exception as e:
         raise HTTPException(
@@ -170,10 +172,10 @@ async def get_clients_by_service_level(
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_active_user)
 ):
-    """Obtiene clientes por nivel de servicio"""
+    """Obtiene clientes por nivel de servicio (síncrono)."""
     try:
         client_service = ClientService(db)
-        clients = await client_service.get_by_service_level(service_level)
+        clients = client_service.get_by_service_level(service_level)
         return clients
     except Exception as e:
         raise HTTPException(
@@ -187,10 +189,10 @@ async def get_clients_by_manager(
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_active_user)
 ):
-    """Obtiene clientes por ejecutivo de cuenta"""
+    """Obtiene clientes por ejecutivo de cuenta (síncrono)."""
     try:
         client_service = ClientService(db)
-        clients = await client_service.get_clients_by_account_manager(account_manager)
+        clients = client_service.get_clients_by_account_manager(account_manager)
         return clients
     except Exception as e:
         raise HTTPException(
@@ -203,10 +205,10 @@ async def get_dashboard_statistics(
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_active_user)
 ):
-    """Obtiene estadísticas para el dashboard"""
+    """Obtiene estadísticas para el dashboard (síncrono)."""
     try:
         client_service = ClientService(db)
-        stats = await client_service.get_dashboard_stats()
+        stats = client_service.get_dashboard_stats()
         return stats
     except Exception as e:
         raise HTTPException(
