@@ -16,19 +16,17 @@ export interface Client {
 export class ClientService {
   static async getClients(search?: string, status?: string): Promise<Client[]> {
     try {
-      // Para endpoints específicos
-      if (search && !status) {
-        const response = await axiosInstance.get(`/clients/search/${search}`);
-        return response.data || [];
-      } else if (status && !search) {
-        // Asegúrate de que status sea un valor válido del enum
-        const response = await axiosInstance.get(`/clients/status/${status}`);
-        return response.data || [];
-      } else {
-        // URL principal DEBE terminar con barra
-        const response = await axiosInstance.get('/clients/');
-        return response.data || [];
-      }
+      // Construir URL base (asegurarse de que termine con slash)
+      const url = '/clients/';
+      
+      // Construir parámetros de consulta
+      const params: Record<string, string> = {};
+      if (search) params.search = search;
+      if (status) params.status = status;
+      
+      // Realizar la solicitud con los parámetros adecuados
+      const response = await axiosInstance.get(url, { params });
+      return response.data || [];
     } catch (error) {
       console.error("Error fetching clients:", error);
       throw error;
