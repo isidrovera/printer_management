@@ -1,4 +1,5 @@
 // src/App.tsx
+// src/App.tsx
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
@@ -119,10 +120,23 @@ const AppRoutes = () => {
           </PrivateRoute>
         } />
 
+        {/* Rutas de agentes */}
+        <Route path="/agents" element={
+          <PrivateRoute>
+            <AgentList />
+          </PrivateRoute>
+        } />
+        
+        <Route path="/agents/:id" element={
+          <PrivateRoute>
+            <AgentDetails />
+          </PrivateRoute>
+        } />
        
         {/* Ruta para manejar páginas no encontradas */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      <Toaster />
     </>
   );
 };
