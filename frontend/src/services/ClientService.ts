@@ -16,24 +16,17 @@ export interface Client {
 export class ClientService {
   static async getClients(search?: string, status?: string): Promise<Client[]> {
     try {
-      // Primero, verifica si estás usando los endpoints específicos
+      // Para endpoints específicos
       if (search && !status) {
-        // Endpoint específico de búsqueda
         const response = await axiosInstance.get(`/clients/search/${search}`);
         return response.data || [];
       } else if (status && !search) {
-        // Endpoint específico de estado
+        // Asegúrate de que status sea un valor válido del enum
         const response = await axiosInstance.get(`/clients/status/${status}`);
         return response.data || [];
       } else {
-        // Ruta principal con parámetros de consulta opcionales
-        let url = '/clients';
-        const params: Record<string, string> = {};
-        
-        if (search) params.search = search;
-        if (status) params.status = status;
-        
-        const response = await axiosInstance.get(url, { params });
+        // URL principal DEBE terminar con barra
+        const response = await axiosInstance.get('/clients/');
         return response.data || [];
       }
     } catch (error) {
