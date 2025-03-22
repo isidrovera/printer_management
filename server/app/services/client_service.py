@@ -46,11 +46,12 @@ class ClientService:
                 "active": 0,
                 "inactive": 0
             }
-    async def get_by_id(self, client_id: int) -> Optional[Client]:
+
+    def get_by_id(self, client_id: int) -> Optional[Client]:
         """Obtiene un cliente por su ID."""
         return self.db.query(Client).filter(Client.id == client_id).first()
 
-    async def search_clients(self, search_term: str) -> List[Client]:
+    def search_clients(self, search_term: str) -> List[Client]:
         """Busca clientes por varios criterios."""
         return self.db.query(Client).filter(
             or_(
@@ -62,7 +63,7 @@ class ClientService:
             )
         ).all()
 
-    async def create(self, client_data: Dict[str, Any]) -> Client:
+    def create(self, client_data: Dict[str, Any]) -> Client:
         """
         Crea un nuevo cliente con todos sus datos.
         
@@ -100,9 +101,9 @@ class ClientService:
             logger.error(f"Error creando cliente: {str(e)}")
             raise
 
-    async def update(self, client_id: int, client_data: Dict[str, Any]) -> Optional[Client]:
+    def update(self, client_id: int, client_data: Dict[str, Any]) -> Optional[Client]:
         try:
-            client = await self.get_by_id(client_id)
+            client = self.get_by_id(client_id)
             if not client:
                 return None
 
@@ -111,8 +112,6 @@ class ClientService:
                 client_data['client_type'] = ClientType(client_data['client_type'])
             if 'status' in client_data:
                 client_data['status'] = ClientStatus(client_data['status'])
-
-            # Las fechas ya vienen como datetime del endpoint
 
             # Actualizar todos los campos proporcionados
             for key, value in client_data.items():
@@ -131,10 +130,10 @@ class ClientService:
             logger.error(f"Error actualizando cliente {client_id}: {str(e)}")
             raise
 
-    async def delete(self, client_id: int) -> bool:
+    def delete(self, client_id: int) -> bool:
         """Elimina un cliente por su ID."""
         try:
-            client = await self.get_by_id(client_id)
+            client = self.get_by_id(client_id)
             if client:
                 self.db.delete(client)
                 self.db.commit()
@@ -146,13 +145,11 @@ class ClientService:
             logger.error(f"Error eliminando cliente {client_id}: {str(e)}")
             raise
 
-    
-
-    async def get_by_status(self, status: ClientStatus) -> List[Client]:
+    def get_by_status(self, status: ClientStatus) -> List[Client]:
         """Obtiene clientes por estado."""
         return self.db.query(Client).filter(Client.status == status).all()
 
-    async def get_active_contracts(self) -> List[Client]:
+    def get_active_contracts(self) -> List[Client]:
         """Obtiene clientes con contratos activos."""
         current_date = datetime.utcnow()
         return self.db.query(Client).filter(
@@ -160,10 +157,10 @@ class ClientService:
             Client.is_active == True
         ).all()
 
-    async def update_last_contact(self, client_id: int) -> Optional[Client]:
+    def update_last_contact(self, client_id: int) -> Optional[Client]:
         """Actualiza la fecha del último contacto."""
         try:
-            client = await self.get_by_id(client_id)
+            client = self.get_by_id(client_id)
             if client:
                 client.last_contact_date = datetime.utcnow()
                 self.db.commit()
@@ -174,21 +171,20 @@ class ClientService:
             logger.error(f"Error actualizando último contacto del cliente {client_id}: {str(e)}")
             raise
 
-    async def get_by_service_level(self, service_level: str) -> List[Client]:
+    def get_by_service_level(self, service_level: str) -> List[Client]:
         """Obtiene clientes por nivel de servicio."""
         return self.db.query(Client).filter(Client.service_level == service_level).all()
 
-    async def get_clients_by_account_manager(self, account_manager: str) -> List[Client]:
+    def get_clients_by_account_manager(self, account_manager: str) -> List[Client]:
         """Obtiene clientes por ejecutivo de cuenta."""
         return self.db.query(Client).filter(Client.account_manager == account_manager).all()
 
-
-    async def get_dashboard_stats(self) -> Dict[str, Any]:
+    def get_dashboard_stats(self) -> Dict[str, Any]:
         """
         Obtiene todas las estadísticas necesarias para el dashboard en una sola consulta.
         """
         try:
-            total_clients = await self.get_count()
+            total_clients = len(self.get_all())
             
             # Obtener conteos por estado
             active_clients = self.db.query(Client).filter(
@@ -232,5 +228,3 @@ class ClientService:
                 "active_contracts": 0,
                 "error": str(e)
             }
-
-    
