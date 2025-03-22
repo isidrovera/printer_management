@@ -25,8 +25,8 @@ import ClientEdit from './pages/Clients/ClientEdit';
 import ClientDetails from './pages/Clients/ClientDetails';
 
 // Páginas de agentes
-import AgentList from './pages/Agents/AgentList';
-import AgentDetails from './pages/Agents/AgentDetails';
+import AgentList from './pages/Agent/AgentList';
+import AgentDetails from './pages/Agent/AgentDetails';
 
 // Páginas de drivers
 import DriverList from './pages/Drivers/DriverList';
