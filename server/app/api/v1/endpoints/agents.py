@@ -12,10 +12,12 @@ router = APIRouter()
 async def list_agents(db: Session = Depends(get_db)):
     """
     Devuelve la lista de agentes y drivers en formato JSON.
+    Se mantiene la lógica completa, utilizando get_all() en lugar de get_agents().
     """
     agent_service = AgentService(db)
-    agents = await agent_service.get_agents(skip=0, limit=100)  # Obtiene los agentes
-    drivers = await agent_service.get_drivers()  # Obtiene la lista de drivers
+    # Utilizamos el método existente get_all() para obtener los agentes
+    agents = agent_service.get_all()
+    drivers = await agent_service.get_drivers()  # Retorna la lista de drivers (actualmente vacía)
     return {"agents": agents, "drivers": drivers}
 
 @router.post("/", response_model=Agent, status_code=status.HTTP_201_CREATED)
@@ -32,7 +34,7 @@ async def create_agent(data: AgentCreate, db: Session = Depends(get_db)):
 @router.delete("/{agent_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_agent(agent_id: int, db: Session = Depends(get_db)):
     """
-    Elimina un agente dado su ID.
+    Desactiva un agente dado su ID.
     """
     agent_service = AgentService(db)
     if not await agent_service.delete_agent(agent_id):
