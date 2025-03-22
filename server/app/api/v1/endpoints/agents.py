@@ -1,28 +1,22 @@
 # server/app/api/v1/endpoints/agents.py
-from typing import List
-from fastapi import APIRouter, Depends, Request, HTTPException, status
-from fastapi.responses import HTMLResponse
-from fastapi.templating import Jinja2Templates
+from typing import Dict, Any
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.services.agent_service import AgentService
 from app.schemas.agent import AgentCreate, Agent, AgentUpdate
 
 router = APIRouter()
-templates = Jinja2Templates(directory="templates")  # Ajusta si usas otra ruta
 
-@router.get("/", response_class=HTMLResponse)
-async def list_agents(request: Request, db: Session = Depends(get_db)):
+@router.get("/", response_model=Dict[str, Any])
+async def list_agents(db: Session = Depends(get_db)):
     """
-    Renderiza la lista de agentes con los datos necesarios para la plantilla.
+    Devuelve la lista de agentes y drivers en formato JSON.
     """
     agent_service = AgentService(db)
     agents = await agent_service.get_agents(skip=0, limit=100)  # Obtiene los agentes
-    drivers = await agent_service.get_drivers()  # Obtiene la lista de drivers (ajusta el método)
-    return templates.TemplateResponse(
-        "agents/agents.html",  # Usa el archivo correcto dentro de tu estructura de templates
-        {"request": request, "agents": agents, "drivers": drivers},
-    )
+    drivers = await agent_service.get_drivers()  # Obtiene la lista de drivers
+    return {"agents": agents, "drivers": drivers}
 
 @router.post("/", response_model=Agent, status_code=status.HTTP_201_CREATED)
 async def create_agent(data: AgentCreate, db: Session = Depends(get_db)):
@@ -44,14 +38,12 @@ async def delete_agent(agent_id: int, db: Session = Depends(get_db)):
     if not await agent_service.delete_agent(agent_id):
         raise HTTPException(status_code=404, detail="Agent not found")
 
-        
 @router.put("/update", response_model=Agent)
 async def update_agent_info(data: AgentUpdate, db: Session = Depends(get_db)):
     """
     Actualiza la información de un agente existente.
     """
     agent_service = AgentService(db)
-
     # Buscar el agente en la base de datos por su token
     existing_agent = await agent_service.get_agent_by_token(data.agent_token)
     if not existing_agent:
@@ -64,6 +56,7 @@ async def update_agent_info(data: AgentUpdate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Error updating agent")
     
     return updated_agent
+
 @router.get("/{agent_id}", response_model=Agent)
 async def get_agent(agent_id: int, db: Session = Depends(get_db)):
     """
@@ -78,10 +71,10 @@ async def get_agent(agent_id: int, db: Session = Depends(get_db)):
     return agent
 
 @router.post("/register")
-async def register_agent(
-    data: AgentCreate,
-    db: Session = Depends(get_db)
-):
+async def register_agent(data: AgentCreate, db: Session = Depends(get_db)):
+    """
+    Registra un nuevo agente en el sistema.
+    """
     agent_service = AgentService(db)
     return await agent_service.register_agent(
         client_token=data.client_token,
