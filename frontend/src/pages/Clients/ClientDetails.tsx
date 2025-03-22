@@ -1,11 +1,12 @@
 // src/pages/Clients/ClientDetails.tsx
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+// Importa la instancia de Axios configurada
+import axiosInstance from '../../lib/axios';
 import { Button } from '../../components/ui/button';
 import { Card } from '../../components/ui/card';
 import { Alert } from '../../components/ui/alert';
 import { Edit, ArrowLeft, User, Building2, Mail, Phone, ClipboardCheck } from 'lucide-react';
-import axios from 'axios';
 
 interface Client {
   id: number;
@@ -40,7 +41,7 @@ const ClientDetails = () => {
 
   const fetchClient = async () => {
     try {
-      const response = await axios.get(`/api/v1/clients/${id}`);
+      const response = await axiosInstance.get(`/clients/${id}`);
       setClient(response.data);
     } catch (err) {
       setError('Error al cargar los datos del cliente');
