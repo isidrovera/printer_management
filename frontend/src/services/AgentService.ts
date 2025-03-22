@@ -47,7 +47,7 @@ export class AgentService {
 
   static async getAgentById(agentId: number): Promise<Agent | null> {
     try {
-      const response = await axiosInstance.get(`/api/v1/agents/${agentId}`);
+      const response = await axiosInstance.get(`/agents/${agentId}`);
       return response.data;
     } catch (error) {
       console.error(`Error fetching agent ${agentId}:`, error);
@@ -57,7 +57,7 @@ export class AgentService {
 
   static async createAgent(agentData: AgentCreate): Promise<Agent> {
     try {
-      const response = await axiosInstance.post('/api/v1/agents/', agentData);
+      const response = await axiosInstance.post('/agents/', agentData);
       return response.data;
     } catch (error) {
       console.error("Error creating agent:", error);
@@ -67,7 +67,7 @@ export class AgentService {
 
   static async updateAgent(agentData: AgentUpdate): Promise<Agent> {
     try {
-      const response = await axiosInstance.put('/api/v1/agents/update', agentData);
+      const response = await axiosInstance.put('/agents/update', agentData);
       return response.data;
     } catch (error) {
       console.error(`Error updating agent:`, error);
@@ -77,7 +77,7 @@ export class AgentService {
 
   static async deleteAgent(agentId: number): Promise<boolean> {
     try {
-      await axiosInstance.delete(`/api/v1/agents/${agentId}`);
+      await axiosInstance.delete(`/agents/${agentId}`);
       return true;
     } catch (error) {
       console.error(`Error deleting agent ${agentId}:`, error);
@@ -87,7 +87,7 @@ export class AgentService {
 
   static async registerAgent(agentData: AgentCreate): Promise<Agent> {
     try {
-      const response = await axiosInstance.post('/api/v1/agents/register', agentData);
+      const response = await axiosInstance.post('/agents/register', agentData);
       return response.data;
     } catch (error) {
       console.error("Error registering agent:", error);
