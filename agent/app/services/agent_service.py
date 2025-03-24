@@ -175,7 +175,22 @@ class AgentService:
                 ws_url = f"{settings.SERVER_URL}/api/v1/ws/agent/{settings.AGENT_TOKEN}"
                 logger.debug(f"🔗 Conectando al servidor WebSocket: {ws_url}")
 
-                async with websockets.connect(ws_url, ping_interval=20, ping_timeout=10) as websocket:
+                # Crear un contexto SSL para la conexión WSS
+                ssl_context = None
+                if ws_url.startswith("wss://"):
+                    import ssl
+                    ssl_context = ssl.create_default_context()
+                    # Para entornos de desarrollo o certificados autofirmados
+                    # Descomenta estas líneas si sigues teniendo problemas
+                    # ssl_context.check_hostname = False
+                    # ssl_context.verify_mode = ssl.CERT_NONE
+
+                async with websockets.connect(
+                    ws_url, 
+                    ping_interval=20, 
+                    ping_timeout=10,
+                    ssl=ssl_context
+                ) as websocket:
                     logger.info("✅ Conectado al servidor WebSocket correctamente.")
                     backoff_time = self.reconnect_interval  # Resetear backoff al conectar exitosamente
                     

@@ -14,6 +14,7 @@ interface Client {
   business_name: string;
   tax_id: string;
   client_type: string;
+  token: string;
   status: string;
   contact_name: string;
   contact_email: string;
@@ -108,6 +109,10 @@ const ClientDetails = () => {
             <div>
               <p className="text-sm text-gray-500">Tipo de Cliente</p>
               <p className="text-lg capitalize">{client.client_type}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Token</p>
+              <p className="text-lg capitalize">{client.token}</p>
             </div>
           </div>
         </Card>
