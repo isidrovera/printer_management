@@ -8,6 +8,7 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 3000,
+    allowedHosts: ['mps.copierconnectremote.com'], // ⬅️ Agrega esta línea
     proxy: {
       '/api/v1': {
         target: 'https://copierconnectremote.com',
@@ -33,6 +34,8 @@ export default defineConfig({
         }
       }
     }
+  
+  
   },
   resolve: {
     alias: {
