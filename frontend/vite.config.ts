@@ -10,7 +10,7 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api/v1': {
-        target: 'http://161.132.39.159:8000',
+        target: 'https://copierconnectremote.com',
         changeOrigin: true,
         secure: false,
         configure: (proxy, _options) => {

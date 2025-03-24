@@ -10,3 +10,4 @@ netifaces
 gputil
 pywin32
 wmi
+dotenv
