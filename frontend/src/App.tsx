@@ -34,11 +34,9 @@ import DriverCreate from './pages/Drivers/DriverCreate';
 import DriverEdit from './pages/Drivers/DriverEdit';
 
 // Páginas de monitoreo de impresoras
-import PrinterMonitor from './pages/Printers/PrinterMonitor';
-import PrinterDetails from './pages/Printers/PrinterDetails';
-import PrinterReport from './pages/Printers/PrinterReport';
-import PrinterCreate from './pages/Printers/PrinterCreate';
-import PrinterEdit from './pages/Printers/PrinterEdit';
+import PrinterMonitor from './pages/Printers/PrinterList';
+import PrinterDetails from './pages/Printers/PrinterForm';
+
 
 // Páginas de OIDs
 import OIDList from './pages/OIDs/OIDList';
@@ -140,27 +138,7 @@ const AppRoutes = () => {
             <PrinterMonitor />
           </PrivateRoute>
         } />
-        <Route path="/printers/create" element={
-          <PrivateRoute>
-            <PrinterCreate />
-          </PrivateRoute>
-        } />
-        <Route path="/printers/:id" element={
-          <PrivateRoute>
-            <PrinterDetails />
-          </PrivateRoute>
-        } />
-        <Route path="/printers/:id/edit" element={
-          <PrivateRoute>
-            <PrinterEdit />
-          </PrivateRoute>
-        } />
-        <Route path="/printers/report" element={
-          <PrivateRoute>
-            <PrinterReport />
-          </PrivateRoute>
-        } />
-       
+        
         {/* Ruta para manejar páginas no encontradas */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
