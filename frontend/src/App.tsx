@@ -138,6 +138,11 @@ const AppRoutes = () => {
             <PrinterMonitor />
           </PrivateRoute>
         } />
+        <Route path="/printers/:id" element={
+          <PrivateRoute>
+            <PrinterDetails />
+          </PrivateRoute>
+        } />
         
         {/* Ruta para manejar páginas no encontradas */}
         <Route path="*" element={<Navigate to="/" replace />} />
