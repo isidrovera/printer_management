@@ -37,7 +37,7 @@ const Navbar = () => {
 
             {/* Navigation Links */}
             <div className="hidden md:ml-6 md:flex md:space-x-4">
-              <Link to="/monitor/printers" className="flex items-center px-3 py-2 text-gray-700 hover:text-blue-600">
+              <Link to="/printers" className="flex items-center px-3 py-2 text-gray-700 hover:text-blue-600">
                 <Monitor className="h-5 w-5 mr-1" />
                 <span>Monitoreo</span>
               </Link>
