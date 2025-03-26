@@ -174,22 +174,50 @@ class AgentService:
             try:
                 ws_url = f"{settings.SERVER_URL}/api/v1/ws/agent/{settings.AGENT_TOKEN}"
                 logger.debug(f"🔗 Conectando al servidor WebSocket: {ws_url}")
-
+                logger.debug(f"📝 Agent token: {settings.AGENT_TOKEN}")
+                logger.debug(f"📝 Client token: {settings.CLIENT_TOKEN}")
+                
+                # Intentar hacer una validación HTTP del token primero para diagnóstico
+                try:
+                    http_url = settings.SERVER_URL.replace("wss://", "https://").replace("ws://", "http://")
+                    validate_url = f"{http_url}/api/v1/agents/ping"
+                    
+                    logger.debug(f"📊 Intentando validación HTTP en: {validate_url}")
+                    
+                    async with aiohttp.ClientSession() as session:
+                        headers = {"Authorization": f"Agent {settings.AGENT_TOKEN}"}
+                        async with session.get(validate_url, headers=headers) as response:
+                            response_text = await response.text()
+                            logger.debug(f"🔍 Respuesta validación HTTP: {response.status} - {response_text}")
+                            
+                            if response.status != 200:
+                                logger.warning(f"⚠️ El token podría no ser válido según validación HTTP")
+                except Exception as e:
+                    logger.error(f"❌ Error en validación HTTP: {e}")
+                
                 # Crear un contexto SSL para la conexión WSS
                 ssl_context = None
                 if ws_url.startswith("wss://"):
                     import ssl
+                    logger.debug("🔒 Creando contexto SSL para conexión segura")
                     ssl_context = ssl.create_default_context()
-                    # Para entornos de desarrollo o certificados autofirmados
-                    # Descomenta estas líneas si sigues teniendo problemas
-                    # ssl_context.check_hostname = False
-                    # ssl_context.verify_mode = ssl.CERT_NONE
-
+                    
+                    # Desactivar verificación para debugging - solo en desarrollo
+                    ssl_context.check_hostname = False
+                    ssl_context.verify_mode = ssl.CERT_NONE
+                    logger.debug("⚠️ Verificación SSL desactivada para diagnóstico")
+                    
+                # Imprimir detalles de la conexión
+                extra_args = {"ssl": ssl_context} if ssl_context else {}
+                logger.debug(f"🔄 Parámetros adicionales de conexión: {extra_args}")
+                
+                # Intentar la conexión WebSocket
+                logger.debug(f"🚀 Iniciando conexión WebSocket a: {ws_url}")
                 async with websockets.connect(
                     ws_url, 
                     ping_interval=20, 
                     ping_timeout=10,
-                    ssl=ssl_context
+                    **extra_args
                 ) as websocket:
                     logger.info("✅ Conectado al servidor WebSocket correctamente.")
                     backoff_time = self.reconnect_interval  # Resetear backoff al conectar exitosamente
@@ -228,12 +256,26 @@ class AgentService:
             except (websockets.exceptions.ConnectionClosed, 
                     websockets.exceptions.WebSocketException,
                     ConnectionRefusedError) as e:
-                logger.error(f"🚨 Conexión WebSocket cerrada/fallida: {e}")
+                error_message = str(e)
+                logger.error(f"🚨 Conexión WebSocket cerrada/fallida: {error_message}")
+                
+                # Analizar el error para determinar la causa
+                if "403" in error_message:
+                    logger.error("🔑 Error 403: Posible problema de autenticación o token invalido")
+                    logger.error("💡 Sugerencia: Intenta eliminar AGENT_TOKEN del .env para forzar nuevo registro")
+                elif "certificate" in error_message.lower():
+                    logger.error("🔒 Error de certificado SSL")
+                elif "timeout" in error_message.lower():
+                    logger.error("⏱️ Timeout en la conexión")
+                
                 await asyncio.sleep(backoff_time)
                 backoff_time = min(backoff_time * 2, max_backoff)
                 
             except Exception as e:
                 logger.error(f"🚨 Error inesperado en la conexión WebSocket: {e}")
+                logger.error(f"🔍 Tipo de error: {type(e)}")
+                import traceback
+                logger.error(f"📋 Stacktrace:\n{traceback.format_exc()}")
                 await asyncio.sleep(backoff_time)
 
     async def _handle_connection(self, websocket):

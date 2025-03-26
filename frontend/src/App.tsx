@@ -1,5 +1,4 @@
 // src/App.tsx
-// src/App.tsx
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
@@ -38,6 +37,8 @@ import DriverEdit from './pages/Drivers/DriverEdit';
 import PrinterMonitor from './pages/Printers/PrinterMonitor';
 import PrinterDetails from './pages/Printers/PrinterDetails';
 import PrinterReport from './pages/Printers/PrinterReport';
+import PrinterCreate from './pages/Printers/PrinterCreate';
+import PrinterEdit from './pages/Printers/PrinterEdit';
 
 // Páginas de OIDs
 import OIDList from './pages/OIDs/OIDList';
@@ -130,6 +131,33 @@ const AppRoutes = () => {
         <Route path="/agents/:id" element={
           <PrivateRoute>
             <AgentDetails />
+          </PrivateRoute>
+        } />
+
+        {/* Rutas de impresoras */}
+        <Route path="/printers" element={
+          <PrivateRoute>
+            <PrinterMonitor />
+          </PrivateRoute>
+        } />
+        <Route path="/printers/create" element={
+          <PrivateRoute>
+            <PrinterCreate />
+          </PrivateRoute>
+        } />
+        <Route path="/printers/:id" element={
+          <PrivateRoute>
+            <PrinterDetails />
+          </PrivateRoute>
+        } />
+        <Route path="/printers/:id/edit" element={
+          <PrivateRoute>
+            <PrinterEdit />
+          </PrivateRoute>
+        } />
+        <Route path="/printers/report" element={
+          <PrivateRoute>
+            <PrinterReport />
           </PrivateRoute>
         } />
        
