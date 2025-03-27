@@ -68,9 +68,8 @@ export class PrinterService {
 
   static async getPrinterById(printerId: number): Promise<Printer | null> {
     try {
-      // Como este endpoint específico no está explícitamente en tu API,
-      // podríamos construirlo o adaptarlo según sea necesario
-      const response = await axiosInstance.get(`/api/v1/monitor/printers/${printerId}`);
+      // Corregido: Usando ruta relativa consistente con las demás funciones
+      const response = await axiosInstance.get(`/monitor/printers/${printerId}`);
       return response.data;
     } catch (error) {
       console.error(`Error fetching printer ${printerId}:`, error);
