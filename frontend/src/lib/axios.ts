@@ -116,7 +116,6 @@ axiosInstance.interceptors.request.use(
   }
 );
 
-// Interceptor para manejar las respuestas (sin cambios)
 axiosInstance.interceptors.response.use(
   (response) => {
     console.log('📥 Respuesta exitosa:', {
@@ -166,7 +165,7 @@ axiosInstance.interceptors.response.use(
   }
 );
 
-// Función de ayuda para depurar token (sin cambios)
+// Función de ayuda para depurar token (puedes llamarla desde consola)
 axiosInstance.debugToken = () => {
   const tokenStr = localStorage.getItem('token');
   console.group('🔍 Depuración de token');

@@ -8,12 +8,13 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 3000,
-    allowedHosts: ['mps.copierconnectremote.com'], // ⬅️ Agrega esta línea
+    allowedHosts: ['mps.copierconnectremote.com'],
     proxy: {
       '/api/v1': {
         target: 'https://copierconnectremote.com',
         changeOrigin: true,
-        secure: false,
+        secure: true,  // Cambiado a true para validar certificados SSL
+        rewrite: (path) => path.replace(/^\/api\/v1/, '/api/v1'),
         configure: (proxy, _options) => {
           proxy.on('error', (err, _req, _res) => {
             console.log('🔴 proxy error', err);
@@ -34,8 +35,6 @@ export default defineConfig({
         }
       }
     }
-  
-  
   },
   resolve: {
     alias: {
