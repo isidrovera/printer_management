@@ -51,13 +51,33 @@ export interface PrinterReport {
 }
 
 export class PrinterService {
+  // En PrinterService.ts, método getPrinters
   static async getPrinters(agentId?: number): Promise<Printer[]> {
     try {
-      // MODIFICADO: Usar URL absoluta HTTPS para esta solicitud que causa problemas
+      // Usar URL absoluta HTTPS y configurar para NO seguir redirecciones
       const params = agentId ? { agent_id: agentId } : {};
       
-      // Usar URL absoluta con HTTPS para evitar problemas de contenido mixto
-      const response = await axiosInstance.get('https://copierconnectremote.com/api/v1/monitor/printers', { params });
+      const response = await axiosInstance.get('https://copierconnectremote.com/api/v1/monitor/printers', { 
+        params,
+        maxRedirects: 0, // No seguir redirecciones
+        validateStatus: function (status) {
+          // Aceptar también códigos de estado 307 (redirección)
+          return (status >= 200 && status < 300) || status === 307;
+        }
+      });
+      
+      // Si recibimos una redirección 307, realizar una nueva solicitud a la URL correcta
+      if (response.status === 307 && response.headers.location) {
+        // Asegurarse de que la URL de redirección use HTTPS
+        let redirectUrl = response.headers.location;
+        if (redirectUrl.startsWith('http://')) {
+          redirectUrl = redirectUrl.replace('http://', 'https://');
+        }
+        
+        // Realizar la solicitud a la URL de redirección con HTTPS
+        const redirectResponse = await axiosInstance.get(redirectUrl, { params });
+        return redirectResponse.data || [];
+      }
       
       return response.data || [];
     } catch (error) {
