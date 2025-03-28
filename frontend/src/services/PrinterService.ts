@@ -53,9 +53,12 @@ export interface PrinterReport {
 export class PrinterService {
   static async getPrinters(agentId?: number): Promise<Printer[]> {
     try {
-      // La ruta correcta según el backend es /monitor/printers
+      // MODIFICADO: Usar URL absoluta HTTPS para esta solicitud que causa problemas
       const params = agentId ? { agent_id: agentId } : {};
-      const response = await axiosInstance.get('/monitor/printers', { params });
+      
+      // Usar URL absoluta con HTTPS para evitar problemas de contenido mixto
+      const response = await axiosInstance.get('https://copierconnectremote.com/api/v1/monitor/printers', { params });
+      
       return response.data || [];
     } catch (error) {
       console.error("Error fetching printers:", error);
@@ -63,9 +66,10 @@ export class PrinterService {
     }
   }
 
+  // El resto de los métodos permanecen igual...
+
   static async getPrinterById(printerId: number): Promise<Printer | null> {
     try {
-      // Para obtener una impresora específica, la ruta sería
       const response = await axiosInstance.get(`/monitor/printers/${printerId}`);
       return response.data;
     } catch (error) {
@@ -86,7 +90,6 @@ export class PrinterService {
 
   static async updatePrinter(printerId: number, printerData: Partial<Printer>): Promise<Printer> {
     try {
-      // Para actualizar una impresora existente, usamos el endpoint update
       const response = await axiosInstance.post('/monitor/printers/update', {
         ...printerData,
         printer_id: printerId,
@@ -101,7 +104,6 @@ export class PrinterService {
 
   static async deletePrinter(printerId: number): Promise<boolean> {
     try {
-      // Según el backend, la ruta de eliminación es /monitor/printers/{printer_id}
       await axiosInstance.delete(`/monitor/printers/${printerId}`);
       return true;
     } catch (error) {
@@ -112,7 +114,6 @@ export class PrinterService {
 
   static async getPrinterSupplies(printerId: number): Promise<PrinterSupplies | null> {
     try {
-      // La ruta para obtener los suministros de una impresora
       const response = await axiosInstance.get(`/monitor/printers/${printerId}/supplies`);
       return response.data.supplies;
     } catch (error) {
@@ -123,7 +124,6 @@ export class PrinterService {
 
   static async getPrinterCounters(printerId: number): Promise<PrinterCounters | null> {
     try {
-      // La ruta para obtener contadores
       const response = await axiosInstance.get(`/monitor/printers/${printerId}/counters`);
       return response.data.counters;
     } catch (error) {
@@ -134,7 +134,6 @@ export class PrinterService {
 
   static async getPrinterHistory(printerId: number, days: number = 7): Promise<any> {
     try {
-      // La ruta para obtener el historial
       const response = await axiosInstance.get(`/monitor/printers/${printerId}/history`, {
         params: { days }
       });
@@ -147,7 +146,6 @@ export class PrinterService {
 
   static async getPrinterReport(): Promise<PrinterReport | null> {
     try {
-      // La ruta para obtener el informe
       const response = await axiosInstance.get('/monitor/printers/report');
       return response.data;
     } catch (error) {
@@ -158,7 +156,6 @@ export class PrinterService {
 
   static async getCriticalSupplies(): Promise<any[]> {
     try {
-      // La ruta para obtener suministros críticos
       const response = await axiosInstance.get('/monitor/printers/critical-supplies');
       return response.data || [];
     } catch (error) {
@@ -169,10 +166,9 @@ export class PrinterService {
 
   static async updatePrinterData(printerId: number, printerData: any, agentId?: number): Promise<Printer> {
     try {
-      // La ruta para actualizar datos específicos de impresión
       const response = await axiosInstance.post('/monitor/printers/update', {
         printer_data: printerData,
-        agent_id: agentId || 1 // Valor por defecto si no se proporciona
+        agent_id: agentId || 1
       });
       return response.data;
     } catch (error) {
@@ -183,7 +179,6 @@ export class PrinterService {
   
   static async countByStatus(): Promise<Record<string, number>> {
     try {
-      // Aquí podríamos implementar lógica para contar por status basada en la lista de impresoras
       const printers = await this.getPrinters();
       
       const result = {
@@ -213,7 +208,6 @@ export class PrinterService {
   
   static async getPrintersByClient(clientId: number): Promise<Printer[]> {
     try {
-      // Obtenemos todas las impresoras y filtramos por cliente
       const printers = await this.getPrinters();
       return printers.filter(printer => printer.client_id === clientId);
     } catch (error) {
