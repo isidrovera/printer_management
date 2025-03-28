@@ -1,37 +1,58 @@
 // src/lib/axios.ts
 import axios from 'axios';
 
+// Forzar que todas las solicitudes usen HTTPS
+const API_URL = 'https://copierconnectremote.com/api/v1';
+
 const axiosInstance = axios.create({
-  baseURL: 'https://copierconnectremote.com/api/v1',  // URL completa del backend
+  baseURL: API_URL,
   headers: {
     'Accept': 'application/json',
     'Content-Type': 'application/json'
   }
 });
 
+// Interceptor que verifica y corrige cualquier URL HTTP antes de enviar la solicitud
 axiosInstance.interceptors.request.use(
   (config) => {
-    // NUEVO: Forzar HTTPS en todas las URLs
+    // Forzar HTTPS en cualquier URL absoluta
     if (config.url && config.url.startsWith('http://')) {
       config.url = config.url.replace('http://', 'https://');
       console.log('🔒 URL corregida a HTTPS:', config.url);
     }
     
-    // NUEVO: Forzar HTTPS en baseURL si está configurado con HTTP
+    // Forzar HTTPS en baseURL
     if (config.baseURL && config.baseURL.startsWith('http://')) {
       config.baseURL = config.baseURL.replace('http://', 'https://');
       console.log('🔒 baseURL corregida a HTTPS:', config.baseURL);
     }
     
-    // Construir fullUrl correctamente para depuración
-    let fullUrl = config.url || '';
-    if (config.baseURL && !config.url?.startsWith('http')) {
-      fullUrl = `${config.baseURL}${config.url}`;
+    // Si generamos una URL completa para depuración, asegurarnos que use HTTPS
+    let fullUrl = '';
+    
+    // Construir la URL completa para depuración
+    if (config.url) {
+      if (config.url.startsWith('http')) {
+        // Si la URL ya es absoluta
+        fullUrl = config.url;
+      } else if (config.baseURL) {
+        // Si tenemos una URL relativa y una baseURL
+        fullUrl = `${config.baseURL}${config.url.startsWith('/') ? config.url : `/${config.url}`}`;
+      } else {
+        // Si solo tenemos una URL relativa sin baseURL
+        fullUrl = `${API_URL}${config.url.startsWith('/') ? config.url : `/${config.url}`}`;
+      }
+    }
+    
+    // Asegurarnos que la URL completa use HTTPS
+    if (fullUrl.startsWith('http://')) {
+      fullUrl = fullUrl.replace('http://', 'https://');
     }
     
     console.log('📤 Request:', {
       method: config.method?.toUpperCase(),
       url: config.url,
+      baseURL: config.baseURL,
       fullUrl: fullUrl
     });
 
@@ -95,6 +116,7 @@ axiosInstance.interceptors.request.use(
   }
 );
 
+// Interceptor para manejar las respuestas (sin cambios)
 axiosInstance.interceptors.response.use(
   (response) => {
     console.log('📥 Respuesta exitosa:', {
@@ -144,7 +166,7 @@ axiosInstance.interceptors.response.use(
   }
 );
 
-// Función de ayuda para depurar token (puedes llamarla desde consola)
+// Función de ayuda para depurar token (sin cambios)
 axiosInstance.debugToken = () => {
   const tokenStr = localStorage.getItem('token');
   console.group('🔍 Depuración de token');
