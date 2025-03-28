@@ -11,10 +11,28 @@ const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(
   (config) => {
+    // NUEVO: Forzar HTTPS en todas las URLs
+    if (config.url && config.url.startsWith('http://')) {
+      config.url = config.url.replace('http://', 'https://');
+      console.log('🔒 URL corregida a HTTPS:', config.url);
+    }
+    
+    // NUEVO: Forzar HTTPS en baseURL si está configurado con HTTP
+    if (config.baseURL && config.baseURL.startsWith('http://')) {
+      config.baseURL = config.baseURL.replace('http://', 'https://');
+      console.log('🔒 baseURL corregida a HTTPS:', config.baseURL);
+    }
+    
+    // Construir fullUrl correctamente para depuración
+    let fullUrl = config.url || '';
+    if (config.baseURL && !config.url?.startsWith('http')) {
+      fullUrl = `${config.baseURL}${config.url}`;
+    }
+    
     console.log('📤 Request:', {
       method: config.method?.toUpperCase(),
       url: config.url,
-      fullUrl: `${config.baseURL}${config.url}`
+      fullUrl: fullUrl
     });
 
     // Obtén el token de localStorage
