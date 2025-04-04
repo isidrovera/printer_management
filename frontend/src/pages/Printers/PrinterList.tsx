@@ -132,14 +132,14 @@ const PrinterList = () => {
           </thead>
           <tbody className="divide-y divide-gray-100">
             {printers.length === 0 ? (
-              <tr>
+              <tr key="no-printers-row">
                 <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
                   No se encontraron impresoras
                 </td>
               </tr>
             ) : (
-              printers.map((printer) => (
-                <tr key={printer.id} className="hover:bg-gray-50 transition-colors">
+              printers.map((printer, index) => (
+                <tr key={printer.id || `printer-${index}`} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4 whitespace-nowrap">{printer.name}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-gray-600">{printer.ip_address}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-gray-600">{printer.brand} {printer.model}</td>
@@ -152,36 +152,33 @@ const PrinterList = () => {
                     {printer.client_id ? `Cliente ${printer.client_id}` : '-'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right">
-                  <div className="flex justify-end gap-2">
-                    <Link 
-                      key={`view-${printer.id}`}
-                      to={`/printers/${printer.id}`}
-                      className="p-1 text-gray-400 hover:text-blue-500 transition-colors"
-                      title="Ver detalles"
-                    >
-                      <Eye size={18} />
-                    </Link>
-                    <Link 
-                      key={`edit-${printer.id}`}
-                      to={`/printers/${printer.id}/edit`}
-                      className="p-1 text-gray-400 hover:text-green-500 transition-colors"
-                      title="Editar impresora"
-                    >
-                      <Edit size={18} />
-                    </Link>
-                    <button
-                      key={`delete-${printer.id}`}
-                      onClick={() => {
-                        setSelectedPrinter(printer);
-                        setShowDeleteModal(true);
-                      }}
-                      className="p-1 text-gray-400 hover:text-red-500 transition-colors"
-                      title="Eliminar impresora"
-                    >
-                      <Trash2 size={18} />
-                    </button>
-                  </div>
-                </td>
+                    <div className="flex justify-end gap-2">
+                      <Link 
+                        to={`/printers/${printer.id}`}
+                        className="p-1 text-gray-400 hover:text-blue-500 transition-colors"
+                        title="Ver detalles"
+                      >
+                        <Eye size={18} />
+                      </Link>
+                      <Link 
+                        to={`/printers/${printer.id}/edit`}
+                        className="p-1 text-gray-400 hover:text-green-500 transition-colors"
+                        title="Editar impresora"
+                      >
+                        <Edit size={18} />
+                      </Link>
+                      <button
+                        onClick={() => {
+                          setSelectedPrinter(printer);
+                          setShowDeleteModal(true);
+                        }}
+                        className="p-1 text-gray-400 hover:text-red-500 transition-colors"
+                        title="Eliminar impresora"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               ))
             )}
