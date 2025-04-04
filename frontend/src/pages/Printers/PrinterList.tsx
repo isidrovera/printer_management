@@ -1,7 +1,7 @@
 // src/components/printers/PrinterList.tsx
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { PrinterService, Printer } from '../../services/PrinterService';
+import { PrinterService, Printer } from '../../services/PrinterServiceInstall';
 import { Eye, Edit, Trash2, Plus, Search, X, Printer as PrinterIcon } from 'lucide-react';
 
 const PrinterList = () => {
