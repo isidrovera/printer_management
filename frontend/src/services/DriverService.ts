@@ -1,6 +1,5 @@
 // src/services/DriverService.ts
-import axios from 'axios';
-import { API_BASE_URL } from '../config';
+import axiosInstance from '../lib/axios';
 
 // Tipos
 export interface Driver {
@@ -16,7 +15,7 @@ export const DriverService = {
   // Obtener todos los drivers
   async getDrivers(): Promise<Driver[]> {
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/v1/drivers`);
+      const response = await axiosInstance.get(`/drivers`);
       return response.data;
     } catch (error) {
       console.error('Error fetching drivers', error);
@@ -27,7 +26,7 @@ export const DriverService = {
   // Obtener driver por ID
   async getDriverById(driverId: number): Promise<Driver> {
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/v1/drivers/${driverId}`);
+      const response = await axiosInstance.get(`/drivers/${driverId}`);
       return response.data;
     } catch (error) {
       console.error(`Error fetching driver ${driverId}`, error);
@@ -38,7 +37,7 @@ export const DriverService = {
   // Eliminar driver
   async deleteDriver(driverId: number): Promise<any> {
     try {
-      const response = await axios.delete(`${API_BASE_URL}/api/v1/drivers/${driverId}`);
+      const response = await axiosInstance.delete(`/drivers/${driverId}`);
       return response.data;
     } catch (error) {
       console.error(`Error deleting driver ${driverId}`, error);
@@ -48,7 +47,7 @@ export const DriverService = {
 
   // Obtener URL de descarga de un driver
   getDriverDownloadUrl(driverId: number): string {
-    return `${API_BASE_URL}/api/v1/drivers/agents/drivers/download/${driverId}`;
+    return `${axiosInstance.defaults.baseURL}/drivers/agents/drivers/download/${driverId}`;
   }
 };
 

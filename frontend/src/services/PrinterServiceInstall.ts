@@ -1,6 +1,5 @@
 // src/services/PrinterServiceInstall.ts
-import axios from 'axios';
-import { API_BASE_URL } from '../config';
+import axiosInstance from '../lib/axios';
 
 // Tipos
 export interface Printer {
@@ -66,7 +65,7 @@ export const PrinterService = {
   // Obtener todas las impresoras para monitoreo
   async getMonitoredPrinters(): Promise<Printer[]> {
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/v1/printers/monitor`);
+      const response = await axiosInstance.get(`/printers/monitor`);
       return response.data;
     } catch (error) {
       console.error('Error fetching monitored printers', error);
@@ -77,7 +76,7 @@ export const PrinterService = {
   // Obtener impresoras por agente
   async getAgentPrinters(agentId: number): Promise<Printer[]> {
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/v1/printers/monitored/${agentId}`);
+      const response = await axiosInstance.get(`/printers/monitored/${agentId}`);
       return response.data;
     } catch (error) {
       console.error(`Error fetching printers for agent ${agentId}`, error);
@@ -88,7 +87,7 @@ export const PrinterService = {
   // Obtener contadores de una impresora
   async getPrinterCounters(printerId: number): Promise<PrinterCounters> {
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/v1/printers/${printerId}/counters`);
+      const response = await axiosInstance.get(`/printers/${printerId}/counters`);
       return response.data;
     } catch (error) {
       console.error(`Error fetching counters for printer ${printerId}`, error);
@@ -99,7 +98,7 @@ export const PrinterService = {
   // Obtener suministros de una impresora
   async getPrinterSupplies(printerId: number): Promise<PrinterSupplies> {
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/v1/printers/${printerId}/supplies`);
+      const response = await axiosInstance.get(`/printers/${printerId}/supplies`);
       return response.data;
     } catch (error) {
       console.error(`Error fetching supplies for printer ${printerId}`, error);
@@ -113,8 +112,8 @@ export const PrinterService = {
     installData: InstallPrinterRequest
   ): Promise<InstallPrinterResponse> {
     try {
-      const response = await axios.post(
-        `${API_BASE_URL}/api/v1/printers/install/${agentToken}`,
+      const response = await axiosInstance.post(
+        `/printers/install/${agentToken}`,
         installData
       );
       return response.data;

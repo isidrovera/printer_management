@@ -1,6 +1,5 @@
 // src/services/TunnelService.ts
-import axios from 'axios';
-import { API_BASE_URL } from '../config';
+import axiosInstance from '../lib/axios';
 
 // Tipos
 export interface Tunnel {
@@ -37,7 +36,7 @@ export const TunnelService = {
   // Obtener todos los túneles con filtro opcional
   async getTunnels(search?: string): Promise<Tunnel[]> {
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/v1/tunnels/list`, {
+      const response = await axiosInstance.get(`/tunnels/list`, {
         params: { search }
       });
       return response.data;
@@ -50,7 +49,7 @@ export const TunnelService = {
   // Obtener detalles de un túnel específico
   async getTunnelById(tunnelId: string): Promise<Tunnel> {
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/v1/tunnels/${tunnelId}`);
+      const response = await axiosInstance.get(`/tunnels/${tunnelId}`);
       return response.data;
     } catch (error) {
       console.error(`Error fetching tunnel ${tunnelId}`, error);
@@ -61,7 +60,7 @@ export const TunnelService = {
   // Crear un nuevo túnel
   async createTunnel(tunnelData: TunnelCreate): Promise<Tunnel> {
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/v1/tunnels/create`, tunnelData);
+      const response = await axiosInstance.post(`/tunnels/create`, tunnelData);
       return response.data;
     } catch (error) {
       console.error('Error creating tunnel', error);
@@ -72,7 +71,7 @@ export const TunnelService = {
   // Cerrar un túnel existente
   async closeTunnel(tunnelId: string): Promise<any> {
     try {
-      const response = await axios.delete(`${API_BASE_URL}/api/v1/tunnels/${tunnelId}`);
+      const response = await axiosInstance.delete(`/tunnels/${tunnelId}`);
       return response.data;
     } catch (error) {
       console.error(`Error closing tunnel ${tunnelId}`, error);
