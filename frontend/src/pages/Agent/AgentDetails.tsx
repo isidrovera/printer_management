@@ -2,15 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { AgentService, Agent } from '../../services/AgentService';
 import { 
-  ArrowLeft, Edit, Trash2, Laptop, Server, Monitor, Desktop, Clipboard, 
-  Clock, Check, AlertCircle, HardDrive, Cpu, Memory, Wifi, Battery, 
+  ArrowLeft, Edit, Trash2, Laptop, Server, Monitor, Clipboard, 
+  Check, AlertCircle, HardDrive, Cpu, Wifi, Battery, 
   Database, Globe, User, MapPin, Info
 } from 'lucide-react';
 
 const AgentDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [agent, setAgent] = useState(null);
+  const [agent, setAgent] = useState<Agent | null>(null);
   const [loading, setLoading] = useState(true);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [copiedToken, setCopiedToken] = useState(false);
@@ -56,10 +56,10 @@ const AgentDetail = () => {
       .catch(err => console.error('Error al copiar token', err));
   };
 
-  const getDeviceIcon = (deviceType) => {
-    switch (deviceType?.toLowerCase()) {
+  const getDeviceIcon = (deviceType: string) => {
+    switch (deviceType.toLowerCase()) {
       case 'desktop':
-        return <Desktop size={24} className="text-blue-500" />;
+        return <Monitor size={24} className="text-blue-500" />;
       case 'server':
         return <Server size={24} className="text-purple-500" />;
       case 'windows':
@@ -69,7 +69,7 @@ const AgentDetail = () => {
     }
   };
 
-  const getStatusIcon = (status) => {
+  const getStatusIcon = (status: string) => {
     switch (status) {
       case 'active':
       case 'online':
@@ -78,11 +78,11 @@ const AgentDetail = () => {
       case 'offline':
         return <AlertCircle size={16} className="text-red-500" />;
       default:
-        return <Clock size={16} className="text-amber-500" />;
+        return <AlertCircle size={16} className="text-amber-500" />;
     }
   };
 
-  const getStatusClass = (status) => {
+  const getStatusClass = (status: string) => {
     switch (status) {
       case 'active':
       case 'online':
@@ -93,15 +93,6 @@ const AgentDetail = () => {
       default:
         return 'bg-amber-100 text-amber-800 border-amber-200';
     }
-  };
-
-  const formatBytes = (bytes, decimals = 2) => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const dm = decimals < 0 ? 0 : decimals;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
   };
 
   if (loading) {
@@ -161,9 +152,9 @@ const AgentDetail = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6">
         {/* Header Card */}
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden lg:col-span-3">
+        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
           <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 text-white">
             <div className="flex items-center">
               <div className="rounded-lg bg-white/20 backdrop-blur-sm p-3 mr-4">
@@ -175,7 +166,7 @@ const AgentDetail = () => {
                   <div className={`px-3 py-1 text-sm font-medium rounded-full border ${getStatusClass(agent.status)} flex items-center gap-1.5`}>
                     {getStatusIcon(agent.status)}
                     {agent.status === 'active' ? 'Activo' : 
-                    agent.status === 'inactive' ? 'Inactivo' : agent.status}
+                     agent.status === 'inactive' ? 'Inactivo' : agent.status}
                   </div>
                   <span className="mx-2 text-white/70">•</span>
                   <span className="text-sm">{agent.ip_address}</span>
@@ -323,7 +314,7 @@ const AgentDetail = () => {
             )}
 
             {/* Hardware Tab */}
-            {activeTab === 'hardware' && (
+            {activeTab === 'hardware' && systemInfo?.CPU && systemInfo?.Memoria && (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* CPU Card */}
                 <div className="bg-white border rounded-lg overflow-hidden shadow-sm">
@@ -337,29 +328,29 @@ const AgentDetail = () => {
                     <div className="space-y-3">
                       <div className="grid grid-cols-2 text-sm">
                         <div className="text-gray-500">Modelo</div>
-                        <div className="font-medium">{systemInfo?.CPU?.Modelo || 'N/A'}</div>
+                        <div className="font-medium">{systemInfo.CPU.Modelo || 'N/A'}</div>
                       </div>
                       <div className="grid grid-cols-2 text-sm">
                         <div className="text-gray-500">Núcleos físicos</div>
-                        <div className="font-medium">{systemInfo?.CPU?.['Núcleos físicos'] || 'N/A'}</div>
+                        <div className="font-medium">{systemInfo.CPU['Núcleos físicos'] || 'N/A'}</div>
                       </div>
                       <div className="grid grid-cols-2 text-sm">
                         <div className="text-gray-500">Núcleos lógicos</div>
-                        <div className="font-medium">{systemInfo?.CPU?.['Núcleos lógicos'] || 'N/A'}</div>
+                        <div className="font-medium">{systemInfo.CPU['Núcleos lógicos'] || 'N/A'}</div>
                       </div>
                       <div className="grid grid-cols-2 text-sm">
                         <div className="text-gray-500">Frecuencia</div>
-                        <div className="font-medium">{systemInfo?.CPU?.['Frecuencia (MHz)'] ? `${systemInfo.CPU['Frecuencia (MHz)']} MHz` : 'N/A'}</div>
+                        <div className="font-medium">{systemInfo.CPU['Frecuencia (MHz)'] ? `${systemInfo.CPU['Frecuencia (MHz)']} MHz` : 'N/A'}</div>
                       </div>
                       <div>
                         <div className="text-gray-500 text-sm mb-1">Uso actual</div>
                         <div className="w-full bg-gray-200 rounded-full h-2.5">
                           <div 
                             className="bg-blue-600 h-2.5 rounded-full" 
-                            style={{ width: `${systemInfo?.CPU?.['Uso actual (%)'] || 0}%` }}
+                            style={{ width: `${systemInfo.CPU['Uso actual (%)'] || 0}%` }}
                           ></div>
                         </div>
-                        <div className="text-xs font-medium text-gray-500 mt-1 text-right">{systemInfo?.CPU?.['Uso actual (%)'] || 0}%</div>
+                        <div className="text-xs font-medium text-gray-500 mt-1 text-right">{systemInfo.CPU['Uso actual (%)'] || 0}%</div>
                       </div>
                     </div>
                   </div>
@@ -369,7 +360,7 @@ const AgentDetail = () => {
                 <div className="bg-white border rounded-lg overflow-hidden shadow-sm">
                   <div className="bg-green-50 px-4 py-3 border-b">
                     <div className="flex items-center">
-                      <Memory size={20} className="text-green-600 mr-2" />
+                      <HardDrive size={20} className="text-green-600 mr-2" />
                       <h3 className="font-medium">Memoria</h3>
                     </div>
                   </div>
@@ -377,21 +368,21 @@ const AgentDetail = () => {
                     <div className="space-y-3">
                       <div className="grid grid-cols-2 text-sm">
                         <div className="text-gray-500">RAM Total</div>
-                        <div className="font-medium">{systemInfo?.Memoria?.['Total RAM (GB)'] ? `${systemInfo.Memoria['Total RAM (GB)']} GB` : 'N/A'}</div>
+                        <div className="font-medium">{systemInfo.Memoria['Total RAM (GB)'] ? `${systemInfo.Memoria['Total RAM (GB)']} GB` : 'N/A'}</div>
                       </div>
                       <div className="grid grid-cols-2 text-sm">
                         <div className="text-gray-500">RAM Disponible</div>
-                        <div className="font-medium">{systemInfo?.Memoria?.['Disponible RAM (GB)'] ? `${systemInfo.Memoria['Disponible RAM (GB)']} GB` : 'N/A'}</div>
+                        <div className="font-medium">{systemInfo.Memoria['Disponible RAM (GB)'] ? `${systemInfo.Memoria['Disponible RAM (GB)']} GB` : 'N/A'}</div>
                       </div>
                       <div>
                         <div className="text-gray-500 text-sm mb-1">Uso de RAM</div>
                         <div className="w-full bg-gray-200 rounded-full h-2.5">
                           <div 
                             className="bg-green-600 h-2.5 rounded-full" 
-                            style={{ width: `${systemInfo?.Memoria?.['Uso de RAM (%)'] || 0}%` }}
+                            style={{ width: `${systemInfo.Memoria['Uso de RAM (%)'] || 0}%` }}
                           ></div>
                         </div>
-                        <div className="text-xs font-medium text-gray-500 mt-1 text-right">{systemInfo?.Memoria?.['Uso de RAM (%)'] || 0}%</div>
+                        <div className="text-xs font-medium text-gray-500 mt-1 text-right">{systemInfo.Memoria['Uso de RAM (%)'] || 0}%</div>
                       </div>
                     </div>
                   </div>
@@ -400,9 +391,9 @@ const AgentDetail = () => {
             )}
 
             {/* Storage Tab */}
-            {activeTab === 'storage' && (
+            {activeTab === 'storage' && systemInfo?.Discos && (
               <div className="space-y-6">
-                {systemInfo?.Discos?.map((disk, index) => (
+                {systemInfo.Discos.map((disk, index) => (
                   <div key={index} className="bg-white border rounded-lg overflow-hidden shadow-sm">
                     <div className="bg-purple-50 px-4 py-3 border-b">
                       <div className="flex items-center justify-between">
@@ -420,7 +411,7 @@ const AgentDetail = () => {
                         <div>
                           <div className="flex justify-between text-sm mb-1">
                             <span className="text-gray-500">Espacio usado</span>
-                            <span className="font-medium">{disk['Usado (GB']} GB de {disk['Total (GB)']} GB</span>
+                            <span className="font-medium">{disk['Usado (GB)']} GB de {disk['Total (GB)']} GB</span>
                           </div>
                           <div className="w-full bg-gray-200 rounded-full h-2.5">
                             <div 
@@ -446,9 +437,9 @@ const AgentDetail = () => {
             )}
 
             {/* Network Tab */}
-            {activeTab === 'network' && (
+            {activeTab === 'network' && systemInfo?.Red && (
               <div className="space-y-6">
-                {systemInfo?.Red && Object.entries(systemInfo.Red).map(([interfaceName, details], idx) => (
+                {Object.entries(systemInfo.Red).map(([interfaceName, details], idx) => (
                   <div key={idx} className="bg-white border rounded-lg overflow-hidden shadow-sm">
                     <div className="bg-blue-50 px-4 py-3 border-b">
                       <div className="flex items-center">
@@ -458,7 +449,7 @@ const AgentDetail = () => {
                     </div>
                     <div className="p-4">
                       <div className="space-y-4">
-                        {details.map((detail, index) => (
+                        {Array.isArray(details) && details.map((detail, index) => (
                           <div key={index} className="grid grid-cols-2 text-sm">
                             <div className="text-gray-500">{detail.Tipo}</div>
                             <div className="font-medium">{detail.Dirección || 'N/A'}</div>
