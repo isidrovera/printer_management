@@ -5,7 +5,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { useAuth } from './contexts/AuthContext';
 import Navbar from './components/Navbar';
 import { Loader2 } from 'lucide-react';
-import { Toaster } from "@/components/ui/toaster";
+import { Toaster } from "@/components/ui/toaster"
 
 // Páginas públicas
 import Home from './pages/Home';
@@ -28,19 +28,19 @@ import ClientDetails from './pages/Clients/ClientDetails';
 import AgentList from './pages/Agent/AgentList';
 import AgentDetails from './pages/Agent/AgentDetails';
 
-// Comenta las importaciones que causan problemas
-// import DriverList from './pages/Drivers/DriverList';
-// import DriverCreate from './pages/Drivers/DriverCreate';
-// import DriverEdit from './pages/Drivers/DriverEdit';
+// Páginas de drivers
+import DriverList from './pages/Drivers/DriverList';
+import DriverCreate from './pages/Drivers/DriverCreate';
+import DriverEdit from './pages/Drivers/DriverEdit';
 
 // Páginas de monitoreo de impresoras
 import PrinterMonitor from './pages/Printers/PrinterList';
 import PrinterDetails from './pages/Printers/PrinterForm';
 
 // Páginas de OIDs
-//import OIDList from './pages/OIDs/OIDList';
-//import OIDCreate from './pages/OIDs/OIDCreate';
-//import OIDEdit from './pages/OIDs/OIDEdit';
+import OIDList from './pages/OIDs/OIDList';
+import OIDCreate from './pages/OIDs/OIDCreate';
+import OIDEdit from './pages/OIDs/OIDEdit';
 
 // Páginas de túneles
 import TunnelList from './pages/Tunnels/TunnelList';
@@ -77,7 +77,7 @@ const AppRoutes = () => {
 
   return (
     <>
-      {/* Renderizar Navbar condicionalmente */}
+      {/* Renderizar Navbar condicionalmente solo si no estamos en dashboard */}
       {showNavbar && <Navbar />}
       
       <Routes>
@@ -137,24 +137,6 @@ const AppRoutes = () => {
           </PrivateRoute>
         } />
 
-        {/* Comenta las rutas que causan problemas
-        <Route path="/drivers" element={
-          <PrivateRoute>
-            <DriverList />
-          </PrivateRoute>
-        } />
-        <Route path="/drivers/create" element={
-          <PrivateRoute>
-            <DriverCreate />
-          </PrivateRoute>
-        } />
-        <Route path="/drivers/:id/edit" element={
-          <PrivateRoute>
-            <DriverEdit />
-          </PrivateRoute>
-        } />
-        */}
-
         {/* Rutas de impresoras */}
         <Route path="/printers" element={
           <PrivateRoute>
@@ -164,30 +146,6 @@ const AppRoutes = () => {
         <Route path="/printers/:id" element={
           <PrivateRoute>
             <PrinterDetails />
-          </PrivateRoute>
-        } />
-
-        {/* Rutas de OIDs */}
-        <Route path="/printer-oids" element={
-          <PrivateRoute>
-            <OIDList />
-          </PrivateRoute>
-        } />
-        <Route path="/printer-oids/create" element={
-          <PrivateRoute>
-            <OIDCreate />
-          </PrivateRoute>
-        } />
-        <Route path="/printer-oids/:id/edit" element={
-          <PrivateRoute>
-            <OIDEdit />
-          </PrivateRoute>
-        } />
-
-        {/* Rutas de túneles */}
-        <Route path="/tunnels" element={
-          <PrivateRoute>
-            <TunnelList />
           </PrivateRoute>
         } />
         
