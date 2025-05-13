@@ -24,30 +24,37 @@ axiosInstance.interceptors.request.use(
       url: config.url
     });
 
+    // MEJORA CRUCIAL: Asegurar que TODAS las solicitudes usen HTTPS
+    
     // 1. Asegurar que la baseURL siempre use HTTPS
-    if (config.baseURL && config.baseURL.startsWith('http://')) {
-      config.baseURL = config.baseURL.replace('http://', 'https://');
+    if (config.baseURL && !config.baseURL.startsWith('https://')) {
+      config.baseURL = config.baseURL.replace(/^http:\/\//i, 'https://');
       console.log('🔒 baseURL corregida a HTTPS:', config.baseURL);
     }
 
     // 2. Si la URL es absoluta, asegurar que use HTTPS
     if (config.url && config.url.startsWith('http://')) {
-      config.url = config.url.replace('http://', 'https://');
+      config.url = config.url.replace(/^http:\/\//i, 'https://');
       console.log('🔒 URL absoluta corregida a HTTPS:', config.url);
     }
     
-    // 3. Modificación crucial: Si estamos en una ruta específica como /monitor/printers,
-    // forzar el uso de una URL absoluta con HTTPS
-    if (config.url && config.url.includes('/monitor/printers')) {
-      // Solo modificar si no es ya una URL absoluta
-      if (!config.url.startsWith('http')) {
-        const originalUrl = config.url;
-        // Crear URL absoluta
-        config.url = `https://copierconnectremote.com/api/v1${config.url.startsWith('/') ? config.url : `/${config.url}`}`;
-        // Eliminar baseURL para evitar que se agregue dos veces
-        config.baseURL = '';
-        console.log(`🔄 Ruta crítica detectada. Cambiando ${originalUrl} a URL absoluta: ${config.url}`);
-      }
+    // 3. SOLUCIÓN PARA MIXED CONTENT: Forzar URLs absolutas para rutas problemáticas
+    // Lista de rutas problemáticas conocidas
+    const criticalPaths = ['/drivers', '/printer-oids', '/monitor/printers'];
+    
+    // Verificar si la URL contiene alguna de las rutas críticas
+    const isCriticalPath = config.url && criticalPaths.some(path => 
+      config.url?.includes(path) || config.url?.startsWith(path)
+    );
+    
+    // Si es una ruta crítica y no es ya una URL absoluta, convertirla a URL absoluta con HTTPS
+    if (isCriticalPath && config.url && !config.url.startsWith('http')) {
+      const originalUrl = config.url;
+      // Crear URL absoluta
+      config.url = `https://copierconnectremote.com/api/v1${config.url.startsWith('/') ? config.url : `/${config.url}`}`;
+      // Eliminar baseURL para evitar que se agregue dos veces
+      config.baseURL = '';
+      console.log(`🔄 Ruta crítica detectada. Cambiando ${originalUrl} a URL absoluta: ${config.url}`);
     }
 
     // Obtén el token de localStorage
@@ -98,6 +105,24 @@ axiosInstance.interceptors.request.use(
       finalUrl = `${config.baseURL}${config.url.startsWith('/') ? config.url : `/${config.url}`}`;
     } else {
       finalUrl = config.url || '';
+    }
+    
+    // VALIDACIÓN FINAL: asegurar que la URL final siempre comience con HTTPS
+    if (finalUrl.startsWith('http://')) {
+      console.warn('⚠️ Aún detectada URL final con HTTP, corrigiendo...');
+      // Substituir solo el principio de la URL
+      const correctedUrl = finalUrl.replace(/^http:\/\//i, 'https://');
+      
+      // Si la URL es relativa al baseURL, ajustar
+      if (config.url && !config.url.startsWith('http')) {
+        config.baseURL = correctedUrl.substring(0, correctedUrl.length - config.url.length);
+      } else {
+        // Si es absoluta, ajustar directamente la URL
+        config.url = correctedUrl;
+        config.baseURL = '';
+      }
+      
+      finalUrl = correctedUrl;
     }
     
     console.log('📤 Solicitud final:', {
