@@ -13,7 +13,9 @@ const axiosInstance = axios.create({
     'Accept': 'application/json',
     'Content-Type': 'application/json'
   },
-  withCredentials: false
+  withCredentials: false,
+  // Propiedad crítica: no permitir URLs absolutas (Novedad en Axios v1.x)
+  allowAbsoluteUrls: false
 });
 
 // Log de la instancia creada
@@ -23,65 +25,25 @@ console.log('✅ Instancia axios creada con configuración:', {
   withCredentials: axiosInstance.defaults.withCredentials
 });
 
-// Función para registrar la URL final (solo para logs)
-const getFullUrl = (config) => {
-  if (!config) return 'Sin configuración';
-  
-  const baseURL = config.baseURL || '';
-  const url = config.url || '';
-  
-  if (url.startsWith('http')) {
-    return url;
-  }
-  
-  const joinedUrl = baseURL + (url.startsWith('/') ? url : `/${url}`);
-  return joinedUrl;
-};
-
 // Función para verificar si una URL usa HTTP
 const isHttpUrl = (url) => {
   if (!url) return false;
   return url.toLowerCase().startsWith('http:');
 };
 
-// Función para imprimir un objeto sin ciclos circulares
-const safeStringify = (obj) => {
-  try {
-    return JSON.stringify(obj);
-  } catch (error) {
-    return `[No serializable: ${typeof obj}]`;
-  }
-};
-
 // Interceptor de solicitud
 axiosInstance.interceptors.request.use(
   (config) => {
     try {
-      // Registro inicial detallado
+      // Registro inicial
       console.log('📝 Configuración original de solicitud:', {
         method: config.method?.toUpperCase(),
         baseURL: config.baseURL,
-        url: config.url,
-        headers: config.headers ? {...config.headers} : 'No headers',
-        fullUrl: getFullUrl(config)
+        url: config.url
       });
-
-      // Verificar si alguna URL está usando HTTP
-      if (isHttpUrl(config.url)) {
-        console.warn('⚠️ ALERTA: config.url está usando HTTP:', config.url);
-      }
-
-      if (isHttpUrl(config.baseURL)) {
-        console.warn('⚠️ ALERTA: config.baseURL está usando HTTP:', config.baseURL);
-      }
-
-      if (isHttpUrl(getFullUrl(config))) {
-        console.warn('⚠️ ALERTA: URL completa está usando HTTP:', getFullUrl(config));
-      }
 
       // Token desde localStorage
       const tokenStr = localStorage.getItem('token');
-      console.log('🔐 Token en localStorage:', tokenStr ? 'Presente' : 'No presente');
 
       if (tokenStr) {
         try {
@@ -103,7 +65,6 @@ axiosInstance.interceptors.request.use(
           } catch (jsonError) {
             authToken = tokenStr;
             console.log('⚠️ Token no es JSON válido, usando directamente:', authToken.substring(0, 15) + '...');
-            console.log('Error al parsear JSON:', jsonError);
           }
 
           if (authToken) {
@@ -119,57 +80,66 @@ axiosInstance.interceptors.request.use(
         console.warn('⚠️ No hay token almacenado en localStorage');
       }
 
-      // PASO IMPORTANTE: Forzar HTTPS para todas las URLs
-      // 1. Verificar y corregir baseURL
+      // CONFIGURACIÓN CRÍTICA: Forzar HTTPS para todas las URLs
+      // Para URLs que comienzan con http:
+      if (config.url && config.url.startsWith('http:')) {
+        console.warn('🔄 Cambiando URL de HTTP a HTTPS:', config.url);
+        config.url = config.url.replace('http:', 'https:');
+      }
+      
+      // Para baseURL que comienza con http:
       if (config.baseURL && config.baseURL.startsWith('http:')) {
         console.warn('🔄 Cambiando baseURL de HTTP a HTTPS:', config.baseURL);
-        const oldBaseUrl = config.baseURL;
         config.baseURL = config.baseURL.replace('http:', 'https:');
-        console.log('✅ baseURL actualizado:', oldBaseUrl, '->', config.baseURL);
       }
-
-      // 2. Verificar y corregir url
-      if (config.url && config.url.startsWith('http:')) {
-        console.warn('🔄 Cambiando url de HTTP a HTTPS:', config.url);
-        const oldUrl = config.url;
-        config.url = config.url.replace('http:', 'https:');
-        console.log('✅ url actualizado:', oldUrl, '->', config.url);
-      }
-
-      // Verificación final y corrección de URL completa
-      const finalUrl = getFullUrl(config);
-      console.log('🔍 URL final después de modificaciones:', finalUrl);
-
-      if (isHttpUrl(finalUrl)) {
-        console.warn('⚠️ La URL final SIGUE usando HTTP. Último intento de corrección.');
-        // Si aún hay HTTP en la URL final, intentar reconstruir la URL completa
-        if (finalUrl.startsWith('http:')) {
-          const httpsUrl = finalUrl.replace('http:', 'https:');
-          console.log('🔄 Reconstruyendo URL completa:', finalUrl, '->', httpsUrl);
+      
+      // SOLUCIÓN ESPECÍFICA PARA DRIVERS
+      if (config.url && (
+          config.url === '/drivers' || 
+          config.url.includes('/drivers/') || 
+          (config.url.startsWith('http') && config.url.includes('/drivers'))
+        )) {
+        console.log('🔧 Aplicando tratamiento especial para ruta /drivers');
+        
+        // Si es una URL relativa, convertirla en absoluta
+        if (!config.url.startsWith('http')) {
+          const baseURL = config.baseURL || API_BASE_URL;
+          const absoluteUrl = baseURL + (config.url.startsWith('/') ? config.url : `/${config.url}`);
           
-          // Si es una URL absoluta, reemplazar completamente
-          if (config.url && config.url.startsWith('http')) {
-            config.url = httpsUrl;
-            config.baseURL = ''; // Evitar problemas con baseURL
-          } else if (config.baseURL) {
-            // Si es relativa, actualizar baseURL
-            config.baseURL = config.baseURL.replace('http:', 'https:');
-          }
+          // Asegurarse que usa HTTPS
+          const finalUrl = absoluteUrl.replace('http:', 'https:');
+          
+          console.log('🔄 Convirtiendo URL relativa a absoluta para /drivers:', {
+            original: config.url,
+            absoluta: finalUrl
+          });
+          
+          // Establecer la URL absoluta directamente
+          config.url = finalUrl;
+          config.baseURL = '';
+        } 
+        // Si ya es absoluta, asegurarse que usa HTTPS
+        else if (config.url.startsWith('http:')) {
+          config.url = config.url.replace('http:', 'https:');
+          console.log('🔄 Forzando HTTPS para URL absoluta de /drivers:', config.url);
         }
       }
 
       // Verificación final
+      const finalUrl = config.baseURL 
+          ? `${config.baseURL}${config.url?.startsWith('/') ? config.url : `/${config.url}`}` 
+          : config.url;
+          
       console.log('📤 Solicitud final:', {
         method: config.method?.toUpperCase(),
         url: config.url,
         baseURL: config.baseURL,
-        finalUrl: getFullUrl(config),
-        headers: config.headers ? {...config.headers} : 'No headers'
+        finalUrl: finalUrl
       });
 
       return config;
     } catch (error) {
-      console.error('❌ Error GRAVE en interceptor de solicitud:', error);
+      console.error('❌ Error en interceptor de solicitud:', error);
       return config; // Devolver config original para no bloquear la solicitud
     }
   },
@@ -182,94 +152,72 @@ axiosInstance.interceptors.request.use(
 // Interceptor de respuesta
 axiosInstance.interceptors.response.use(
   (response) => {
-    try {
-      console.log('📥 Respuesta exitosa:', {
-        status: response.status,
-        statusText: response.statusText,
-        url: response.config?.url,
-        baseURL: response.config?.baseURL,
-        finalUrl: getFullUrl(response.config),
-        data: response.data ? 'Datos recibidos' : 'Sin datos',
-        contentType: response.headers?.['content-type']
-      });
+    console.log('📥 Respuesta exitosa:', {
+      status: response.status,
+      statusText: response.statusText,
+      url: response.config?.url
+    });
+    
+    // Verificar si hay redirección (para debug)
+    if (response.request?.responseURL) {
+      console.log('🔄 URL de respuesta:', response.request.responseURL);
       
-      // Si hay redirección, verificar
-      if (response.request?.responseURL) {
-        console.log('🔄 URL de respuesta:', response.request.responseURL);
-        
-        if (isHttpUrl(response.request.responseURL)) {
-          console.warn('⚠️ ALERTA: La respuesta viene de una URL HTTP:', 
-            response.request.responseURL);
-        }
+      if (isHttpUrl(response.request.responseURL)) {
+        console.warn('⚠️ ALERTA: La respuesta viene de una URL HTTP:', response.request.responseURL);
       }
-      
-      return response;
-    } catch (error) {
-      console.error('❌ Error al procesar respuesta exitosa:', error);
-      return response;
     }
+    
+    return response;
   },
   (error) => {
-    try {
-      const errorInfo = {
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        url: error.config?.url,
-        baseURL: error.config?.baseURL,
-        finalUrl: getFullUrl(error.config),
-        method: error.config?.method,
-        hasAuthHeader: !!error.config?.headers?.Authorization,
-        message: error.message
-      };
+    const errorInfo = {
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      url: error.config?.url,
+      method: error.config?.method,
+      hasAuthHeader: !!error.config?.headers?.Authorization,
+      message: error.message
+    };
 
-      console.error('❌ Error en respuesta:', errorInfo);
+    console.error('❌ Error en respuesta:', errorInfo);
+    
+    // Error de red específico (para debug)
+    if (error.code === 'ERR_NETWORK') {
+      console.error('🌐 Error de red detectado:', {
+        message: error.message,
+        url: error.config?.url
+      });
       
-      // Información detallada del error
-      if (error.request) {
-        console.error('📡 Información de la solicitud fallida:', {
-          responseURL: error.request.responseURL,
-          statusText: error.request.statusText,
-          responseType: error.request.responseType,
-          withCredentials: error.request.withCredentials,
-          timeout: error.request.timeout
-        });
-        
-        // Verificar si hay un problema de protocolo
-        if (error.request.responseURL && isHttpUrl(error.request.responseURL)) {
-          console.error('⚠️ ALERTA CRÍTICA: Respuesta fallida desde URL HTTP:', 
-            error.request.responseURL);
-        }
+      if (error.message && error.message.includes('Mixed Content')) {
+        console.error('🔒 Error de contenido mixto (HTTP vs HTTPS)');
       }
-      
-      // Error de red específico
-      if (error.code === 'ERR_NETWORK') {
-        console.error('🌐 Error de red detectado:', {
-          message: error.message,
-          url: error.config?.url,
-          protocol: error.config?.url?.split('://')[0]
-        });
-        
-        // Verificar si es un problema de Mixed Content
-        if (error.message.includes('Mixed Content')) {
-          console.error('🔒 Error de contenido mixto (HTTP vs HTTPS)');
-        }
-      }
-
-      if (error.response?.status === 401) {
-        console.warn('🔒 Error de autenticación (401), redirigiendo a login...');
-        localStorage.removeItem('token');
-        window.location.href = '/login';
-      }
-
-      return Promise.reject(error);
-    } catch (unexpectedError) {
-      console.error('❌ Error inesperado al procesar el error:', unexpectedError);
-      return Promise.reject(error);
     }
+
+    if (error.response?.status === 401) {
+      console.warn('🔒 Error de autenticación (401), redirigiendo a login...');
+      localStorage.removeItem('token');
+      window.location.href = '/login';
+    }
+
+    return Promise.reject(error);
   }
 );
 
-// Log final de configuración completa
-console.log('✅ Configuración de axios completada.');
+// SOLUCIÓN ADICIONAL: Interceptar XMLHttpRequest a nivel global
+// Esta es una medida de última instancia para asegurar que ninguna solicitud use HTTP
+const originalOpen = XMLHttpRequest.prototype.open;
+XMLHttpRequest.prototype.open = function() {
+  const args = Array.from(arguments);
+  const url = args[1];
+  
+  if (typeof url === 'string' && url.startsWith('http:')) {
+    console.warn('⚠️ INTERCEPTANDO XMLHttpRequest con HTTP y cambiando a HTTPS:', url);
+    args[1] = url.replace('http:', 'https:');
+  }
+  
+  return originalOpen.apply(this, args);
+};
+
+console.log('✅ Configuración de axios completada con protecciones HTTPS.');
 
 export default axiosInstance;
