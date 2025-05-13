@@ -1,17 +1,23 @@
-fastapi
+# Core framework
+fastapi>=0.88.0
+starlette>=0.13.0
+
+# ASGI server
 uvicorn[standard]
+
+# Seguridad y autenticación
 authlib
 cryptography
 python-jose[cryptography]
 passlib==1.7.4
 bcrypt==4.0.1
 PyJWT==2.8.0
-uvicorn
-websockets
-wsproto
+
+# HTTP clients
 requests
 httpx
-websockets
-wsproto
-uvicorn[standard]
-requests
+
+# WebSocket soporte (incluido en uvicorn[standard])
+# No es necesario duplicar
+# websockets
+# wsproto
