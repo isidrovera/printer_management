@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axiosInstance from '../../lib/axios';
 import { 
   AlertTriangle, 
   Download, 
@@ -11,14 +10,8 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-
-interface Driver {
-  id: number;
-  manufacturer: string;
-  model: string;
-  driver_filename: string;
-  description: string;
-}
+// Importar el servicio en lugar de axiosInstance
+import DriverService, { Driver } from '../../services/DriverService';
 
 const DriverList = () => {
   const [drivers, setDrivers] = useState<Driver[]>([]);
@@ -31,8 +24,9 @@ const DriverList = () => {
     const fetchDrivers = async () => {
       try {
         setLoading(true);
-        const response = await axiosInstance.get('/drivers');
-        setDrivers(response.data);
+        // Usar el servicio en lugar de axiosInstance
+        const data = await DriverService.getAll();
+        setDrivers(data);
         setError(null);
       } catch (err: any) {
         console.error('Error fetching drivers:', err);
@@ -48,7 +42,8 @@ const DriverList = () => {
   const handleDelete = async (id: number) => {
     if (window.confirm('¿Estás seguro de que deseas eliminar este driver?')) {
       try {
-        await axiosInstance.delete(`/drivers/${id}`);
+        // Usar el servicio en lugar de axiosInstance
+        await DriverService.delete(id);
         setDrivers(drivers.filter(driver => driver.id !== id));
       } catch (err: any) {
         console.error('Error deleting driver:', err);
@@ -60,7 +55,7 @@ const DriverList = () => {
   const filteredDrivers = drivers.filter(driver =>
     driver.manufacturer.toLowerCase().includes(searchTerm.toLowerCase()) ||
     driver.model.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    driver.description.toLowerCase().includes(searchTerm.toLowerCase())
+    driver.description?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   if (loading) {
@@ -136,7 +131,8 @@ const DriverList = () => {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => window.open(`/api/v1/drivers/agents/drivers/download/${driver.id}`, '_blank')}
+                        // Usar el método getDownloadUrl del servicio
+                        onClick={() => window.open(DriverService.getDownloadUrl(driver.id), '_blank')}
                         className="flex items-center"
                       >
                         <Download className="h-4 w-4 mr-1" />
