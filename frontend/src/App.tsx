@@ -137,6 +137,23 @@ const AppRoutes = () => {
           </PrivateRoute>
         } />
 
+        {/* Rutas de drivers */}
+        <Route path="/drivers" element={
+          <PrivateRoute>
+            <DriverList />
+          </PrivateRoute>
+        } />
+        <Route path="/drivers/create" element={
+          <PrivateRoute>
+            <DriverCreate />
+          </PrivateRoute>
+        } />
+        <Route path="/drivers/:id/edit" element={
+          <PrivateRoute>
+            <DriverEdit />
+          </PrivateRoute>
+        } />
+
         {/* Rutas de impresoras */}
         <Route path="/printers" element={
           <PrivateRoute>
@@ -146,6 +163,30 @@ const AppRoutes = () => {
         <Route path="/printers/:id" element={
           <PrivateRoute>
             <PrinterDetails />
+          </PrivateRoute>
+        } />
+
+        {/* Rutas de OIDs */}
+        <Route path="/printer-oids" element={
+          <PrivateRoute>
+            <OIDList />
+          </PrivateRoute>
+        } />
+        <Route path="/printer-oids/create" element={
+          <PrivateRoute>
+            <OIDCreate />
+          </PrivateRoute>
+        } />
+        <Route path="/printer-oids/:id/edit" element={
+          <PrivateRoute>
+            <OIDEdit />
+          </PrivateRoute>
+        } />
+
+        {/* Rutas de túneles */}
+        <Route path="/tunnels" element={
+          <PrivateRoute>
+            <TunnelList />
           </PrivateRoute>
         } />
         
