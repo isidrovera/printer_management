@@ -1,4 +1,4 @@
-// src/components/tunnels/TunnelList.tsx
+// src/pages/tunnels/TunnelList.tsx
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { TunnelService, Tunnel } from '../../services/TunnelService';

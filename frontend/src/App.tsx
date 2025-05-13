@@ -45,6 +45,7 @@ import OIDEdit from './pages/OIDs/OIDEdit';
 // Páginas de túneles
 import TunnelList from './pages/Tunnels/TunnelList';
 
+
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, user, isLoading } = useAuth();
   const location = useLocation();
