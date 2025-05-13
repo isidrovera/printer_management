@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import axiosInstance from '../lib/axios';
-
 import { 
   Printer, 
   Users, 
@@ -25,6 +24,10 @@ import {
 } from 'lucide-react';
 
 const Dashboard = () => {
+  // Hooks de navegación y autenticación
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
+  
   // Estado para datos del dashboard
   const [stats, setStats] = useState({
     printers: { total: 0, online: 0, offline: 0, error: 0 },
@@ -45,28 +48,45 @@ const Dashboard = () => {
       if (showLoading) setLoading(true);
       setRefreshing(true);
 
-      // Simulamos datos para la demo
-      // En producción, esto sería reemplazado por la llamada a la API
-      // const response = await axiosInstance.get('/dashboard/stats');
+      // Llamada real a la API
+      const response = await axiosInstance.get('/dashboard/stats');
       
-      // Datos simulados para la demo
-      const demoData = {
-        printers: { total: 1720, online: 1423, offline: 247, error: 50 },
-        clients: { total: 1350, active: 987 },
-        agents: { total: 324, online: 298, offline: 26 },
-        tunnels: { total: 234, active: 198 }
-      };
-      
-      setTimeout(() => {
-        setStats(demoData);
+      if (response.data) {
+        const safeStats = {
+          printers: {
+            total: response.data?.printers?.total ?? 0,
+            online: response.data?.printers?.online ?? 0,
+            offline: response.data?.printers?.offline ?? 0,
+            error: response.data?.printers?.error ?? 0
+          },
+          clients: {
+            total: response.data?.clients?.total ?? 0,
+            active: response.data?.clients?.active ?? 0
+          },
+          agents: {
+            total: response.data?.agents?.total ?? 0,
+            online: response.data?.agents?.online ?? 0,
+            offline: response.data?.agents?.offline ?? 0
+          },
+          tunnels: {
+            total: response.data?.tunnels?.total ?? 0,
+            active: response.data?.tunnels?.active ?? 0
+          }
+        };
+        setStats(safeStats);
         setError(null);
-        setLoading(false);
-        setRefreshing(false);
-      }, 800);
-      
+      }
     } catch (err) {
       console.error('Error fetching dashboard stats:', err);
+      
+      if (err.response?.status === 401 || err.response?.status === 303) {
+        await logout();
+        navigate('/login');
+        return;
+      }
+      
       setError('Error al cargar las estadísticas del dashboard');
+    } finally {
       setLoading(false);
       setRefreshing(false);
     }
@@ -75,7 +95,8 @@ const Dashboard = () => {
   // Efecto para cargar datos iniciales
   useEffect(() => {
     let mounted = true;
-    
+    const controller = new AbortController();
+
     if (mounted) {
       fetchStats();
     }
@@ -89,13 +110,20 @@ const Dashboard = () => {
 
     return () => {
       mounted = false;
+      controller.abort();
       clearInterval(interval);
     };
-  }, []);
+  }, [logout, navigate]);
 
   // Manejador para actualizar manualmente
   const handleRefresh = () => {
     fetchStats(false);
+  };
+
+  // Manejador de cierre de sesión
+  const handleLogout = async () => {
+    await logout();
+    navigate('/login');
   };
 
   // Cálculo del porcentaje de dispositivos en línea
@@ -106,12 +134,6 @@ const Dashboard = () => {
   };
 
   const onlinePercentage = calculateOnlinePercentage();
-
-  // Navegación simulada
-  const handleNavigate = (destination) => {
-    console.log(`Navegando a: ${destination}`);
-    setActivePage(destination);
-  };
 
   // Pantalla de carga
   if (loading) {
@@ -126,11 +148,11 @@ const Dashboard = () => {
   }
 
   // Componente para los elementos de la sidebar
-  const SidebarItem = ({ icon: Icon, label, active, onClick }) => {
+  const SidebarItem = ({ icon: Icon, label, path, active }) => {
     return (
       <div 
         className={`flex items-center space-x-3 p-3 rounded-lg cursor-pointer transition-all ${active ? 'bg-blue-50 text-blue-600' : 'hover:bg-gray-50 text-gray-700'}`}
-        onClick={onClick}
+        onClick={() => navigate(path)}
       >
         <Icon className={`h-5 w-5 ${active ? 'text-blue-600' : 'text-gray-500'}`} />
         <span className={`${active ? 'font-medium' : ''}`}>{label}</span>
@@ -152,11 +174,11 @@ const Dashboard = () => {
         </div>
         
         <div className="bg-gray-100 p-2 rounded-lg flex items-center space-x-3 mb-6">
-          <div className="bg-yellow-500 h-8 w-8 rounded-lg flex items-center justify-center text-white font-medium">
-            JF
+          <div className="bg-blue-500 h-8 w-8 rounded-lg flex items-center justify-center text-white font-medium">
+            {user?.username ? user.username.substring(0, 2).toUpperCase() : 'JF'}
           </div>
           <div>
-            <p className="text-sm font-medium">Jayden Frankie</p>
+            <p className="text-sm font-medium">{user?.username || 'Jayden Frankie'}</p>
           </div>
         </div>
         
@@ -164,53 +186,55 @@ const Dashboard = () => {
           <SidebarItem 
             icon={LayoutDashboard} 
             label="Dashboard" 
+            path="/dashboard" 
             active={activePage === 'dashboard'} 
-            onClick={() => handleNavigate('dashboard')}
           />
           <SidebarItem 
             icon={Printer} 
             label="Monitoreo" 
-            active={activePage === 'monitoreo'} 
-            onClick={() => handleNavigate('monitoreo')}
+            path="/printers" 
+            active={window.location.pathname === '/printers'} 
           />
           <SidebarItem 
             icon={Users} 
             label="Clientes" 
-            active={activePage === 'clientes'} 
-            onClick={() => handleNavigate('clientes')}
+            path="/clients" 
+            active={window.location.pathname === '/clients'} 
           />
           <SidebarItem 
             icon={Network} 
             label="Agentes" 
-            active={activePage === 'agentes'} 
-            onClick={() => handleNavigate('agentes')}
+            path="/agents" 
+            active={window.location.pathname === '/agents'} 
           />
           <SidebarItem 
             icon={HardDrive} 
             label="Drivers" 
-            active={activePage === 'drivers'} 
-            onClick={() => handleNavigate('drivers')}
+            path="/drivers" 
+            active={window.location.pathname === '/drivers'} 
           />
           <SidebarItem 
             icon={Settings} 
             label="OIDs" 
-            active={activePage === 'oids'} 
-            onClick={() => handleNavigate('oids')}
+            path="/printer-oids" 
+            active={window.location.pathname === '/printer-oids'} 
           />
           <SidebarItem 
             icon={BookOpen} 
             label="Reportes" 
-            active={activePage === 'reportes'} 
-            onClick={() => handleNavigate('reportes')}
+            path="/reports" 
+            active={window.location.pathname === '/reports'} 
           />
         </nav>
         
         <div className="mt-auto pt-4 border-t border-gray-200">
-          <SidebarItem 
-            icon={LogOut} 
-            label="Cerrar sesión" 
-            onClick={() => console.log('Cerrando sesión...')}
-          />
+          <div 
+            className="flex items-center space-x-3 p-3 rounded-lg cursor-pointer transition-all hover:bg-gray-50 text-gray-700"
+            onClick={handleLogout}
+          >
+            <LogOut className="h-5 w-5 text-gray-500" />
+            <span>Cerrar sesión</span>
+          </div>
         </div>
       </div>
       
@@ -250,7 +274,7 @@ const Dashboard = () => {
               </button>
               
               <div className="bg-orange-100 h-8 w-8 rounded-lg flex items-center justify-center text-orange-800 font-medium">
-                JF
+                {user?.username ? user.username.substring(0, 2).toUpperCase() : 'JF'}
               </div>
             </div>
           </div>
@@ -260,43 +284,43 @@ const Dashboard = () => {
             {/* Tarjeta 1 */}
             <div 
               className="bg-blue-50 rounded-xl p-6 flex flex-col items-center cursor-pointer transition-all hover:shadow-md"
-              onClick={() => handleNavigate('stats_weekly')}
+              onClick={() => navigate('/stats_weekly')}
             >
               <div className="p-3 rounded-full bg-white bg-opacity-30 mb-4">
                 <BarChart3 className="h-6 w-6 text-blue-600" />
               </div>
-              <h2 className="text-2xl font-bold text-blue-600">714k</h2>
+              <h2 className="text-2xl font-bold text-blue-600">{stats.printers?.total > 0 ? "714k" : "0"}</h2>
               <p className="text-blue-600 text-sm opacity-90">Impresiones Semanales</p>
             </div>
             
             {/* Tarjeta 2 */}
             <div 
               className="bg-green-50 rounded-xl p-6 flex flex-col items-center cursor-pointer transition-all hover:shadow-md"
-              onClick={() => handleNavigate('new_users')}
+              onClick={() => navigate('/clients')}
             >
               <div className="p-3 rounded-full bg-white bg-opacity-30 mb-4">
                 <Users className="h-6 w-6 text-green-600" />
               </div>
-              <h2 className="text-2xl font-bold text-green-600">1.35m</h2>
+              <h2 className="text-2xl font-bold text-green-600">{stats.clients?.total > 0 ? "1.35m" : "0"}</h2>
               <p className="text-green-600 text-sm opacity-90">Usuarios Nuevos</p>
             </div>
             
             {/* Tarjeta 3 */}
             <div 
               className="bg-yellow-50 rounded-xl p-6 flex flex-col items-center cursor-pointer transition-all hover:shadow-md"
-              onClick={() => handleNavigate('total_printers')}
+              onClick={() => navigate('/printers')}
             >
               <div className="p-3 rounded-full bg-white bg-opacity-30 mb-4">
                 <Printer className="h-6 w-6 text-yellow-600" />
               </div>
-              <h2 className="text-2xl font-bold text-yellow-600">1.72m</h2>
+              <h2 className="text-2xl font-bold text-yellow-600">{stats.printers?.total > 0 ? "1.72m" : "0"}</h2>
               <p className="text-yellow-600 text-sm opacity-90">Total Impresoras</p>
             </div>
             
             {/* Tarjeta 4 */}
             <div 
               className="bg-red-50 rounded-xl p-6 flex flex-col items-center cursor-pointer transition-all hover:shadow-md"
-              onClick={() => handleNavigate('bug_reports')}
+              onClick={() => navigate('/reports')}
             >
               <div className="p-3 rounded-full bg-white bg-opacity-30 mb-4">
                 <AlertTriangle className="h-6 w-6 text-red-600" />
@@ -358,7 +382,7 @@ const Dashboard = () => {
                 </div>
                 <button 
                   className="text-blue-600 text-sm font-medium flex items-center"
-                  onClick={() => handleNavigate('printer_activity')}
+                  onClick={() => navigate('/printer_activity')}
                 >
                   Ver detalles
                   <ArrowUpRight className="h-4 w-4 ml-1" />
@@ -433,7 +457,7 @@ const Dashboard = () => {
                 </div>
                 <button 
                   className="text-blue-600 text-sm font-medium flex items-center"
-                  onClick={() => handleNavigate('client_distribution')}
+                  onClick={() => navigate('/client_distribution')}
                 >
                   Ver detalles
                   <ArrowUpRight className="h-4 w-4 ml-1" />
