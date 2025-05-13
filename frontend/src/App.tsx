@@ -28,10 +28,10 @@ import ClientDetails from './pages/Clients/ClientDetails';
 import AgentList from './pages/Agent/AgentList';
 import AgentDetails from './pages/Agent/AgentDetails';
 
-// Páginas de drivers
-import DriverList from './pages/Drivers/DriverList';
-import DriverCreate from './pages/Drivers/DriverCreate';
-import DriverEdit from './pages/Drivers/DriverEdit';
+// Comenta las importaciones que causan problemas
+// import DriverList from './pages/Drivers/DriverList';
+// import DriverCreate from './pages/Drivers/DriverCreate';
+// import DriverEdit from './pages/Drivers/DriverEdit';
 
 // Páginas de monitoreo de impresoras
 import PrinterMonitor from './pages/Printers/PrinterList';
@@ -137,7 +137,7 @@ const AppRoutes = () => {
           </PrivateRoute>
         } />
 
-        {/* Rutas de drivers */}
+        {/* Comenta las rutas que causan problemas
         <Route path="/drivers" element={
           <PrivateRoute>
             <DriverList />
@@ -153,6 +153,7 @@ const AppRoutes = () => {
             <DriverEdit />
           </PrivateRoute>
         } />
+        */}
 
         {/* Rutas de impresoras */}
         <Route path="/printers" element={
