@@ -38,9 +38,9 @@ import PrinterMonitor from './pages/Printers/PrinterList';
 import PrinterDetails from './pages/Printers/PrinterForm';
 
 // Páginas de OIDs
-import OIDList from './pages/OIDs/OIDList';
-import OIDCreate from './pages/OIDs/OIDCreate';
-import OIDEdit from './pages/OIDs/OIDEdit';
+//import OIDList from './pages/OIDs/OIDList';
+//import OIDCreate from './pages/OIDs/OIDCreate';
+//import OIDEdit from './pages/OIDs/OIDEdit';
 
 // Páginas de túneles
 import TunnelList from './pages/Tunnels/TunnelList';
