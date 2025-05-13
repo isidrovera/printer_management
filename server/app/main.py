@@ -7,9 +7,9 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
-# ProxyHeadersMiddleware eliminado por incompatibilidad con starlette>=0.40.0
+from starlette.requests import Request
+from starlette.responses import Response
 
-# Cargar configuración y módulos internos
 os.environ["STARLETTE_ENV_FILE"] = ""
 
 from app.core.config import settings
@@ -20,65 +20,63 @@ from app.api.v1.api import api_router
 from app.db.session import engine, SessionLocal
 from app.db.base import Base
 
-# Configuración de logging
+# Logging setup
 logging.basicConfig(
     level=logging.DEBUG,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
 
-# Crear carpeta de almacenamiento si no existe
+# Middleware para redirigir http -> https
+class ForceHttpsMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        forwarded_proto = request.headers.get('x-forwarded-proto')
+        if forwarded_proto == 'http':
+            url = request.url.replace(scheme="https")
+            return Response(status_code=307, headers={"Location": str(url)})
+        return await call_next(request)
+
+# Preparar carpeta de almacenamiento
 os.makedirs(settings.DRIVERS_STORAGE_PATH, exist_ok=True)
 
-# Contexto de vida útil de la aplicación
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    logger.info("🔄 [LIFESPAN] Iniciando aplicación...")
+    logger.info("🔄 Iniciando aplicación...")
     db = SessionLocal()
     try:
-        logger.info("🔍 [LIFESPAN] Verificando estructura DB...")
         Base.metadata.create_all(bind=engine)
-
-        logger.info("🚀 [LIFESPAN] Ejecutando setup inicial...")
         await InitialSetupService.run_initial_setup(db)
-
-        logger.info("✅ [LIFESPAN] Aplicación iniciada con éxito")
+        logger.info("✅ Setup inicial completo")
     except Exception as e:
-        logger.error(f"❌ [LIFESPAN] Error en arranque: {e}")
+        logger.error(f"❌ Error al iniciar: {e}")
         raise
     finally:
         db.close()
-
     yield
+    logger.info("🛑 Aplicación finalizada")
 
-    logger.info("🛑 [LIFESPAN] Cerrando aplicación...")
-
-# Inicializar la app FastAPI
 app = FastAPI(
     title=settings.PROJECT_NAME,
     lifespan=lifespan
 )
 
+# Forzar HTTPS
+app.add_middleware(ForceHttpsMiddleware)
+
 # CORS
-logger.info("🔧 [CONFIG] Configurando middleware CORS")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # ⚠️ Cambiar a dominios específicos en producción
+    allow_origins=["*"],  # En producción, restringe esto
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"]
 )
 
-# Middleware de autenticación personalizado
-logger.info("🔐 [CONFIG] Agregando middleware de autenticación")
+# Middlewares personalizados
 app.add_middleware(BaseHTTPMiddleware, dispatch=auth_middleware)
-
-# Middleware para primer login
-logger.info("🔄 [CONFIG] Agregando middleware primer login")
 app.add_middleware(BaseHTTPMiddleware, dispatch=first_login_middleware)
 
-# Rutas de la API
-logger.info("📡 [CONFIG] Incluyendo rutas API")
+# Rutas API
 app.include_router(api_router, prefix=settings.API_V1_STR)
 
-logger.info("🚀 [CONFIG] Aplicación completamente inicializada")
+logger.info("🚀 Aplicación lista")
